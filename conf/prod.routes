@@ -1,5 +1,5 @@
 # Add all the application routes to the app.routes file
-->         /view-vat-returns-frontend              app.Routes
+->         /view-your-vat-returns     app.Routes
 ->         /                          health.Routes
 ->     	   /template                  template.Routes
 
