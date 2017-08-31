@@ -23,14 +23,13 @@
 
 @import uk.gov.hmrc.play.views.html.layouts
 
-
-@serviceInfoContent = {}
-
 @sidebar = {
     @if(sidebarLinks.isDefined) {
         @layouts.sidebar(sidebarLinks.get, Some("sidebar"))
     }
 }
+
+@serviceInfoContent = {}
 
 
 @govuk_wrapper(appConfig = uk.gov.hmrc.viewvatreturnsfrontend.FrontendAppConfig,
