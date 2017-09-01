@@ -22,13 +22,12 @@ import uk.gov.hmrc.play.frontend.controller.FrontendController
 import play.api.mvc._
 
 import scala.concurrent.Future
-import play.api.Play.current
-import play.api.i18n.Messages.Implicits._
 import views.html.helloworld.hello_world
 import config.AppConfig
+import play.api.i18n.{I18nSupport, MessagesApi}
 
-
-class HelloWorld @Inject()(appConfig: AppConfig) extends FrontendController {
+@Singleton
+class HelloWorld @Inject()(val appConfig: AppConfig, val messagesApi: MessagesApi) extends FrontendController with I18nSupport{
   val helloWorld = Action.async { implicit request =>
 		Future.successful(Ok(hello_world(appConfig)))
   }

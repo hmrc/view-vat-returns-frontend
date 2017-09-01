@@ -18,17 +18,21 @@ package config
 
 import javax.inject.{Inject, Singleton}
 
-import play.api.Play.{configuration, current}
+import play.api.{Application, Configuration}
+//import play.api.Play.{configuration, current}
 import uk.gov.hmrc.play.config.ServicesConfig
 
-trait AppConfig extends ServicesConfig{
+trait AppConfig extends ServicesConfig {
   val analyticsToken: String
   val analyticsHost: String
   val reportAProblemPartialUrl: String
   val reportAProblemNonJSUrl: String
 }
+
 @Singleton
-class ApplicationConfig @Inject()() extends AppConfig {
+class FrontendAppConfig @Inject()(val app: Application) extends AppConfig {
+
+  protected val configuration: Configuration = app.configuration
 
   private def loadConfig(key: String) = configuration.getString(key).getOrElse(throw new Exception(s"Missing configuration key: $key"))
 
