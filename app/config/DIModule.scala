@@ -14,19 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.viewvatreturnsfrontend.controllers
+package config
 
-import uk.gov.hmrc.play.frontend.controller.FrontendController
-import play.api.mvc._
-import scala.concurrent.Future
-import play.api.Play.current
-import play.api.i18n.Messages.Implicits._
+import com.google.inject.AbstractModule
 
-
-object HelloWorld extends HelloWorld
-
-trait HelloWorld extends FrontendController {
-  val helloWorld = Action.async { implicit request =>
-		Future.successful(Ok(uk.gov.hmrc.viewvatreturnsfrontend.views.html.helloworld.hello_world()))
-  }
+class DIModule extends AbstractModule {
+ def configure(): Unit = {
+   bind(classOf[AppConfig]) to classOf[ApplicationConfig]
+ }
 }

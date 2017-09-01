@@ -14,19 +14,21 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.viewvatreturnsfrontend
+package config
+
+import javax.inject.{Inject, Singleton}
 
 import play.api.Play.{configuration, current}
 import uk.gov.hmrc.play.config.ServicesConfig
 
-trait AppConfig {
+trait AppConfig extends ServicesConfig{
   val analyticsToken: String
   val analyticsHost: String
   val reportAProblemPartialUrl: String
   val reportAProblemNonJSUrl: String
 }
-
-object FrontendAppConfig extends AppConfig with ServicesConfig {
+@Singleton
+class ApplicationConfig @Inject()() extends AppConfig {
 
   private def loadConfig(key: String) = configuration.getString(key).getOrElse(throw new Exception(s"Missing configuration key: $key"))
 
