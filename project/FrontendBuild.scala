@@ -24,12 +24,14 @@ object FrontendBuild extends Build with MicroService {
     "uk.gov.hmrc" %% "play-whitelist-filter" % "2.0.0"
   )
 
-  def test(scope: String = "test") = Seq(
+  def test(scope: String = "test"): Seq[ModuleID] = Seq(
     "uk.gov.hmrc" %% "hmrctest" % "2.3.0" % scope,
     "org.scalatest" %% "scalatest" % "2.2.6" % scope,
     "org.pegdown" % "pegdown" % "1.6.0" % scope,
     "org.jsoup" % "jsoup" % "1.8.1" % scope,
-    "com.typesafe.play" %% "play-test" % PlayVersion.current % scope
+    "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
+    "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0" % scope,
+    "org.mockito" % "mockito-core" % "2.8.47" % scope
   )
 
 }

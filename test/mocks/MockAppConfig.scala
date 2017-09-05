@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-package config
+package mocks
 
-import com.google.inject.AbstractModule
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import config.AppConfig
+import play.api.mvc.Call
 
-class DIModule extends AbstractModule {
- def configure(): Unit = {
-   bind(classOf[AppConfig]).to(classOf[FrontendAppConfig]).asEagerSingleton()
-   bind(classOf[AuthConnector]).to(classOf[config.FrontendAuthConnector])
-   bind(classOf[AuditConnector]).to(classOf[config.FrontendAuditConnector])
- }
+class MockAppConfig extends AppConfig {
+  override val analyticsToken: String = ""
+  override val analyticsHost: String = ""
+  override val reportAProblemPartialUrl: String = ""
+  override val reportAProblemNonJSUrl: String = ""
+  override val whitelistIps: Seq[String] = Seq("")
+  override val ipExclusionList: Seq[Call] = Nil
+  override val shutterPage: String = "https://www.tax.service.gov.uk/shutter/view-vat-returns"
 }
+
