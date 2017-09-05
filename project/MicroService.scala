@@ -1,7 +1,7 @@
 import sbt.Keys._
-import sbt.Tests.{SubProcess, Group}
+import sbt.Tests.{Group, SubProcess}
 import sbt._
-import play.routes.compiler.StaticRoutesGenerator
+import play.routes.compiler.{InjectedRoutesGenerator, StaticRoutesGenerator}
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin._
 
 
@@ -34,7 +34,7 @@ trait MicroService {
       libraryDependencies ++= appDependencies,
       retrieveManaged := true,
       evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
-      routesGenerator := StaticRoutesGenerator
+      routesGenerator := InjectedRoutesGenerator
     )
     .configs(IntegrationTest)
     .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
@@ -52,8 +52,8 @@ trait MicroService {
 
 private object TestPhases {
 
-  def oneForkedJvmPerTest(tests: Seq[TestDefinition]) =
+  def oneForkedJvmPerTest(tests: Seq[TestDefinition]): Seq[Group] =
     tests map {
-      test => new Group(test.name, Seq(test), SubProcess(ForkOptions(runJVMOptions = Seq("-Dtest.name=" + test.name))))
+      test => Group(test.name, Seq(test), SubProcess(ForkOptions(runJVMOptions = Seq("-Dtest.name=" + test.name))))
     }
 }
