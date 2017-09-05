@@ -21,7 +21,6 @@ import javax.inject.{Inject, Singleton}
 
 import play.api.mvc.Call
 import play.api.{Application, Configuration}
-//import play.api.Play.{configuration, current}
 import uk.gov.hmrc.play.config.ServicesConfig
 
 trait AppConfig extends ServicesConfig {

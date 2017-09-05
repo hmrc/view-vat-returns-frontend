@@ -16,12 +16,9 @@
 
 package config
 
-import java.io.File
-
 import com.typesafe.config.Config
 import config.filters.WhitelistFilter
 import net.ceedubs.ficus.Ficus._
-import play.api.Mode._
 import play.api.mvc.{EssentialFilter, Request}
 import play.api.{Application, Configuration, Play}
 import play.twirl.api.Html
