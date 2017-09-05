@@ -19,9 +19,10 @@ package config
 import java.io.File
 
 import com.typesafe.config.Config
+import config.filters.WhitelistFilter
 import net.ceedubs.ficus.Ficus._
 import play.api.Mode._
-import play.api.mvc.Request
+import play.api.mvc.{EssentialFilter, Request}
 import play.api.{Application, Configuration, Play}
 import play.twirl.api.Html
 import uk.gov.hmrc.crypto.ApplicationCrypto
@@ -29,7 +30,7 @@ import uk.gov.hmrc.play.audit.filters.FrontendAuditFilter
 import uk.gov.hmrc.play.config.{AppName, ControllerConfig, RunMode}
 import uk.gov.hmrc.play.frontend.bootstrap.DefaultFrontendGlobal
 import uk.gov.hmrc.play.http.logging.filters.FrontendLoggingFilter
-import uk.gov.hmrc.play.filters.MicroserviceFilterSupport
+import uk.gov.hmrc.play.filters.{MicroserviceFilterSupport, RecoveryFilter}
 import play.api.i18n.Messages.Implicits._
 import play.api.Play.current
 import views.html.error_template
@@ -38,9 +39,18 @@ import views.html.error_template
 object FrontendGlobal
   extends DefaultFrontendGlobal {
 
-  override val auditConnector = FrontendAuditConnector
+  override lazy val auditConnector = new FrontendAuditConnector(Play.current)
   override val loggingFilter = LoggingFilter
   override val frontendAuditFilter = AuditFilter
+
+  override protected lazy val defaultFrontendFilters: Seq[EssentialFilter] = {
+    val coreFilters = super.defaultFrontendFilters.filterNot(f => f.equals(RecoveryFilter))
+    val ipWhitelistKey = "ip-whitelist.enable-ip-whitelisting"
+    Play.current.configuration.getString(ipWhitelistKey).getOrElse(throw new Exception(s"Missing configuration key: $ipWhitelistKey")).toBoolean match {
+      case true => coreFilters.:+(new WhitelistFilter(Play.current))
+      case _ => coreFilters
+    }
+  }
 
   override def onStart(app: Application) {
     super.onStart(app)
@@ -69,7 +79,7 @@ object AuditFilter extends FrontendAuditFilter with RunMode with AppName with Mi
 
   override lazy val applicationPort = None
 
-  override lazy val auditConnector = FrontendAuditConnector
+  override lazy val auditConnector = new FrontendAuditConnector(Play.current)
 
   override def controllerNeedsAuditing(controllerName: String) = ControllerConfiguration.paramsForController(controllerName).needsAuditing
 }
