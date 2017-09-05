@@ -16,7 +16,7 @@
 
 package config
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
 import play.api.Application
 import uk.gov.hmrc.play.audit.http.config.LoadAuditingConfig
@@ -36,6 +36,6 @@ class WSHttp @Inject()(val app:Application) extends uk.gov.hmrc.play.http.ws.WSH
 }
 
 @Singleton
-class FrontendAuthConnector @Inject(extends AuthConnector with ServicesConfig {
+class FrontendAuthConnector @Inject()(appConfig: AppConfig, val http: WSHttp) extends AuthConnector with ServicesConfig {
   val serviceUrl = baseUrl("auth")
 }
