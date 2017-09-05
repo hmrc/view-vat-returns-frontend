@@ -20,11 +20,16 @@ import javax.inject.Inject
 
 import config.AppConfig
 import play.api.Application
+import play.api.mvc.Call
+import uk.gov.hmrc.play.config.RunMode
+import uk.gov.hmrc.play.filters.MicroserviceFilterSupport
 import uk.gov.hmrc.whitelist.AkamaiWhitelistFilter
 
-class WhitelistFilter @Inject()(app: Application) extends AkamaiWhitelistFilter {
+class WhitelistFilter @Inject()(app: Application) extends AkamaiWhitelistFilter with RunMode with MicroserviceFilterSupport {
 
   private lazy val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
-  override lazy val whitelist: Seq[String] = appConfig.ip-whitelist.urls
+  override lazy val whitelist: Seq[String] = appConfig.whitelistIps
+  override lazy val destination: Call = Call("GET", appConfig.shutterPage)
+  override lazy val excludedPaths: Seq[Call] = appConfig.ipExclusionList
 
 }
