@@ -23,7 +23,7 @@ import uk.gov.hmrc.play.audit.http.config.LoadAuditingConfig
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector => Auditing}
 import uk.gov.hmrc.play.config.{AppName, RunMode, ServicesConfig}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.play.http.ws._
+import uk.gov.hmrc.play.http.hooks.HttpHook
 
 @Singleton
 class FrontendAuditConnector @Inject()(val app: Application) extends Auditing with AppName {
@@ -31,11 +31,11 @@ class FrontendAuditConnector @Inject()(val app: Application) extends Auditing wi
 }
 
 @Singleton
-class WSHttp @Inject()(val app:Application) extends uk.gov.hmrc.play.http.ws.WSHttp with AppName with RunMode {
-  override val hooks = NoneRequired
+class WSHttp @Inject()(val app: Application) extends uk.gov.hmrc.play.http.ws.WSHttp with AppName with RunMode {
+  override val hooks: Seq[HttpHook] = NoneRequired
 }
 
 @Singleton
 class FrontendAuthConnector @Inject()(appConfig: AppConfig, val http: WSHttp) extends AuthConnector with ServicesConfig {
-  val serviceUrl = baseUrl("auth")
+  val serviceUrl: String = baseUrl("auth")
 }

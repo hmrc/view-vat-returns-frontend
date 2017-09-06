@@ -19,33 +19,35 @@ package config
 import com.typesafe.config.Config
 import config.filters.WhitelistFilter
 import net.ceedubs.ficus.Ficus._
+import play.api.Play.current
+import play.api.i18n.Messages.Implicits._
 import play.api.mvc.{EssentialFilter, Request}
 import play.api.{Application, Configuration, Play}
 import play.twirl.api.Html
 import uk.gov.hmrc.crypto.ApplicationCrypto
 import uk.gov.hmrc.play.audit.filters.FrontendAuditFilter
 import uk.gov.hmrc.play.config.{AppName, ControllerConfig, RunMode}
+import uk.gov.hmrc.play.filters.{MicroserviceFilterSupport, RecoveryFilter}
 import uk.gov.hmrc.play.frontend.bootstrap.DefaultFrontendGlobal
 import uk.gov.hmrc.play.http.logging.filters.FrontendLoggingFilter
-import uk.gov.hmrc.play.filters.{MicroserviceFilterSupport, RecoveryFilter}
-import play.api.i18n.Messages.Implicits._
-import play.api.Play.current
 import views.html.error_template
-
 
 object FrontendGlobal
   extends DefaultFrontendGlobal {
 
   override lazy val auditConnector = new FrontendAuditConnector(Play.current)
-  override val loggingFilter = LoggingFilter
-  override val frontendAuditFilter = AuditFilter
+  override val loggingFilter: LoggingFilter.type = LoggingFilter
+  override val frontendAuditFilter: AuditFilter.type = AuditFilter
 
   override protected lazy val defaultFrontendFilters: Seq[EssentialFilter] = {
-    val coreFilters = super.defaultFrontendFilters.filterNot(f => f.equals(RecoveryFilter))
-    val ipWhitelistKey = "ip-whitelist.enable-ip-whitelisting"
-    Play.current.configuration.getString(ipWhitelistKey).getOrElse(throw new Exception(s"Missing configuration key: $ipWhitelistKey")).toBoolean match {
-      case true => coreFilters.:+(new WhitelistFilter(Play.current))
-      case _ => coreFilters
+    val coreFilters = super.defaultFrontendFilters.filterNot(filter => filter.equals(RecoveryFilter))
+    val whiteListEnabled = Play.current.configuration.getBoolean("whitelist.enabled").getOrElse(false)
+
+    if (whiteListEnabled) {
+      coreFilters.:+(new WhitelistFilter(Play.current))
+    } else {
+//      coreFilters
+      super.defaultFrontendFilters
     }
   }
 
@@ -55,8 +57,8 @@ object FrontendGlobal
   }
 
   override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit rh: Request[_]): Html = {
-      val appConfig: AppConfig = Play.current.injector.instanceOf[AppConfig]
-      error_template(appConfig, pageTitle, heading, message)
+    val appConfig: AppConfig = Play.current.injector.instanceOf[AppConfig]
+    error_template(appConfig, pageTitle, heading, message)
   }
 
   override def microserviceMetricsConfig(implicit app: Application): Option[Configuration] = app.configuration.getConfig(s"microservice.metrics")
@@ -67,16 +69,16 @@ object ControllerConfiguration extends ControllerConfig {
 }
 
 object LoggingFilter extends FrontendLoggingFilter with MicroserviceFilterSupport {
-  override def controllerNeedsLogging(controllerName: String) = ControllerConfiguration.paramsForController(controllerName).needsLogging
+  override def controllerNeedsLogging(controllerName: String): Boolean = ControllerConfiguration.paramsForController(controllerName).needsLogging
 }
 
 object AuditFilter extends FrontendAuditFilter with RunMode with AppName with MicroserviceFilterSupport {
 
   override lazy val maskedFormFields = Seq("password")
 
-  override lazy val applicationPort = None
+  override lazy val applicationPort: None.type = None
 
   override lazy val auditConnector = new FrontendAuditConnector(Play.current)
 
-  override def controllerNeedsAuditing(controllerName: String) = ControllerConfiguration.paramsForController(controllerName).needsAuditing
+  override def controllerNeedsAuditing(controllerName: String): Boolean = ControllerConfiguration.paramsForController(controllerName).needsAuditing
 }
