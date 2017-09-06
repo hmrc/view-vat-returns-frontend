@@ -46,8 +46,7 @@ object FrontendGlobal
     if (whiteListEnabled) {
       coreFilters.:+(new WhitelistFilter(Play.current))
     } else {
-//      coreFilters
-      super.defaultFrontendFilters
+      coreFilters
     }
   }
 
