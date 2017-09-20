@@ -22,13 +22,16 @@ import config.AppConfig
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc._
 import uk.gov.hmrc.play.frontend.controller.FrontendController
+import utils.MetricsReporter
 import views.html.helloworld.hello_world
 
 import scala.concurrent.Future
 
 @Singleton
-class HelloWorld @Inject()(val appConfig: AppConfig, val messagesApi: MessagesApi) extends FrontendController with I18nSupport {
+class HelloWorld @Inject()(val appConfig: AppConfig, val messagesApi: MessagesApi, metrics: MetricsReporter) extends FrontendController with I18nSupport {
   val helloWorld: Action[AnyContent] = Action.async { implicit request =>
+    metrics.incrementCounter("controllers.HelloWorld.helloworld.visits")
+    metrics.currentMins("controllers.HelloWorld.helloworld.mins")
     Future.successful(Ok(hello_world(appConfig)))
   }
 }
