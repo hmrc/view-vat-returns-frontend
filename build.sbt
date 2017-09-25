@@ -21,7 +21,7 @@ import uk.gov.hmrc.versioning.SbtGitVersioning
 import play.core.PlayVersion
 import TestPhases._
 
-val appName = "view-vat-returns-frontend"
+val appName: String = "view-vat-returns-frontend"
 lazy val appDependencies: Seq[ModuleID] = compile ++ test()
 lazy val plugins : Seq[Plugins] = Seq(play.sbt.PlayScala)
 
