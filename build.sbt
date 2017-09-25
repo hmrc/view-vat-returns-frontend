@@ -1,0 +1,68 @@
+/*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import uk.gov.hmrc.DefaultBuildSettings._
+import uk.gov.hmrc.SbtAutoBuildPlugin
+import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin._
+import uk.gov.hmrc.versioning.SbtGitVersioning
+import play.core.PlayVersion
+import TestPhases._
+
+val appName = "view-vat-returns-frontend"
+lazy val appDependencies: Seq[ModuleID] = compile ++ test()
+lazy val plugins : Seq[Plugins] = Seq(play.sbt.PlayScala)
+
+val compile = Seq(
+  ws,
+  "uk.gov.hmrc" %% "frontend-bootstrap" % "8.6.0",
+  "uk.gov.hmrc" %% "play-partials" % "6.0.0",
+  "uk.gov.hmrc" %% "play-whitelist-filter" % "2.0.0"
+)
+
+def test(scope: String = "test"): Seq[ModuleID] = Seq(
+  "uk.gov.hmrc" %% "hmrctest" % "2.4.0" % scope,
+  "org.scalatest" %% "scalatest" % "3.0.0" % scope,
+  "org.pegdown" % "pegdown" % "1.6.0" % scope,
+  "org.jsoup" % "jsoup" % "1.10.2" % scope,
+  "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
+  "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0" % scope,
+  "org.mockito" % "mockito-core" % "2.9.0" % scope
+)
+
+lazy val microservice = Project(appName, file("."))
+  .enablePlugins(Seq(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin) ++ plugins : _*)
+  .settings(scalaSettings: _*)
+  .settings(publishingSettings: _*)
+  .settings(defaultSettings(): _*)
+  .settings(
+    scalaVersion := "2.11.11",
+    libraryDependencies ++= appDependencies,
+    retrieveManaged := true,
+    evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
+    routesGenerator := InjectedRoutesGenerator
+  )
+  .configs(IntegrationTest)
+  .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
+  .settings(
+    Keys.fork in IntegrationTest := false,
+    unmanagedSourceDirectories in IntegrationTest <<= (baseDirectory in IntegrationTest)(base => Seq(base / "it")),
+    addTestReportOption(IntegrationTest, "int-test-reports"),
+    testGrouping in IntegrationTest := oneForkedJvmPerTest((definedTests in IntegrationTest).value),
+    parallelExecution in IntegrationTest := false)
+  .settings(resolvers ++= Seq(
+    Resolver.bintrayRepo("hmrc", "releases"),
+    Resolver.jcenterRepo
+  ))
