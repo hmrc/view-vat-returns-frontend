@@ -34,7 +34,7 @@ class HelloWorldControllerSpec extends UnitSpec with WithFakeApplication{
 
   implicit val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("", "")
 
-  lazy val target = new HelloWorld(mockConfig, messages)
+  lazy val target = new HelloWorldController(mockConfig, messages)
 
   "Calling the helloWorld action" should {
     "return 200" in {
