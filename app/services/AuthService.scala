@@ -14,19 +14,11 @@
  * limitations under the License.
  */
 
-package config
+package services
 
-import com.google.inject.AbstractModule
-import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.http.HttpPost
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import javax.inject.{Inject, Singleton}
 
+import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 
-class DIModule extends AbstractModule {
- def configure(): Unit = {
-   bind(classOf[AppConfig]).to(classOf[FrontendAppConfig]).asEagerSingleton()
-   bind(classOf[AuthConnector]).to(classOf[config.FrontendAuthConnector])
-   bind(classOf[AuditConnector]).to(classOf[config.FrontendAuditConnector])
-   bind(classOf[HttpPost]).to(classOf[config.WSHttp])
- }
-}
+@Singleton
+class AuthService @Inject()(val authConnector: AuthConnector) extends AuthorisedFunctions
