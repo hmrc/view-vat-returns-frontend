@@ -36,7 +36,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class HelloWorldControllerSpec extends UnitSpec with MockFactory with WithFakeApplication {
 
-  private trait Test {
+  private class Test {
     lazy val injector: Injector = fakeApplication.injector
     lazy val messages: MessagesApi = injector.instanceOf[MessagesApi]
     lazy val mockConfig: AppConfig = injector.instanceOf[AppConfig]
@@ -44,28 +44,50 @@ class HelloWorldControllerSpec extends UnitSpec with MockFactory with WithFakeAp
     val mockAuthConnector = mock[AuthConnector]
     val mockAuthService = new AuthService(mockAuthConnector)
 
-    (mockAuthConnector.authorise(_: Predicate, _: Retrieval[Enrolments])(_: HeaderCarrier, _: ExecutionContext))
-      .expects(*, *, *, *)
-      .returns(Future.successful(
-        Enrolments(Set(Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("", "12345")), "", ConfidenceLevel.L100, None))))
-      )
-
-    implicit val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("", "")
+    implicit val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
     lazy val target = new HelloWorldController(mockConfig, mockAuthService, messages)
   }
 
-  "Calling the helloWorld action" should {
-    "return 200" in new Test {
-      val result = target.helloWorld(fakeRequest)
-      status(result) shouldBe Status.OK
+  "Calling the helloWorld action" when {
+
+    "authenticated" should {
+
+      "return 200" in new Test {
+        (mockAuthConnector.authorise(_: Predicate, _: Retrieval[Enrolments])(_: HeaderCarrier, _: ExecutionContext))
+          .expects(*, *, *, *)
+          .returns(Future.successful(
+            Enrolments(Set(Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("", "12345")), "", ConfidenceLevel.L100, None))))
+          )
+        val result = target.helloWorld(fakeRequest)
+        status(result) shouldBe Status.OK
+      }
+
+      "return HTML" in new Test {
+        (mockAuthConnector.authorise(_: Predicate, _: Retrieval[Enrolments])(_: HeaderCarrier, _: ExecutionContext))
+          .expects(*, *, *, *)
+          .returns(Future.successful(
+            Enrolments(Set(Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("", "12345")), "", ConfidenceLevel.L100, None))))
+          )
+        val result = target.helloWorld(fakeRequest)
+        contentType(result) shouldBe Some("text/html")
+        charset(result) shouldBe Some("utf-8")
+      }
+
     }
 
-    "return HTML" in new Test {
-      val result = target.helloWorld(fakeRequest)
-      contentType(result) shouldBe Some("text/html")
-      charset(result) shouldBe Some("utf-8")
+    "not authenticated" should {
+
+      "return 303" in new Test {
+        (mockAuthConnector.authorise(_: Predicate, _: Retrieval[Enrolments])(_: HeaderCarrier, _: ExecutionContext))
+          .expects(*, *, *, *)
+          .returns(Future.failed(new BearerTokenExpired))
+        val result = target.helloWorld(fakeRequest)
+        status(result) shouldBe Status.SEE_OTHER
+      }
+
     }
+
   }
 
 }

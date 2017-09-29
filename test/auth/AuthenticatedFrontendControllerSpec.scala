@@ -64,6 +64,20 @@ class AuthenticatedFrontendControllerSpec extends UnitSpec with MockFactory with
       status(result) shouldBe 200
     }
 
+    "redirect and not execute the action body if the user is not authenticated" in new Test {
+      val action = AuthAction {
+        implicit req => user => Ok
+      }
+
+      (mockAuthConnector.authorise(_: Predicate, _: Retrieval[Enrolments])(_: HeaderCarrier, _: ExecutionContext))
+        .expects(*, *, *, *)
+        .returns(Future.failed(new BearerTokenExpired))
+
+      val result = action(fakeRequest)
+
+      status(result) shouldBe 303
+    }
+
   }
 
   "AuthAction.async" should {
@@ -83,6 +97,20 @@ class AuthenticatedFrontendControllerSpec extends UnitSpec with MockFactory with
       val result = action(fakeRequest)
 
       status(result) shouldBe 200
+    }
+
+    "redirect and not execute the action body if the user is not authenticated" in new Test {
+      val action = AuthAction {
+        implicit req => user => Ok
+      }
+
+      (mockAuthConnector.authorise(_: Predicate, _: Retrieval[Enrolments])(_: HeaderCarrier, _: ExecutionContext))
+        .expects(*, *, *, *)
+        .returns(Future.failed(new BearerTokenExpired))
+
+      val result = action(fakeRequest)
+
+      status(result) shouldBe 303
     }
 
   }

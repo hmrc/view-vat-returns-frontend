@@ -20,6 +20,7 @@ import auth.AuthPredicate.AuthPredicate
 import play.api.mvc._
 import uk.gov.hmrc.auth.core.retrieve.Retrievals._
 import services.AuthService
+import uk.gov.hmrc.auth.core.{NoActiveSession, SessionRecordNotFound}
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 
 import scala.concurrent.Future
@@ -46,6 +47,8 @@ trait AuthenticatedFrontendController extends FrontendController {
             case Right(AuthPredicate.Success) => action(request)(user)
             case Left(failureResult) => failureResult
           }
+        }.recover {
+          case _: NoActiveSession => Redirect(controllers.routes.SessionTimeoutController.timeout())
         }
       }
     }
