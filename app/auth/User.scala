@@ -16,4 +16,13 @@
 
 package auth
 
-case class User(mtdVatId: String)
+import uk.gov.hmrc.auth.core.{Enrolment, EnrolmentIdentifier, Enrolments}
+
+case class User(enrolments: Enrolments) {
+
+  // TODO clean this code when the identifier key is known
+  lazy val mtdVatId: Option[String] = enrolments.enrolments.collectFirst {
+    case Enrolment("HMRC-MTD-VAT", EnrolmentIdentifier(_, value) :: _, _, _, _) => value
+  }
+
+}

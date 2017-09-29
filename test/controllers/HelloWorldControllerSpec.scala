@@ -17,32 +17,51 @@
 package controllers
 
 import config.AppConfig
+import org.scalamock.scalatest.MockFactory
 import play.api.http.Status
 import play.api.i18n.MessagesApi
 import play.api.inject.Injector
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import services.AuthService
+import uk.gov.hmrc.auth.core.authorise.Predicate
+import uk.gov.hmrc.auth.core.retrieve.Retrieval
+import uk.gov.hmrc.auth.core._
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
+import scala.concurrent.{ExecutionContext, Future}
 
-class HelloWorldControllerSpec extends UnitSpec with WithFakeApplication{
 
-  lazy val injector: Injector = fakeApplication.injector
-  lazy val messages: MessagesApi = injector.instanceOf[MessagesApi]
-  lazy val mockConfig: AppConfig = injector.instanceOf[AppConfig]
+class HelloWorldControllerSpec extends UnitSpec with MockFactory with WithFakeApplication {
 
-  implicit val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("", "")
+  private trait Test {
+    lazy val injector: Injector = fakeApplication.injector
+    lazy val messages: MessagesApi = injector.instanceOf[MessagesApi]
+    lazy val mockConfig: AppConfig = injector.instanceOf[AppConfig]
 
-  lazy val target = new HelloWorldController(mockConfig, messages)
+    val mockAuthConnector = mock[AuthConnector]
+    val mockAuthService = new AuthService(mockAuthConnector)
+
+    (mockAuthConnector.authorise(_: Predicate, _: Retrieval[Enrolments])(_: HeaderCarrier, _: ExecutionContext))
+      .expects(*, *, *, *)
+      .returns(Future.successful(
+        Enrolments(Set(Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("", "12345")), "", ConfidenceLevel.L100, None))))
+      )
+
+    implicit val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("", "")
+
+    lazy val target = new HelloWorldController(mockConfig, mockAuthService, messages)
+  }
 
   "Calling the helloWorld action" should {
-    "return 200" in {
+    "return 200" in new Test {
       val result = target.helloWorld(fakeRequest)
       status(result) shouldBe Status.OK
     }
 
-    "return HTML" in {
+    "return HTML" in new Test {
       val result = target.helloWorld(fakeRequest)
       contentType(result) shouldBe Some("text/html")
       charset(result) shouldBe Some("utf-8")
