@@ -40,6 +40,19 @@ object WireMockHelper extends Eventually with IntegrationPatience {
           withBody(responseBody)
       )
     )
+
+  def verifyGet(uri: String): Unit = {
+    verify(getRequestedFor(urlEqualTo(uri)))
+  }
+
+  def verifyPost(uri: String, optBody: Option[String] = None): Unit = {
+    val uriMapping = postRequestedFor(urlEqualTo(uri))
+    val postRequest = optBody match {
+      case Some(body) => uriMapping.withRequestBody(equalTo(body))
+      case None => uriMapping
+    }
+    verify(postRequest)
+  }
 }
 
 trait WireMockHelper {

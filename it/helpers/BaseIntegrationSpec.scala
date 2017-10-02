@@ -20,6 +20,7 @@ import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, TestSuite}
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.{Application, Environment, Mode}
 import play.api.inject.guice.GuiceApplicationBuilder
+import stubs.AuthStub
 
 trait BaseIntegrationSpec extends WireMockHelper with GuiceOneServerPerSuite with TestSuite
   with BeforeAndAfterEach with BeforeAndAfterAll {
@@ -38,7 +39,7 @@ trait BaseIntegrationSpec extends WireMockHelper with GuiceOneServerPerSuite wit
 
   class User()(implicit builder: PreconditionBuilder) {
     def isAuthenticated: PreconditionBuilder = {
-      // TODO add controllers.auth wiremock call
+      AuthStub.stubAuthSuccess()
       builder
     }
   }
