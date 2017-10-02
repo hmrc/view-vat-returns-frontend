@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package auth
+package controllers.auth
 
-import auth.AuthPredicate.AuthPredicate
+import AuthPredicate.AuthPredicate
 import play.api.mvc._
 import uk.gov.hmrc.auth.core.retrieve.Retrievals._
 import services.AuthService
-import uk.gov.hmrc.auth.core.{NoActiveSession, SessionRecordNotFound}
+import uk.gov.hmrc.auth.core.NoActiveSession
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 
 import scala.concurrent.Future

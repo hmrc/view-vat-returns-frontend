@@ -38,14 +38,14 @@ trait BaseIntegrationSpec extends WireMockHelper with GuiceOneServerPerSuite wit
 
   class User()(implicit builder: PreconditionBuilder) {
     def isAuthenticated: PreconditionBuilder = {
-      // TODO add auth wiremock call
+      // TODO add controllers.auth wiremock call
       builder
     }
   }
 
   def servicesConfig: Map[String, String] = Map(
-    "microservice.service.auth.host" -> mockHost,
-    "microservice.service.auth.port" -> mockPort
+    "microservice.service.controllers.auth.host" -> mockHost,
+    "microservice.service.controllers.auth.port" -> mockPort
   )
 
   override implicit lazy val app: Application = new GuiceApplicationBuilder()

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package auth
+package controllers.auth
 
 import config.AppConfig
 import org.scalamock.scalatest.MockFactory

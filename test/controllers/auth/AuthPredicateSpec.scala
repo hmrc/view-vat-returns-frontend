@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package auth
+package controllers.auth
 
-import auth.AuthPredicate.Success
-import auth.AuthPredicates.{enrolledPredicate, predicates, timeoutPredicate}
+import controllers.auth.AuthPredicate.Success
+import controllers.auth.AuthPredicates.{enrolledPredicate, predicates, timeoutPredicate}
 import mocks.MockAppConfig
 import org.scalatest.EitherValues
 import play.api.inject.Injector
