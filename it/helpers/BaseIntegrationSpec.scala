@@ -22,11 +22,26 @@ import play.api.{Application, Environment, Mode}
 import play.api.inject.guice.GuiceApplicationBuilder
 
 trait BaseIntegrationSpec extends WireMockHelper with GuiceOneServerPerSuite with TestSuite
-  with BeforeAndAfterEach with BeforeAndAfterAll{
+  with BeforeAndAfterEach with BeforeAndAfterAll {
 
   val mockHost: String = WireMockHelper.host
   val mockPort: String = WireMockHelper.port.toString
   val mockUrl: String = s"http://$mockHost:$mockPort"
+
+  class PreconditionBuilder {
+    implicit val builder: PreconditionBuilder = this
+
+    def user: User = new User()
+  }
+
+  def given: PreconditionBuilder = new PreconditionBuilder
+
+  class User()(implicit builder: PreconditionBuilder) {
+    def isAuthenticated: PreconditionBuilder = {
+      // TODO add auth wiremock call
+      builder
+    }
+  }
 
   def servicesConfig: Map[String, String] = Map(
     "microservice.service.auth.host" -> mockHost,
