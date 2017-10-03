@@ -26,7 +26,7 @@ trait BaseIntegrationSpec extends WireMockHelper with GuiceOneServerPerSuite wit
   with BeforeAndAfterEach with BeforeAndAfterAll {
 
   val mockHost: String = WireMockHelper.host
-  val mockPort: String = WireMockHelper.port.toString
+  val mockPort: String = WireMockHelper.wireMockPort.toString
   val mockUrl: String = s"http://$mockHost:$mockPort"
 
   class PreconditionBuilder {
@@ -42,11 +42,16 @@ trait BaseIntegrationSpec extends WireMockHelper with GuiceOneServerPerSuite wit
       AuthStub.stubAuthSuccess()
       builder
     }
+
+    def isNotAuthenticated: PreconditionBuilder = {
+      AuthStub.stubUnauthorised()
+      builder
+    }
   }
 
   def servicesConfig: Map[String, String] = Map(
-    "microservice.service.controllers.auth.host" -> mockHost,
-    "microservice.service.controllers.auth.port" -> mockPort
+    "microservice.services.auth.host" -> mockHost,
+    "microservice.services.auth.port" -> mockPort
   )
 
   override implicit lazy val app: Application = new GuiceApplicationBuilder()

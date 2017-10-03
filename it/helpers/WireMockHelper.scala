@@ -28,9 +28,9 @@ import play.api.libs.ws.WSClient
 
 object WireMockHelper extends Eventually with IntegrationPatience {
 
-  val port: Int = 11111
+  val wireMockPort: Int = 11111
   val host: String = "localhost"
-  val url: String = s"http://$host:$port"
+  //val url: String = s"http://$host:$wireMockPort"
 
   def stubPost(url: String, status: Integer, responseBody: String): StubMapping =
     stubFor(post(urlMatching(url))
@@ -62,12 +62,12 @@ trait WireMockHelper {
   import WireMockHelper._
 
   lazy val wsClient: WSClient = app.injector.instanceOf[WSClient]
-  lazy val wireMockPort: WireMockConfiguration = wireMockConfig().port(port)
-  lazy val wireMockServer: WireMockServer = new WireMockServer(wireMockPort)
+  lazy val wiremockConfig: WireMockConfiguration = wireMockConfig().port(wireMockPort)
+  lazy val wireMockServer: WireMockServer = new WireMockServer(wiremockConfig)
 
   def startWireMock(): Unit = {
     wireMockServer.start()
-    WireMock.configureFor(host, port)
+    WireMock.configureFor(host, wireMockPort)
   }
 
   def stopWireMock(): Unit = wireMockServer.stop()

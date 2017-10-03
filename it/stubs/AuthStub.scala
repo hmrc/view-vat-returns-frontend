@@ -15,6 +15,11 @@ object AuthStub extends WireMockMethods {
       .thenReturn(status = OK, body = successfulAuthResponse(mtdVatEnrolment))
   }
 
+  def stubUnauthorised(): StubMapping = {
+    when(method = POST, uri = authoriseUri)
+      .thenReturn(status = UNAUTHORIZED, headers = Map("WWW-Authenticate" -> """MDTP detail="MissingBearerToken""""))
+  }
+
   private val mtdVatEnrolment = Json.obj(
     "key" -> MTD_VAT_ENROLMENT_KEY,
     "identifiers" -> Json.arr(
