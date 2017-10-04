@@ -30,7 +30,6 @@ object WireMockHelper extends Eventually with IntegrationPatience {
 
   val wireMockPort: Int = 11111
   val host: String = "localhost"
-  //val url: String = s"http://$host:$wireMockPort"
 
   def stubPost(url: String, status: Integer, responseBody: String): StubMapping =
     stubFor(post(urlMatching(url))

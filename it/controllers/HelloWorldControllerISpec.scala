@@ -10,7 +10,7 @@ class HelloWorldControllerISpec extends UnitSpec with BaseIntegrationSpec {
 
   "Calling the helloWorld action" when {
 
-    "authenticated" should {
+    "the user is authenticated" should {
 
       "return 200 OK" in {
         given.user.isAuthenticated
@@ -20,7 +20,7 @@ class HelloWorldControllerISpec extends UnitSpec with BaseIntegrationSpec {
       }
     }
 
-    "not authenticated" should {
+    "the user is not authenticated" should {
 
       "return 303 SEE OTHER" in {
         given.user.isNotAuthenticated
