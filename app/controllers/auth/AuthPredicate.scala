@@ -14,25 +14,23 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.auth
 
-import javax.inject.{Inject, Singleton}
+import cats.Monoid
+import play.api.mvc.{AnyContent, Request, Result}
 
-import auth.AuthenticatedFrontendController
-import config.AppConfig
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc._
-import services.AuthService
-import views.html.helloworld.hello_world
+import scala.concurrent.Future
 
+object AuthPredicate {
 
-@Singleton
-class HelloWorldController @Inject()(val appConfig: AppConfig, val authService: AuthService, val messagesApi: MessagesApi)
-  extends AuthenticatedFrontendController with I18nSupport {
+  object Success
 
-  val helloWorld: Action[AnyContent] = AuthAction {
-    implicit request => user =>
-      Ok(hello_world(appConfig))
+  type Success = Success.type
+
+  implicit object SuccessMonoid extends Monoid[Success] {
+    override def empty: Success = Success
+    override def combine(x: Success, y: Success): Success = Success
   }
 
+  type AuthPredicate = Request[AnyContent] => User => Either[Future[Result], Success]
 }

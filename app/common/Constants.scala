@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
-package auth
+package common
 
-case class User(mtdVatId: String)
+object Constants {
+
+  val MTD_VAT_ENROLMENT_KEY = "HMRC-MTD-VAT"
+
+}

@@ -33,13 +33,13 @@ import uk.gov.hmrc.play.frontend.filters.{ FrontendAuditFilter, FrontendLoggingF
 object FrontendGlobal
   extends DefaultFrontendGlobal {
 
-  override lazy val auditConnector = new FrontendAuditConnector(Play.current)
+  override lazy val auditConnector = new FrontendAuditConnector
   override val loggingFilter: LoggingFilter.type = LoggingFilter
   override val frontendAuditFilter: AuditFilter.type = AuditFilter
 
   override protected lazy val defaultFrontendFilters: Seq[EssentialFilter] = {
     val coreFilters = super.defaultFrontendFilters.filterNot(filter => filter.equals(RecoveryFilter))
-    val whiteListEnabled = Play.current.configuration.getBoolean("whitelist.enabled").getOrElse(false)
+    val whiteListEnabled = configuration.getBoolean("whitelist.enabled").getOrElse(false)
 
     if (whiteListEnabled) {
       coreFilters.:+(new WhitelistFilter(Play.current))
@@ -75,7 +75,7 @@ object AuditFilter extends FrontendAuditFilter with RunMode with AppName with Mi
 
   override lazy val applicationPort: None.type = None
 
-  override lazy val auditConnector = new FrontendAuditConnector(Play.current)
+  override lazy val auditConnector = new FrontendAuditConnector
 
   override def controllerNeedsAuditing(controllerName: String): Boolean = ControllerConfiguration.paramsForController(controllerName).needsAuditing
 }
