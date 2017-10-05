@@ -17,7 +17,6 @@
 package controllers
 
 import config.AppConfig
-import org.scalamock.scalatest.MockFactory
 import play.api.http.Status
 import play.api.i18n.MessagesApi
 import play.api.inject.Injector
@@ -29,12 +28,11 @@ import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.Retrieval
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 
-class HelloWorldControllerSpec extends UnitSpec with MockFactory with WithFakeApplication {
+class HelloWorldControllerSpec extends ControllerBaseSpec {
 
   private class Test {
     lazy val injector: Injector = fakeApplication.injector
