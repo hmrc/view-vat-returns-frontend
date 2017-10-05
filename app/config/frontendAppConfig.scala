@@ -67,5 +67,5 @@ class FrontendAppConfig @Inject()(val app: Application) extends AppConfig {
   override lazy val baseUrl: String = loadConfig(s"base.host")
   lazy val continueUrl: String = ContinueUrl(baseUrl + controllers.routes.HelloWorldController.helloWorld()).encodedUrl
   override lazy val ggSignInUrl: String = governmentGatewaySignIn +
-    "?continue=" + baseUrl + continueUrl + "&origin=" + loadConfig("appName")
+    "?continue=" + continueUrl + "&origin=" + loadConfig("appName")
 }
