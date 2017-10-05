@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2017 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,10 +12,23 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@()(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
+package controllers
 
-@views.html.main_template(title = messages("notEnrolled.title"), bodyClasses = None, appConfig = appConfig) {
-  <h1>@messages("notEnrolled.title")</h1>
+import javax.inject.{Inject, Singleton}
+
+import config.AppConfig
+import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.mvc.{Action, AnyContent}
+import uk.gov.hmrc.play.frontend.controller.FrontendController
+
+
+@Singleton
+class UnauthorisedController @Inject()(val messagesApi: MessagesApi,
+                                       implicit val appConfig: AppConfig) extends FrontendController with I18nSupport {
+
+  val show: Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.unauthorised())
+  }
 }
