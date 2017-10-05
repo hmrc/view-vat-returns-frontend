@@ -94,8 +94,8 @@ class AuthPredicateSpec extends UnitSpec with WithFakeApplication with EitherVal
         status(result) shouldBe 303
       }
 
-      s"redirect to ${controllers.routes.NotEnrolledController.show().url}" in {
-        redirectLocation(result) shouldBe Some(controllers.routes.NotEnrolledController.show().url)
+      s"redirect to ${controllers.routes.UnauthorisedController.show().url}" in {
+        redirectLocation(result) shouldBe Some(controllers.routes.UnauthorisedController.show().url)
       }
     }
   }
@@ -139,8 +139,8 @@ class AuthPredicateSpec extends UnitSpec with WithFakeApplication with EitherVal
         status(result) shouldBe 303
       }
 
-      s"redirect to ${controllers.routes.NotEnrolledController.show().url}" in {
-        redirectLocation(result) shouldBe Some(controllers.routes.NotEnrolledController.show().url)
+      s"redirect to ${controllers.routes.UnauthorisedController.show().url}" in {
+        redirectLocation(result) shouldBe Some(controllers.routes.UnauthorisedController.show().url)
       }
     }
   }

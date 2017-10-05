@@ -21,14 +21,14 @@ import play.api.i18n.MessagesApi
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 
-class NotEnrolledControllerSpec extends ControllerBaseSpec {
+class UnauthorisedControllerSpec extends ControllerBaseSpec {
 
   "Calling the show action" should {
 
     lazy val messages = fakeApplication.injector.instanceOf[MessagesApi]
     lazy val mockAppConfig = fakeApplication.injector.instanceOf[AppConfig]
 
-    lazy val target = new NotEnrolledController(messages, mockAppConfig)
+    lazy val target = new UnauthorisedController(messages, mockAppConfig)
 
     lazy val result = target.show(FakeRequest())
 
