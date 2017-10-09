@@ -60,7 +60,7 @@ class FrontendAppConfig @Inject()(val app: Application) extends AppConfig {
     .map(_.split(",")).getOrElse(Array.empty).toSeq
 
   override lazy val whitelistedIps: Seq[String] = whitelistConfig("whitelist.allowedIps")
-  override lazy val whitelistExcludedPaths: Seq[Call] = whitelistConfig("whitelist.excludePaths").map(path => Call("GET", path))
+  override lazy val whitelistExcludedPaths: Seq[Call] = whitelistConfig("whitelist.excludedPaths").map(path => Call("GET", path))
   override lazy val shutterPage: String = loadConfig("whitelist.shutter-page-url")
   override lazy val governmentGateway: String = loadConfig(s"government-gateway.host")
   override lazy val governmentGatewaySignIn: String = s"$governmentGateway/gg/sign-in"
