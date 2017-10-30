@@ -32,11 +32,8 @@ trait AppConfig extends ServicesConfig {
   val whitelistedIps: Seq[String]
   val whitelistExcludedPaths: Seq[Call]
   val shutterPage: String
+  val ggServiceUrl: String
   val authUrl: String
-  val governmentGateway: String
-  val governmentGatewaySignIn: String
-  val baseUrl: String
-  val ggSignInUrl: String
 }
 
 @Singleton
@@ -62,10 +59,11 @@ class FrontendAppConfig @Inject()(val app: Application) extends AppConfig {
   override lazy val whitelistedIps: Seq[String] = whitelistConfig("whitelist.allowedIps")
   override lazy val whitelistExcludedPaths: Seq[Call] = whitelistConfig("whitelist.excludedPaths").map(path => Call("GET", path))
   override lazy val shutterPage: String = loadConfig("whitelist.shutter-page-url")
-  override lazy val governmentGateway: String = loadConfig(s"government-gateway.host")
-  override lazy val governmentGatewaySignIn: String = s"$governmentGateway/gg/sign-in"
-  override lazy val baseUrl: String = loadConfig(s"base.host")
-  lazy val continueUrl: String = ContinueUrl(baseUrl + controllers.routes.HelloWorldController.helloWorld()).encodedUrl
-  override lazy val ggSignInUrl: String = governmentGatewaySignIn +
-    "?continue=" + continueUrl + "&origin=" + loadConfig("appName")
+
+  private lazy val signInBaseUrl: String = loadConfig("signIn.url")
+  private lazy val signInContinueBaseUrl: String = configuration.getString("signIn.continueBaseUrl").getOrElse("")
+  private lazy val signInContinueUrl: String = ContinueUrl(signInContinueBaseUrl +
+    controllers.routes.HelloWorldController.helloWorld().url).encodedUrl
+  private lazy val signInOrigin = loadConfig("appName")
+  override lazy val ggServiceUrl: String = s"$signInBaseUrl?continue=$signInContinueUrl&origin=$signInOrigin"
 }

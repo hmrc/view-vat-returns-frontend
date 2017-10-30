@@ -29,7 +29,7 @@ class SessionTimeoutSpec extends ViewSpec {
       val instructions = "#content p"
     }
 
-    lazy val view = views.html.sessionTimeout(appConfig.ggSignInUrl)
+    lazy val view = views.html.sessionTimeout(appConfig.ggServiceUrl)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     s"have the correct document title" in {
