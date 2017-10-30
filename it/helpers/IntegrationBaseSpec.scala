@@ -16,38 +16,23 @@
 
 package helpers
 
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, TestSuite}
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.{Application, Environment, Mode}
 import play.api.inject.guice.GuiceApplicationBuilder
-import stubs.AuthStub
+import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
+import uk.gov.hmrc.play.test.UnitSpec
 
-trait BaseIntegrationSpec extends WireMockHelper with GuiceOneServerPerSuite with TestSuite
+trait IntegrationBaseSpec extends UnitSpec with WireMockHelper with GuiceOneServerPerSuite with TestSuite
   with BeforeAndAfterEach with BeforeAndAfterAll {
 
   val mockHost: String = WireMockHelper.host
   val mockPort: String = WireMockHelper.wireMockPort.toString
-  val mockUrl: String = s"http://$mockHost:$mockPort"
+  val appRouteContext: String = "/view-your-vat-returns"
 
-  class PreconditionBuilder {
-    implicit val builder: PreconditionBuilder = this
-
-    def user: User = new User()
-  }
-
-  def given: PreconditionBuilder = new PreconditionBuilder
-
-  class User()(implicit builder: PreconditionBuilder) {
-    def isAuthenticated: PreconditionBuilder = {
-      AuthStub.stubAuthSuccess()
-      builder
-    }
-
-    def isNotAuthenticated: PreconditionBuilder = {
-      AuthStub.stubUnauthorised()
-      builder
-    }
-  }
+  lazy val client: WSClient = app.injector.instanceOf[WSClient]
 
   def servicesConfig: Map[String, String] = Map(
     "microservice.services.auth.host" -> mockHost,
@@ -68,4 +53,8 @@ trait BaseIntegrationSpec extends WireMockHelper with GuiceOneServerPerSuite wit
     stopWireMock()
     super.afterAll()
   }
+
+  def buildRequest(path: String): WSRequest = client.url(s"http://localhost:$port$appRouteContext$path").withFollowRedirects(false)
+
+  def document(response: WSResponse): Document = Jsoup.parse(response.body)
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers
+package pages
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import helpers.IntegrationBaseSpec
@@ -66,7 +66,7 @@ class HelloWorldPageSpec extends IntegrationBaseSpec {
       def setupStubsForScenario(): StubMapping = AuthStub.unauthorisedOtherEnrolment()
 
       "return 303" in new Test {
-        override def setupStubs(): StubMapping = AuthStub.unauthorisedOtherEnrolment()
+        override def setupStubs(): StubMapping = setupStubsForScenario()
         val response: WSResponse = await(request().get())
         response.status shouldBe Status.SEE_OTHER
       }
