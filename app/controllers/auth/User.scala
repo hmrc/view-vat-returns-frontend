@@ -22,7 +22,7 @@ import common.Constants.MTD_VAT_ENROLMENT_KEY
 case class User(enrolments: Enrolments) {
 
   // TODO clean this code when the identifier for the enrolment key is known
-  lazy val mtdVatId: Option[String] = enrolments.enrolments.collectFirst {
+  lazy val Vrn: Option[String] = enrolments.enrolments.collectFirst {
     case Enrolment(MTD_VAT_ENROLMENT_KEY, EnrolmentIdentifier(_, value) :: _, _, _, _) => value
   }
 

@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2017 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,15 +12,13 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@(signInUrl: String)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
+package services
 
-@views.html.main_template(title = messages("sessionTimeout.title"), bodyClasses = None, appConfig = appConfig) {
-  <h1>@messages("sessionTimeout.title")</h1>
+import javax.inject.{Inject, Singleton}
 
-  <p>@messages("sessionTimeout.helpOne")
-     <a href=@signInUrl>@messages("sessionTimeout.helpTwo")</a>
-     @messages("sessionTimeout.helpThree")
-  </p>
-}
+import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
+
+@Singleton
+class EnrolmentsAuthService @Inject()(val authConnector: AuthConnector) extends AuthorisedFunctions

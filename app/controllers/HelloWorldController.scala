@@ -18,21 +18,23 @@ package controllers
 
 import javax.inject.{Inject, Singleton}
 
-import auth.AuthenticatedFrontendController
 import config.AppConfig
+import controllers.auth.actions.VatUserAction
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc._
-import services.AuthService
-import views.html.helloworld.hello_world
-
+import uk.gov.hmrc.auth.core.AuthorisedFunctions
+import uk.gov.hmrc.play.frontend.controller.FrontendController
+import scala.concurrent.Future
 
 @Singleton
-class HelloWorldController @Inject()(val appConfig: AppConfig, val authService: AuthService, val messagesApi: MessagesApi)
-  extends AuthenticatedFrontendController with I18nSupport {
+class HelloWorldController @Inject()(val messagesApi: MessagesApi, val authFunctions: AuthorisedFunctions,
+                                     implicit val appConfig: AppConfig)
+  extends FrontendController with VatUserAction with I18nSupport {
 
-  val helloWorld: Action[AnyContent] = AuthAction {
-    implicit request => user =>
-      Ok(hello_world(appConfig))
+  val helloWorld: Action[AnyContent] = VatUserAction.async {
+    implicit request =>
+      implicit user =>
+        Future.successful(Ok(views.html.helloworld.hello_world(appConfig)))
   }
 
 }

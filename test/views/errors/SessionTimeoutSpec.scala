@@ -29,7 +29,7 @@ class SessionTimeoutSpec extends ViewSpec {
       val instructions = "#content p"
     }
 
-    lazy val view = views.html.sessionTimeout(appConfig.ggServiceUrl)
+    lazy val view = views.html.errors.sessionTimeout()
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     s"have the correct document title" in {
@@ -43,7 +43,5 @@ class SessionTimeoutSpec extends ViewSpec {
     s"have the correct instructions on the page" in {
       elementText(Selectors.instructions) shouldBe "To view your VAT returns, you'll have to sign in using your Government Gateway ID."
     }
-
   }
-
 }

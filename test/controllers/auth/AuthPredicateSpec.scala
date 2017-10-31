@@ -17,7 +17,7 @@
 package controllers.auth
 
 import controllers.auth.AuthPredicate.Success
-import controllers.auth.AuthPredicates.{enrolledPredicate, predicates, timeoutPredicate}
+import controllers.auth.AuthPredicates.{enrolledPredicate, enrolledUserPredicate, timeoutPredicate}
 import mocks.MockAppConfig
 import org.scalatest.EitherValues
 import play.api.inject.Injector
@@ -70,8 +70,8 @@ class AuthPredicateSpec extends UnitSpec with WithFakeApplication with EitherVal
         status(result) shouldBe 303
       }
 
-      s"redirect to ${controllers.routes.SessionTimeoutController.timeout().url}" in {
-        redirectLocation(result) shouldBe Some(controllers.routes.SessionTimeoutController.timeout().url)
+      s"redirect to ${controllers.routes.ErrorsController.sessionTimeout().url}" in {
+        redirectLocation(result) shouldBe Some(controllers.routes.ErrorsController.sessionTimeout().url)
       }
     }
   }
@@ -94,8 +94,8 @@ class AuthPredicateSpec extends UnitSpec with WithFakeApplication with EitherVal
         status(result) shouldBe 303
       }
 
-      s"redirect to ${controllers.routes.UnauthorisedController.show().url}" in {
-        redirectLocation(result) shouldBe Some(controllers.routes.UnauthorisedController.show().url)
+      s"redirect to ${controllers.routes.ErrorsController.unauthorised().url}" in {
+        redirectLocation(result) shouldBe Some(controllers.routes.ErrorsController.unauthorised().url)
       }
     }
   }
@@ -107,22 +107,22 @@ class AuthPredicateSpec extends UnitSpec with WithFakeApplication with EitherVal
       lazy val request = FakeRequest().withSession(
         lastRequestTimestamp -> "lastRequestTimestamp"
       )
-      lazy val predicate = predicates(request)(blankUser)
+      lazy val predicate = enrolledUserPredicate(request)(blankUser)
       lazy val result = predicate.left.value
 
       "return 303" in {
         status(result) shouldBe 303
       }
 
-      s"redirect to ${controllers.routes.SessionTimeoutController.timeout().url}" in {
-        redirectLocation(result) shouldBe Some(controllers.routes.SessionTimeoutController.timeout().url)
+      s"redirect to ${controllers.routes.ErrorsController.sessionTimeout().url}" in {
+        redirectLocation(result) shouldBe Some(controllers.routes.ErrorsController.sessionTimeout().url)
       }
     }
 
     "Both predicates pass" should {
 
       lazy val request = FakeRequest()
-      lazy val predicate = predicates(request)(userWithMtdVatEnrolment)
+      lazy val predicate = enrolledUserPredicate(request)(userWithMtdVatEnrolment)
 
       "return Success" in {
         predicate.right.value shouldBe Success
@@ -132,15 +132,15 @@ class AuthPredicateSpec extends UnitSpec with WithFakeApplication with EitherVal
     "One predicate fails" should {
 
       lazy val request = FakeRequest()
-      lazy val predicate = predicates(request)(blankUser)
+      lazy val predicate = enrolledUserPredicate(request)(blankUser)
       lazy val result = predicate.left.value
 
       "return 303" in {
         status(result) shouldBe 303
       }
 
-      s"redirect to ${controllers.routes.UnauthorisedController.show().url}" in {
-        redirectLocation(result) shouldBe Some(controllers.routes.UnauthorisedController.show().url)
+      s"redirect to ${controllers.routes.ErrorsController.unauthorised().url}" in {
+        redirectLocation(result) shouldBe Some(controllers.routes.ErrorsController.unauthorised().url)
       }
     }
   }

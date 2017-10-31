@@ -16,57 +16,53 @@
 
 package controllers
 
-import config.AppConfig
 import play.api.http.Status
-import play.api.i18n.MessagesApi
-import play.api.inject.Injector
-import play.api.mvc.AnyContentAsEmpty
-import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import services.AuthService
+import services.EnrolmentsAuthService
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.Retrieval
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.http.HeaderCarrier
-
 import scala.concurrent.{ExecutionContext, Future}
-
 
 class HelloWorldControllerSpec extends ControllerBaseSpec {
 
-  private class Test {
-    lazy val injector: Injector = fakeApplication.injector
-    lazy val messages: MessagesApi = injector.instanceOf[MessagesApi]
-    lazy val mockConfig: AppConfig = injector.instanceOf[AppConfig]
+  private trait Test {
+    val enrolments: Enrolments
+    val mockAuthConnector: AuthConnector = mock[AuthConnector]
 
-    val mockAuthConnector = mock[AuthConnector]
-    val mockAuthService = new AuthService(mockAuthConnector)
+    def setup(): Unit = {
+      (mockAuthConnector.authorise(_: Predicate, _: Retrieval[Enrolments])(_: HeaderCarrier, _: ExecutionContext))
+        .expects(*, *, *, *)
+        .returns(Future.successful(enrolments))
+    }
 
-    implicit val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
+    val mockAuthorisedFunctions: AuthorisedFunctions = new EnrolmentsAuthService(mockAuthConnector)
 
-    lazy val target = new HelloWorldController(mockConfig, mockAuthService, messages)
+    def target: HelloWorldController = {
+      setup()
+      new HelloWorldController(messages, mockAuthorisedFunctions, mockConfig)
+    }
   }
 
-  "Calling the helloWorld action" when {
+  "Calling the .helloWorld action" when {
 
-    "authenticated" should {
+    "the user is authorised" should {
+
+      val goodEnrolments: Enrolments = Enrolments(
+        Set(
+          Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("", "VRN1234567890")), "", ConfidenceLevel.L0)
+        )
+      )
 
       "return 200" in new Test {
-        (mockAuthConnector.authorise(_: Predicate, _: Retrieval[Enrolments])(_: HeaderCarrier, _: ExecutionContext))
-          .expects(*, *, *, *)
-          .returns(Future.successful(
-            Enrolments(Set(Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("", "12345")), "", ConfidenceLevel.L100, None))))
-          )
+        override val enrolments: Enrolments = goodEnrolments
         val result = target.helloWorld(fakeRequest)
         status(result) shouldBe Status.OK
       }
 
       "return HTML" in new Test {
-        (mockAuthConnector.authorise(_: Predicate, _: Retrieval[Enrolments])(_: HeaderCarrier, _: ExecutionContext))
-          .expects(*, *, *, *)
-          .returns(Future.successful(
-            Enrolments(Set(Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("", "12345")), "", ConfidenceLevel.L100, None))))
-          )
+        override val enrolments: Enrolments = goodEnrolments
         val result = target.helloWorld(fakeRequest)
         contentType(result) shouldBe Some("text/html")
         charset(result) shouldBe Some("utf-8")
@@ -74,14 +70,20 @@ class HelloWorldControllerSpec extends ControllerBaseSpec {
 
     }
 
-    "not authenticated" should {
+    "the user is not authorised" should {
+
+      val noEnrolments: Enrolments = Enrolments(Set())
 
       "return 303" in new Test {
-        (mockAuthConnector.authorise(_: Predicate, _: Retrieval[Enrolments])(_: HeaderCarrier, _: ExecutionContext))
-          .expects(*, *, *, *)
-          .returns(Future.failed(new BearerTokenExpired))
+        override val enrolments: Enrolments = noEnrolments
         val result = target.helloWorld(fakeRequest)
         status(result) shouldBe Status.SEE_OTHER
+      }
+
+      "redirect the user to the unauthorised page" in new Test {
+        override val enrolments: Enrolments = noEnrolments
+        val result = target.helloWorld(fakeRequest)
+        redirectLocation(result) shouldBe Some(routes.ErrorsController.unauthorised().url)
       }
 
     }

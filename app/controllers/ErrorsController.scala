@@ -17,18 +17,21 @@
 package controllers
 
 import javax.inject.{Inject, Singleton}
-
 import config.AppConfig
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 
-
 @Singleton
-class UnauthorisedController @Inject()(val messagesApi: MessagesApi,
-                                       implicit val appConfig: AppConfig) extends FrontendController with I18nSupport {
+class ErrorsController @Inject()(val messagesApi: MessagesApi, implicit val appConfig: AppConfig)
+  extends FrontendController with I18nSupport {
 
-  val show: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.unauthorised())
+  val sessionTimeout: Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.errors.sessionTimeout())
   }
+
+  val unauthorised: Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.errors.unauthorised())
+  }
+
 }
