@@ -14,18 +14,14 @@
  * limitations under the License.
  */
 
-package config
+package connectors
 
-import com.google.inject.AbstractModule
-import uk.gov.hmrc.auth.core.AuthConnector
+import javax.inject.{Inject, Singleton}
+import config.AppConfig
+import uk.gov.hmrc.auth.core.PlayAuthConnector
 import uk.gov.hmrc.http.HttpPost
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
-class DIModule extends AbstractModule {
- def configure(): Unit = {
-   bind(classOf[AppConfig]).to(classOf[FrontendAppConfig]).asEagerSingleton()
-   bind(classOf[AuthConnector]).to(classOf[connectors.FrontendAuthConnector])
-   bind(classOf[AuditConnector]).to(classOf[connectors.FrontendAuditConnector])
-   bind(classOf[HttpPost]).to(classOf[config.WSHttp])
- }
+@Singleton
+class FrontendAuthConnector @Inject()(appConfig: AppConfig, val http: HttpPost) extends PlayAuthConnector {
+  override lazy val serviceUrl: String = appConfig.authUrl
 }

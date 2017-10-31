@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-package config
+package connectors
 
-import com.google.inject.AbstractModule
-import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.http.HttpPost
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import javax.inject.{Inject, Singleton}
+import uk.gov.hmrc.play.audit.http.connector.{AuditConnector => Auditing}
+import uk.gov.hmrc.play.config.AppName
+import uk.gov.hmrc.play.frontend.config.LoadAuditingConfig
 
-class DIModule extends AbstractModule {
- def configure(): Unit = {
-   bind(classOf[AppConfig]).to(classOf[FrontendAppConfig]).asEagerSingleton()
-   bind(classOf[AuthConnector]).to(classOf[connectors.FrontendAuthConnector])
-   bind(classOf[AuditConnector]).to(classOf[connectors.FrontendAuditConnector])
-   bind(classOf[HttpPost]).to(classOf[config.WSHttp])
- }
+@Singleton
+class FrontendAuditConnector @Inject()() extends Auditing with AppName {
+  override lazy val auditingConfig = LoadAuditingConfig(s"auditing")
 }
+
