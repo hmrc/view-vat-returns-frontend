@@ -26,7 +26,6 @@ trait VatUserAction extends AuthorisedActions {
   self: FrontendController =>
 
   object VatUserAction {
-    def apply(action: ActionBody): Action[AnyContent] = async(action andThen (_ andThen Future.successful))
     def async: AuthenticatedAction = action(AuthPredicates.enrolledUserPredicate)
   }
 }
