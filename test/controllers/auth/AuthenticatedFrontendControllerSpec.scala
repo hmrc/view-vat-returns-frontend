@@ -22,7 +22,7 @@ import play.api.i18n.MessagesApi
 import play.api.inject.Injector
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
-import services.AuthService
+import services.EnrolmentsAuthService
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.Retrieval
 import uk.gov.hmrc.auth.core._
@@ -39,7 +39,7 @@ class AuthenticatedFrontendControllerSpec extends UnitSpec with MockFactory with
     lazy val mockConfig: AppConfig = injector.instanceOf[AppConfig]
 
     val mockAuthConnector = mock[AuthConnector]
-    val mockAuthService = new AuthService(mockAuthConnector)
+    val mockAuthService = new EnrolmentsAuthService(mockAuthConnector)
 
     implicit val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
     override val authService = mockAuthService

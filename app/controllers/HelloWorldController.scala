@@ -17,17 +17,16 @@
 package controllers
 
 import javax.inject.{Inject, Singleton}
-
 import auth.AuthenticatedFrontendController
 import config.AppConfig
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc._
-import services.AuthService
+import uk.gov.hmrc.auth.core.AuthorisedFunctions
 import views.html.helloworld.hello_world
 
-
 @Singleton
-class HelloWorldController @Inject()(val appConfig: AppConfig, val authService: AuthService, val messagesApi: MessagesApi)
+class HelloWorldController @Inject()(val appConfig: AppConfig, val messagesApi: MessagesApi,
+                                     val authorisedFunctions: AuthorisedFunctions)
   extends AuthenticatedFrontendController with I18nSupport {
 
   val helloWorld: Action[AnyContent] = AuthAction {

@@ -70,8 +70,8 @@ class AuthPredicateSpec extends UnitSpec with WithFakeApplication with EitherVal
         status(result) shouldBe 303
       }
 
-      s"redirect to ${controllers.routes.SessionTimeoutController.timeout().url}" in {
-        redirectLocation(result) shouldBe Some(controllers.routes.SessionTimeoutController.timeout().url)
+      s"redirect to ${controllers.routes.ErrorsController.sessionTimeout().url}" in {
+        redirectLocation(result) shouldBe Some(controllers.routes.ErrorsController.sessionTimeout().url)
       }
     }
   }
@@ -94,8 +94,8 @@ class AuthPredicateSpec extends UnitSpec with WithFakeApplication with EitherVal
         status(result) shouldBe 303
       }
 
-      s"redirect to ${controllers.routes.UnauthorisedController.show().url}" in {
-        redirectLocation(result) shouldBe Some(controllers.routes.UnauthorisedController.show().url)
+      s"redirect to ${controllers.routes.ErrorsController.unauthorised().url}" in {
+        redirectLocation(result) shouldBe Some(controllers.routes.ErrorsController.unauthorised().url)
       }
     }
   }
@@ -114,8 +114,8 @@ class AuthPredicateSpec extends UnitSpec with WithFakeApplication with EitherVal
         status(result) shouldBe 303
       }
 
-      s"redirect to ${controllers.routes.SessionTimeoutController.timeout().url}" in {
-        redirectLocation(result) shouldBe Some(controllers.routes.SessionTimeoutController.timeout().url)
+      s"redirect to ${controllers.routes.ErrorsController.sessionTimeout().url}" in {
+        redirectLocation(result) shouldBe Some(controllers.routes.ErrorsController.sessionTimeout().url)
       }
     }
 
@@ -139,8 +139,8 @@ class AuthPredicateSpec extends UnitSpec with WithFakeApplication with EitherVal
         status(result) shouldBe 303
       }
 
-      s"redirect to ${controllers.routes.UnauthorisedController.show().url}" in {
-        redirectLocation(result) shouldBe Some(controllers.routes.UnauthorisedController.show().url)
+      s"redirect to ${controllers.routes.ErrorsController.unauthorised().url}" in {
+        redirectLocation(result) shouldBe Some(controllers.routes.ErrorsController.unauthorised().url)
       }
     }
   }

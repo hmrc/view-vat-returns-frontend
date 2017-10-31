@@ -19,7 +19,7 @@ package controllers.auth
 import AuthPredicate.AuthPredicate
 import play.api.mvc._
 import uk.gov.hmrc.auth.core.retrieve.Retrievals._
-import services.AuthService
+import services.EnrolmentsAuthService
 import uk.gov.hmrc.auth.core.NoActiveSession
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 
@@ -27,7 +27,7 @@ import scala.concurrent.Future
 
 trait AuthenticatedFrontendController extends FrontendController {
 
-  def authService: AuthService
+  def authService: EnrolmentsAuthService
 
   type ActionBody = Request[AnyContent] => User => Result
   type AsyncActionBody = Request[AnyContent] => User => Future[Result]
@@ -48,7 +48,7 @@ trait AuthenticatedFrontendController extends FrontendController {
             case Left(failureResult) => failureResult
           }
         }.recover {
-          case _: NoActiveSession => Redirect(controllers.routes.SessionTimeoutController.timeout())
+          case _: NoActiveSession => Redirect(controllers.routes.ErrorsController.sessionTimeout())
         }
       }
     }

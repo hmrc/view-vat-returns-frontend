@@ -16,31 +16,38 @@
 
 package controllers
 
-import config.AppConfig
-import play.api.i18n.MessagesApi
-import play.api.test.FakeRequest
+import play.api.http.Status
 import play.api.test.Helpers._
 
-class UnauthorisedControllerSpec extends ControllerBaseSpec {
+class ErrorsControllerSpec extends ControllerBaseSpec {
 
-  "Calling the show action" should {
+  lazy val target = new ErrorsController(mockConfig, messages)
 
-    lazy val messages = fakeApplication.injector.instanceOf[MessagesApi]
-    lazy val mockAppConfig = fakeApplication.injector.instanceOf[AppConfig]
+  "Calling the sessionTimeout action" should {
 
-    lazy val target = new UnauthorisedController(messages, mockAppConfig)
+    lazy val result = target.sessionTimeout(fakeRequest)
 
-    lazy val result = target.show(FakeRequest())
-
-    "return 200 OK" in {
-      status(result) shouldBe OK
+    "return 200" in {
+      status(result) shouldBe Status.OK
     }
 
     "return HTML" in {
       contentType(result) shouldBe Some("text/html")
       charset(result) shouldBe Some("utf-8")
     }
-
   }
 
+  "Calling the unauthorised action" should {
+
+    lazy val result = target.unauthorised(fakeRequest)
+
+    "return 200" in {
+      status(result) shouldBe Status.OK
+    }
+
+    "return HTML" in {
+      contentType(result) shouldBe Some("text/html")
+      charset(result) shouldBe Some("utf-8")
+    }
+  }
 }
