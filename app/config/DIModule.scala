@@ -17,7 +17,8 @@
 package config
 
 import com.google.inject.AbstractModule
-import uk.gov.hmrc.auth.core.AuthConnector
+import services.EnrolmentsAuthService
+import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.http.HttpPost
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
@@ -27,5 +28,6 @@ class DIModule extends AbstractModule {
    bind(classOf[AuthConnector]).to(classOf[connectors.FrontendAuthConnector])
    bind(classOf[AuditConnector]).to(classOf[connectors.FrontendAuditConnector])
    bind(classOf[HttpPost]).to(classOf[config.WSHttp])
+   bind(classOf[AuthorisedFunctions]).to(classOf[EnrolmentsAuthService])
  }
 }

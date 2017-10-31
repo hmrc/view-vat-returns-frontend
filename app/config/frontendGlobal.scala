@@ -28,8 +28,8 @@ import play.twirl.api.Html
 import uk.gov.hmrc.crypto.ApplicationCrypto
 import uk.gov.hmrc.play.config.{AppName, ControllerConfig, RunMode}
 import uk.gov.hmrc.play.frontend.bootstrap.DefaultFrontendGlobal
-import views.html.error_template
 import uk.gov.hmrc.play.frontend.filters.{FrontendAuditFilter, FrontendLoggingFilter, MicroserviceFilterSupport, RecoveryFilter}
+import views.html.errors.standardError
 
 object FrontendGlobal
   extends DefaultFrontendGlobal {
@@ -56,7 +56,7 @@ object FrontendGlobal
 
   override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit rh: Request[_]): Html = {
     val appConfig: AppConfig = Play.current.injector.instanceOf[AppConfig]
-    error_template(appConfig, pageTitle, heading, message)
+    standardError(appConfig, pageTitle, heading, message)
   }
 
   override def microserviceMetricsConfig(implicit app: Application): Option[Configuration] = app.configuration.getConfig(s"microservice.metrics")

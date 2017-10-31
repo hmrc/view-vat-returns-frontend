@@ -28,7 +28,7 @@ class UnauthorisedSpec extends ViewSpec {
       val pageHeading = "#content h1"
     }
 
-    lazy val view = views.html.unauthorised()
+    lazy val view = views.html.errors.unauthorised()
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     s"have the correct document title" in {
@@ -38,7 +38,5 @@ class UnauthorisedSpec extends ViewSpec {
     s"have a the correct page heading" in {
       elementText(Selectors.pageHeading) shouldBe "Not enrolled - TODO"
     }
-
   }
-
 }

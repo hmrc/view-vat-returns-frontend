@@ -20,29 +20,28 @@ import cats.implicits._
 import AuthPredicate.{AuthPredicate, Success}
 import play.api.mvc.{Result, Results}
 import uk.gov.hmrc.http.SessionKeys.{authToken, lastRequestTimestamp}
-
 import scala.concurrent.Future
 
 object AuthPredicates extends Results {
 
-  lazy val unauthorised: Result = Redirect(controllers.routes.ErrorsController.unauthorised())
+  lazy val unauthorisedRoute: Result = Redirect(controllers.routes.ErrorsController.unauthorised())
   lazy val timeoutRoute: Result = Redirect(controllers.routes.ErrorsController.sessionTimeout())
 
   private[auth] val enrolledPredicate: AuthPredicate = request => user =>
-    if (user.mtdVatId.nonEmpty) {
+    if (user.Vrn.isDefined) {
       Right(Success)
     } else {
-      Left(Future.successful(unauthorised))
+      Left(Future.successful(unauthorisedRoute))
     }
 
   private[auth] val timeoutPredicate: AuthPredicate = request => user =>
-    if (request.session.get(lastRequestTimestamp).nonEmpty && request.session.get(authToken).isEmpty) {
+    if (request.session.get(lastRequestTimestamp).isDefined && request.session.get(authToken).isEmpty) {
       Left(Future.successful(timeoutRoute))
     }
     else {
       Right(Success)
     }
 
-  val predicates: AuthPredicate = timeoutPredicate |+| enrolledPredicate
+  val enrolledUserPredicate: AuthPredicate = timeoutPredicate |+| enrolledPredicate
 
 }

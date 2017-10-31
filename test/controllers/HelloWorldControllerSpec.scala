@@ -41,30 +41,28 @@ class HelloWorldControllerSpec extends ControllerBaseSpec {
 
     def target: HelloWorldController = {
       setup()
-      new HelloWorldController(mockConfig, messages, mockAuthorisedFunctions)
+      new HelloWorldController(messages, mockAuthorisedFunctions, mockConfig)
     }
   }
 
-  "Calling the helloWorld action" when {
+  "Calling the .helloWorld action" when {
 
-    "authenticated" should {
+    "the user is authorised" should {
+
+      val goodEnrolments: Enrolments = Enrolments(
+        Set(
+          Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("", "VRN1234567890")), "", ConfidenceLevel.L0)
+        )
+      )
 
       "return 200" in new Test {
-        (mockAuthConnector.authorise(_: Predicate, _: Retrieval[Enrolments])(_: HeaderCarrier, _: ExecutionContext))
-          .expects(*, *, *, *)
-          .returns(Future.successful(
-            Enrolments(Set(Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("", "12345")), "", ConfidenceLevel.L100, None))))
-          )
+        override val enrolments: Enrolments = goodEnrolments
         val result = target.helloWorld(fakeRequest)
         status(result) shouldBe Status.OK
       }
 
       "return HTML" in new Test {
-        (mockAuthConnector.authorise(_: Predicate, _: Retrieval[Enrolments])(_: HeaderCarrier, _: ExecutionContext))
-          .expects(*, *, *, *)
-          .returns(Future.successful(
-            Enrolments(Set(Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("", "12345")), "", ConfidenceLevel.L100, None))))
-          )
+        override val enrolments: Enrolments = goodEnrolments
         val result = target.helloWorld(fakeRequest)
         contentType(result) shouldBe Some("text/html")
         charset(result) shouldBe Some("utf-8")
@@ -72,14 +70,20 @@ class HelloWorldControllerSpec extends ControllerBaseSpec {
 
     }
 
-    "not authenticated" should {
+    "the user is not authorised" should {
+
+      val noEnrolments: Enrolments = Enrolments(Set())
 
       "return 303" in new Test {
-        (mockAuthConnector.authorise(_: Predicate, _: Retrieval[Enrolments])(_: HeaderCarrier, _: ExecutionContext))
-          .expects(*, *, *, *)
-          .returns(Future.failed(new BearerTokenExpired))
+        override val enrolments: Enrolments = noEnrolments
         val result = target.helloWorld(fakeRequest)
         status(result) shouldBe Status.SEE_OTHER
+      }
+
+      "redirect the user to the unauthorised page" in new Test {
+        override val enrolments: Enrolments = noEnrolments
+        val result = target.helloWorld(fakeRequest)
+        redirectLocation(result) shouldBe Some(routes.ErrorsController.unauthorised().url)
       }
 
     }
