@@ -19,15 +19,39 @@ import uk.gov.hmrc.SbtAutoBuildPlugin
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin._
 import uk.gov.hmrc.versioning.SbtGitVersioning
 import play.core.PlayVersion
-import TestPhases._
+import sbt.Tests.{Group, SubProcess}
 
 val appName: String = "view-vat-returns-frontend"
 lazy val appDependencies: Seq[ModuleID] = compile ++ test()
 lazy val plugins : Seq[Plugins] = Seq(play.sbt.PlayScala)
+lazy val playSettings: Seq[Setting[_]] = Seq.empty
+
+lazy val coverageSettings: Seq[Setting[_]] = {
+  import scoverage.ScoverageKeys
+
+  val excludedPackages = Seq(
+    "<empty>",
+    "Reverse.*",
+    ".*standardError*.*",
+    ".*govuk_wrapper*.*",
+    ".*main_template*.*",
+    "uk.gov.hmrc.BuildInfo",
+    "app.*",
+    "prod.*",
+    "config.*",
+    "testOnlyDoNotUseInAppConf.*")
+
+  Seq(
+    ScoverageKeys.coverageExcludedPackages := excludedPackages.mkString(";"),
+    ScoverageKeys.coverageMinimum := 90,
+    ScoverageKeys.coverageFailOnMinimum := false,
+    ScoverageKeys.coverageHighlighting := true
+  )
+}
 
 val compile = Seq(
   ws,
-  "uk.gov.hmrc" %% "frontend-bootstrap" % "8.6.0",
+  "uk.gov.hmrc" %% "frontend-bootstrap" % "8.10.0",
   "uk.gov.hmrc" %% "play-partials" % "6.0.0",
   "uk.gov.hmrc" %% "play-whitelist-filter" % "2.0.0",
   "uk.gov.hmrc" %% "auth-client" % "1.0.0",
@@ -45,8 +69,19 @@ def test(scope: String = "test, it"): Seq[ModuleID] = Seq(
   "com.github.tomakehurst" % "wiremock" % "2.6.0" % scope
 )
 
+def oneForkedJvmPerTest(tests: Seq[TestDefinition]): Seq[Group] = tests map {
+  test =>
+    Group(
+      test.name,
+      Seq(test),
+      SubProcess(ForkOptions(runJVMOptions = Seq("-Dtest.name=" + test.name, "-Dlogger.resource=logback-test.xml")))
+    )
+}
+
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(Seq(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin) ++ plugins : _*)
+  .settings(coverageSettings: _*)
+  .settings(playSettings: _*)
   .settings(scalaSettings: _*)
   .settings(publishingSettings: _*)
   .settings(defaultSettings(): _*)
