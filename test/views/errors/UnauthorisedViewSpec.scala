@@ -18,25 +18,30 @@ package views.errors
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import views.ViewSpec
+import views.ViewBaseSpec
 
-class UnauthorisedSpec extends ViewSpec {
+class UnauthorisedViewSpec extends ViewBaseSpec {
 
   "Rendering the unauthorised page" should {
 
     object Selectors {
       val pageHeading = "#content h1"
+      val instructions = "#content p"
     }
 
     lazy val view = views.html.errors.unauthorised()
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
-    s"have the correct document title" in {
-      document.title shouldBe "Not enrolled - TODO"
+    "have the correct document title" in {
+      document.title shouldBe "Unauthorised access"
     }
 
-    s"have a the correct page heading" in {
-      elementText(Selectors.pageHeading) shouldBe "Not enrolled - TODO"
+    "have a the correct page heading" in {
+      elementText(Selectors.pageHeading) shouldBe "Unauthorised access"
+    }
+
+    "have the correct instructions on the page" in {
+      elementText(Selectors.instructions) shouldBe "To view your VAT returns, you'll have to sign in using your Government Gateway ID."
     }
   }
 }
