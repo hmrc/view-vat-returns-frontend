@@ -32,7 +32,7 @@ trait AppConfig extends ServicesConfig {
   val whitelistedIps: Seq[String]
   val whitelistExcludedPaths: Seq[Call]
   val shutterPage: String
-  val ggServiceUrl: String
+  val signInUrl: String
   val authUrl: String
 }
 
@@ -65,5 +65,5 @@ class FrontendAppConfig @Inject()(val app: Application) extends AppConfig {
   private lazy val signInContinueUrl: String = ContinueUrl(signInContinueBaseUrl +
     controllers.routes.HelloWorldController.helloWorld().url).encodedUrl
   private lazy val signInOrigin = loadConfig("appName")
-  override lazy val ggServiceUrl: String = s"$signInBaseUrl?continue=$signInContinueUrl&origin=$signInOrigin"
+  override lazy val signInUrl: String = s"$signInBaseUrl?continue=$signInContinueUrl&origin=$signInOrigin"
 }

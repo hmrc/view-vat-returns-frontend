@@ -28,6 +28,6 @@ class MockAppConfig extends AppConfig {
   override val whitelistExcludedPaths: Seq[Call] = Nil
   override val shutterPage: String = "https://www.tax.service.gov.uk/shutter/view-vat-returns"
   override val authUrl: String = ""
-  override val ggServiceUrl: String = ""
+  override val signInUrl: String = ""
 }
 
