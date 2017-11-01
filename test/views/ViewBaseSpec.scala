@@ -16,34 +16,25 @@
 
 package views
 
-import config.AppConfig
+import mocks.MockAppConfig
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.{Lang, Messages, MessagesApi}
+import play.api.inject.Injector
+import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.collection.JavaConversions._
 
-class ViewSpec extends UnitSpec with GuiceOneAppPerSuite {
+class ViewBaseSpec extends UnitSpec with GuiceOneAppPerSuite {
 
-  lazy val injector = app.injector
-
-  lazy val messagesApi = injector.instanceOf[MessagesApi]
-
-  implicit lazy val appConfig = injector.instanceOf[AppConfig]
-  implicit lazy val request = FakeRequest()
-  implicit lazy val messages = Messages(Lang("en-GB"), messagesApi)
-
-  def elementText(selector: String)(implicit document: Document): String = {
-    element(selector).text()
-  }
-
-  def elementAttributes(cssSelector: String)(implicit document: Document): Map[String, String] = {
-    val attributes = element(cssSelector).attributes.asList().toList
-    attributes.map(attribute => (attribute.getKey, attribute.getValue)).toMap
-  }
+  implicit lazy val mockConfig: MockAppConfig = new MockAppConfig
+  implicit lazy val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
+  implicit lazy val messages: Messages = Messages(Lang("en-GB"), messagesApi)
+  lazy val injector: Injector = app.injector
+  lazy val messagesApi: MessagesApi = injector.instanceOf[MessagesApi]
 
   def element(cssSelector: String)(implicit document: Document): Element = {
     val elements = document.select(cssSelector)
@@ -53,6 +44,15 @@ class ViewSpec extends UnitSpec with GuiceOneAppPerSuite {
     }
 
     document.select(cssSelector).first()
+  }
+
+  def elementText(selector: String)(implicit document: Document): String = {
+    element(selector).text()
+  }
+
+  def elementAttributes(cssSelector: String)(implicit document: Document): Map[String, String] = {
+    val attributes = element(cssSelector).attributes.asList().toList
+    attributes.map(attribute => (attribute.getKey, attribute.getValue)).toMap
   }
 
   def formatHtml(markup: String): String = Jsoup.parseBodyFragment(s"\n$markup\n").toString.trim
