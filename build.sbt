@@ -56,7 +56,6 @@ val compile = Seq(
   "uk.gov.hmrc" %% "play-ui" % "7.8.0",
   "uk.gov.hmrc" %% "play-partials" % "6.0.0",
   "uk.gov.hmrc" %% "play-whitelist-filter" % "2.0.0",
-  "uk.gov.hmrc" %% "auth-client" % "1.0.0",
   "org.typelevel" %% "cats" % "0.9.0"
 )
 
