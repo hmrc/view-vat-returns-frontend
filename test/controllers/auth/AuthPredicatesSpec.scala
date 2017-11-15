@@ -20,21 +20,27 @@ import controllers.auth.AuthPredicate.Success
 import controllers.auth.AuthPredicates.{enrolledPredicate, enrolledUserPredicate, timeoutPredicate}
 import mocks.MockAppConfig
 import org.scalatest.EitherValues
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.inject.Injector
 import play.api.test.FakeRequest
-import uk.gov.hmrc.http.SessionKeys.{authToken, lastRequestTimestamp}
-import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 import play.api.test.Helpers._
-import uk.gov.hmrc.auth.core.{ConfidenceLevel, Enrolment, EnrolmentIdentifier, Enrolments}
-import common.EnrolmentKeys._
+import uk.gov.hmrc.auth.core.{Enrolment, EnrolmentIdentifier, Enrolments}
+import uk.gov.hmrc.http.SessionKeys.{authToken, lastRequestTimestamp}
+import uk.gov.hmrc.play.test.UnitSpec
 
-class AuthPredicatesSpec extends UnitSpec with WithFakeApplication with EitherValues {
+class AuthPredicatesSpec extends UnitSpec with GuiceOneAppPerSuite with EitherValues {
 
   lazy val injector: Injector = fakeApplication.injector
-  lazy val mockAppConfig = new MockAppConfig
+  lazy val mockAppConfig = new MockAppConfig(app.configuration)
+
+  private val SERVICE_ENROLMENT_KEY = "HMRC-MTD-VAT"
 
   val userWithMtdVatEnrolment = User(
-    Enrolments(Set(Enrolment(VAT_ENROLMENT_KEY, Seq(EnrolmentIdentifier("", "12345")), "", ConfidenceLevel.L100, None)))
+    Enrolments(
+      Set(
+        Enrolment(SERVICE_ENROLMENT_KEY, Seq(EnrolmentIdentifier("", "")), "")
+      )
+    )
   )
   val blankUser = User(Enrolments(Set.empty))
 
