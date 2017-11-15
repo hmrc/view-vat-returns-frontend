@@ -51,7 +51,7 @@ class HelloWorldControllerSpec extends ControllerBaseSpec {
 
       val goodEnrolments: Enrolments = Enrolments(
         Set(
-          Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("", "VRN1234567890")), "", ConfidenceLevel.L0)
+          Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("", "VRN1234567890")), "Active")
         )
       )
 

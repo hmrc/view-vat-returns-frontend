@@ -16,12 +16,15 @@
 
 package config
 
-import javax.inject.{Inject, Singleton}
-import uk.gov.hmrc.http._
-import uk.gov.hmrc.http.hooks.HttpHook
+import javax.inject.Inject
 
-@Singleton
-class WSHttp @Inject()() extends uk.gov.hmrc.play.http.ws.WSHttp with HttpGet with HttpPut with HttpPost with HttpDelete with HttpPatch {
-  override val hooks: Seq[HttpHook] = NoneRequired
+import play.api.i18n.MessagesApi
+import play.api.mvc.Request
+import play.twirl.api.Html
+import uk.gov.hmrc.play.bootstrap.http.FrontendErrorHandler
+
+class ServiceErrorHandler @Inject()(val messagesApi: MessagesApi, val appConfig: AppConfig) extends FrontendErrorHandler {
+
+  override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(
+    implicit request: Request[_]): Html = views.html.errors.standardError(appConfig, pageTitle, heading, message)
 }
-
