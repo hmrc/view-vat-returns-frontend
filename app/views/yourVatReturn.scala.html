@@ -1,0 +1,89 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@()(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
+
+@views.html.main_template(title = "Your VAT return", bodyClasses = None, appConfig = appConfig) {
+  <div class="page-topper">
+    <h1>@messages("yourVatReturn.title")</h1>
+    <p>@messages("yourVatReturn.vrn") 999999999</p>
+  </div>
+  <div class="grid-row">
+    <h2 class="heading-medium">@messages("yourVatReturn.moneyOwed") £999</h2>
+    <p>@messages("yourVatReturn.processedPayment")</p>
+    <table class="margin-bottom">
+      <thead>
+        <tr>
+          <th>
+            <h3 class="heading-medium">ABC Clothing</h3>
+          </th>
+          <th><span class="bold-small">1 January to 31 March 2017</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td id="rowOne">@messages("yourVatReturn.tableRowOne")</td>
+          <td>6 April 2017</td>
+        </tr>
+        <tr>
+          <td id="rowTwo">@messages("yourVatReturn.tableRowTwo")</td>
+          <td>8 April 2017</td>
+        </tr>
+        <tr>
+          <td id="rowThree">@messages("yourVatReturn.tableRowThree")</td>
+          <td>£99,999</td>
+        </tr>
+        <tr>
+          <td id="rowFour">@messages("yourVatReturn.tableRowFour")</td>
+          <td>£77,777</td>
+        </tr>
+        <tr>
+          <td id="rowFive">@messages("yourVatReturn.tableRowFive")</td>
+          <td>£9,999</td>
+        </tr>
+        <tr>
+          <td id="rowSix">@messages("yourVatReturn.tableRowSix")</td>
+          <td>£5,555</td>
+        </tr>
+        <tr>
+          <td id="rowSeven">@messages("yourVatReturn.tableRowSeven")</td>
+          <td>£999,999</td>
+        </tr>
+        <tr>
+          <td id="rowEight">@messages("yourVatReturn.tableRowEight")</td>
+          <td>£9,444,444</td>
+        </tr>
+        <tr>
+          <td id="rowNine">@messages("yourVatReturn.tableRowNine")</td>
+          <td>£4,999</td>
+        </tr>
+        <tr>
+          <td id="rowTen">@messages("yourVatReturn.tableRowTen")</td>
+          <td>£7,999</td>
+        </tr>
+        <tr>
+          <td id="rowEleven">@messages("yourVatReturn.tableRowEleven")</td>
+          <td>£999</td>
+        </tr>
+        <tr>
+          <td id="rowTwelve">@messages("yourVatReturn.tableRowTwelve")</td>
+          <td>£0</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p id="adjustments">@messages("yourVatReturn.adjustmentsOne") <a href>@messages("yourVatReturn.adjustmentsTwo")</a>.</p>
+}

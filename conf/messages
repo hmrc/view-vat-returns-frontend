@@ -5,3 +5,22 @@ sessionTimeout.helpThree = using your Government Gateway ID.
 
 unauthorised.title = Unauthorised access
 unauthorised.instructions = To view your VAT returns, you''ll have to sign in using your Government Gateway ID.
+
+yourVatReturn.title = Your VAT return
+yourVatReturn.vrn = VAT registration number (VRN):
+yourVatReturn.moneyOwed = What you owed:
+yourVatReturn.processedPayment = Your payment has been processed. There is nothing more you need to do with this return.
+yourVatReturn.tableRowOne = Date submitted:
+yourVatReturn.tableRowTwo = Return due date:
+yourVatReturn.tableRowThree = Total sales (minus VAT):
+yourVatReturn.tableRowFour = EU sales (minus VAT):
+yourVatReturn.tableRowFive = VAT charged in UK:
+yourVatReturn.tableRowSix = VAT charged to EU:
+yourVatReturn.tableRowSeven = Total costs (minus VAT):
+yourVatReturn.tableRowEight = EU costs (minus VAT):
+yourVatReturn.tableRowNine = Total VAT you charged:
+yourVatReturn.tableRowTen = Total VAT you reclaimed:
+yourVatReturn.tableRowEleven = What you owed HMRC:
+yourVatReturn.tableRowTwelve = Your VAT balance:
+yourVatReturn.adjustmentsOne = If there are any errors, you can make adjustments through
+yourVatReturn.adjustmentsTwo = your software
