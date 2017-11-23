@@ -26,8 +26,8 @@ import uk.gov.hmrc.auth.core.AuthorisedFunctions
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 
 @Singleton
-class YourVatReturnController @Inject()(val messagesApi: MessagesApi, val authFunctions: AuthorisedFunctions,
-                                     implicit val appConfig: AppConfig)
+class VatReturnController @Inject()(val messagesApi: MessagesApi, val authFunctions: AuthorisedFunctions,
+                                    implicit val appConfig: AppConfig)
   extends FrontendController with VatUserAction with I18nSupport {
 
   val yourVatReturn: Action[AnyContent] = TODO

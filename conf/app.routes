@@ -6,4 +6,4 @@ GET        /session-timeout         controllers.ErrorsController.sessionTimeout
 
 GET        /unauthorised            controllers.ErrorsController.unauthorised
 
-GET        /return                  controllers.YourVatReturnController.yourVatReturn
+GET        /return                  controllers.VatReturnController.yourVatReturn
