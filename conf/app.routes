@@ -5,3 +5,5 @@ GET        /hello-world             controllers.HelloWorldController.helloWorld
 GET        /session-timeout         controllers.ErrorsController.sessionTimeout
 
 GET        /unauthorised            controllers.ErrorsController.unauthorised
+
+GET        /return                  controllers.VatReturnController.yourVatReturn
