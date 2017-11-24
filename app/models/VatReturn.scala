@@ -16,8 +16,7 @@
 
 package models
 
-import java.time.LocalDate
-
+import org.joda.time.LocalDate
 import play.api.libs.json.{Format, Json}
 
 case class VatReturn(
@@ -26,16 +25,16 @@ case class VatReturn(
                     endDate: LocalDate,
                     dateSubmitted: LocalDate,
                     dueDate: LocalDate,
-                    totalSales: Int,
-                    euSales: Int,
-                    vatChargedInUk: Int,
-                    vatChargedToEu: Int,
-                    totalCosts: Int,
-                    euCosts: Int,
-                    totalVatCharged: Int,
-                    totalVatReclaimed: Int,
-                    owedToHmrc: Int,
-                    vatBalance: Int
+                    totalSales: BigDecimal,
+                    euSales: BigDecimal,
+                    vatChargedInUk: BigDecimal,
+                    vatChargedToEu: BigDecimal,
+                    totalCosts: BigDecimal,
+                    euCosts: BigDecimal,
+                    totalVatCharged: BigDecimal,
+                    totalVatReclaimed: BigDecimal,
+                    owedToHmrc: BigDecimal,
+                    vatBalance: BigDecimal
                     )
 
 object VatReturn {

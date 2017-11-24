@@ -16,11 +16,11 @@
 
 package views
 
-import java.time.LocalDate
-
 import models.VatReturn
+import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import uk.gov.hmrc.play.views.formatting.Money
 
 class YourVatReturnViewSpec extends ViewBaseSpec {
 
@@ -65,7 +65,7 @@ class YourVatReturnViewSpec extends ViewBaseSpec {
     }
 
     "have the correct subheading" in {
-      elementText(Selectors.subHeading) shouldBe "What you owed: £999"
+      elementText(Selectors.subHeading) shouldBe "What you owed: £999.00"
     }
 
     "have the correct row headings in the table" in {

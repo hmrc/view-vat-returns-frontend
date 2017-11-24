@@ -14,76 +14,79 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.play.views.formatting.Dates
+@import uk.gov.hmrc.play.views.formatting.Money
+
 @(vatReturn: VatReturn)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
-@views.html.main_template(title = "Your VAT return", bodyClasses = None, appConfig = appConfig) {
+@views.html.main_template(title = messages("yourVatReturn.title"), bodyClasses = None, appConfig = appConfig) {
   <div class="page-topper">
     <h1>@messages("yourVatReturn.title")</h1>
     <p>@messages("yourVatReturn.vrn") 999999999</p>
   </div>
   <div class="grid-row">
-    <h2 class="heading-medium">@messages("yourVatReturn.moneyOwed") £@vatReturn.owedToHmrc</h2>
+    <h2 class="heading-medium">@messages("yourVatReturn.moneyOwed") @Money.pounds(vatReturn.owedToHmrc, 2)</h2>
     <p>@messages("yourVatReturn.processedPayment")</p>
     <table class="margin-bottom">
       <thead>
-        <tr>
-          <th>
-            <h3 class="heading-medium">@vatReturn.businessName</h3>
-          </th>
-          <th><span class="bold-small">@vatReturn.startDate to @vatReturn.endDate</span></th>
-        </tr>
+      <tr>
+        <th>
+          <h3 class="heading-medium">@vatReturn.businessName</h3>
+        </th>
+        <th><span class="bold-small">@Dates.formatDate(vatReturn.startDate) to @Dates.formatDate(vatReturn.endDate)</span></th>
+      </tr>
       </thead>
       <tbody>
-        <tr>
-          <td id="dateSubmitted">@messages("yourVatReturn.dateSubmitted")</td>
-          <td>@vatReturn.dateSubmitted</td>
-        </tr>
-        <tr>
-          <td id="returnDueDate">@messages("yourVatReturn.returnDueDate")</td>
-          <td>@vatReturn.dueDate</td>
-        </tr>
-        <tr>
-          <td id="totalSales">@messages("yourVatReturn.totalSales")</td>
-          <td>£@vatReturn.totalSales</td>
-        </tr>
-        <tr>
-          <td id="euSales">@messages("yourVatReturn.euSales")</td>
-          <td>£@vatReturn.euSales</td>
-        </tr>
-        <tr>
-          <td id="vatChargedInUk">@messages("yourVatReturn.vatChargedInUk")</td>
-          <td>£@vatReturn.vatChargedInUk</td>
-        </tr>
-        <tr>
-          <td id="vatChargedToEu">@messages("yourVatReturn.vatChargedToEu")</td>
-          <td>£@vatReturn.vatChargedToEu</td>
-        </tr>
-        <tr>
-          <td id="totalCosts">@messages("yourVatReturn.totalCosts")</td>
-          <td>£@vatReturn.totalCosts</td>
-        </tr>
-        <tr>
-          <td id="euCosts">@messages("yourVatReturn.euCosts")</td>
-          <td>£@vatReturn.euCosts</td>
-        </tr>
-        <tr>
-          <td id="totalVatCharged">@messages("yourVatReturn.totalVatCharged")</td>
-          <td>£@vatReturn.totalVatCharged</td>
-        </tr>
-        <tr>
-          <td id="totalVatReclaimed">@messages("yourVatReturn.totalVatReclaimed")</td>
-          <td>£@vatReturn.totalVatReclaimed</td>
-        </tr>
-        <tr>
-          <td id="owedToHmrc">@messages("yourVatReturn.owedToHmrc")</td>
-          <td>£@vatReturn.owedToHmrc</td>
-        </tr>
-        <tr>
-          <td id="vatBalance">@messages("yourVatReturn.vatBalance")</td>
-          <td>£@vatReturn.vatBalance</td>
-        </tr>
+      <tr>
+        <td id="dateSubmitted">@messages("yourVatReturn.dateSubmitted")</td>
+        <td>@Dates.formatDate(vatReturn.dateSubmitted)</td>
+      </tr>
+      <tr>
+        <td id="returnDueDate">@messages("yourVatReturn.returnDueDate")</td>
+        <td>@Dates.formatDate(vatReturn.dueDate)</td>
+      </tr>
+      <tr>
+        <td id="totalSales">@messages("yourVatReturn.totalSales")</td>
+        <td>@Money.pounds(vatReturn.totalSales, 2)</td>
+      </tr>
+      <tr>
+        <td id="euSales">@messages("yourVatReturn.euSales")</td>
+        <td>@Money.pounds(vatReturn.euSales, 2)</td>
+      </tr>
+      <tr>
+        <td id="vatChargedInUk">@messages("yourVatReturn.vatChargedInUk")</td>
+        <td>@Money.pounds(vatReturn.vatChargedInUk, 2)</td>
+      </tr>
+      <tr>
+        <td id="vatChargedToEu">@messages("yourVatReturn.vatChargedToEu")</td>
+        <td>@Money.pounds(vatReturn.vatChargedToEu, 2)</td>
+      </tr>
+      <tr>
+        <td id="totalCosts">@messages("yourVatReturn.totalCosts")</td>
+        <td>@Money.pounds(vatReturn.totalCosts, 2)</td>
+      </tr>
+      <tr>
+        <td id="euCosts">@messages("yourVatReturn.euCosts")</td>
+        <td>@Money.pounds(vatReturn.euCosts, 2)</td>
+      </tr>
+      <tr>
+        <td id="totalVatCharged">@messages("yourVatReturn.totalVatCharged")</td>
+        <td>@Money.pounds(vatReturn.totalVatCharged, 2)</td>
+      </tr>
+      <tr>
+        <td id="totalVatReclaimed">@messages("yourVatReturn.totalVatReclaimed")</td>
+        <td>@Money.pounds(vatReturn.totalVatReclaimed, 2)</td>
+      </tr>
+      <tr>
+        <td id="owedToHmrc">@messages("yourVatReturn.owedToHmrc")</td>
+        <td>@Money.pounds(vatReturn.owedToHmrc, 2)</td>
+      </tr>
+      <tr>
+        <td id="vatBalance">@messages("yourVatReturn.vatBalance")</td>
+        <td>@Money.pounds(vatReturn.vatBalance, 2)</td>
+      </tr>
       </tbody>
     </table>
   </div>
-  <p id="adjustments">@messages("yourVatReturn.adjustmentsOne") <a href>@messages("yourVatReturn.adjustmentsTwo")</a>.</p>
+  <p id="adjustments">@messages("yourVatReturn.adjustmentsOne") <a href="#">@messages("yourVatReturn.adjustmentsTwo")</a>.</p>
 }
