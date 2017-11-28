@@ -16,7 +16,7 @@
 
 package models
 
-import org.joda.time.LocalDate
+import java.time.LocalDate
 import play.api.libs.json.Json
 import uk.gov.hmrc.play.test.UnitSpec
 
@@ -38,7 +38,7 @@ class VatReturnSpec extends UnitSpec {
       9444444,
       9999,
       7777,
-      999,
+      999.54,
       0
     )
 
@@ -57,7 +57,7 @@ class VatReturnSpec extends UnitSpec {
         |"euCosts":9444444,
         |"totalVatCharged":9999,
         |"totalVatReclaimed":7777,
-        |"owedToHmrc":999,
+        |"owedToHmrc":999.54,
         |"vatBalance":0
         |}"""
         .stripMargin.replace("\n", "")

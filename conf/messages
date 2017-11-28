@@ -1,3 +1,5 @@
+common.dateRangeSeparator = to
+
 sessionTimeout.title = Your session has timed out
 sessionTimeout.helpOne = To view your VAT returns, you''ll have to
 sessionTimeout.helpTwo = sign in
@@ -9,7 +11,6 @@ unauthorised.instructions = To view your VAT returns, you''ll have to sign in us
 yourVatReturn.title = Your VAT return
 yourVatReturn.vrn = VAT registration number (VRN):
 yourVatReturn.moneyOwed = What you owed:
-yourVatReturn.processedPayment = Your payment has been processed. There is nothing more you need to do with this return.
 yourVatReturn.dateSubmitted = Date submitted:
 yourVatReturn.returnDueDate = Return due date:
 yourVatReturn.totalSales = Total sales (minus VAT):
@@ -22,5 +23,4 @@ yourVatReturn.totalVatCharged = Total VAT you charged:
 yourVatReturn.totalVatReclaimed = Total VAT you reclaimed:
 yourVatReturn.owedToHmrc = What you owed HMRC:
 yourVatReturn.vatBalance = Your VAT balance:
-yourVatReturn.adjustmentsOne = If there are any errors, you can make adjustments through
-yourVatReturn.adjustmentsTwo = your software
+yourVatReturn.adjustments = If there are any errors, you can make adjustments through your software.
