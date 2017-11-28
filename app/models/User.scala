@@ -14,20 +14,14 @@
  * limitations under the License.
  */
 
-package services
+package models
 
-import javax.inject.{Inject, Singleton}
+import uk.gov.hmrc.auth.core.{Enrolment, EnrolmentIdentifier, Enrolments, InternalError}
 
-import connectors.VatReturnConnector
-import models.User
-import models.VatReturn
+case class User(vrn: String, active: Boolean = true)
 
-import scala.concurrent.Future
-
-@Singleton
-class VatReturnService @Inject()(connector: VatReturnConnector) {
-
-  def getVatReturn(user: User): Future[VatReturn] = {
-    connector.getVatReturn(user.vrn)
-  }
+object User {
+  def apply(enrolments: Enrolments): User = enrolments.enrolments.collectFirst {
+    case Enrolment("HMRC-MTD-VAT", EnrolmentIdentifier(_, vatId) :: _, _, _) => User(vatId)
+  }.getOrElse(throw InternalError("VRN Missing"))
 }
