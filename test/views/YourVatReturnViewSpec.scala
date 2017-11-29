@@ -17,10 +17,10 @@
 package views
 
 import models.VatReturn
-import org.joda.time.LocalDate
+import java.time.LocalDate
+
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import uk.gov.hmrc.play.views.formatting.Money
 
 class YourVatReturnViewSpec extends ViewBaseSpec {
 
@@ -29,9 +29,8 @@ class YourVatReturnViewSpec extends ViewBaseSpec {
     object Selectors {
       val pageHeading = "#content h1"
       val subHeading = "#content h2"
-      val rows = Array("#dateSubmitted", "#returnDueDate", "#totalSales", "#euSales", "#vatChargedInUk",
-                      "#vatChargedToEu", "#totalCosts", "#euCosts", "#totalVatCharged", "#totalVatReclaimed",
-                      "#owedToHmrc", "#vatBalance")
+      val rows = Array("#totalSales", "#euSales", "#vatChargedInUk", "#vatChargedToEu", "#totalCosts",
+                    "#euCosts", "#totalVatCharged", "#totalVatReclaimed", "#owedToHmrc", "#vatBalance")
       val adjustments = "#adjustments"
     }
 
@@ -49,7 +48,7 @@ class YourVatReturnViewSpec extends ViewBaseSpec {
       9444444,
       9999,
       7777,
-      999,
+      999.54,
       0
     )
 
@@ -61,17 +60,17 @@ class YourVatReturnViewSpec extends ViewBaseSpec {
     }
 
     "have the correct page heading" in {
-      elementText(Selectors.pageHeading) shouldBe "Your VAT return"
+      elementText(Selectors.pageHeading) shouldBe "Your VAT return 1 January to 31 March 2017"
     }
 
     "have the correct subheading" in {
-      elementText(Selectors.subHeading) shouldBe "What you owed: £999.00"
+      elementText(Selectors.subHeading) shouldBe "What you owed: £999.54"
     }
 
     "have the correct row headings in the table" in {
-      val expectedRows = Array("Date submitted:", "Return due date:", "Total sales (minus VAT):", "EU sales (minus VAT):",
-                      "VAT charged in UK:", "VAT charged to EU:", "Total costs (minus VAT):", "EU costs (minus VAT):",
-                      "Total VAT you charged:", "Total VAT you reclaimed:", "What you owed HMRC:", "Your VAT balance:")
+      val expectedRows = Array("Total sales (minus VAT):", "EU sales (minus VAT):", "VAT charged in UK:",
+        "VAT charged to EU:", "Total costs (minus VAT):", "EU costs (minus VAT):", "Total VAT you charged:",
+        "Total VAT you reclaimed:", "What you owed HMRC:", "Your VAT balance:")
 
       expectedRows.indices.foreach(i => elementText(Selectors.rows(i)) shouldBe expectedRows(i))
     }
