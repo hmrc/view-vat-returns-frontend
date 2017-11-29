@@ -21,7 +21,16 @@ import uk.gov.hmrc.auth.core.{Enrolment, EnrolmentIdentifier, Enrolments, Intern
 case class User(vrn: String, active: Boolean = true)
 
 object User {
-  def apply(enrolments: Enrolments): User = enrolments.enrolments.collectFirst {
-    case Enrolment("HMRC-MTD-VAT", EnrolmentIdentifier(_, vatId) :: _, _, _) => User(vatId)
-  }.getOrElse(throw InternalError("VRN Missing"))
+  def apply(enrolments: Enrolments): User = {
+    val vatEnrolments = enrolments.enrolments.filter(enrolment => enrolment.key == "HMRC-MTD-VAT")
+
+    if (vatEnrolments.isEmpty) {
+      throw InternalError("VAT enrolment missing")
+    }
+    else {
+      vatEnrolments.collectFirst {
+        case Enrolment("HMRC-MTD-VAT", EnrolmentIdentifier(_, vrn) :: _, status, _) => User(vrn, status == "Activated")
+      }.getOrElse(throw InternalError("VRN missing"))
+    }
+  }
 }
