@@ -19,7 +19,7 @@ package connectors
 import javax.inject.{Inject, Singleton}
 
 import models.VatReturn
-import org.joda.time.LocalDate
+import java.time.LocalDate
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import scala.concurrent.Future
