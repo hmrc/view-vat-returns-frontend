@@ -19,39 +19,20 @@ package controllers
 import javax.inject.{Inject, Singleton}
 
 import config.AppConfig
-import models.User
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.MessagesApi
 import play.api.mvc._
 import services.{EnrolmentsAuthService, VatReturnService}
-import uk.gov.hmrc.auth.core.retrieve.Retrievals
-import uk.gov.hmrc.auth.core.{AuthorisationException, Enrolment, NoActiveSession}
-import uk.gov.hmrc.play.bootstrap.controller.FrontendController
-
-import scala.concurrent.Future
 
 @Singleton
-class VatReturnController @Inject()(val messagesApi: MessagesApi, enrolmentsAuthService: EnrolmentsAuthService,
+class VatReturnController @Inject()(val messagesApi: MessagesApi, val enrolmentsAuthService: EnrolmentsAuthService,
                                     vatReturnService: VatReturnService, implicit val appConfig: AppConfig)
-  extends FrontendController with I18nSupport {
+  extends AuthorisedController {
 
-  def yourVatReturn(): Action[AnyContent] = enrolledAction {
+  def yourVatReturn(): Action[AnyContent] = authorisedAction {
     implicit request =>
       implicit user =>
         vatReturnService.getVatReturn(user).map { vatReturn =>
           Ok(views.html.yourVatReturn(vatReturn))
         }
-  }
-
-  private def enrolledAction(block: Request[AnyContent] => User => Future[Result]): Action[AnyContent] = Action.async {
-    implicit request =>
-      enrolmentsAuthService.authorised(Enrolment("HMRC-MTD-VAT")).retrieve(Retrievals.authorisedEnrolments) {
-        enrolments => {
-          val user = User(enrolments)
-          block(request)(user)
-        }
-      }.recover {
-        case _: NoActiveSession => Redirect(controllers.routes.ErrorsController.sessionTimeout())
-        case _: AuthorisationException => Redirect(controllers.routes.ErrorsController.unauthorised())
-      }
   }
 }
