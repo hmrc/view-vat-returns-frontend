@@ -21,7 +21,7 @@ import java.time.LocalDate
 import helpers.IntegrationBaseSpec
 import models.{User, VatReturn}
 
-class VatReturnISpec extends IntegrationBaseSpec {
+class VatReturnServiceISpec extends IntegrationBaseSpec {
 
   private trait Test {
     val exampleVatReturn: VatReturn = VatReturn(
