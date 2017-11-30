@@ -19,16 +19,20 @@ package controllers
 import javax.inject.{Inject, Singleton}
 
 import config.AppConfig
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.i18n.MessagesApi
 import play.api.mvc._
-import uk.gov.hmrc.auth.core.AuthorisedFunctions
-import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import services.{EnrolmentsAuthService, VatReturnService}
 
 @Singleton
-class VatReturnController @Inject()(val messagesApi: MessagesApi, val authFunctions: AuthorisedFunctions,
-                                    implicit val appConfig: AppConfig)
-  extends FrontendController with I18nSupport {
+class VatReturnController @Inject()(val messagesApi: MessagesApi, val enrolmentsAuthService: EnrolmentsAuthService,
+                                    vatReturnService: VatReturnService, implicit val appConfig: AppConfig)
+  extends AuthorisedController {
 
-  val yourVatReturn: Action[AnyContent] = TODO
-
+  def yourVatReturn(): Action[AnyContent] = authorisedAction {
+    implicit request =>
+      implicit user =>
+        vatReturnService.getVatReturn(user).map { vatReturn =>
+          Ok(views.html.yourVatReturn(vatReturn))
+        }
+  }
 }
