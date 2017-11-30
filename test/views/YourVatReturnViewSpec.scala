@@ -60,7 +60,7 @@ class YourVatReturnViewSpec extends ViewBaseSpec {
     }
 
     "have the correct page heading" in {
-      elementText(Selectors.pageHeading) shouldBe "Your VAT return 1 January to 31 March 2017"
+      elementText(Selectors.pageHeading) shouldBe "Your VAT return"
     }
 
     "have the correct subheading" in {
