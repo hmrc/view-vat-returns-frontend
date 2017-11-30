@@ -24,8 +24,8 @@
     <div class="column-two-thirds">
       <h1 class="heading-xlarge">
         @messages("yourVatReturn.title")
-        <span class="heading-secondary">@displayDateRange(vatReturn.startDate, vatReturn.endDate)</span>
       </h1>
+      <span>@displayDateRange(vatReturn.startDate, vatReturn.endDate)</span>
       <h2 class="heading-large">@messages("yourVatReturn.moneyOwed") @displayMoney(vatReturn.owedToHmrc)</h2>
       <ul>
         <li>@messages("yourVatReturn.returnDueDate") @displayDate(vatReturn.dueDate)</li>
