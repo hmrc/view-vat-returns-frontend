@@ -18,7 +18,6 @@ package controllers
 
 import java.time.LocalDate
 
-import connectors.VatReturnConnector
 import models.{User, VatReturn}
 import play.api.http.Status
 import play.api.test.Helpers._
