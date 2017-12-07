@@ -22,15 +22,17 @@
 @views.html.main_template(title = messages("yourVatReturn.title"), bodyClasses = None, appConfig = appConfig) {
   <div class="grid-row">
     <div class="column-two-thirds">
-      <h1 class="heading-xlarge">@messages("yourVatReturn.title")</h1>
-      <span>@displayDateRange(vatReturn.startDate, vatReturn.endDate)</span>
+      <h1 class="heading-xlarge">@messages("yourVatReturn.title")
+        <span class="heading-secondary">@displayDateRange(vatReturn.startDate, vatReturn.endDate)</span>
+      </h1>
+      <p>@messages("yourVatReturn.paymentProcessed")</p>
       <h2 class="heading-large">@messages("yourVatReturn.moneyOwed") @displayMoney(vatReturn.owedToHmrc)</h2>
       <ul>
         <li>@messages("yourVatReturn.returnDueDate") @displayDate(vatReturn.dueDate)</li>
         <li>@messages("yourVatReturn.dateSubmitted") @displayDate(vatReturn.dateSubmitted)</li>
       </ul>
       <h3 class="heading-medium">@vatReturn.businessName</h3>
-      <table role="presentation">
+      <table style="margin-bottom: 3em;" role="presentation">
         <tbody>
           <tr>
             <td id="totalSales">@messages("yourVatReturn.totalSales")</td>

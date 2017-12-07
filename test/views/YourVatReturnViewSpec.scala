@@ -60,7 +60,7 @@ class YourVatReturnViewSpec extends ViewBaseSpec {
     }
 
     "have the correct page heading" in {
-      elementText(Selectors.pageHeading) shouldBe "Your VAT return"
+      elementText(Selectors.pageHeading).contains("Your VAT return") shouldBe true
     }
 
     "have the correct subheading" in {
