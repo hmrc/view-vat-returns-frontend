@@ -42,8 +42,7 @@ class VatReturnServiceSpec extends ControllerBaseSpec {
       9444444,
       9999,
       7777,
-      999.54,
-      0
+      999.54
     )
     val mockConnector: VatReturnConnector = mock[VatReturnConnector]
     val service = new VatReturnService(mockConnector)

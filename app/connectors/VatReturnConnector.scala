@@ -44,8 +44,7 @@ class VatReturnConnector @Inject()(http: HttpClient) {
         9444444,
         9999,
         7777,
-        999,
-        0
+        999
       )
     )
   }

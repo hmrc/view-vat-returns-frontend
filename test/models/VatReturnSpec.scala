@@ -38,8 +38,7 @@ class VatReturnSpec extends UnitSpec {
       9444444,
       9999,
       7777,
-      999.54,
-      0
+      999.54
     )
 
     val exampleString =
@@ -57,8 +56,7 @@ class VatReturnSpec extends UnitSpec {
         |"euCosts":9444444,
         |"totalVatCharged":9999,
         |"totalVatReclaimed":7777,
-        |"owedToHmrc":999.54,
-        |"vatBalance":0
+        |"owedToHmrc":999.54
         |}"""
         .stripMargin.replace("\n", "")
 

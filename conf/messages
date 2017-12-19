@@ -22,6 +22,5 @@ yourVatReturn.euCosts = EU costs (minus VAT):
 yourVatReturn.totalVatCharged = Total VAT you charged:
 yourVatReturn.totalVatReclaimed = Total VAT you reclaimed:
 yourVatReturn.owedToHmrc = What you owed HMRC:
-yourVatReturn.vatBalance = Your VAT balance:
 yourVatReturn.adjustments = If there are any errors, you can make adjustments through your software.
 yourVatReturn.paymentProcessed = Your payment has been processed. There is nothing more you need to do with this return.

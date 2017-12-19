@@ -46,8 +46,7 @@ class VatReturnControllerSpec extends ControllerBaseSpec {
       9444444,
       9999,
       7777,
-      999.54,
-      0
+      999.54
     )
     val serviceCall: Boolean = true
     val authResult: Future[_]
