@@ -33,8 +33,7 @@ case class VatReturn(
                     euCosts: BigDecimal,
                     totalVatCharged: BigDecimal,
                     totalVatReclaimed: BigDecimal,
-                    owedToHmrc: BigDecimal,
-                    vatBalance: BigDecimal
+                    owedToHmrc: BigDecimal
                     )
 
 object VatReturn {

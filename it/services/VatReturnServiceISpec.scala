@@ -38,8 +38,7 @@ class VatReturnServiceISpec extends IntegrationBaseSpec {
       9444444,
       9999,
       7777,
-      999,
-      0
+      999
     )
     val service: VatReturnService = app.injector.instanceOf[VatReturnService]
   }

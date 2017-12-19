@@ -48,8 +48,7 @@ class YourVatReturnViewSpec extends ViewBaseSpec {
       9444444,
       9999,
       7777,
-      999.54,
-      0
+      999.54
     )
 
     lazy val view = views.html.yourVatReturn(exampleVatReturn)
@@ -70,7 +69,7 @@ class YourVatReturnViewSpec extends ViewBaseSpec {
     "have the correct row headings in the table" in {
       val expectedRows = Array("Total sales (minus VAT):", "EU sales (minus VAT):", "VAT charged in UK:",
         "VAT charged to EU:", "Total costs (minus VAT):", "EU costs (minus VAT):", "Total VAT you charged:",
-        "Total VAT you reclaimed:", "What you owed HMRC:", "Your VAT balance:")
+        "Total VAT you reclaimed:", "What you owed HMRC:")
 
       expectedRows.indices.foreach(i => elementText(Selectors.rows(i)) shouldBe expectedRows(i))
     }
