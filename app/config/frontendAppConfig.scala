@@ -19,6 +19,7 @@ package config
 import java.util.Base64
 import javax.inject.{Inject, Singleton}
 
+import config.features.Features
 import play.api.Mode.Mode
 import play.api.mvc.Call
 import play.api.{Configuration, Environment}
@@ -36,6 +37,7 @@ trait AppConfig extends ServicesConfig {
   val whitelistExcludedPaths: Seq[Call]
   val shutterPage: String
   val signInUrl: String
+  val features: Features
 }
 
 @Singleton
@@ -66,4 +68,6 @@ class FrontendAppConfig @Inject()(val runModeConfiguration: Configuration, val e
     controllers.routes.VatReturnController.yourVatReturn().url).encodedUrl
   private lazy val signInOrigin = getString("appName")
   override lazy val signInUrl: String = s"$signInBaseUrl?continue=$signInContinueUrl&origin=$signInOrigin"
+
+  override val features = new Features(runModeConfiguration)
 }
