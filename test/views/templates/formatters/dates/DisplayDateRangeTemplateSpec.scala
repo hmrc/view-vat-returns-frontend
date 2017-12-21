@@ -20,9 +20,9 @@ import java.time.LocalDate
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import views.ViewBaseSpec
+import views.templates.TemplateBaseSpec
 
-class DisplayDateRangeTemplateSpec extends ViewBaseSpec {
+class DisplayDateRangeTemplateSpec extends TemplateBaseSpec {
 
   "Calling displayDateRange template" when {
 

@@ -19,9 +19,9 @@ package views.templates.inputs
 import forms.FeatureSwitchForm
 import play.api.data.Field
 import play.twirl.api.Html
-import views.ViewBaseSpec
+import views.templates.TemplateBaseSpec
 
-class SingleCheckboxTemplateSpec extends ViewBaseSpec {
+class SingleCheckboxTemplateSpec extends TemplateBaseSpec {
 
   "Rendering the singleCheckbox input" when {
 

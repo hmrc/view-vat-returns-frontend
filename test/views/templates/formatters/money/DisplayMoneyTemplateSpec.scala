@@ -18,9 +18,9 @@ package views.templates.formatters.money
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import views.ViewBaseSpec
+import views.templates.TemplateBaseSpec
 
-class DisplayMoneyTemplateSpec extends ViewBaseSpec {
+class DisplayMoneyTemplateSpec extends TemplateBaseSpec {
 
   "Calling displayMoney" when {
 

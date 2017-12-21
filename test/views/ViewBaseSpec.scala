@@ -24,7 +24,6 @@ import play.api.i18n.{Lang, Messages, MessagesApi}
 import play.api.inject.Injector
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
-import play.twirl.api.Html
 import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.collection.JavaConversions._
@@ -56,6 +55,6 @@ class ViewBaseSpec extends UnitSpec with GuiceOneAppPerSuite {
     attributes.map(attribute => (attribute.getKey, attribute.getValue)).toMap
   }
 
-  def formatHtml(markup: Html): String = Jsoup.parseBodyFragment(s"\n$markup\n").toString.trim
+  def formatHtml(markup: String): String = Jsoup.parseBodyFragment(s"\n$markup\n").toString.trim
 
 }
