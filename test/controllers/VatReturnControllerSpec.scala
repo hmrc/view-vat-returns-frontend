@@ -102,37 +102,23 @@ class VatReturnControllerSpec extends ControllerBaseSpec {
       }
     }
 
-    "A user is logged in but not enrolled to HMRC-MTD-VAT" should {
+    "A user is not authorised" should {
 
-      "return 303" in new Test {
+      "return 403 (Forbidden)" in new Test {
         override val serviceCall = false
         override val authResult: Future[Nothing] = Future.failed(InsufficientEnrolments())
         private val result = target.yourVatReturn()(fakeRequest)
-        status(result) shouldBe Status.SEE_OTHER
-      }
-
-      "redirect to the unauthorised page" in new Test {
-        override val serviceCall = false
-        override val authResult: Future[Nothing] = Future.failed(InsufficientEnrolments())
-        private val result = target.yourVatReturn()(fakeRequest)
-        redirectLocation(result) shouldBe Some(routes.ErrorsController.unauthorised().url)
+        status(result) shouldBe Status.FORBIDDEN
       }
     }
 
-    "A user is not logged in" should {
+    "A user is not authenticated" should {
 
-      "return 303" in new Test {
+      "return 401 (Unauthorised)" in new Test {
         override val serviceCall = false
         override val authResult: Future[Nothing] = Future.failed(MissingBearerToken())
         private val result = target.yourVatReturn()(fakeRequest)
-        status(result) shouldBe Status.SEE_OTHER
-      }
-
-      "redirect to the session timeout page" in new Test {
-        override val serviceCall = false
-        override val authResult: Future[Nothing] = Future.failed(MissingBearerToken())
-        private val result = target.yourVatReturn()(fakeRequest)
-        redirectLocation(result) shouldBe Some(routes.ErrorsController.sessionTimeout().url)
+        status(result) shouldBe Status.UNAUTHORIZED
       }
     }
   }

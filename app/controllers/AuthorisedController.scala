@@ -46,8 +46,8 @@ abstract class AuthorisedController extends FrontendController with I18nSupport 
           block(request)(user)
         }
       } recoverWith {
-        case _: NoActiveSession => Future.successful(Redirect(controllers.routes.ErrorsController.sessionTimeout()))
-        case _: AuthorisationException => Future.successful(Redirect(controllers.routes.ErrorsController.unauthorised()))
+        case _: NoActiveSession => Future.successful(Unauthorized(views.html.errors.sessionTimeout()))
+        case _: AuthorisationException => Future.successful(Forbidden(views.html.errors.unauthorised()))
       }
   }
 

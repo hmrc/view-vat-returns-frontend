@@ -1,9 +1,5 @@
 # microservice specific routes
 
-GET        /session-timeout         controllers.ErrorsController.sessionTimeout
-
-GET        /unauthorised            controllers.ErrorsController.unauthorised
-
 GET        /return                  controllers.VatReturnController.yourVatReturn
 GET        /feature-switch          controllers.FeatureSwitchController.featureSwitch
 POST       /feature-switch          controllers.FeatureSwitchController.submitFeatureSwitch
