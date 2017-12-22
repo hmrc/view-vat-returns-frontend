@@ -47,35 +47,22 @@ class VatReturnPageSpec extends IntegrationBaseSpec {
 
       def setupStubsForScenario(): StubMapping = AuthStub.unauthorisedNotLoggedIn()
 
-      "return 303" in new Test {
+      "return 401 (Unauthorised)" in new Test {
         override def setupStubs(): StubMapping = setupStubsForScenario()
 
         val response: WSResponse = await(request().get())
-        response.status shouldBe Status.SEE_OTHER
-      }
-
-      "redirect to the session timeout page" in new Test {
-        override def setupStubs(): StubMapping = setupStubsForScenario()
-
-        val response: WSResponse = await(request().get())
-        response.header(HeaderNames.LOCATION) shouldBe Some(s"$appRouteContext/session-timeout")
+        response.status shouldBe Status.UNAUTHORIZED
       }
     }
 
-    "the user has a different enrolment" should {
+    "the user is not authorised" should {
 
       def setupStubsForScenario(): StubMapping = AuthStub.unauthorisedOtherEnrolmentVatReturn()
 
-      "return 303" in new Test {
+      "return 401 (Forbidden)" in new Test {
         override def setupStubs(): StubMapping = setupStubsForScenario()
         val response: WSResponse = await(request().get())
-        response.status shouldBe Status.SEE_OTHER
-      }
-
-      "redirect to the unauthorised page" in new Test {
-        override def setupStubs(): StubMapping = setupStubsForScenario()
-        val response: WSResponse = await(request().get())
-        response.header(HeaderNames.LOCATION) shouldBe Some(s"$appRouteContext/unauthorised")
+        response.status shouldBe Status.FORBIDDEN
       }
     }
   }
