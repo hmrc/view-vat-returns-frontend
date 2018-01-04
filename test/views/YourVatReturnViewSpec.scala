@@ -29,8 +29,19 @@ class YourVatReturnViewSpec extends ViewBaseSpec {
     object Selectors {
       val pageHeading = "#content h1"
       val subHeading = "#content h2"
-      val rows = Array("#totalSales", "#euSales", "#vatChargedInUk", "#vatChargedToEu", "#totalCosts",
-                    "#euCosts", "#totalVatCharged", "#totalVatReclaimed", "#owedToHmrc", "#vatBalance")
+      val tableHeadingOne = "#content > article > div > div:nth-child(6) > h3"
+
+      val tableHeadingTwo = "#content > article > div > div:nth-child(14) > div"
+      val boxes = Array(
+        nineBoxElemSelector("8", "1"), nineBoxElemSelector("9", "1"), nineBoxElemSelector("10", "1"),
+        nineBoxElemSelector("11", "1"), nineBoxElemSelector("12", "1"), nineBoxElemSelector("16", "1"),
+        nineBoxElemSelector("17", "1"), nineBoxElemSelector("18", "1"), nineBoxElemSelector("19", "1")
+      )
+      val rowDescriptions = Array(
+        nineBoxElemSelector("8", "2"), nineBoxElemSelector("9", "2"), nineBoxElemSelector("10", "2"),
+        nineBoxElemSelector("11", "2"), nineBoxElemSelector("12", "2"), nineBoxElemSelector("16", "2"),
+        nineBoxElemSelector("17", "2"), nineBoxElemSelector("18", "2"), nineBoxElemSelector("19", "2")
+      )
       val adjustments = "#adjustments"
     }
 
@@ -54,27 +65,50 @@ class YourVatReturnViewSpec extends ViewBaseSpec {
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct document title" in {
-      document.title shouldBe "Your VAT return"
+      document.title shouldBe "VAT return"
     }
 
     "have the correct page heading" in {
-      elementText(Selectors.pageHeading) should include ("Your VAT return")
+      elementText(Selectors.pageHeading) should include ("VAT return")
     }
 
     "have the correct subheading" in {
-      elementText(Selectors.subHeading) shouldBe "What you owed: £999.54"
+      elementText(Selectors.subHeading) shouldBe "You owed: £1,320"
     }
 
-    "have the correct row headings in the table" in {
-      val expectedRows = Array("Total sales (minus VAT):", "EU sales (minus VAT):", "VAT charged in UK:",
-        "VAT charged to EU:", "Total costs (minus VAT):", "EU costs (minus VAT):", "Total VAT you charged:",
-        "Total VAT you reclaimed:", "What you owed HMRC:")
+    "have the correct heading for the first section of the return" in {
+      elementText(Selectors.tableHeadingOne) shouldBe "VAT details"
+    }
 
-      expectedRows.indices.foreach(i => elementText(Selectors.rows(i)) shouldBe expectedRows(i))
+    "have the correct heading for the second section of the return" in {
+      elementText(Selectors.tableHeadingTwo) shouldBe "Additional information"
+    }
+
+    "have the correct box numbers in the table" in {
+      val expectedBoxes = Array("Box 1", "Box 2", "Box 3", "Box 4", "Box 5", "Box 6", "Box 7", "Box 8", "Box 9")
+      expectedBoxes.indices.foreach(i => elementText(Selectors.boxes(i)) shouldBe expectedBoxes(i))
+    }
+
+    "have the correct row descriptions in the table" in {
+      val expectedDescriptions = Array(
+        "VAT on United Kingdom sales and other outputs",
+        "VAT on European Community sales and related costs",
+        "Total VAT you owe HMRC",
+        "Total VAT reclaimed from anywhere",
+        "Total you owe",
+        "Total sales and other outputs from anywhere, minus VAT",
+        "Total purchases from anywhere, minus VAT",
+        "Total supplies, goods and related costs to European Community, minus VAT",
+        "Total value of acquisitions of goods from European Community, minus VAT"
+      )
+      expectedDescriptions.indices.foreach(i => elementText(Selectors.rowDescriptions(i)) shouldBe expectedDescriptions(i))
     }
 
     "have the correct info regarding making adjustments" in {
       elementText(Selectors.adjustments) shouldBe "If there are any errors, you can make adjustments through your software."
     }
   }
+
+  def nineBoxElemSelector(divNumber: String, columnNumber: String): String =
+    s"#content > article > div > div:nth-child($divNumber) > div:nth-child($columnNumber)"
 }
