@@ -28,7 +28,8 @@ class YourVatReturnViewSpec extends ViewBaseSpec {
 
     object Selectors {
       val pageHeading = "#content h1"
-      val subHeading = "#content h2"
+      val subHeading = "#content h2.heading-large"
+      val tradingNameHeading = "#content h2.heading-medium"
       val tableHeadingOne = "#content > article > div > div:nth-child(6) > h3"
 
       val tableHeadingTwo = "#content > article > div > div:nth-child(14) > div"
@@ -75,6 +76,10 @@ class YourVatReturnViewSpec extends ViewBaseSpec {
 
     "have the correct subheading" in {
       elementText(Selectors.subHeading) shouldBe "You owed: £1,320"
+    }
+
+    "have the correct trading name" in {
+      elementText(Selectors.tradingNameHeading) shouldBe tradingName
     }
 
     "have the correct heading for the first section of the return" in {
