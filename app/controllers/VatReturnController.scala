@@ -21,18 +21,20 @@ import javax.inject.{Inject, Singleton}
 import config.AppConfig
 import play.api.i18n.MessagesApi
 import play.api.mvc._
-import services.{EnrolmentsAuthService, VatReturnService}
+import services.{EnrolmentsAuthService, VatApiService, VatReturnService}
 
 @Singleton
 class VatReturnController @Inject()(val messagesApi: MessagesApi, val enrolmentsAuthService: EnrolmentsAuthService,
-                                    vatReturnService: VatReturnService, implicit val appConfig: AppConfig)
+                                    vatReturnService: VatReturnService, vatApiService: VatApiService,
+                                    implicit val appConfig: AppConfig)
   extends AuthorisedController {
 
   def yourVatReturn(): Action[AnyContent] = authorisedAction {
     implicit request =>
       implicit user =>
-        vatReturnService.getVatReturn(user).map { vatReturn =>
-          Ok(views.html.yourVatReturn(vatReturn))
-        }
+        for {
+          vatReturn <- vatReturnService.getVatReturn(user)
+          tradingName <- vatApiService.getTradingName(user)
+        } yield Ok(views.html.yourVatReturn(vatReturn, tradingName))
   }
 }
