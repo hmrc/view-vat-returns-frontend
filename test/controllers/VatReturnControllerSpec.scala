@@ -21,7 +21,7 @@ import java.time.LocalDate
 import models.{User, VatReturn}
 import play.api.http.Status
 import play.api.test.Helpers._
-import services.{EnrolmentsAuthService, VatReturnService}
+import services.{EnrolmentsAuthService, VatApiService, VatReturnService}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.Retrieval
@@ -47,10 +47,12 @@ class VatReturnControllerSpec extends ControllerBaseSpec {
       55454,
       545645
     )
+    val exampleTradingName: String = "Cheapo Clothing Ltd"
     val serviceCall: Boolean = true
     val authResult: Future[_]
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
     val mockVatReturnService: VatReturnService = mock[VatReturnService]
+    val mockVatApiService: VatApiService = mock[VatApiService]
 
     def setup(): Any = {
       (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
@@ -61,6 +63,10 @@ class VatReturnControllerSpec extends ControllerBaseSpec {
         (mockVatReturnService.getVatReturn(_: User))
           .expects(*)
           .returns(Future.successful(exampleVatReturn))
+
+        (mockVatApiService.getTradingName(_: User))
+          .expects(*)
+          .returns(Future.successful(exampleTradingName))
       }
     }
 
@@ -68,7 +74,7 @@ class VatReturnControllerSpec extends ControllerBaseSpec {
 
     def target: VatReturnController = {
       setup()
-      new VatReturnController(messages, mockEnrolmentsAuthService, mockVatReturnService, mockConfig)
+      new VatReturnController(messages, mockEnrolmentsAuthService, mockVatReturnService, mockVatApiService, mockConfig)
     }
   }
 

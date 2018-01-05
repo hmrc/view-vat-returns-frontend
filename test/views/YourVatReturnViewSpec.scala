@@ -60,8 +60,9 @@ class YourVatReturnViewSpec extends ViewBaseSpec {
       55454,
       545645
     )
+    val tradingName = "Cheapo Clothing Ltd"
 
-    lazy val view = views.html.yourVatReturn(exampleVatReturn)
+    lazy val view = views.html.yourVatReturn(exampleVatReturn, tradingName)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct document title" in {
