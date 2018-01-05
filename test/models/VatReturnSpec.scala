@@ -25,38 +25,36 @@ class VatReturnSpec extends UnitSpec {
   "A VAT Return" should {
 
     val exampleVatReturn = VatReturn(
-      "ABC Clothing",
       LocalDate.parse("2017-01-01"),
       LocalDate.parse("2017-03-31"),
       LocalDate.parse("2017-04-06"),
       LocalDate.parse("2017-04-08"),
-      99999,
-      77777,
-      4444,
-      5555,
-      999999,
-      9444444,
-      9999,
-      7777,
-      999.54
+      1297,
+      5755,
+      7052,
+      5732,
+      1320,
+      77656,
+      765765,
+      55454,
+      545645
     )
 
     val exampleString =
       """{
-        |"businessName":"ABC Clothing",
         |"startDate":"2017-01-01",
         |"endDate":"2017-03-31",
         |"dateSubmitted":"2017-04-06",
         |"dueDate":"2017-04-08",
-        |"totalSales":99999,
-        |"euSales":77777,
-        |"vatChargedInUk":4444,
-        |"vatChargedToEu":5555,
-        |"totalCosts":999999,
-        |"euCosts":9444444,
-        |"totalVatCharged":9999,
-        |"totalVatReclaimed":7777,
-        |"owedToHmrc":999.54
+        |"ukVatDue":1297,
+        |"euVatDue":5755,
+        |"totalVatDue":7052,
+        |"totalVatReclaimed":5732,
+        |"totalOwed":1320,
+        |"totalSales":77656,
+        |"totalCosts":765765,
+        |"euTotalSales":55454,
+        |"euTotalCosts":545645
         |}"""
         .stripMargin.replace("\n", "")
 

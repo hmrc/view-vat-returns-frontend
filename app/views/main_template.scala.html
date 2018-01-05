@@ -18,7 +18,7 @@
   sidebarLinks: Option[Html] = None,
   contentHeader: Option[Html] = None,
   bodyClasses: Option[String] = None,
-  mainClass: Option[String] = None,
+  mainClass: Option[String] = Some("full-width"),
   scriptElem: Option[Html] = None,
   appConfig: config.AppConfig)(mainContent: Html)(implicit request : Request[_], messages: Messages)
 

@@ -20,59 +20,72 @@
 @(vatReturn: VatReturn)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
 @views.html.main_template(title = messages("yourVatReturn.title"), bodyClasses = None, appConfig = appConfig) {
-  <div class="grid-row">
-    <div class="column-two-thirds">
-      <h1 class="heading-xlarge">@messages("yourVatReturn.title")
-        <span class="heading-secondary">@displayDateRange(vatReturn.startDate, vatReturn.endDate)</span>
-      </h1>
-      <p>@messages("yourVatReturn.paymentProcessed")</p>
-      <h2 class="heading-large">@messages("yourVatReturn.moneyOwed") @displayMoney(vatReturn.owedToHmrc)</h2>
-      <ul>
-        <li>@messages("yourVatReturn.returnDueDate") @displayDate(vatReturn.dueDate)</li>
-        <li>@messages("yourVatReturn.dateSubmitted") @displayDate(vatReturn.dateSubmitted)</li>
-      </ul>
-      <h3 class="heading-medium">@vatReturn.businessName</h3>
-      <table style="margin-bottom: 3em;" role="presentation">
-        <tbody>
-          <tr>
-            <td id="totalSales">@messages("yourVatReturn.totalSales")</td>
-            <td class="bold-small" style="text-align: right;">@displayMoney(vatReturn.totalSales)</td>
-          </tr>
-          <tr>
-            <td id="euSales">@messages("yourVatReturn.euSales")</td>
-            <td class="bold-small" style="text-align: right;">@displayMoney(vatReturn.euSales)</td>
-          </tr>
-          <tr>
-            <td id="vatChargedInUk">@messages("yourVatReturn.vatChargedInUk")</td>
-            <td class="bold-small" style="text-align: right;">@displayMoney(vatReturn.vatChargedInUk)</td>
-          </tr>
-          <tr>
-            <td id="vatChargedToEu">@messages("yourVatReturn.vatChargedToEu")</td>
-            <td class="bold-small" style="text-align: right;">@displayMoney(vatReturn.vatChargedToEu)</td>
-          </tr>
-          <tr>
-            <td id="totalCosts">@messages("yourVatReturn.totalCosts")</td>
-            <td class="bold-small" style="text-align: right;">@displayMoney(vatReturn.totalCosts)</td>
-          </tr>
-          <tr>
-            <td id="euCosts">@messages("yourVatReturn.euCosts")</td>
-            <td class="bold-small" style="text-align: right;">@displayMoney(vatReturn.euCosts)</td>
-          </tr>
-          <tr>
-            <td id="totalVatCharged">@messages("yourVatReturn.totalVatCharged")</td>
-            <td class="bold-small" style="text-align: right;">@displayMoney(vatReturn.totalVatCharged)</td>
-          </tr>
-          <tr>
-            <td id="totalVatReclaimed">@messages("yourVatReturn.totalVatReclaimed")</td>
-            <td class="bold-small" style="text-align: right;">@displayMoney(vatReturn.totalVatReclaimed)</td>
-          </tr>
-          <tr>
-            <td id="owedToHmrc">@messages("yourVatReturn.owedToHmrc")</td>
-            <td class="bold-small" style="text-align: right;">@displayMoney(vatReturn.owedToHmrc)</td>
-          </tr>
-        </tbody>
-      </table>
-      <p id="adjustments">@messages("yourVatReturn.adjustments")</p>
+  <div class="grid-row column-two-thirds">
+    <h1 class="heading-xlarge">@messages("yourVatReturn.title")
+      <span class="heading-secondary">@displayDateRange(vatReturn.startDate, vatReturn.endDate)</span>
+    </h1>
+    <p>@messages("yourVatReturn.paymentProcessed")</p>
+    <h2 class="heading-large">@messages("yourVatReturn.moneyOwed") @displayMoney(vatReturn.totalOwed)</h2>
+    <ul>
+      <li>@messages("yourVatReturn.returnDueDate") @displayDate(vatReturn.dueDate)</li>
+      <li>@messages("yourVatReturn.dateSubmitted") @displayDate(vatReturn.dateSubmitted)</li>
+    </ul>
+    <h2 class="heading-medium">Placeholder</h2>
+    <div class="grid-row">
+      <h3 class="column-two-thirds bold-small">@messages("yourVatReturn.vatDetails")</h3>
     </div>
+    <br>
+    <div class="grid-row">
+      <div class="column-one-quarter form-hint">@messages("yourVatReturn.boxOne")</div>
+      <div class="column-one-half form-hint">@messages("yourVatReturn.boxOneDescription")</div>
+      <div class="column-one-quarter form-hint text--right">@displayMoney(vatReturn.ukVatDue)</div>
+    </div>
+    <div class="grid-row">
+      <div class="column-one-quarter form-hint">@messages("yourVatReturn.boxTwo")</div>
+      <div class="column-one-half form-hint">@messages("yourVatReturn.boxTwoDescription")</div>
+      <div class="column-one-quarter form-hint text--right">@displayMoney(vatReturn.euVatDue)</div>
+    </div>
+    <div class="grid-row">
+      <div class="column-one-quarter form-hint">@messages("yourVatReturn.boxThree")</div>
+      <div class="column-one-half form-hint">@messages("yourVatReturn.boxThreeDescription")</div>
+      <div class="column-one-quarter form-hint text--right">@displayMoney(vatReturn.totalVatDue)</div>
+    </div>
+    <div class="grid-row">
+      <div class="column-one-quarter form-hint">@messages("yourVatReturn.boxFour")</div>
+      <div class="column-one-half form-hint">@messages("yourVatReturn.boxFourDescription")</div>
+      <div class="column-one-quarter form-hint text--right">-@displayMoney(vatReturn.totalVatReclaimed)</div>
+    </div>
+    <div class="grid-row">
+      <div class="column-one-quarter heading-small">@messages("yourVatReturn.boxFive")</div>
+      <div class="column-one-half heading-small">@messages("yourVatReturn.boxFiveDescription")</div>
+      <div class="column-one-quarter heading-small text--right">@displayMoney(vatReturn.totalOwed)</div>
+    </div>
+    <hr>
+    <div class="grid-row">
+      <div class="column-two-thirds bold-small">@messages("yourVatReturn.additionalInfo")</div>
+    </div>
+    <br>
+    <div class="grid-row">
+      <div class="column-one-quarter form-hint">@messages("yourVatReturn.boxSix")</div>
+      <div class="column-one-half form-hint">@messages("yourVatReturn.boxSixDescription")</div>
+      <div class="column-one-quarter form-hint text--right">@displayMoney(vatReturn.totalSales)</div>
+    </div>
+    <div class="grid-row">
+      <div class="column-one-quarter form-hint">@messages("yourVatReturn.boxSeven")</div>
+      <div class="column-one-half form-hint">@messages("yourVatReturn.boxSevenDescription")</div>
+      <div class="column-one-quarter form-hint text--right">@displayMoney(vatReturn.totalCosts)</div>
+    </div>
+    <div class="grid-row">
+      <div class="column-one-quarter form-hint">@messages("yourVatReturn.boxEight")</div>
+      <div class="column-one-half form-hint">@messages("yourVatReturn.boxEightDescription")</div>
+      <div class="column-one-quarter form-hint text--right">@displayMoney(vatReturn.euTotalSales)</div>
+    </div>
+    <div class="grid-row">
+      <div class="column-one-quarter form-hint">@messages("yourVatReturn.boxNine")</div>
+      <div class="column-one-half form-hint">@messages("yourVatReturn.boxNineDescription")</div>
+      <div class="column-one-quarter form-hint text--right">@displayMoney(vatReturn.euTotalCosts)</div>
+    </div>
+    <br>
+    <p id="adjustments">@messages("yourVatReturn.adjustments")</p>
   </div>
 }

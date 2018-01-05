@@ -20,20 +20,19 @@ import java.time.LocalDate
 import play.api.libs.json.{Format, Json}
 
 case class VatReturn(
-                    businessName: String,
                     startDate: LocalDate,
                     endDate: LocalDate,
                     dateSubmitted: LocalDate,
                     dueDate: LocalDate,
-                    totalSales: BigDecimal,
-                    euSales: BigDecimal,
-                    vatChargedInUk: BigDecimal,
-                    vatChargedToEu: BigDecimal,
-                    totalCosts: BigDecimal,
-                    euCosts: BigDecimal,
-                    totalVatCharged: BigDecimal,
+                    ukVatDue: BigDecimal,
+                    euVatDue: BigDecimal,
+                    totalVatDue: BigDecimal,
                     totalVatReclaimed: BigDecimal,
-                    owedToHmrc: BigDecimal
+                    totalOwed: BigDecimal,
+                    totalSales: BigDecimal,
+                    totalCosts: BigDecimal,
+                    euTotalSales: BigDecimal,
+                    euTotalCosts: BigDecimal
                     )
 
 object VatReturn {

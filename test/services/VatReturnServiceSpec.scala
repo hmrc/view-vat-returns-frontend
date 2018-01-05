@@ -29,20 +29,19 @@ class VatReturnServiceSpec extends ControllerBaseSpec {
 
   private trait Test {
     val exampleVatReturn: VatReturn = VatReturn(
-      "ABC Clothing",
       LocalDate.parse("2017-01-01"),
       LocalDate.parse("2017-03-31"),
       LocalDate.parse("2017-04-06"),
       LocalDate.parse("2017-04-08"),
-      99999,
-      77777,
-      4444,
-      5555,
-      999999,
-      9444444,
-      9999,
-      7777,
-      999.54
+      1297,
+      5755,
+      7052,
+      5732,
+      1320,
+      77656,
+      765765,
+      55454,
+      545645
     )
     val mockConnector: VatReturnConnector = mock[VatReturnConnector]
     val service = new VatReturnService(mockConnector)
