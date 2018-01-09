@@ -20,11 +20,11 @@ import java.time.LocalDate
 import play.api.libs.json.Json
 import uk.gov.hmrc.play.test.UnitSpec
 
-class VatReturnSpec extends UnitSpec {
+class NineBoxSpec extends UnitSpec {
 
   "A VAT Return" should {
 
-    val exampleVatReturn = VatReturn(
+    val exampleVatReturn = NineBox(
       LocalDate.parse("2017-01-01"),
       LocalDate.parse("2017-03-31"),
       LocalDate.parse("2017-04-06"),
@@ -64,7 +64,7 @@ class VatReturnSpec extends UnitSpec {
     }
 
     "be parsed from appropriate JSON" in {
-      val result = Json.parse(exampleString).as[VatReturn]
+      val result = Json.parse(exampleString).as[NineBox]
       result shouldEqual exampleVatReturn
     }
   }

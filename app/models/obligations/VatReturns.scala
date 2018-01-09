@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package app
+package models.obligations
 
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import uk.gov.hmrc.play.test.UnitSpec
+import play.api.libs.json.{Format, Json}
 
-class RouteSpec extends UnitSpec with GuiceOneAppPerSuite {
+case class VatReturns(obligations: Seq[VatReturn])
 
-  "The route for the submitted 9 box returns" should {
-    "be /view-your-vat-returns/return" in {
-      controllers.routes.NineBoxController.yourNineBox().url shouldBe "/view-your-vat-returns/return"
-    }
-  }
+object VatReturns {
+
+  implicit val format: Format[VatReturns] = Json.format[VatReturns]
+
 }

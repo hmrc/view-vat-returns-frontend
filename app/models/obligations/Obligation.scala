@@ -14,16 +14,12 @@
  * limitations under the License.
  */
 
-package app
+package models.obligations
 
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import uk.gov.hmrc.play.test.UnitSpec
+import java.time.LocalDate
 
-class RouteSpec extends UnitSpec with GuiceOneAppPerSuite {
+trait Obligation {
 
-  "The route for the submitted 9 box returns" should {
-    "be /view-your-vat-returns/return" in {
-      controllers.routes.NineBoxController.yourNineBox().url shouldBe "/view-your-vat-returns/return"
-    }
-  }
+  def due: LocalDate
+
 }

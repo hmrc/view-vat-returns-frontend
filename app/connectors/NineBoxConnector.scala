@@ -14,20 +14,37 @@
  * limitations under the License.
  */
 
-package services
+package connectors
 
 import javax.inject.{Inject, Singleton}
 
-import connectors.VatReturnConnector
-import models.User
-import models.VatReturn
+import models.NineBox
+import java.time.LocalDate
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import scala.concurrent.Future
 
 @Singleton
-class VatReturnService @Inject()(connector: VatReturnConnector) {
+class NineBoxConnector @Inject()(http: HttpClient) {
 
-  def getVatReturn(user: User): Future[VatReturn] = {
-    connector.getVatReturn(user.vrn)
+  // Static example data return. Does not look for a specific VAT Return.
+  def getNineBox(vrn: String): Future[NineBox] = {
+    Future.successful(
+      NineBox(
+        LocalDate.parse("2017-01-01"),
+        LocalDate.parse("2017-03-31"),
+        LocalDate.parse("2017-04-06"),
+        LocalDate.parse("2017-04-08"),
+        1297,
+        5755,
+        7052,
+        5732,
+        1320,
+        77656,
+        765765,
+        55454,
+        545645
+      )
+    )
   }
 }

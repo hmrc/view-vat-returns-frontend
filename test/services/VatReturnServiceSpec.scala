@@ -18,17 +18,17 @@ package services
 
 import java.time.LocalDate
 
-import connectors.VatReturnConnector
+import connectors.NineBoxConnector
 import controllers.ControllerBaseSpec
 import models.User
-import models.VatReturn
+import models.NineBox
 
 import scala.concurrent.Future
 
 class VatReturnServiceSpec extends ControllerBaseSpec {
 
   private trait Test {
-    val exampleVatReturn: VatReturn = VatReturn(
+    val exampleVatReturn: NineBox = NineBox(
       LocalDate.parse("2017-01-01"),
       LocalDate.parse("2017-03-31"),
       LocalDate.parse("2017-04-06"),
@@ -43,18 +43,18 @@ class VatReturnServiceSpec extends ControllerBaseSpec {
       55454,
       545645
     )
-    val mockConnector: VatReturnConnector = mock[VatReturnConnector]
-    val service = new VatReturnService(mockConnector)
+    val mockConnector: NineBoxConnector = mock[NineBoxConnector]
+    val service = new NineBoxService(mockConnector)
   }
 
   "Calling .getVatReturn" should {
 
     "return a VAT Return" in new Test {
-      (mockConnector.getVatReturn(_: String))
+      (mockConnector.getNineBox(_: String))
         .expects(*)
         .returns(Future.successful(exampleVatReturn))
 
-      lazy val result: VatReturn = await(service.getVatReturn(User("999999999")))
+      lazy val result: NineBox = await(service.getNineBox(User("999999999")))
 
       result shouldBe exampleVatReturn
     }
