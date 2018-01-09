@@ -36,6 +36,20 @@ yourVatReturn.boxNineDescription = Total value of acquisitions of goods from Eur
 yourVatReturn.adjustments = If there are any errors, you can make adjustments through your software.
 yourVatReturn.paymentProcessed = Your payment has been processed. There is nothing more you need to do with this return.
 
+vatReturnsList.title = VAT returns
+vatReturnsList.submitReturns = You submit returns through your accounting software.
+vatReturnsList.periodEnding = Period ending
+vatReturnsList.status = Status
+vatReturnsList.returnDetails = Return details
+vatReturnsList.notSubmitted = Not yet submitted
+vatReturnsList.due = Due
+vatReturnsList.received = Received
+vatReturnsList.viewReturnOne = View
+vatReturnsList.viewReturnTwo = Return
+vatReturnsList.viewEarlierReturnsOne = You can also
+vatReturnsList.viewEarlierReturnsTwo = view earlier returns
+vatReturnsList.viewEarlierReturnsThree = you submitted before using accounting software.
+
 featureSwitch.title = Feature switches
 featureSwitch.heading = Features
 featureSwitch.submit = Submit
