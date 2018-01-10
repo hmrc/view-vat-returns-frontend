@@ -1,5 +1,5 @@
 # microservice specific routes
 
-GET        /return                  controllers.NineBoxController.yourNineBox
+GET        /return                  controllers.ReturnsController.vatReturnDetails
 GET        /feature-switch          controllers.FeatureSwitchController.featureSwitch
 POST       /feature-switch          controllers.FeatureSwitchController.submitFeatureSwitch

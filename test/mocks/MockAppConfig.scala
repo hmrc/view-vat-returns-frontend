@@ -32,8 +32,7 @@ class MockAppConfig(val runModeConfiguration: Configuration, val mode: Mode = Mo
   override val whitelistExcludedPaths: Seq[Call] = Nil
   override val shutterPage: String = "https://www.tax.service.gov.uk/shutter/view-vat-returns"
   override val signInUrl: String = ""
-
   override val features: Features = new Features(runModeConfiguration)
-
+  override val portalUrl: String = ""
 }
 
