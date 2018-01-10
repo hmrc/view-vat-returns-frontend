@@ -18,7 +18,7 @@ package views
 
 import java.time.LocalDate
 
-import models.obligations.{VatReturn, VatReturns}
+import models.{VatReturn, VatReturns}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 

@@ -18,7 +18,7 @@ package pages
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import helpers.IntegrationBaseSpec
-import play.api.http.{HeaderNames, Status}
+import play.api.http.Status
 import play.api.libs.ws.{WSRequest, WSResponse}
 import stubs.AuthStub
 
@@ -26,6 +26,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
 
   private trait Test {
     def setupStubs(): StubMapping
+
     def request(): WSRequest = {
       setupStubs()
       buildRequest("/return")
@@ -38,6 +39,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
 
       "return 200" in new Test {
         override def setupStubs(): StubMapping = AuthStub.authorisedVatReturn()
+
         val response: WSResponse = await(request().get())
         response.status shouldBe Status.OK
       }
@@ -61,6 +63,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
 
       "return 401 (Forbidden)" in new Test {
         override def setupStubs(): StubMapping = setupStubsForScenario()
+
         val response: WSResponse = await(request().get())
         response.status shouldBe Status.FORBIDDEN
       }

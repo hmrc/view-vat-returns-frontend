@@ -17,23 +17,22 @@
 package models
 
 import java.time.LocalDate
+
 import play.api.libs.json.{Format, Json}
 
-case class VatReturnDetails(
-                    startDate: LocalDate,
-                    endDate: LocalDate,
-                    dateSubmitted: LocalDate,
-                    dueDate: LocalDate,
-                    ukVatDue: BigDecimal,
-                    euVatDue: BigDecimal,
-                    totalVatDue: BigDecimal,
-                    totalVatReclaimed: BigDecimal,
-                    totalOwed: BigDecimal,
-                    totalSales: BigDecimal,
-                    totalCosts: BigDecimal,
-                    euTotalSales: BigDecimal,
-                    euTotalCosts: BigDecimal
-                    )
+case class VatReturnDetails(startDate: LocalDate,
+                            endDate: LocalDate,
+                            dateSubmitted: LocalDate,
+                            dueDate: LocalDate,
+                            ukVatDue: BigDecimal,
+                            euVatDue: BigDecimal,
+                            totalVatDue: BigDecimal,
+                            totalVatReclaimed: BigDecimal,
+                            totalOwed: BigDecimal,
+                            totalSales: BigDecimal,
+                            totalCosts: BigDecimal,
+                            euTotalSales: BigDecimal,
+                            euTotalCosts: BigDecimal)
 
 object VatReturnDetails {
 

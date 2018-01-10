@@ -24,8 +24,10 @@ import play.api.mvc._
 import services.{EnrolmentsAuthService, ReturnsService, VatApiService}
 
 @Singleton
-class ReturnsController @Inject()(val messagesApi: MessagesApi, val enrolmentsAuthService: EnrolmentsAuthService,
-                                  returnsService: ReturnsService, vatApiService: VatApiService,
+class ReturnsController @Inject()(val messagesApi: MessagesApi,
+                                  val enrolmentsAuthService: EnrolmentsAuthService,
+                                  returnsService: ReturnsService,
+                                  vatApiService: VatApiService,
                                   implicit val appConfig: AppConfig)
   extends AuthorisedController {
 

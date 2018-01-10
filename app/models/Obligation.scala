@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package models.obligations
+package models
 
-import play.api.libs.json.{Format, Json}
+import java.time.LocalDate
 
-case class VatReturns(obligations: Seq[VatReturn])
+trait Obligation {
 
-object VatReturns {
-
-  implicit val format: Format[VatReturns] = Json.format[VatReturns]
+  def due: LocalDate
 
 }
