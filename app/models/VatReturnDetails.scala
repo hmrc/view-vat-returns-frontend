@@ -19,7 +19,7 @@ package models
 import java.time.LocalDate
 import play.api.libs.json.{Format, Json}
 
-case class NineBox(
+case class VatReturnDetails(
                     startDate: LocalDate,
                     endDate: LocalDate,
                     dateSubmitted: LocalDate,
@@ -35,7 +35,7 @@ case class NineBox(
                     euTotalCosts: BigDecimal
                     )
 
-object NineBox {
+object VatReturnDetails {
 
-  implicit val format: Format[NineBox] = Json.format[NineBox]
+  implicit val format: Format[VatReturnDetails] = Json.format[VatReturnDetails]
 }

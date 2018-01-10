@@ -18,10 +18,10 @@ package controllers
 
 import java.time.LocalDate
 
-import models.{User, NineBox}
+import models.{User, VatReturnDetails}
 import play.api.http.Status
 import play.api.test.Helpers._
-import services.{EnrolmentsAuthService, VatApiService, NineBoxService}
+import services.{EnrolmentsAuthService, VatApiService, ReturnsService}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.Retrieval
@@ -29,10 +29,10 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class VatReturnControllerSpec extends ControllerBaseSpec {
+class ReturnsControllerSpec extends ControllerBaseSpec {
 
   private trait Test {
-    val exampleVatReturn: NineBox = NineBox(
+    val exampleVatReturn: VatReturnDetails = VatReturnDetails(
       LocalDate.parse("2017-01-01"),
       LocalDate.parse("2017-03-31"),
       LocalDate.parse("2017-04-06"),
@@ -51,7 +51,7 @@ class VatReturnControllerSpec extends ControllerBaseSpec {
     val serviceCall: Boolean = true
     val authResult: Future[_]
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
-    val mockVatReturnService: NineBoxService = mock[NineBoxService]
+    val mockVatReturnService: ReturnsService = mock[ReturnsService]
     val mockVatApiService: VatApiService = mock[VatApiService]
 
     def setup(): Any = {
@@ -60,8 +60,8 @@ class VatReturnControllerSpec extends ControllerBaseSpec {
         .returns(authResult)
 
       if(serviceCall) {
-        (mockVatReturnService.getNineBox(_: User))
-          .expects(*)
+        (mockVatReturnService.getVatReturnDetails(_: User, _: String))
+          .expects(*, *)
           .returns(Future.successful(exampleVatReturn))
 
         (mockVatApiService.getTradingName(_: User))
@@ -72,9 +72,9 @@ class VatReturnControllerSpec extends ControllerBaseSpec {
 
     val mockEnrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
 
-    def target: NineBoxController = {
+    def target: ReturnsController = {
       setup()
-      new NineBoxController(messages, mockEnrolmentsAuthService, mockVatReturnService, mockVatApiService, mockConfig)
+      new ReturnsController(messages, mockEnrolmentsAuthService, mockVatReturnService, mockVatApiService, mockConfig)
     }
   }
 
@@ -90,19 +90,19 @@ class VatReturnControllerSpec extends ControllerBaseSpec {
 
       "return 200" in new Test {
         override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
-        private val result = target.yourNineBox()(fakeRequest)
+        private val result = target.vatReturnDetails()(fakeRequest)
         status(result) shouldBe Status.OK
       }
 
       "return HTML" in new Test {
         override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
-        private val result = target.yourNineBox()(fakeRequest)
+        private val result = target.vatReturnDetails()(fakeRequest)
         contentType(result) shouldBe Some("text/html")
       }
 
       "return charset of utf-8" in new Test {
         override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
-        private val result = target.yourNineBox()(fakeRequest)
+        private val result = target.vatReturnDetails()(fakeRequest)
         charset(result) shouldBe Some("utf-8")
       }
     }
@@ -112,7 +112,7 @@ class VatReturnControllerSpec extends ControllerBaseSpec {
       "return 403 (Forbidden)" in new Test {
         override val serviceCall = false
         override val authResult: Future[Nothing] = Future.failed(InsufficientEnrolments())
-        private val result = target.yourNineBox()(fakeRequest)
+        private val result = target.vatReturnDetails()(fakeRequest)
         status(result) shouldBe Status.FORBIDDEN
       }
     }
@@ -122,7 +122,7 @@ class VatReturnControllerSpec extends ControllerBaseSpec {
       "return 401 (Unauthorised)" in new Test {
         override val serviceCall = false
         override val authResult: Future[Nothing] = Future.failed(MissingBearerToken())
-        private val result = target.yourNineBox()(fakeRequest)
+        private val result = target.vatReturnDetails()(fakeRequest)
         status(result) shouldBe Status.UNAUTHORIZED
       }
     }

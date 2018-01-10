@@ -38,6 +38,7 @@ trait AppConfig extends ServicesConfig {
   val shutterPage: String
   val signInUrl: String
   val features: Features
+  val portalUrl: String
 }
 
 @Singleton
@@ -65,9 +66,11 @@ class FrontendAppConfig @Inject()(val runModeConfiguration: Configuration, val e
   private lazy val signInBaseUrl: String = getString(Keys.signInBaseUrl)
   private lazy val signInContinueBaseUrl: String = runModeConfiguration.getString(Keys.signInContinueBaseUrl).getOrElse("")
   private lazy val signInContinueUrl: String = ContinueUrl(signInContinueBaseUrl +
-    controllers.routes.NineBoxController.yourNineBox().url).encodedUrl
+    controllers.routes.ReturnsController.vatReturnDetails().url).encodedUrl
   private lazy val signInOrigin = getString("appName")
   override lazy val signInUrl: String = s"$signInBaseUrl?continue=$signInContinueUrl&origin=$signInOrigin"
 
   override val features = new Features(runModeConfiguration)
+
+  override val portalUrl: String = ""
 }

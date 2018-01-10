@@ -22,7 +22,7 @@ import play.api.http.{HeaderNames, Status}
 import play.api.libs.ws.{WSRequest, WSResponse}
 import stubs.AuthStub
 
-class VatReturnPageSpec extends IntegrationBaseSpec {
+class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
 
   private trait Test {
     def setupStubs(): StubMapping

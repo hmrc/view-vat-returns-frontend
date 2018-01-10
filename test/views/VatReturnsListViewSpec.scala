@@ -16,23 +16,34 @@
 
 package views
 
+import java.time.LocalDate
+
+import models.obligations.{VatReturn, VatReturns}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
 class VatReturnsListViewSpec extends ViewBaseSpec {
 
-  "Rendering the list of your VAT Returns page" should {
+  object Selectors {
+    val pageHeading = "#content h1"
+    val submitThroughSoftware = "#content > article > div > div > p:nth-child(2)"
+    val tableCaption = "#content caption"
+    val periodEndingColumnHeading = "#vatReturnsList > thead > tr > th:nth-child(1)"
+    val statusColumnHeading = "#vatReturnsList > thead > tr > th:nth-child(2)"
+    val returnDetailsColumnHeading = "#vatReturnsList > thead > tr > th:nth-child(3)"
+    val periodEndingOutstanding = "#vatReturnsList > tbody:nth-child(3) > tr:nth-child(1) > td:nth-child(1)"
+    val periodEndingFulfilled = "#vatReturnsList > tbody:nth-child(3) > tr:nth-child(2) > td:nth-child(1)"
+    val statusOutstanding = "#vatReturnsList > tbody:nth-child(3) > tr:nth-child(1) > td:nth-child(2)"
+    val statusFulfilled = "#vatReturnsList > tbody:nth-child(3) > tr:nth-child(2) > td:nth-child(2)"
+    val detailsOutstanding = "#vatReturnsList > tbody:nth-child(3) > tr:nth-child(1) > td:nth-child(3)"
+    val detailsFulfilled = "#vatReturnsList > tbody:nth-child(3) > tr:nth-child(2) > td:nth-child(3) > a"
+    val noReturns = "#content h2"
+    val earlierReturns = "#content > article > div > div > p:nth-child(4)"
+  }
 
-    object Selectors {
-      val pageHeading = "#content h1"
-      val submitThroughSoftware = "#content > article > div > div > p:nth-child(2)"
-      val columnOneHeading = "#content > article > div > div > table > thead > tr > th:nth-child(1) > h2"
-      val columnTwoHeading = "#content > article > div > div > table > thead > tr > th:nth-child(2) > h2"
-      val columnThreeHeading = "#content > article > div > div > table > thead > tr > th:nth-child(3) > h2"
-      val earlierReturns = "#content > article > div > div > p:nth-child(6)"
-    }
+  "Rendering the VAT Returns page" should {
 
-    lazy val view = views.html.vatReturns.vatReturnsList()
+    lazy val view = views.html.returns.vatReturnsList(VatReturns(Seq()))
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct document title" in {
@@ -47,20 +58,85 @@ class VatReturnsListViewSpec extends ViewBaseSpec {
       elementText(Selectors.submitThroughSoftware) shouldBe "You submit returns through your accounting software."
     }
 
-    "have the correct heading for column one of the list of VAT returns" in {
-      elementText(Selectors.columnOneHeading) shouldBe "Period ending"
-    }
-
-    "have the correct heading for column two of the list of VAT returns" in {
-      elementText(Selectors.columnTwoHeading) shouldBe "Status"
-    }
-
-    "have the correct heading for column three of the list of VAT returns" in {
-      elementText(Selectors.columnThreeHeading) shouldBe "Return details"
-    }
-
-    "have the correct message regarding viewing ealier returns" in {
+    "have the correct message regarding viewing earlier returns" in {
       elementText(Selectors.earlierReturns) shouldBe "You can also view earlier returns you submitted before using accounting software."
+    }
+  }
+
+  "Rendering the VAT Returns page with one outstanding and one fulfilled VAT Return" should {
+
+    lazy val exampleReturns: VatReturns = VatReturns(
+      Seq(
+        VatReturn(
+          LocalDate.parse("2017-01-01"),
+          LocalDate.parse("2017-12-31"),
+          LocalDate.parse("2018-01-31"),
+          "O",
+          None,
+          "#001"
+        ),
+        VatReturn(
+          LocalDate.parse("2017-01-01"),
+          LocalDate.parse("2017-09-30"),
+          LocalDate.parse("2018-10-31"),
+          "F",
+          None,
+          "#001"
+        )
+      )
+    )
+
+    lazy val view = views.html.returns.vatReturnsList(exampleReturns)
+    lazy implicit val document: Document = Jsoup.parse(view.body)
+
+    "have the correct table caption" in {
+      elementText(Selectors.tableCaption) shouldBe "VAT returns found since opting in for Making Tax Digital For Business"
+    }
+
+    "have the correct heading for the period ending column" in {
+      elementText(Selectors.periodEndingColumnHeading) shouldBe "Period ending"
+    }
+
+    "have the correct heading for the status column" in {
+      elementText(Selectors.statusColumnHeading) shouldBe "Status"
+    }
+
+    "have the correct heading for the return details column" in {
+      elementText(Selectors.returnDetailsColumnHeading) shouldBe "Return details"
+    }
+
+    "have the correct period ending for the outstanding return" in {
+      elementText(Selectors.periodEndingOutstanding) shouldBe "31 December 2017"
+    }
+
+    "have the correct period ending for the fulfilled return" in {
+      elementText(Selectors.periodEndingFulfilled) shouldBe "30 September 2017"
+    }
+
+    "have the correct status for the outstanding return" in {
+      elementText(Selectors.statusOutstanding) shouldBe "Due 31 January 2018"
+    }
+
+    "have the correct status for the fulfilled return" in {
+      elementText(Selectors.statusFulfilled) shouldBe "Received"
+    }
+
+    "have the correct return details for the outstanding return" in {
+      elementText(Selectors.detailsOutstanding) shouldBe "Not yet submitted"
+    }
+
+    "have the correct return details for the fulfilled return" in {
+      elementText(Selectors.detailsFulfilled) shouldBe "View 30 September 2017 Return"
+    }
+  }
+
+  "Rendering the VAT Returns page with no available VAT Returns" should {
+
+    lazy val view = views.html.returns.vatReturnsList(VatReturns(Seq()))
+    lazy implicit val document: Document = Jsoup.parse(view.body)
+
+    "have the correct message that there are no returns" in {
+      elementText(Selectors.noReturns) shouldBe "You have no returns."
     }
   }
 }

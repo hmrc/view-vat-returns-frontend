@@ -16,13 +16,13 @@
 
 package views
 
-import models.NineBox
+import models.VatReturnDetails
 import java.time.LocalDate
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
-class YourNineBoxViewSpec extends ViewBaseSpec {
+class VatReturnDetailsViewSpec extends ViewBaseSpec {
 
   "Rendering the vat return details page" should {
 
@@ -46,7 +46,7 @@ class YourNineBoxViewSpec extends ViewBaseSpec {
       val adjustments = "#adjustments"
     }
 
-    val exampleVatReturn = NineBox(
+    val exampleVatReturn = VatReturnDetails(
       LocalDate.parse("2017-01-01"),
       LocalDate.parse("2017-03-31"),
       LocalDate.parse("2017-04-06"),
@@ -63,7 +63,7 @@ class YourNineBoxViewSpec extends ViewBaseSpec {
     )
     val tradingName = "Cheapo Clothing Ltd"
 
-    lazy val view = views.html.yourNineBox(exampleVatReturn, tradingName)
+    lazy val view = views.html.returns.vatReturnDetails(exampleVatReturn, tradingName)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct document title" in {

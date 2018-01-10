@@ -49,6 +49,8 @@ vatReturnsList.viewReturnTwo = Return
 vatReturnsList.viewEarlierReturnsOne = You can also
 vatReturnsList.viewEarlierReturnsTwo = view earlier returns
 vatReturnsList.viewEarlierReturnsThree = you submitted before using accounting software.
+vatReturnsList.noReturns = You have no returns.
+vatReturnsList.tableCaption = VAT returns found since opting in for Making Tax Digital For Business
 
 featureSwitch.title = Feature switches
 featureSwitch.heading = Features
