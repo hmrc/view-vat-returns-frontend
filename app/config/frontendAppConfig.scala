@@ -39,6 +39,7 @@ trait AppConfig extends ServicesConfig {
   val signInUrl: String
   val features: Features
   val portalUrl: String
+  val vatApiBaseUrl: String
 }
 
 @Singleton
@@ -73,4 +74,5 @@ class FrontendAppConfig @Inject()(val runModeConfiguration: Configuration, val e
   override val features = new Features(runModeConfiguration)
 
   override val portalUrl: String = ""
+  override val vatApiBaseUrl: String = baseUrl("vat-api")
 }
