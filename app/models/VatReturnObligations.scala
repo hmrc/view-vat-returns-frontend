@@ -14,20 +14,14 @@
  * limitations under the License.
  */
 
-package services
+package models
 
-import javax.inject.{Inject, Singleton}
+import play.api.libs.json.{Format, Json}
 
-import connectors.VatApiConnector
-import models.User
-import models.VatReturn
+case class VatReturnObligations(obligations: Seq[VatReturnObligation])
 
-import scala.concurrent.Future
+object VatReturnObligations {
 
-@Singleton
-class ReturnsService @Inject()(connector: VatApiConnector) {
+  implicit val format: Format[VatReturnObligations] = Json.format[VatReturnObligations]
 
-  def getVatReturnDetails(user: User, periodKey: String): Future[VatReturn] = {
-    connector.getVatReturnDetails(user.vrn, periodKey)
-  }
 }

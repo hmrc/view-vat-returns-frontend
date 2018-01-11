@@ -21,14 +21,14 @@ import java.time.LocalDate
 import connectors.VatApiConnector
 import controllers.ControllerBaseSpec
 import models.User
-import models.VatReturnDetails
+import models.VatReturn
 
 import scala.concurrent.Future
 
 class ReturnsServiceSpec extends ControllerBaseSpec {
 
   private trait Test {
-    val exampleVatReturn: VatReturnDetails = VatReturnDetails(
+    val exampleVatReturn: VatReturn = VatReturn(
       LocalDate.parse("2017-01-01"),
       LocalDate.parse("2017-03-31"),
       LocalDate.parse("2017-04-06"),
@@ -54,7 +54,7 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
         .expects(*, *)
         .returns(Future.successful(exampleVatReturn))
 
-      lazy val result: VatReturnDetails = await(service.getVatReturnDetails(User("999999999"), "periodKey"))
+      lazy val result: VatReturn = await(service.getVatReturnDetails(User("999999999"), "periodKey"))
 
       result shouldBe exampleVatReturn
     }

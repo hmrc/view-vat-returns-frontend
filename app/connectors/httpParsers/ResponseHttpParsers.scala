@@ -16,6 +16,7 @@
 
 package connectors.httpParsers
 
+import models.errors._
 import play.api.libs.json.JsValue
 
 trait ResponseHttpParsers {

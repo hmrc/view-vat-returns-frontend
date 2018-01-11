@@ -19,7 +19,7 @@ package connectors
 import java.time.LocalDate
 import javax.inject.Inject
 
-import models.VatReturnDetails
+import models.VatReturn
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import scala.concurrent.Future
@@ -32,9 +32,9 @@ class VatApiConnector @Inject()(http: HttpClient) {
   }
 
   // Static example data return. Does not look for a specific VAT Return.
-  def getVatReturnDetails(vrn: String, periodKey: String): Future[VatReturnDetails] = {
+  def getVatReturnDetails(vrn: String, periodKey: String): Future[VatReturn] = {
     Future.successful(
-      VatReturnDetails(
+      VatReturn(
         LocalDate.parse("2017-01-01"),
         LocalDate.parse("2017-03-31"),
         LocalDate.parse("2017-04-06"),

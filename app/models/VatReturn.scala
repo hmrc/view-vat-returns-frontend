@@ -20,21 +20,21 @@ import java.time.LocalDate
 
 import play.api.libs.json.{Format, Json}
 
-case class VatReturn(start: LocalDate,
-                     end: LocalDate,
-                     due: LocalDate,
-                     status: String,
-                     received: Option[LocalDate],
-                     periodKey: String) extends Obligation
+case class VatReturn(startDate: LocalDate,
+                     endDate: LocalDate,
+                     dateSubmitted: LocalDate,
+                     dueDate: LocalDate,
+                     ukVatDue: BigDecimal,
+                     euVatDue: BigDecimal,
+                     totalVatDue: BigDecimal,
+                     totalVatReclaimed: BigDecimal,
+                     totalOwed: BigDecimal,
+                     totalSales: BigDecimal,
+                     totalCosts: BigDecimal,
+                     euTotalSales: BigDecimal,
+                     euTotalCosts: BigDecimal)
 
 object VatReturn {
 
   implicit val format: Format[VatReturn] = Json.format[VatReturn]
-
-  object Status extends Enumeration {
-    val All: Status.Value = Value("A")
-    val Outstanding: Status.Value = Value("O")
-    val Fulfilled: Status.Value = Value("F")
-  }
-
 }

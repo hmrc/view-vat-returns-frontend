@@ -17,107 +17,55 @@
 package models
 
 import java.time.LocalDate
-
 import play.api.libs.json.Json
 import uk.gov.hmrc.play.test.UnitSpec
 
 class VatReturnSpec extends UnitSpec {
 
-  "An obligation" should {
+  "A VAT Return" should {
 
-    "parse to the correct json format" in {
+    val exampleVatReturn = VatReturn(
+      LocalDate.parse("2017-01-01"),
+      LocalDate.parse("2017-03-31"),
+      LocalDate.parse("2017-04-06"),
+      LocalDate.parse("2017-04-08"),
+      1297,
+      5755,
+      7052,
+      5732,
+      1320,
+      77656,
+      765765,
+      55454,
+      545645
+    )
 
-      val input = VatReturn(
-        LocalDate.parse("2017-01-01"),
-        LocalDate.parse("2017-12-31"),
-        LocalDate.parse("2018-01-31"),
-        "O",
-        None,
-        "#001"
-      )
+    val exampleString =
+      """{
+        |"startDate":"2017-01-01",
+        |"endDate":"2017-03-31",
+        |"dateSubmitted":"2017-04-06",
+        |"dueDate":"2017-04-08",
+        |"ukVatDue":1297,
+        |"euVatDue":5755,
+        |"totalVatDue":7052,
+        |"totalVatReclaimed":5732,
+        |"totalOwed":1320,
+        |"totalSales":77656,
+        |"totalCosts":765765,
+        |"euTotalSales":55454,
+        |"euTotalCosts":545645
+        |}"""
+        .stripMargin.replace("\n", "")
 
-      val expected =
-        """{"start":"2017-01-01","end":"2017-12-31","due":"2018-01-31","status":"O","periodKey":"#001"}"""
-
-
-      val result = Json.toJson(input).toString()
-
-      result shouldEqual expected
+    "parse to JSON" in {
+      val result = Json.toJson(exampleVatReturn).toString
+      result shouldEqual exampleString
     }
 
-    "parse from json" in {
-
-      val input =
-        """{"start":"2017-02-02","end":"2017-11-11","due":"2018-01-31","status":"O","periodKey":"#003"}"""
-
-      val expected = VatReturn(
-        LocalDate.parse("2017-02-02"),
-        LocalDate.parse("2017-11-11"),
-        LocalDate.parse("2018-01-31"),
-        "O",
-        None,
-        "#003"
-      )
-
-      val result = Json.parse(input).as[VatReturn]
-
-      result shouldEqual expected
-
+    "be parsed from appropriate JSON" in {
+      val result = Json.parse(exampleString).as[VatReturn]
+      result shouldEqual exampleVatReturn
     }
-
   }
-
-  "Obligations" should {
-
-    "parse to the correct json" in {
-
-      val input = VatReturns(
-        Seq(
-          VatReturn(
-            LocalDate.parse("2017-01-01"),
-            LocalDate.parse("2017-12-31"),
-            LocalDate.parse("2018-01-31"),
-            "O",
-            None,
-            "#001"
-          )
-        )
-      )
-
-      val expected =
-        """{"obligations":[{"start":"2017-01-01","end":"2017-12-31","due":"2018-01-31","status":"O","periodKey":"#001"}]}"""
-
-      val result = Json.toJson(input).toString()
-
-      result shouldEqual expected
-
-    }
-
-    "parse from json" in {
-
-      val input =
-        """{"obligations":[{"start":"2017-01-01","end":"2017-12-31","due":"2018-01-31","status":"O","periodKey":"#001"}]}"""
-
-      val expected = VatReturns(
-        Seq(
-          VatReturn(
-            LocalDate.parse("2017-01-01"),
-            LocalDate.parse("2017-12-31"),
-            LocalDate.parse("2018-01-31"),
-            "O",
-            None,
-            "#001"
-          )
-        )
-      )
-
-      val result = Json.parse(input).as[VatReturns]
-
-      result shouldEqual expected
-
-    }
-
-  }
-
 }
-

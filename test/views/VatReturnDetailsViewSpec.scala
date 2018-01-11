@@ -16,7 +16,7 @@
 
 package views
 
-import models.VatReturnDetails
+import models.VatReturn
 import java.time.LocalDate
 
 import org.jsoup.Jsoup
@@ -46,7 +46,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       val adjustments = "#adjustments"
     }
 
-    val exampleVatReturn = VatReturnDetails(
+    val exampleVatReturn = VatReturn(
       LocalDate.parse("2017-01-01"),
       LocalDate.parse("2017-03-31"),
       LocalDate.parse("2017-04-06"),
