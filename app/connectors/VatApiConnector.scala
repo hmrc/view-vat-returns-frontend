@@ -22,7 +22,7 @@ import javax.inject.{Inject, Singleton}
 import config.AppConfig
 import connectors.httpParsers.VatReturnObligationsHttpParser._
 import models.VatReturnObligation.Status
-import models.{VatReturn, VatReturnObligations}
+import models.{CustomerInformation, VatReturn, VatReturnObligations}
 import play.api.Logger
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
@@ -35,13 +35,15 @@ class VatApiConnector @Inject()(http: HttpClient, appConfig: AppConfig) {
   private[connectors] def obligationsUrl(vrn: String): String = s"${appConfig.vatApiBaseUrl}/vat/$vrn/obligations"
 
   // TODO: Replace with a real call to an endpoint once it becomes available. This returns static data for now.
-  def getTradingName(vrn: String): Future[String] = {
-    Future.successful("Cheapo Clothing Ltd")
+  def getTradingName(vrn: String)
+                    (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[CustomerInformation]] = {
+    Future.successful(Right(CustomerInformation("Cheapo Clothing Ltd")))
   }
 
   // TODO: Replace with a real call to an endpoint once it becomes available. This returns static data for now.
-  def getVatReturnDetails(vrn: String, periodKey: String): Future[VatReturn] = {
-    Future.successful(
+  def getVatReturnDetails(vrn: String, periodKey: String)
+                         (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[VatReturn]] = {
+    Future.successful(Right(
       VatReturn(
         LocalDate.parse("2017-01-01"),
         LocalDate.parse("2017-03-31"),
@@ -57,7 +59,7 @@ class VatApiConnector @Inject()(http: HttpClient, appConfig: AppConfig) {
         55454,
         545645
       )
-    )
+    ))
   }
 
   def getVatReturnObligations(vrn: String, from: LocalDate, to: LocalDate, status: Status.Value)

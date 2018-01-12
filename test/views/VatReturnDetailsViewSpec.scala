@@ -16,7 +16,7 @@
 
 package views
 
-import models.VatReturn
+import models.{CustomerInformation, VatReturn}
 import java.time.LocalDate
 
 import org.jsoup.Jsoup
@@ -61,9 +61,9 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       55454,
       545645
     )
-    val tradingName = "Cheapo Clothing Ltd"
+    val customerInfo = CustomerInformation("Cheapo Clothing Ltd")
 
-    lazy val view = views.html.returns.vatReturnDetails(exampleVatReturn, tradingName)
+    lazy val view = views.html.returns.vatReturnDetails(exampleVatReturn, customerInfo)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct document title" in {
@@ -79,7 +79,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     }
 
     "have the correct trading name" in {
-      elementText(Selectors.tradingNameHeading) shouldBe tradingName
+      elementText(Selectors.tradingNameHeading) shouldBe customerInfo.tradingName
     }
 
     "have the correct heading for the first section of the return" in {

@@ -16,50 +16,25 @@
 
 package connectors.httpParsers
 
-import java.time.LocalDate
-
-import connectors.httpParsers.VatReturnObligationsHttpParser.VatReturnObligationsReads
-import models.errors._
-import models.{VatReturnObligation, VatReturnObligations}
+import connectors.httpParsers.CustomerInfoHttpParser.CustomerInfoReads
+import models.CustomerInformation
+import models.errors.{BadRequestError, MultipleErrors, ServerSideError, UnexpectedStatusError, UnknownError}
 import play.api.http.Status
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.play.test.UnitSpec
 
-class VatReturnObligationsHttpParserSpec extends UnitSpec {
+class CustomerInfoHttpParserSpec extends UnitSpec {
 
-  "VatReturnObligationsReads" when {
+  "CustomerInfoReads" when {
 
     "the HTTP response status is OK (200)" should {
 
-      val httpResponse = HttpResponse(Status.OK, responseJson = Some(
-        Json.obj(
-          "obligations" -> Json.arr(
-            Json.obj(
-              "start" -> "2017-01-01",
-              "end" -> "2017-03-30",
-              "due" -> "2017-04-30",
-              "status" -> "O",
-              "periodKey" -> "#001"
-            )
-          )
-        )
-      ))
+      val httpResponse = HttpResponse(Status.OK, responseJson = Some(Json.obj("tradingName" -> "Cheapo Clothing Ltd")))
+      val expected = Right(CustomerInformation("Cheapo Clothing Ltd"))
+      val result = CustomerInfoReads.read("", "", httpResponse)
 
-      val expected = Right(VatReturnObligations(Seq(
-        VatReturnObligation(
-          start = LocalDate.parse("2017-01-01"),
-          end = LocalDate.parse("2017-03-30"),
-          due = LocalDate.parse("2017-04-30"),
-          status = "O",
-          received = None,
-          periodKey = "#001"
-        )
-      )))
-
-      val result = VatReturnObligationsReads.read("", "", httpResponse)
-
-      "return a VatReturnObligations" in {
+      "return a Trading Name" in {
         result shouldBe expected
       }
     }
@@ -78,7 +53,7 @@ class VatReturnObligationsHttpParserSpec extends UnitSpec {
         message = "Fail!"
       ))
 
-      val result = VatReturnObligationsReads.read("", "", httpResponse)
+      val result = CustomerInfoReads.read("", "", httpResponse)
 
       "return a BadRequestError" in {
         result shouldBe expected
@@ -108,7 +83,7 @@ class VatReturnObligationsHttpParserSpec extends UnitSpec {
 
       val expected = Left(MultipleErrors)
 
-      val result = VatReturnObligationsReads.read("", "", httpResponse)
+      val result = CustomerInfoReads.read("", "", httpResponse)
 
       "return a MultipleErrors" in {
         result shouldBe expected
@@ -126,7 +101,7 @@ class VatReturnObligationsHttpParserSpec extends UnitSpec {
 
       val expected = Left(UnknownError)
 
-      val result = VatReturnObligationsReads.read("", "", httpResponse)
+      val result = CustomerInfoReads.read("", "", httpResponse)
 
       "return an UnknownError" in {
         result shouldBe expected
@@ -137,7 +112,7 @@ class VatReturnObligationsHttpParserSpec extends UnitSpec {
 
       val httpResponse = HttpResponse(Status.INTERNAL_SERVER_ERROR)
       val expected = Left(ServerSideError)
-      val result = VatReturnObligationsReads.read("", "", httpResponse)
+      val result = CustomerInfoReads.read("", "", httpResponse)
 
       "return a ServerSideError" in {
         result shouldBe expected
@@ -148,7 +123,7 @@ class VatReturnObligationsHttpParserSpec extends UnitSpec {
 
       val httpResponse = HttpResponse(Status.CREATED)
       val expected = Left(UnexpectedStatusError(Status.CREATED))
-      val result = VatReturnObligationsReads.read("", "", httpResponse)
+      val result = CustomerInfoReads.read("", "", httpResponse)
 
       "return an UnexpectedStatusError" in {
         result shouldBe expected

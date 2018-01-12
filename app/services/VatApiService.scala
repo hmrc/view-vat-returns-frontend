@@ -18,14 +18,16 @@ package services
 
 import javax.inject.Inject
 
+import connectors.httpParsers.CustomerInfoHttpParser.HttpGetResult
 import connectors.VatApiConnector
-import models.User
+import models.{CustomerInformation, User}
+import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class VatApiService @Inject()(connector: VatApiConnector) {
 
-  def getTradingName(user: User): Future[String] = {
+  def getTradingName(user: User)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[CustomerInformation]] = {
     connector.getTradingName(user.vrn)
   }
 }

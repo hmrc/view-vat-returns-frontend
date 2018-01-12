@@ -18,10 +18,10 @@ package controllers
 
 import java.time.LocalDate
 
-import models.{User, VatReturn}
+import models.{CustomerInformation, User, VatReturn}
 import play.api.http.Status
 import play.api.test.Helpers._
-import services.{EnrolmentsAuthService, VatApiService, ReturnsService}
+import services.{EnrolmentsAuthService, ReturnsService, VatApiService}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.Retrieval
@@ -47,7 +47,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       55454,
       545645
     )
-    val exampleTradingName: String = "Cheapo Clothing Ltd"
+    val exampleCustomerInfo: CustomerInformation = CustomerInformation("Cheapo Clothing Ltd")
     val serviceCall: Boolean = true
     val authResult: Future[_]
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
@@ -60,13 +60,13 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         .returns(authResult)
 
       if(serviceCall) {
-        (mockVatReturnService.getVatReturnDetails(_: User, _: String))
-          .expects(*, *)
-          .returns(Future.successful(exampleVatReturn))
+        (mockVatReturnService.getVatReturnDetails(_: User, _: String)(_: HeaderCarrier, _: ExecutionContext))
+          .expects(*, *, *, *)
+          .returns(Future.successful(Right(exampleVatReturn)))
 
-        (mockVatApiService.getTradingName(_: User))
-          .expects(*)
-          .returns(Future.successful(exampleTradingName))
+        (mockVatApiService.getTradingName(_: User)(_: HeaderCarrier, _: ExecutionContext))
+          .expects(*, *, *)
+          .returns(Future.successful(Right(exampleCustomerInfo)))
       }
     }
 

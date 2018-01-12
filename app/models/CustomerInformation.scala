@@ -14,19 +14,12 @@
  * limitations under the License.
  */
 
-package connectors.httpParsers
+package models
 
-import connectors.VatApiConnector
-import controllers.ControllerBaseSpec
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import play.api.libs.json.{Format, Json}
 
-class VatApiConnectorSpec extends ControllerBaseSpec {
+case class CustomerInformation(tradingName: String)
 
-  "VatApiConnector" should {
-
-    "generate the correct obligations url" in {
-      val connector = new VatApiConnector(mock[HttpClient], mockConfig)
-      connector.obligationsUrl("808") shouldBe "/vat/808/obligations"
-    }
-  }
+object CustomerInformation {
+  implicit val format: Format[CustomerInformation] = Json.format[CustomerInformation]
 }

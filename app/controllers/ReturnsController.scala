@@ -37,6 +37,6 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
         for {
           vatReturn <- returnsService.getVatReturnDetails(user, "periodKey")
           tradingName <- vatApiService.getTradingName(user)
-        } yield Ok(views.html.returns.vatReturnDetails(vatReturn, tradingName))
+        } yield Ok(views.html.returns.vatReturnDetails(vatReturn.right.get, tradingName.right.get))
   }
 }
