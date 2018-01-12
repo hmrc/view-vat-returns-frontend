@@ -35,7 +35,7 @@ class VatApiConnector @Inject()(http: HttpClient, appConfig: AppConfig) {
   private[connectors] def obligationsUrl(vrn: String): String = s"${appConfig.vatApiBaseUrl}/vat/$vrn/obligations"
 
   // TODO: Replace with a real call to an endpoint once it becomes available. This returns static data for now.
-  def getTradingName(vrn: String)
+  def getCustomerInfo(vrn: String)
                     (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[CustomerInformation]] = {
     Future.successful(Right(CustomerInformation("Cheapo Clothing Ltd")))
   }

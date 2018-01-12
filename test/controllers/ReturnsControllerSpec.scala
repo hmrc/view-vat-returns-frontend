@@ -64,7 +64,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
           .expects(*, *, *, *)
           .returns(Future.successful(Right(exampleVatReturn)))
 
-        (mockVatApiService.getTradingName(_: User)(_: HeaderCarrier, _: ExecutionContext))
+        (mockVatApiService.getCustomerInfo(_: User)(_: HeaderCarrier, _: ExecutionContext))
           .expects(*, *, *)
           .returns(Future.successful(Right(exampleCustomerInfo)))
       }

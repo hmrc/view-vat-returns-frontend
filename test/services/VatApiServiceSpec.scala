@@ -34,14 +34,14 @@ class VatApiServiceSpec extends ControllerBaseSpec {
     implicit val hc: HeaderCarrier = HeaderCarrier()
   }
 
-  "Calling .getTradingName" should {
+  "Calling .getCustomerInfo" should {
 
-    "return a trading name" in new Test {
-      (mockConnector.getTradingName(_: String)(_: HeaderCarrier, _: ExecutionContext))
+    "return a user's information" in new Test {
+      (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
         .expects(*, *, *)
         .returns(Future.successful(Right(exampleCustomerInfo)))
 
-      lazy val result: HttpGetResult[CustomerInformation] = await(service.getTradingName(User("999999999")))
+      lazy val result: HttpGetResult[CustomerInformation] = await(service.getCustomerInfo(User("999999999")))
 
       result shouldBe Right(exampleCustomerInfo)
     }

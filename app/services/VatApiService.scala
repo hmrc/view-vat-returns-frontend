@@ -27,7 +27,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class VatApiService @Inject()(connector: VatApiConnector) {
 
-  def getTradingName(user: User)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[CustomerInformation]] = {
-    connector.getTradingName(user.vrn)
+  def getCustomerInfo(user: User)
+                    (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[CustomerInformation]] = {
+    connector.getCustomerInfo(user.vrn)
   }
 }
