@@ -16,30 +16,34 @@
 
 package services
 
+import connectors.httpParsers.CustomerInfoHttpParser.HttpGetResult
 import connectors.VatApiConnector
 import controllers.ControllerBaseSpec
-import models.User
+import models.{CustomerInformation, User}
+import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits._
+import scala.concurrent.{ExecutionContext, Future}
 
 class VatApiServiceSpec extends ControllerBaseSpec {
 
   private trait Test {
-    val exampleTradingName: String = "Cheapo Clothing Ltd"
+    val exampleCustomerInfo: CustomerInformation = CustomerInformation("Cheapo Clothing Ltd")
     val mockConnector: VatApiConnector = mock[VatApiConnector]
     val service: VatApiService = new VatApiService(mockConnector)
+    implicit val hc: HeaderCarrier = HeaderCarrier()
   }
 
-  "Calling .getTradingName" should {
+  "Calling .getCustomerInfo" should {
 
-    "return a trading name" in new Test {
-      (mockConnector.getTradingName(_: String))
-        .expects(*)
-        .returns(Future.successful(exampleTradingName))
+    "return a user's information" in new Test {
+      (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
+        .expects(*, *, *)
+        .returns(Future.successful(Right(exampleCustomerInfo)))
 
-      lazy val result: String = await(service.getTradingName(User("999999999")))
+      lazy val result: HttpGetResult[CustomerInformation] = await(service.getCustomerInfo(User("999999999")))
 
-      result shouldBe exampleTradingName
+      result shouldBe Right(exampleCustomerInfo)
     }
   }
 }

@@ -14,21 +14,23 @@
  * limitations under the License.
  */
 
-package services
+package models.errors
 
-import javax.inject.Inject
+import play.api.libs.json.{Format, Json}
 
-import connectors.httpParsers.CustomerInfoHttpParser.HttpGetResult
-import connectors.VatApiConnector
-import models.{CustomerInformation, User}
-import uk.gov.hmrc.http.HeaderCarrier
+sealed trait ApiError {
+  def code: String
+  def message: String
+}
 
-import scala.concurrent.{ExecutionContext, Future}
+case class ApiSingleError(code: String, message: String, path: Option[String]) extends ApiError
 
-class VatApiService @Inject()(connector: VatApiConnector) {
+object ApiSingleError {
+  implicit val format: Format[ApiSingleError] = Json.format[ApiSingleError]
+}
 
-  def getCustomerInfo(user: User)
-                    (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[CustomerInformation]] = {
-    connector.getCustomerInfo(user.vrn)
-  }
+case class ApiMultiError(code: String, message: String, errors: Seq[ApiSingleError]) extends ApiError
+
+object ApiMultiError {
+  implicit val format: Format[ApiMultiError] = Json.format[ApiMultiError]
 }

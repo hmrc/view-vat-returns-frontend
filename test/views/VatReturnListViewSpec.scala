@@ -18,11 +18,11 @@ package views
 
 import java.time.LocalDate
 
-import models.{VatReturn, VatReturns}
+import models.{VatReturnObligation, VatReturnObligations}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
-class VatReturnsListViewSpec extends ViewBaseSpec {
+class VatReturnListViewSpec extends ViewBaseSpec {
 
   object Selectors {
     val pageHeading = "#content h1"
@@ -43,7 +43,7 @@ class VatReturnsListViewSpec extends ViewBaseSpec {
 
   "Rendering the VAT Returns page" should {
 
-    lazy val view = views.html.returns.vatReturnsList(VatReturns(Seq()))
+    lazy val view = views.html.returns.vatReturnsList(VatReturnObligations(Seq()))
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct document title" in {
@@ -65,9 +65,9 @@ class VatReturnsListViewSpec extends ViewBaseSpec {
 
   "Rendering the VAT Returns page with one outstanding and one fulfilled VAT Return" should {
 
-    lazy val exampleReturns: VatReturns = VatReturns(
+    lazy val exampleReturns: VatReturnObligations = VatReturnObligations(
       Seq(
-        VatReturn(
+        VatReturnObligation(
           LocalDate.parse("2017-01-01"),
           LocalDate.parse("2017-12-31"),
           LocalDate.parse("2018-01-31"),
@@ -75,7 +75,7 @@ class VatReturnsListViewSpec extends ViewBaseSpec {
           None,
           "#001"
         ),
-        VatReturn(
+        VatReturnObligation(
           LocalDate.parse("2017-01-01"),
           LocalDate.parse("2017-09-30"),
           LocalDate.parse("2018-10-31"),
@@ -132,7 +132,7 @@ class VatReturnsListViewSpec extends ViewBaseSpec {
 
   "Rendering the VAT Returns page with no available VAT Returns" should {
 
-    lazy val view = views.html.returns.vatReturnsList(VatReturns(Seq()))
+    lazy val view = views.html.returns.vatReturnsList(VatReturnObligations(Seq()))
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct message that there are no returns" in {

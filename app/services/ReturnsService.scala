@@ -18,16 +18,19 @@ package services
 
 import javax.inject.{Inject, Singleton}
 
+import connectors.httpParsers.VatReturnHttpParser.HttpGetResult
 import connectors.VatApiConnector
 import models.User
-import models.VatReturnDetails
+import models.VatReturn
+import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ReturnsService @Inject()(connector: VatApiConnector) {
 
-  def getVatReturnDetails(user: User, periodKey: String): Future[VatReturnDetails] = {
+  def getVatReturnDetails(user: User, periodKey: String)
+                         (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[VatReturn]] = {
     connector.getVatReturnDetails(user.vrn, periodKey)
   }
 }

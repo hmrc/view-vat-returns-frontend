@@ -34,5 +34,6 @@ class MockAppConfig(val runModeConfiguration: Configuration, val mode: Mode = Mo
   override val signInUrl: String = ""
   override val features: Features = new Features(runModeConfiguration)
   override val portalUrl: String = ""
+  override val vatApiBaseUrl: String = ""
 }
 

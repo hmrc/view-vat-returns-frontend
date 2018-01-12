@@ -18,10 +18,8 @@ package models
 
 import play.api.libs.json.{Format, Json}
 
-case class VatReturns(obligations: Seq[VatReturn])
+case class CustomerInformation(tradingName: String)
 
-object VatReturns {
-
-  implicit val format: Format[VatReturns] = Json.format[VatReturns]
-
+object CustomerInformation {
+  implicit val format: Format[CustomerInformation] = Json.format[CustomerInformation]
 }

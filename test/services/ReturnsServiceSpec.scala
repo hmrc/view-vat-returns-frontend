@@ -18,17 +18,20 @@ package services
 
 import java.time.LocalDate
 
+import connectors.httpParsers.VatReturnHttpParser.HttpGetResult
 import connectors.VatApiConnector
 import controllers.ControllerBaseSpec
 import models.User
-import models.VatReturnDetails
+import models.VatReturn
+import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits._
+import scala.concurrent.{ExecutionContext, Future}
 
 class ReturnsServiceSpec extends ControllerBaseSpec {
 
   private trait Test {
-    val exampleVatReturn: VatReturnDetails = VatReturnDetails(
+    val exampleVatReturn: VatReturn = VatReturn(
       LocalDate.parse("2017-01-01"),
       LocalDate.parse("2017-03-31"),
       LocalDate.parse("2017-04-06"),
@@ -45,18 +48,19 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
     )
     val mockConnector: VatApiConnector = mock[VatApiConnector]
     val service = new ReturnsService(mockConnector)
+    implicit val hc: HeaderCarrier = HeaderCarrier()
   }
 
   "Calling .getVatReturn" should {
 
     "return a VAT Return" in new Test {
-      (mockConnector.getVatReturnDetails(_: String, _: String))
-        .expects(*, *)
-        .returns(Future.successful(exampleVatReturn))
+      (mockConnector.getVatReturnDetails(_: String, _: String)(_: HeaderCarrier, _: ExecutionContext))
+        .expects(*, *, *, *)
+        .returns(Future.successful(Right(exampleVatReturn)))
 
-      lazy val result: VatReturnDetails = await(service.getVatReturnDetails(User("999999999"), "periodKey"))
+      lazy val result: HttpGetResult[VatReturn] = await(service.getVatReturnDetails(User("999999999"), "periodKey"))
 
-      result shouldBe exampleVatReturn
+      result shouldBe Right(exampleVatReturn)
     }
   }
 }

@@ -14,21 +14,18 @@
  * limitations under the License.
  */
 
-package services
+package connectors
 
-import javax.inject.Inject
+import controllers.ControllerBaseSpec
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
-import connectors.httpParsers.CustomerInfoHttpParser.HttpGetResult
-import connectors.VatApiConnector
-import models.{CustomerInformation, User}
-import uk.gov.hmrc.http.HeaderCarrier
+class VatApiConnectorSpec extends ControllerBaseSpec {
 
-import scala.concurrent.{ExecutionContext, Future}
+  "VatApiConnector" should {
 
-class VatApiService @Inject()(connector: VatApiConnector) {
-
-  def getCustomerInfo(user: User)
-                    (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[CustomerInformation]] = {
-    connector.getCustomerInfo(user.vrn)
+    "generate the correct obligations url" in {
+      val connector = new VatApiConnector(mock[HttpClient], mockConfig)
+      connector.obligationsUrl("808") shouldBe "/vat/808/obligations"
+    }
   }
 }

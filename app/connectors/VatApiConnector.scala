@@ -17,24 +17,34 @@
 package connectors
 
 import java.time.LocalDate
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
-import models.VatReturnDetails
+import config.AppConfig
+import connectors.httpParsers.VatReturnObligationsHttpParser._
+import models.VatReturnObligation.Status
+import models.{CustomerInformation, VatReturn, VatReturnObligations}
+import play.api.Logger
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class VatApiConnector @Inject()(http: HttpClient) {
+@Singleton
+class VatApiConnector @Inject()(http: HttpClient, appConfig: AppConfig) {
 
-  // Static example data. Does not look for a specific trading name.
-  def getTradingName(vrn: String): Future[String] = {
-    Future.successful("Cheapo Clothing Ltd")
+  private[connectors] def obligationsUrl(vrn: String): String = s"${appConfig.vatApiBaseUrl}/vat/$vrn/obligations"
+
+  // TODO: Replace with a real call to an endpoint once it becomes available. This returns static data for now.
+  def getCustomerInfo(vrn: String)
+                    (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[CustomerInformation]] = {
+    Future.successful(Right(CustomerInformation("Cheapo Clothing Ltd")))
   }
 
-  // Static example data return. Does not look for a specific VAT Return.
-  def getVatReturnDetails(vrn: String, periodKey: String): Future[VatReturnDetails] = {
-    Future.successful(
-      VatReturnDetails(
+  // TODO: Replace with a real call to an endpoint once it becomes available. This returns static data for now.
+  def getVatReturnDetails(vrn: String, periodKey: String)
+                         (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[VatReturn]] = {
+    Future.successful(Right(
+      VatReturn(
         LocalDate.parse("2017-01-01"),
         LocalDate.parse("2017-03-31"),
         LocalDate.parse("2017-04-06"),
@@ -49,6 +59,16 @@ class VatApiConnector @Inject()(http: HttpClient) {
         55454,
         545645
       )
-    )
+    ))
+  }
+
+  def getVatReturnObligations(vrn: String, from: LocalDate, to: LocalDate, status: Status.Value)
+                          (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[VatReturnObligations]] = {
+    http.GET(obligationsUrl(vrn), Seq("from" -> from.toString, "to" -> to.toString, "status" -> status.toString)).map {
+      case vatReturns@Right(_) => vatReturns
+      case httpError@Left(error) =>
+        Logger.info("VatApiConnector received error: " + error.message)
+        httpError
+    }
   }
 }
