@@ -1,5 +1,6 @@
 # microservice specific routes
 
 GET        /return                  controllers.ReturnsController.vatReturnDetails
+GET        /returns                 controllers.ReturnObligationsController.vatReturnsList
 GET        /feature-switch          controllers.FeatureSwitchController.featureSwitch
 POST       /feature-switch          controllers.FeatureSwitchController.submitFeatureSwitch
