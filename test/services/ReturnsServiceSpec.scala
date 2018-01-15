@@ -21,8 +21,8 @@ import java.time.LocalDate
 import connectors.httpParsers.VatReturnHttpParser.HttpGetResult
 import connectors.VatApiConnector
 import controllers.ControllerBaseSpec
-import models.User
-import models.VatReturn
+import models.VatReturnObligation.Status
+import models.{User, VatReturn, VatReturnObligation, VatReturnObligations}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits._
@@ -31,6 +31,13 @@ import scala.concurrent.{ExecutionContext, Future}
 class ReturnsServiceSpec extends ControllerBaseSpec {
 
   private trait Test {
+    val mockConnector: VatApiConnector = mock[VatApiConnector]
+    val service = new ReturnsService(mockConnector)
+    implicit val hc: HeaderCarrier = HeaderCarrier()
+  }
+
+  "Calling .getVatReturn" should {
+
     val exampleVatReturn: VatReturn = VatReturn(
       LocalDate.parse("2017-01-01"),
       LocalDate.parse("2017-03-31"),
@@ -46,12 +53,6 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
       55454,
       545645
     )
-    val mockConnector: VatApiConnector = mock[VatApiConnector]
-    val service = new ReturnsService(mockConnector)
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-  }
-
-  "Calling .getVatReturn" should {
 
     "return a VAT Return" in new Test {
       (mockConnector.getVatReturnDetails(_: String, _: String)(_: HeaderCarrier, _: ExecutionContext))
@@ -61,6 +62,33 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
       lazy val result: HttpGetResult[VatReturn] = await(service.getVatReturnDetails(User("999999999"), "periodKey"))
 
       result shouldBe Right(exampleVatReturn)
+    }
+  }
+
+  "Calling .getAllReturns" should {
+
+    val exampleObligations: VatReturnObligations = VatReturnObligations(
+      Seq(
+        VatReturnObligation(
+          LocalDate.parse("2017-01-01"),
+          LocalDate.parse("2017-12-31"),
+          LocalDate.parse("2018-01-31"),
+          "O",
+          None,
+          "#001"
+        )
+      )
+    )
+
+    "return all of a user's VAT return obligations" in new Test {
+      (mockConnector.getVatReturnObligations(_: String, _: LocalDate, _: LocalDate, _: Status.Value)(_: HeaderCarrier, _: ExecutionContext))
+        .expects(*, *, *, *, *, *)
+        .returns(Future.successful(Right(exampleObligations)))
+
+      lazy val result: HttpGetResult[VatReturnObligations] =
+        await(service.getAllReturns(User("999999999"), LocalDate.parse("2017-01-01")))
+
+      result shouldBe Right(exampleObligations)
     }
   }
 }
