@@ -51,6 +51,13 @@ object VatApiStub extends WireMockMethods {
       .thenReturn(status = OK, body = Json.toJson(fulfilledObligations))
   }
 
+  def stubPrototypeObligations: StubMapping = {
+    when(method = GET, uri = obligationsUri, queryParams = Map(
+      "from" -> dateRegex, "to" -> dateRegex, "status" -> "A"
+    ))
+      .thenReturn(status = OK, body = Json.toJson(prototypeObligations))
+  }
+
   def stubNoObligations: StubMapping = {
     when(method = GET, uri = obligationsUri, queryParams = Map(
       "from" -> dateRegex, "to" -> dateRegex, "status" -> "O"
@@ -124,6 +131,41 @@ object VatApiStub extends WireMockMethods {
       pastFulfilledObligation,
       pastOutstandingObligation
     )
+  )
+
+  private val prototypeObligations = VatReturnObligations(Seq(
+    VatReturnObligation(
+      LocalDate.parse("2017-10-31"),
+      LocalDate.parse("2018-01-31"),
+      LocalDate.parse("2018-02-28"),
+      "O",
+      None,
+      "#001"
+    ),
+    VatReturnObligation(
+      LocalDate.parse("2017-07-31"),
+      LocalDate.parse("2017-10-31"),
+      LocalDate.parse("2017-11-30"),
+      "F",
+      Some(LocalDate.parse("2017-11-27")),
+      "#002"
+    ),
+    VatReturnObligation(
+      LocalDate.parse("2017-04-30"),
+      LocalDate.parse("2017-07-31"),
+      LocalDate.parse("2017-08-31"),
+      "F",
+      Some(LocalDate.parse("2017-08-30")),
+      "#003"
+    ),
+    VatReturnObligation(
+      LocalDate.parse("2017-01-31"),
+      LocalDate.parse("2017-04-30"),
+      LocalDate.parse("2017-05-31"),
+      "F",
+      Some(LocalDate.parse("2017-05-28")),
+      "#004"
+    ))
   )
 
   private val outstandingObligations = VatReturnObligations(
