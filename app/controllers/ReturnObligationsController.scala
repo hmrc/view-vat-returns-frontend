@@ -20,9 +20,13 @@ import java.time.LocalDate
 import javax.inject.Inject
 
 import config.AppConfig
+import models.{User, VatReturnObligations}
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent}
 import services.{EnrolmentsAuthService, ReturnsService}
+import uk.gov.hmrc.http.HeaderCarrier
+
+import scala.concurrent.Future
 
 class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
                                             val enrolmentsAuthService: EnrolmentsAuthService,
@@ -34,7 +38,14 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
     implicit request =>
       implicit user =>
         for {
-          returnObligations <- returnsService.getAllReturns(user, LocalDate.now())
-        } yield Ok(views.html.returns.vatReturnsList(returnObligations.right.get))
+          returnObligations <- handleReturnObligations(user)
+        } yield Ok(views.html.returns.vatReturnsList(returnObligations))
+  }
+
+  private[controllers] def handleReturnObligations(user: User)(implicit hc: HeaderCarrier): Future[VatReturnObligations] = {
+    returnsService.getAllReturns(user, LocalDate.now()).map {
+      case Right(vatReturnObligations) => vatReturnObligations
+      case Left(_) => VatReturnObligations(Seq())
+    }
   }
 }

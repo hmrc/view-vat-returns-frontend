@@ -18,6 +18,7 @@ package controllers
 
 import java.time.LocalDate
 
+import models.errors.{BadRequestError, HttpError}
 import models.{User, VatReturnObligation, VatReturnObligations}
 import play.api.http.Status
 import play.api.test.Helpers._
@@ -63,6 +64,26 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     }
 
     val mockEnrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
+
+    def target: ReturnObligationsController = {
+      setup()
+      new ReturnObligationsController(messages, mockEnrolmentsAuthService, mockVatReturnService, mockConfig)
+    }
+  }
+
+  private trait HandleReturnObligationsTest {
+    val vatServiceResult: Future[Either[HttpError, VatReturnObligations]]
+    val mockAuthConnector: AuthConnector = mock[AuthConnector]
+    val mockVatReturnService: ReturnsService = mock[ReturnsService]
+    val mockEnrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
+    val testUser: User = User("999999999")
+    implicit val hc: HeaderCarrier = HeaderCarrier()
+
+    def setup(): Any = {
+      (mockVatReturnService.getAllReturns(_: User, _: LocalDate)(_: HeaderCarrier, _: ExecutionContext))
+        .expects(*, *, *, *)
+        .returns(vatServiceResult)
+    }
 
     def target: ReturnObligationsController = {
       setup()
@@ -116,6 +137,40 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         override val authResult: Future[Nothing] = Future.failed(MissingBearerToken())
         private val result = target.vatReturnsList()(fakeRequest)
         status(result) shouldBe Status.UNAUTHORIZED
+      }
+    }
+  }
+
+  "Calling the .handleReturnObligations function" when {
+
+    "the vatReturnsService retrieves a valid list of VatReturnObligations" should {
+
+      "return the VatReturnObligations" in new HandleReturnObligationsTest {
+        override val vatServiceResult: Future[Right[HttpError, VatReturnObligations]] = Future.successful {
+          Right(
+            VatReturnObligations(Seq(VatReturnObligation(
+              LocalDate.parse("2017-01-01"),
+              LocalDate.parse("2017-01-01"),
+              LocalDate.parse("2017-01-01"),
+              "O",
+              None,
+              "#001"
+            )))
+          )
+        }
+        private val result = await(target.handleReturnObligations(testUser))
+        result shouldBe vatServiceResult.b
+      }
+    }
+
+    "the vatReturnsService retrieves an error" should {
+
+      "return an empty VatReturnObligations" in new HandleReturnObligationsTest {
+        override val vatServiceResult: Future[Either[HttpError, VatReturnObligations]] = Future.successful {
+          Left(BadRequestError("", ""))
+        }
+        private val result = await(target.handleReturnObligations(testUser))
+        result shouldBe VatReturnObligations(Seq())
       }
     }
   }
