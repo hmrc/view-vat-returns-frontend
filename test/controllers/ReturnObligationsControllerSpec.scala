@@ -97,7 +97,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
       val goodEnrolments: Enrolments = Enrolments(
         Set(
-          Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("", "999999999")), "Active")
+          Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("VATRegNo", "999999999")), "Active")
         )
       )
 

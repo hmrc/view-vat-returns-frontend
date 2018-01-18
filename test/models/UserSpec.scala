@@ -21,7 +21,7 @@ import uk.gov.hmrc.play.test.UnitSpec
 
 class UserSpec extends UnitSpec {
 
-  "Creating a user with only a VRN" should {
+  "Creating a User with only a VRN" should {
 
     val user = User("123456789")
 
@@ -34,7 +34,7 @@ class UserSpec extends UnitSpec {
     }
   }
 
-  "Creating a user with a VRN and inactive status" should {
+  "Creating a User with a VRN and inactive status" should {
 
     val user = User("123456789", active = false)
 
@@ -47,16 +47,14 @@ class UserSpec extends UnitSpec {
     }
   }
 
-  "Creating a user with an active VAT enrolment" should {
+  "Creating a User with a valid, active VAT Enrolment" should {
 
     val enrolments = Enrolments(
-      Set(
-        Enrolment(
+      Set(Enrolment(
           "HMRC-MTD-VAT",
-          Seq(EnrolmentIdentifier("XXX", "123456789")),
+          Seq(EnrolmentIdentifier("VATRegNo", "123456789")),
           "Activated"
-        )
-      )
+        ))
     )
 
     val user = User(enrolments)
@@ -65,21 +63,19 @@ class UserSpec extends UnitSpec {
       user.vrn shouldBe "123456789"
     }
 
-    "be have an active status" in {
+    "have an active status" in {
       user.active shouldBe true
     }
   }
 
-  "Creating a user with an inactive VAT enrolment" should {
+  "Creating a User with a valid, inactive VAT Enrolment" should {
 
     val enrolments = Enrolments(
-      Set(
-        Enrolment(
+      Set(Enrolment(
           "HMRC-MTD-VAT",
-          Seq(EnrolmentIdentifier("XXX", "123456789")),
+          Seq(EnrolmentIdentifier("VATRegNo", "123456789")),
           ""
-        )
-      )
+        ))
     )
 
     val user = User(enrolments)
@@ -88,21 +84,19 @@ class UserSpec extends UnitSpec {
       user.vrn shouldBe "123456789"
     }
 
-    "be have an active status" in {
+    "have an inactive status" in {
       user.active shouldBe false
     }
   }
 
-  "Creating a user with an no VAT enrolment" should {
+  "Creating a User with an invalid VAT Enrolment Key" should {
 
     val enrolments = Enrolments(
-      Set(
-        Enrolment(
+      Set(Enrolment(
           "HMRC-XXX-XXX",
-          Seq(EnrolmentIdentifier("XXX", "123456789")),
+          Seq(EnrolmentIdentifier("VATRegNo", "123456789")),
           ""
-        )
-      )
+        ))
     )
 
     "throw an exception" in {
@@ -118,16 +112,14 @@ class UserSpec extends UnitSpec {
     }
   }
 
-  "Creating a user with a VAT enrolment with no VRN" should {
+  "Creating a User with an invalid VAT Identifier Name" should {
 
     val enrolments = Enrolments(
-      Set(
-        Enrolment(
-          "HMRC-MTD-VAT",
-          Seq(),
-          ""
-        )
-      )
+      Set(Enrolment(
+        "HMRC-MTD-VAT",
+        Seq(EnrolmentIdentifier("VATXXXXX", "123456789")),
+        ""
+      ))
     )
 
     "throw an exception" in {
@@ -139,7 +131,30 @@ class UserSpec extends UnitSpec {
     "have the correct message in the exception" in {
       the[AuthorisationException] thrownBy {
         User(enrolments)
-      } should have message "VRN missing"
+      } should have message "VAT enrolment missing"
+    }
+  }
+
+  "Creating a User with an invalid VRN" should {
+
+    val enrolments = Enrolments(
+      Set(Enrolment(
+        "HMRC-MTD-VAT",
+        Seq(EnrolmentIdentifier("VATRegNo", "")),
+        ""
+      ))
+    )
+
+    "throw an exception" in {
+      intercept[AuthorisationException] {
+        User(enrolments)
+      }
+    }
+
+    "have the correct message in the exception" in {
+      the[AuthorisationException] thrownBy {
+        User(enrolments)
+      } should have message "VRN is invalid"
     }
   }
 }

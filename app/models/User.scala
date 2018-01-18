@@ -22,15 +22,18 @@ case class User(vrn: String, active: Boolean = true)
 
 object User {
   def apply(enrolments: Enrolments): User = {
-    val vatEnrolments = enrolments.enrolments.filter(enrolment => enrolment.key == "HMRC-MTD-VAT")
+    val vatEnrolments = enrolments.enrolments.filter(
+      enrolment => enrolment.key == "HMRC-MTD-VAT" && enrolment.identifiers.head.key == "VATRegNo"
+    )
 
     if (vatEnrolments.isEmpty) {
       throw InternalError("VAT enrolment missing")
     }
     else {
       vatEnrolments.collectFirst {
-        case Enrolment("HMRC-MTD-VAT", EnrolmentIdentifier(_, vrn) :: _, status, _) => User(vrn, status == "Activated")
-      }.getOrElse(throw InternalError("VRN missing"))
+        case Enrolment(_, EnrolmentIdentifier(_, vrn) :: _, status, _) if vrn.matches("\\d{9}") =>
+           User(vrn, status == "Activated")
+      }.getOrElse(throw InternalError("VRN is invalid"))
     }
   }
 }
