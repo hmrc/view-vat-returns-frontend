@@ -33,6 +33,12 @@ import scala.concurrent.{ExecutionContext, Future}
 class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
   private trait Test {
+    val goodEnrolments: Enrolments = Enrolments(
+      Set(
+        Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("VATRegNo", "999999999")), "Active")
+      )
+    )
+
     val exampleObligations: VatReturnObligations = VatReturnObligations(
       Seq(
         VatReturnObligation(
@@ -95,12 +101,6 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
     "A user is logged in and enrolled to HMRC-MTD-VAT" should {
 
-      val goodEnrolments: Enrolments = Enrolments(
-        Set(
-          Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("VATRegNo", "999999999")), "Active")
-        )
-      )
-
       "return 200" in new Test {
         override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
         private val result = target.vatReturnsList()(fakeRequest)
@@ -136,6 +136,53 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         override val serviceCall = false
         override val authResult: Future[Nothing] = Future.failed(MissingBearerToken())
         private val result = target.vatReturnsList()(fakeRequest)
+        status(result) shouldBe Status.UNAUTHORIZED
+      }
+    }
+  }
+
+  "Calling the .returnDeadlines action" when {
+
+    "A user is logged in and enrolled to HMRC-MTD-VAT" should {
+
+      "return 200" in new Test {
+        override val serviceCall = false
+        override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
+        private val result = target.returnDeadlines()(fakeRequest)
+        status(result) shouldBe Status.OK
+      }
+
+      "return HTML" in new Test {
+        override val serviceCall = false
+        override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
+        private val result = target.returnDeadlines()(fakeRequest)
+        contentType(result) shouldBe Some("text/html")
+      }
+
+      "return charset of utf-8" in new Test {
+        override val serviceCall = false
+        override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
+        private val result = target.returnDeadlines()(fakeRequest)
+        charset(result) shouldBe Some("utf-8")
+      }
+    }
+
+    "A user is not authorised" should {
+
+      "return 403 (Forbidden)" in new Test {
+        override val serviceCall = false
+        override val authResult: Future[Nothing] = Future.failed(InsufficientEnrolments())
+        private val result = target.returnDeadlines()(fakeRequest)
+        status(result) shouldBe Status.FORBIDDEN
+      }
+    }
+
+    "A user is not authenticated" should {
+
+      "return 401 (Unauthorised)" in new Test {
+        override val serviceCall = false
+        override val authResult: Future[Nothing] = Future.failed(MissingBearerToken())
+        private val result = target.returnDeadlines()(fakeRequest)
         status(result) shouldBe Status.UNAUTHORIZED
       }
     }

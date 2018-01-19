@@ -20,6 +20,7 @@ import java.time.LocalDate
 import javax.inject.Inject
 
 import config.AppConfig
+import models.viewModels.ReturnDeadline
 import models.{User, VatReturnObligations}
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent}
@@ -34,12 +35,18 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
                                             implicit val appConfig: AppConfig)
   extends AuthorisedController {
 
-  def vatReturnsList(): Action[AnyContent] = authorisedAction {
-    implicit request =>
-      implicit user =>
-        for {
-          returnObligations <- handleReturnObligations(user)
-        } yield Ok(views.html.returns.vatReturnsList(returnObligations))
+  def vatReturnsList(): Action[AnyContent] = authorisedAction { implicit request =>
+    implicit user =>
+      for {
+        returnObligations <- handleReturnObligations(user)
+      } yield Ok(views.html.returns.vatReturnsList(returnObligations))
+  }
+
+  def returnDeadlines(): Action[AnyContent] = authorisedAction { implicit request =>
+    implicit user =>
+      Future.successful(Ok(views.html.returns.returnDeadlines(
+        ReturnDeadline(LocalDate.parse("2018-08-07"), LocalDate.parse("2018-06-30"))
+      )))
   }
 
   private[controllers] def handleReturnObligations(user: User)(implicit hc: HeaderCarrier): Future[VatReturnObligations] = {
