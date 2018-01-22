@@ -32,4 +32,10 @@ class RouteSpec extends UnitSpec with GuiceOneAppPerSuite {
       controllers.routes.ReturnObligationsController.vatReturnsList().url shouldBe "/view-your-vat-returns/returns"
     }
   }
+
+  "The route for the return deadlines" should {
+    "be /view-your-vat-returns/return-deadlines" in {
+      controllers.routes.ReturnObligationsController.returnDeadlines().url shouldBe "/view-your-vat-returns/return-deadlines"
+    }
+  }
 }

@@ -2,5 +2,6 @@
 
 GET        /return                  controllers.ReturnsController.vatReturnDetails
 GET        /returns                 controllers.ReturnObligationsController.vatReturnsList
+GET        /return-deadlines        controllers.ReturnObligationsController.returnDeadlines
 GET        /feature-switch          controllers.FeatureSwitchController.featureSwitch
 POST       /feature-switch          controllers.FeatureSwitchController.submitFeatureSwitch
