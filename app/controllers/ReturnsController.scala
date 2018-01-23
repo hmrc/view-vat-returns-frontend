@@ -16,6 +16,7 @@
 
 package controllers
 
+import java.time.LocalDate
 import javax.inject.{Inject, Singleton}
 
 import config.AppConfig
@@ -31,11 +32,11 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
                                   implicit val appConfig: AppConfig)
   extends AuthorisedController {
 
-  def vatReturnDetails(): Action[AnyContent] = authorisedAction {
+  def vatReturnDetails(start: String, end: String): Action[AnyContent] = authorisedAction {
     implicit request =>
       implicit user =>
         for {
-          vatReturn <- returnsService.getVatReturnDetails(user, "periodKey")
+          vatReturn <- returnsService.getVatReturnDetails(user, LocalDate.parse(start), LocalDate.parse(end))
           customerInfo <- vatApiService.getCustomerInfo(user)
         } yield Ok(views.html.returns.vatReturnDetails(vatReturn.right.get, customerInfo.right.get))
   }

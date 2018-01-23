@@ -60,8 +60,8 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         .returns(authResult)
 
       if(serviceCall) {
-        (mockVatReturnService.getVatReturnDetails(_: User, _: String)(_: HeaderCarrier, _: ExecutionContext))
-          .expects(*, *, *, *)
+        (mockVatReturnService.getVatReturnDetails(_: User, _: LocalDate, _: LocalDate)(_: HeaderCarrier, _: ExecutionContext))
+          .expects(*, *, *, *, *)
           .returns(Future.successful(Right(exampleVatReturn)))
 
         (mockVatApiService.getCustomerInfo(_: User)(_: HeaderCarrier, _: ExecutionContext))
@@ -90,19 +90,19 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
       "return 200" in new Test {
         override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
-        private val result = target.vatReturnDetails()(fakeRequest)
+        private val result = target.vatReturnDetails("2017-04-30", "2017-07-31")(fakeRequest)
         status(result) shouldBe Status.OK
       }
 
       "return HTML" in new Test {
         override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
-        private val result = target.vatReturnDetails()(fakeRequest)
+        private val result = target.vatReturnDetails("2017-04-30", "2017-07-31")(fakeRequest)
         contentType(result) shouldBe Some("text/html")
       }
 
       "return charset of utf-8" in new Test {
         override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
-        private val result = target.vatReturnDetails()(fakeRequest)
+        private val result = target.vatReturnDetails("2017-04-30", "2017-07-31")(fakeRequest)
         charset(result) shouldBe Some("utf-8")
       }
     }
@@ -112,7 +112,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       "return 403 (Forbidden)" in new Test {
         override val serviceCall = false
         override val authResult: Future[Nothing] = Future.failed(InsufficientEnrolments())
-        private val result = target.vatReturnDetails()(fakeRequest)
+        private val result = target.vatReturnDetails("2017-04-30", "2017-07-31")(fakeRequest)
         status(result) shouldBe Status.FORBIDDEN
       }
     }
@@ -122,7 +122,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       "return 401 (Unauthorised)" in new Test {
         override val serviceCall = false
         override val authResult: Future[Nothing] = Future.failed(MissingBearerToken())
-        private val result = target.vatReturnDetails()(fakeRequest)
+        private val result = target.vatReturnDetails("2017-04-30", "2017-07-31")(fakeRequest)
         status(result) shouldBe Status.UNAUTHORIZED
       }
     }

@@ -35,11 +35,11 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
                                             implicit val appConfig: AppConfig)
   extends AuthorisedController {
 
-  def vatReturnsList(): Action[AnyContent] = authorisedAction { implicit request =>
+  def completedReturns(): Action[AnyContent] = authorisedAction { implicit request =>
     implicit user =>
       for {
         returnObligations <- handleReturnObligations(user)
-      } yield Ok(views.html.returns.vatReturnsList(returnObligations))
+      } yield Ok(views.html.returns.completedReturns(returnObligations))
   }
 
   def returnDeadlines(): Action[AnyContent] = authorisedAction { implicit request =>

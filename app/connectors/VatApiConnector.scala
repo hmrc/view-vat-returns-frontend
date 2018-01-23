@@ -22,7 +22,7 @@ import javax.inject.{Inject, Singleton}
 import config.AppConfig
 import connectors.httpParsers.VatReturnObligationsHttpParser._
 import models.VatReturnObligation.Status
-import models.{CustomerInformation, VatReturn, VatReturnObligations}
+import models.{CustomerInformation, VatReturn, VatReturnObligation, VatReturnObligations}
 import play.api.Logger
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
@@ -41,12 +41,12 @@ class VatApiConnector @Inject()(http: HttpClient, appConfig: AppConfig) {
   }
 
   // TODO: Replace with a real call to an endpoint once it becomes available. This returns static data for now.
-  def getVatReturnDetails(vrn: String, periodKey: String)
+  def getVatReturnDetails(vrn: String, start: LocalDate, end: LocalDate)
                          (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[VatReturn]] = {
     Future.successful(Right(
       VatReturn(
-        LocalDate.parse("2017-01-01"),
-        LocalDate.parse("2017-03-31"),
+        start,
+        end,
         LocalDate.parse("2017-04-06"),
         LocalDate.parse("2017-04-08"),
         1297,

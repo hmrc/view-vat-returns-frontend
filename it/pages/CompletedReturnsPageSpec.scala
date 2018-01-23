@@ -27,7 +27,7 @@ import play.api.http.Status
 import play.api.libs.ws.{WSRequest, WSResponse}
 import stubs.{AuthStub, VatApiStub}
 
-class VatReturnListPageSpec extends IntegrationBaseSpec {
+class CompletedReturnsPageSpec extends IntegrationBaseSpec {
 
   private trait Test {
     val vatReturnList = VatReturnObligations(Seq(
@@ -96,7 +96,7 @@ class VatReturnListPageSpec extends IntegrationBaseSpec {
 
         lazy implicit val document: Document = Jsoup.parse(response.body)
 
-        val rowSelector = "#vatReturnsList tbody tr"
+        val rowSelector = "#completedReturns tbody tr"
 
         document.select(rowSelector).size() shouldBe 4
       }
