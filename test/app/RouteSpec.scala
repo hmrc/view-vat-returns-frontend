@@ -23,7 +23,8 @@ class RouteSpec extends UnitSpec with GuiceOneAppPerSuite {
 
   "The route for the submitted 9 box returns" should {
     "be /view-your-vat-returns/return" in {
-      controllers.routes.ReturnsController.vatReturnDetails().url shouldBe "/view-your-vat-returns/return"
+      controllers.routes.ReturnsController.vatReturnDetails("2017-04-30", "2017-07-31").url shouldBe
+        "/view-your-vat-returns/return?start=2017-04-30&end=2017-07-31"
     }
   }
 

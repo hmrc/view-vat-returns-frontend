@@ -1,6 +1,6 @@
 # microservice specific routes
 
-GET        /return                  controllers.ReturnsController.vatReturnDetails
+GET        /return                  controllers.ReturnsController.vatReturnDetails(start: String, end: String)
 GET        /returns                 controllers.ReturnObligationsController.completedReturns
 GET        /return-deadlines        controllers.ReturnObligationsController.returnDeadlines
 GET        /feature-switch          controllers.FeatureSwitchController.featureSwitch

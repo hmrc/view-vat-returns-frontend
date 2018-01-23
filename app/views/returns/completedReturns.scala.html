@@ -52,7 +52,7 @@
                   <td>@displayDate(obligation.end)</td>
                   <td>@messages("completedReturns.received")</td>
                   <td>
-                    <a href="@controllers.routes.ReturnsController.vatReturnDetails()">
+                    <a href="@controllers.routes.ReturnsController.vatReturnDetails(obligation.start.toString, obligation.end.toString)">
                       @messages("completedReturns.viewReturnOne") @displayDate(obligation.end) @messages("completedReturns.viewReturnTwo")
                     </a>
                   </td>

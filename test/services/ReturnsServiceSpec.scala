@@ -55,11 +55,13 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
     )
 
     "return a VAT Return" in new Test {
-      (mockConnector.getVatReturnDetails(_: String, _: String)(_: HeaderCarrier, _: ExecutionContext))
-        .expects(*, *, *, *)
+      (mockConnector.getVatReturnDetails(_: String, _: LocalDate, _: LocalDate)(_: HeaderCarrier, _: ExecutionContext))
+        .expects(*, *, *, *, *)
         .returns(Future.successful(Right(exampleVatReturn)))
 
-      lazy val result: HttpGetResult[VatReturn] = await(service.getVatReturnDetails(User("999999999"), "periodKey"))
+      lazy val result: HttpGetResult[VatReturn] = await(
+        service.getVatReturnDetails(User("999999999"), LocalDate.parse("2017-04-30"), LocalDate.parse("2017-07-31"))
+      )
 
       result shouldBe Right(exampleVatReturn)
     }

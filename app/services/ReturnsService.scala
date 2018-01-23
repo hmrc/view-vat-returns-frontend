@@ -30,9 +30,9 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class ReturnsService @Inject()(connector: VatApiConnector) {
 
-  def getVatReturnDetails(user: User, periodKey: String)
+  def getVatReturnDetails(user: User, start: LocalDate, end: LocalDate)
                          (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[VatReturn]] = {
-    connector.getVatReturnDetails(user.vrn, periodKey)
+    connector.getVatReturnDetails(user.vrn, start, end)
   }
 
   def getAllReturns(user: User, upTo: LocalDate)
