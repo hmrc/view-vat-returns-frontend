@@ -18,22 +18,22 @@
 
 @(returns: VatReturnObligations)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
-@views.html.main_template(title = messages("vatReturnsList.title"), bodyClasses = None, appConfig = appConfig) {
+@views.html.main_template(title = messages("completedReturns.title"), bodyClasses = None, appConfig = appConfig) {
 
   <div class="grid-row">
     <div class="column-two-thirds">
-      <h1 class="heading-xlarge">@messages("vatReturnsList.title")</h1>
+      <h1 class="heading-xlarge">@messages("completedReturns.title")</h1>
       <p>@messages("common.submitReturns")</p>
       @if(returns.obligations.isEmpty) {
-        <h2 class="heading-medium">@messages("vatReturnsList.noReturns")</h2>
+        <h2 class="heading-medium">@messages("completedReturns.noReturns")</h2>
       } else {
-        <table id="vatReturnsList" class="form-group">
-          <caption class="visually-hidden">@messages("vatReturnsList.tableCaption")</caption>
+        <table id="completedReturns" class="form-group">
+          <caption class="visually-hidden">@messages("completedReturns.tableCaption")</caption>
           <thead>
             <tr>
-              <th>@messages("vatReturnsList.periodEnding")</th>
-              <th>@messages("vatReturnsList.status")</th>
-              <th>@messages("vatReturnsList.returnDetails")</th>
+              <th>@messages("completedReturns.periodEnding")</th>
+              <th>@messages("completedReturns.status")</th>
+              <th>@messages("completedReturns.returnDetails")</th>
             </tr>
           </thead>
           <tbody>
@@ -41,8 +41,8 @@
               case obligation if obligation.status == "O" => {
                 <tr>
                   <td>@displayDate(obligation.end)</td>
-                  <td>@messages("vatReturnsList.due") @displayDate(obligation.due)</td>
-                  <td>@messages("vatReturnsList.notSubmitted")</td>
+                  <td>@messages("completedReturns.due") @displayDate(obligation.due)</td>
+                  <td>@messages("completedReturns.notSubmitted")</td>
                 </tr>
               }
             }
@@ -50,10 +50,10 @@
               case obligation if obligation.status == "F" => {
                 <tr>
                   <td>@displayDate(obligation.end)</td>
-                  <td>@messages("vatReturnsList.received")</td>
+                  <td>@messages("completedReturns.received")</td>
                   <td>
                     <a href="@controllers.routes.ReturnsController.vatReturnDetails()">
-                      @messages("vatReturnsList.viewReturnOne") @displayDate(obligation.end) @messages("vatReturnsList.viewReturnTwo")
+                      @messages("completedReturns.viewReturnOne") @displayDate(obligation.end) @messages("completedReturns.viewReturnTwo")
                     </a>
                   </td>
                 </tr>
@@ -63,9 +63,9 @@
         </table>
       }
 
-      <p>@messages("vatReturnsList.viewEarlierReturnsOne")
-        <a href="@appConfig.portalUrl">@messages("vatReturnsList.viewEarlierReturnsTwo")</a>
-        @messages("vatReturnsList.viewEarlierReturnsThree")
+      <p>@messages("completedReturns.viewEarlierReturnsOne")
+        <a href="@appConfig.portalUrl">@messages("completedReturns.viewEarlierReturnsTwo")</a>
+        @messages("completedReturns.viewEarlierReturnsThree")
       </p>
 
     </div>

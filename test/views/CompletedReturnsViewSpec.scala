@@ -22,28 +22,28 @@ import models.{VatReturnObligation, VatReturnObligations}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
-class VatReturnListViewSpec extends ViewBaseSpec {
+class CompletedReturnsViewSpec extends ViewBaseSpec {
 
   object Selectors {
     val pageHeading = "#content h1"
     val submitThroughSoftware = "#content > article > div > div > p:nth-child(2)"
     val tableCaption = "#content caption"
-    val periodEndingColumnHeading = "#vatReturnsList > thead > tr > th:nth-child(1)"
-    val statusColumnHeading = "#vatReturnsList > thead > tr > th:nth-child(2)"
-    val returnDetailsColumnHeading = "#vatReturnsList > thead > tr > th:nth-child(3)"
-    val periodEndingOutstanding = "#vatReturnsList > tbody:nth-child(3) > tr:nth-child(1) > td:nth-child(1)"
-    val periodEndingFulfilled = "#vatReturnsList > tbody:nth-child(3) > tr:nth-child(2) > td:nth-child(1)"
-    val statusOutstanding = "#vatReturnsList > tbody:nth-child(3) > tr:nth-child(1) > td:nth-child(2)"
-    val statusFulfilled = "#vatReturnsList > tbody:nth-child(3) > tr:nth-child(2) > td:nth-child(2)"
-    val detailsOutstanding = "#vatReturnsList > tbody:nth-child(3) > tr:nth-child(1) > td:nth-child(3)"
-    val detailsFulfilled = "#vatReturnsList > tbody:nth-child(3) > tr:nth-child(2) > td:nth-child(3) > a"
+    val periodEndingColumnHeading = "#completedReturns > thead > tr > th:nth-child(1)"
+    val statusColumnHeading = "#completedReturns > thead > tr > th:nth-child(2)"
+    val returnDetailsColumnHeading = "#completedReturns > thead > tr > th:nth-child(3)"
+    val periodEndingOutstanding = "#completedReturns > tbody:nth-child(3) > tr:nth-child(1) > td:nth-child(1)"
+    val periodEndingFulfilled = "#completedReturns > tbody:nth-child(3) > tr:nth-child(2) > td:nth-child(1)"
+    val statusOutstanding = "#completedReturns > tbody:nth-child(3) > tr:nth-child(1) > td:nth-child(2)"
+    val statusFulfilled = "#completedReturns > tbody:nth-child(3) > tr:nth-child(2) > td:nth-child(2)"
+    val detailsOutstanding = "#completedReturns > tbody:nth-child(3) > tr:nth-child(1) > td:nth-child(3)"
+    val detailsFulfilled = "#completedReturns > tbody:nth-child(3) > tr:nth-child(2) > td:nth-child(3) > a"
     val noReturns = "#content h2"
     val earlierReturns = "#content > article > div > div > p:nth-child(4)"
   }
 
   "Rendering the VAT Returns page" should {
 
-    lazy val view = views.html.returns.vatReturnsList(VatReturnObligations(Seq()))
+    lazy val view = views.html.returns.completedReturns(VatReturnObligations(Seq()))
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct document title" in {
@@ -86,7 +86,7 @@ class VatReturnListViewSpec extends ViewBaseSpec {
       )
     )
 
-    lazy val view = views.html.returns.vatReturnsList(exampleReturns)
+    lazy val view = views.html.returns.completedReturns(exampleReturns)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct table caption" in {
@@ -132,7 +132,7 @@ class VatReturnListViewSpec extends ViewBaseSpec {
 
   "Rendering the VAT Returns page with no available VAT Returns" should {
 
-    lazy val view = views.html.returns.vatReturnsList(VatReturnObligations(Seq()))
+    lazy val view = views.html.returns.completedReturns(VatReturnObligations(Seq()))
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct message that there are no returns" in {

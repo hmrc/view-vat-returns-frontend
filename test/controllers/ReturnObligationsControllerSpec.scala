@@ -97,25 +97,25 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     }
   }
 
-  "Calling the .vatReturnsList action" when {
+  "Calling the .completedReturns action" when {
 
     "A user is logged in and enrolled to HMRC-MTD-VAT" should {
 
       "return 200" in new Test {
         override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
-        private val result = target.vatReturnsList()(fakeRequest)
+        private val result = target.completedReturns()(fakeRequest)
         status(result) shouldBe Status.OK
       }
 
       "return HTML" in new Test {
         override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
-        private val result = target.vatReturnsList()(fakeRequest)
+        private val result = target.completedReturns()(fakeRequest)
         contentType(result) shouldBe Some("text/html")
       }
 
       "return charset of utf-8" in new Test {
         override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
-        private val result = target.vatReturnsList()(fakeRequest)
+        private val result = target.completedReturns()(fakeRequest)
         charset(result) shouldBe Some("utf-8")
       }
     }
@@ -125,7 +125,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
       "return 403 (Forbidden)" in new Test {
         override val serviceCall = false
         override val authResult: Future[Nothing] = Future.failed(InsufficientEnrolments())
-        private val result = target.vatReturnsList()(fakeRequest)
+        private val result = target.completedReturns()(fakeRequest)
         status(result) shouldBe Status.FORBIDDEN
       }
     }
@@ -135,7 +135,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
       "return 401 (Unauthorised)" in new Test {
         override val serviceCall = false
         override val authResult: Future[Nothing] = Future.failed(MissingBearerToken())
-        private val result = target.vatReturnsList()(fakeRequest)
+        private val result = target.completedReturns()(fakeRequest)
         status(result) shouldBe Status.UNAUTHORIZED
       }
     }
