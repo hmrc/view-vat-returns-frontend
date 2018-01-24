@@ -47,7 +47,11 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       55454,
       545645
     )
-    val exampleCustomerInfo: CustomerInformation = CustomerInformation("Cheapo Clothing Ltd")
+    val exampleCustomerInfo: CustomerInformation = CustomerInformation(
+      "John",
+      "Smith",
+      "Cheapo Clothing Ltd"
+    )
     val serviceCall: Boolean = true
     val authResult: Future[_]
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
