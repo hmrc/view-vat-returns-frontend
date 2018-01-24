@@ -22,7 +22,7 @@ import javax.inject.{Inject, Singleton}
 import config.AppConfig
 import connectors.httpParsers.VatReturnObligationsHttpParser._
 import models.VatReturnObligation.Status
-import models.{CustomerInformation, VatReturn, VatReturnObligation, VatReturnObligations}
+import models.{CustomerInformation, VatReturn, VatReturnObligations}
 import play.api.Logger
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
