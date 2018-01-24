@@ -61,7 +61,12 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       55454,
       545645
     )
-    val customerInfo = CustomerInformation("Cheapo Clothing Ltd")
+
+    val customerInfo = CustomerInformation(
+      "John",
+      "Smith",
+      "Cheapo Clothing Ltd"
+    )
 
     lazy val view = views.html.returns.vatReturnDetails(exampleVatReturn, customerInfo)
     lazy implicit val document: Document = Jsoup.parse(view.body)

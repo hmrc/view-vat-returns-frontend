@@ -28,7 +28,11 @@ import scala.concurrent.{ExecutionContext, Future}
 class VatApiServiceSpec extends ControllerBaseSpec {
 
   private trait Test {
-    val exampleCustomerInfo: CustomerInformation = CustomerInformation("Cheapo Clothing Ltd")
+    val exampleCustomerInfo: CustomerInformation = CustomerInformation(
+      "John",
+      "Smith",
+      "Cheapo Clothing Ltd"
+    )
     val mockConnector: VatApiConnector = mock[VatApiConnector]
     val service: VatApiService = new VatApiService(mockConnector)
     implicit val hc: HeaderCarrier = HeaderCarrier()

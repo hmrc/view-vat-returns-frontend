@@ -22,7 +22,7 @@ import javax.inject.{Inject, Singleton}
 import config.AppConfig
 import connectors.httpParsers.VatReturnObligationsHttpParser._
 import models.VatReturnObligation.Status
-import models.{CustomerInformation, VatReturn, VatReturnObligation, VatReturnObligations}
+import models.{CustomerInformation, VatReturn, VatReturnObligations}
 import play.api.Logger
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
@@ -37,7 +37,11 @@ class VatApiConnector @Inject()(http: HttpClient, appConfig: AppConfig) {
   // TODO: Replace with a real call to an endpoint once it becomes available. This returns static data for now.
   def getCustomerInfo(vrn: String)
                     (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[CustomerInformation]] = {
-    Future.successful(Right(CustomerInformation("Cheapo Clothing Ltd")))
+    Future.successful(Right(CustomerInformation(
+      "Betty",
+      "Jones",
+      "Cheapo Clothing Ltd"
+    )))
   }
 
   // TODO: Replace with a real call to an endpoint once it becomes available. This returns static data for now.
