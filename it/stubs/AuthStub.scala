@@ -50,18 +50,9 @@ object AuthStub extends WireMockMethods {
       .thenReturn(status = OK, body = successfulAuthResponse(mtdVatEnrolment))
   }
 
-  def authorisedVatReturn(): StubMapping = {
-    when(method = POST, uri = authoriseUri)
-      .thenReturn(status = OK, body = successfulAuthResponseVatReturn(mtdVatEnrolment))
-  }
-
   def unauthorisedOtherEnrolment(): StubMapping = {
-    when(method = POST, uri = authoriseUri).thenReturn(status = OK, body = successfulAuthResponse(otherEnrolment))
-  }
-
-  def unauthorisedOtherEnrolmentVatReturn(): StubMapping = {
     when(method = POST, uri = authoriseUri)
-      .thenReturn(status = OK, body = successfulAuthResponseVatReturn(otherEnrolment))
+      .thenReturn(status = OK, body = successfulAuthResponse(otherEnrolment))
   }
 
   def unauthorisedNotLoggedIn(): StubMapping = {
@@ -70,10 +61,6 @@ object AuthStub extends WireMockMethods {
   }
 
   private def successfulAuthResponse(enrolments: JsObject*): JsObject = {
-    Json.obj("allEnrolments" -> enrolments)
-  }
-
-  private def successfulAuthResponseVatReturn(enrolments: JsObject*): JsObject = {
     Json.obj("authorisedEnrolments" -> enrolments)
   }
 }

@@ -27,5 +27,10 @@ class VatApiConnectorSpec extends ControllerBaseSpec {
       val connector = new VatApiConnector(mock[HttpClient], mockConfig)
       connector.obligationsUrl("808") shouldBe "/vat/808/obligations"
     }
+
+    "generate the correct customer information url" in {
+      val connector = new VatApiConnector(mock[HttpClient], mockConfig)
+      connector.customerInfoUrl("123456789") shouldBe "/customer-information/vat/123456789"
+    }
   }
 }

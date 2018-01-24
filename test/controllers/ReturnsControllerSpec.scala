@@ -21,7 +21,7 @@ import java.time.LocalDate
 import models.{CustomerInformation, User, VatReturn}
 import play.api.http.Status
 import play.api.test.Helpers._
-import services.{EnrolmentsAuthService, ReturnsService, VatApiService}
+import services.{EnrolmentsAuthService, ReturnsService, CustomerInfoService}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.Retrieval
@@ -56,7 +56,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     val authResult: Future[_]
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
     val mockVatReturnService: ReturnsService = mock[ReturnsService]
-    val mockVatApiService: VatApiService = mock[VatApiService]
+    val mockVatApiService: CustomerInfoService = mock[CustomerInfoService]
 
     def setup(): Any = {
       (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))

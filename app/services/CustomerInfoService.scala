@@ -18,17 +18,17 @@ package services
 
 import javax.inject.Inject
 
-import connectors.httpParsers.CustomerInfoHttpParser.HttpGetResult
 import connectors.VatApiConnector
+import connectors.httpParsers.CustomerInfoHttpParser.HttpGetResult
 import models.{CustomerInformation, User}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class VatApiService @Inject()(connector: VatApiConnector) {
+class CustomerInfoService @Inject()(connector: VatApiConnector) {
 
   def getCustomerInfo(user: User)
-                    (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[CustomerInformation]] = {
+                     (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[CustomerInformation]] = {
     connector.getCustomerInfo(user.vrn)
   }
 }

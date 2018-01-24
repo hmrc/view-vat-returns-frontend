@@ -28,6 +28,7 @@ import play.api.libs.json.Json
 object VatApiStub extends WireMockMethods {
 
   private val obligationsUri = "/vat/([0-9]+)/obligations"
+  private val customerInfoApiUri = "/customer-information/vat/([0-9]+)"
   private val dateRegex = "([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))"
 
   def stubAllObligations: StubMapping = {
@@ -107,6 +108,15 @@ object VatApiStub extends WireMockMethods {
       .thenReturn(BAD_REQUEST, body = Json.toJson(multipleErrors))
   }
 
+  def stubSuccessfulCustomerInfo: StubMapping = {
+    when(method = GET, uri = customerInfoApiUri)
+      .thenReturn(status = OK, body = validCustomerInfo)
+  }
+
+  def stubFailureCustomerInfo: StubMapping = {
+    when(method = GET, uri = customerInfoApiUri)
+      .thenReturn(status = BAD_REQUEST, body = Json.toJson(apiError))
+  }
 
   private val pastFulfilledObligation = VatReturnObligation(
     start = LocalDate.now().minusDays(80L),
@@ -177,6 +187,21 @@ object VatApiStub extends WireMockMethods {
   )
 
   private val noObligations = VatReturnObligations(Seq.empty)
+
+  private val validCustomerInfo = Json.parse(
+    """{
+      | "organisationDetails":{
+      |   "individualName":{
+      |     "firstName":"John",
+      |     "lastName":"Smith"
+      |   },
+      |   "tradingName":"Cheapo Clothing Ltd"
+      | }
+      |}"""
+      .stripMargin
+  )
+
+  private val apiError: ApiSingleError = ApiSingleError("", "", None)
 
   private val invalidVrn = ApiSingleError("VRN_INVALID", "", None)
   private val invalidFromDate = ApiSingleError("INVALID_DATE_FROM", "", None)

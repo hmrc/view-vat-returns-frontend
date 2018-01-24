@@ -22,13 +22,13 @@ import javax.inject.{Inject, Singleton}
 import config.AppConfig
 import play.api.i18n.MessagesApi
 import play.api.mvc._
-import services.{EnrolmentsAuthService, ReturnsService, VatApiService}
+import services.{EnrolmentsAuthService, ReturnsService, CustomerInfoService}
 
 @Singleton
 class ReturnsController @Inject()(val messagesApi: MessagesApi,
                                   val enrolmentsAuthService: EnrolmentsAuthService,
                                   returnsService: ReturnsService,
-                                  vatApiService: VatApiService,
+                                  customerInfoService: CustomerInfoService,
                                   implicit val appConfig: AppConfig)
   extends AuthorisedController {
 
@@ -37,7 +37,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
       implicit user =>
         for {
           vatReturn <- returnsService.getVatReturnDetails(user, LocalDate.parse(start), LocalDate.parse(end))
-          customerInfo <- vatApiService.getCustomerInfo(user)
+          customerInfo <- customerInfoService.getCustomerInfo(user)
         } yield Ok(views.html.returns.vatReturnDetails(vatReturn.right.get, customerInfo.right.get))
   }
 }
