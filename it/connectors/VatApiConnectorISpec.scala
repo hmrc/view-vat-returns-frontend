@@ -253,7 +253,12 @@ class VatApiConnectorISpec extends IntegrationBaseSpec {
       "provide a user's information" in new Test {
         override def setupStubs(): StubMapping = VatApiStub.stubSuccessfulCustomerInfo
         setupStubs()
-        val expected = Right(CustomerInformation("John", "Smith", "Cheapo Clothing Ltd"))
+        val expected = Right(CustomerInformation(
+          Some("Cheapo Clothing Ltd"),
+          Some("John"),
+          Some("Smith"),
+          Some("Cheapo Clothing")
+        ))
         private val result = await(connector.getCustomerInfo("999999999"))
 
         result shouldBe expected

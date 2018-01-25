@@ -63,9 +63,10 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     )
 
     val customerInfo = CustomerInformation(
-      "John",
-      "Smith",
-      "Cheapo Clothing Ltd"
+      Some("Cheapo Clothing Ltd"),
+      Some("John"),
+      Some("Smith"),
+      Some("Cheapo Clothing")
     )
 
     lazy val view = views.html.returns.vatReturnDetails(exampleVatReturn, customerInfo)
@@ -84,7 +85,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     }
 
     "have the correct trading name" in {
-      elementText(Selectors.tradingNameHeading) shouldBe customerInfo.tradingName
+      elementText(Selectors.tradingNameHeading) shouldBe customerInfo.tradingName.get
     }
 
     "have the correct heading for the first section of the return" in {

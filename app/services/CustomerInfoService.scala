@@ -27,7 +27,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class CustomerInfoService @Inject()(connector: VatApiConnector) {
 
-  def getCustomerInfo(user: User)
+  def getEntityName(user: User)
                      (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[CustomerInformation]] = {
     connector.getCustomerInfo(user.vrn)
   }

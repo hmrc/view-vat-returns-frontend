@@ -191,11 +191,12 @@ object VatApiStub extends WireMockMethods {
   private val validCustomerInfo = Json.parse(
     """{
       | "organisationDetails":{
+      |   "organisationName":"Cheapo Clothing Ltd",
       |   "individualName":{
       |     "firstName":"John",
       |     "lastName":"Smith"
       |   },
-      |   "tradingName":"Cheapo Clothing Ltd"
+      |   "tradingName":"Cheapo Clothing"
       | }
       |}"""
       .stripMargin

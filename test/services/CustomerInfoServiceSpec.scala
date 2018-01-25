@@ -30,9 +30,10 @@ class CustomerInfoServiceSpec extends ControllerBaseSpec {
 
   private trait Test {
     val exampleCustomerInfo: CustomerInformation = CustomerInformation(
-      "John",
-      "Smith",
-      "Cheapo Clothing Ltd"
+      Some("Cheapo Clothing Ltd"),
+      Some("John"),
+      Some("Smith"),
+      Some("Cheapo Clothing")
     )
     val mockConnector: VatApiConnector = mock[VatApiConnector]
     val service: CustomerInfoService = new CustomerInfoService(mockConnector)
@@ -48,7 +49,7 @@ class CustomerInfoServiceSpec extends ControllerBaseSpec {
           .expects(*, *, *)
           .returns(Future.successful(Right(exampleCustomerInfo)))
 
-        lazy val result: HttpGetResult[CustomerInformation] = await(service.getCustomerInfo(User("999999999")))
+        lazy val result: HttpGetResult[CustomerInformation] = await(service.getEntityName(User("999999999")))
 
         result shouldBe Right(exampleCustomerInfo)
       }
@@ -61,7 +62,7 @@ class CustomerInfoServiceSpec extends ControllerBaseSpec {
           .expects(*, *, *)
           .returns(Future.successful(Left(BadRequestError("", ""))))
 
-        val result: HttpGetResult[CustomerInformation] = await(service.getCustomerInfo(User("999999999")))
+        val result: HttpGetResult[CustomerInformation] = await(service.getEntityName(User("999999999")))
 
         result shouldBe Left(BadRequestError("", ""))
       }

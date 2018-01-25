@@ -48,9 +48,10 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       545645
     )
     val exampleCustomerInfo: CustomerInformation = CustomerInformation(
-      "John",
-      "Smith",
-      "Cheapo Clothing Ltd"
+      Some("Cheapo Clothing Ltd"),
+      Some("John"),
+      Some("Smith"),
+      Some("Cheapo Clothing")
     )
     val serviceCall: Boolean = true
     val authResult: Future[_]
@@ -68,7 +69,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
           .expects(*, *, *, *, *)
           .returns(Future.successful(Right(exampleVatReturn)))
 
-        (mockVatApiService.getCustomerInfo(_: User)(_: HeaderCarrier, _: ExecutionContext))
+        (mockVatApiService.getEntityName(_: User)(_: HeaderCarrier, _: ExecutionContext))
           .expects(*, *, *)
           .returns(Future.successful(Right(exampleCustomerInfo)))
       }

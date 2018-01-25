@@ -37,7 +37,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
       implicit user =>
         for {
           vatReturn <- returnsService.getVatReturnDetails(user, LocalDate.parse(start), LocalDate.parse(end))
-          customerInfo <- customerInfoService.getCustomerInfo(user)
+          customerInfo <- customerInfoService.getEntityName(user)
         } yield Ok(views.html.returns.vatReturnDetails(vatReturn.right.get, customerInfo.right.get))
   }
 }

@@ -33,19 +33,21 @@ class CustomerInfoHttpParserSpec extends UnitSpec {
       val httpResponse = HttpResponse(Status.OK, responseJson = Some(
         Json.obj(
           "organisationDetails" -> Json.obj(
+            "organisationName" -> "Cheapo Clothing Ltd",
             "individualName" -> Json.obj(
               "firstName" -> "John",
               "lastName" -> "Smith"
             ),
-            "tradingName" -> "Cheapo Clothing Ltd"
+            "tradingName" -> "Cheapo Clothing"
           )
         )
       ))
 
       val expected = Right(CustomerInformation(
-        "John",
-        "Smith",
-        "Cheapo Clothing Ltd"
+        Some("Cheapo Clothing Ltd"),
+        Some("John"),
+        Some("Smith"),
+        Some("Cheapo Clothing")
       ))
       val result = CustomerInfoReads.read("", "", httpResponse)
 
