@@ -18,10 +18,10 @@ package controllers
 
 import java.time.LocalDate
 
-import models.{CustomerInformation, User, VatReturn}
+import models.{User, VatReturn}
 import play.api.http.Status
 import play.api.test.Helpers._
-import services.{EnrolmentsAuthService, ReturnsService, CustomerInfoService}
+import services.{EnrolmentsAuthService, ReturnsService, VatApiService}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.Retrieval
@@ -47,17 +47,11 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       55454,
       545645
     )
-    val exampleCustomerInfo: CustomerInformation = CustomerInformation(
-      Some("Cheapo Clothing Ltd"),
-      Some("John"),
-      Some("Smith"),
-      Some("Cheapo Clothing")
-    )
     val serviceCall: Boolean = true
     val authResult: Future[_]
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
     val mockVatReturnService: ReturnsService = mock[ReturnsService]
-    val mockVatApiService: CustomerInfoService = mock[CustomerInfoService]
+    val mockVatApiService: VatApiService = mock[VatApiService]
 
     def setup(): Any = {
       (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
@@ -71,7 +65,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
         (mockVatApiService.getEntityName(_: User)(_: HeaderCarrier, _: ExecutionContext))
           .expects(*, *, *)
-          .returns(Future.successful(Right(exampleCustomerInfo)))
+          .returns(Future.successful(Some("My trading name")))
       }
     }
 
