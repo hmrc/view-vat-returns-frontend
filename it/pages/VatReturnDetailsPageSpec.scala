@@ -20,7 +20,7 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import helpers.IntegrationBaseSpec
 import play.api.http.Status
 import play.api.libs.ws.{WSRequest, WSResponse}
-import stubs.AuthStub
+import stubs.{AuthStub, VatApiStub}
 
 class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
 
@@ -35,10 +35,13 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
 
   "Calling the return route" when {
 
-    "the user is authenticated" should {
+    "the user is authenticated and the Customer Information API returns a valid response" should {
 
       "return 200" in new Test {
-        override def setupStubs(): StubMapping = AuthStub.authorisedVatReturn()
+        override def setupStubs(): StubMapping = {
+          AuthStub.authorised()
+          VatApiStub.stubSuccessfulCustomerInfo
+        }
 
         val response: WSResponse = await(request().get())
         response.status shouldBe Status.OK
@@ -59,7 +62,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
 
     "the user is not authorised" should {
 
-      def setupStubsForScenario(): StubMapping = AuthStub.unauthorisedOtherEnrolmentVatReturn()
+      def setupStubsForScenario(): StubMapping = AuthStub.unauthorisedOtherEnrolment()
 
       "return 401 (Forbidden)" in new Test {
         override def setupStubs(): StubMapping = setupStubsForScenario()

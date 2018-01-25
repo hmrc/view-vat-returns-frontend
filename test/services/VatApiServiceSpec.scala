@@ -16,9 +16,9 @@
 
 package services
 
-import connectors.httpParsers.CustomerInfoHttpParser.HttpGetResult
 import connectors.VatApiConnector
 import controllers.ControllerBaseSpec
+import models.errors.BadRequestError
 import models.{CustomerInformation, User}
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -28,26 +28,104 @@ import scala.concurrent.{ExecutionContext, Future}
 class VatApiServiceSpec extends ControllerBaseSpec {
 
   private trait Test {
-    val exampleCustomerInfo: CustomerInformation = CustomerInformation(
-      "John",
-      "Smith",
-      "Cheapo Clothing Ltd"
-    )
     val mockConnector: VatApiConnector = mock[VatApiConnector]
     val service: VatApiService = new VatApiService(mockConnector)
     implicit val hc: HeaderCarrier = HeaderCarrier()
   }
 
-  "Calling .getCustomerInfo" should {
+  "Calling .getEntityName" when {
 
-    "return a user's information" in new Test {
-      (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
-        .expects(*, *, *)
-        .returns(Future.successful(Right(exampleCustomerInfo)))
+    "the connector retrieves a trading name" should {
 
-      lazy val result: HttpGetResult[CustomerInformation] = await(service.getCustomerInfo(User("999999999")))
+      "return the trading name" in new Test {
+        val exampleCustomerInfo: CustomerInformation = CustomerInformation(
+          Some("My organisation name"),
+          Some("John"),
+          Some("Smith"),
+          Some("My trading name")
+        )
 
-      result shouldBe Right(exampleCustomerInfo)
+        (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
+          .expects(*, *, *)
+          .returns(Future.successful(Right(exampleCustomerInfo)))
+
+        lazy val result: Option[String] = await(service.getEntityName(User("999999999")))
+
+        result shouldBe Some("My trading name")
+      }
+    }
+
+    "the connector does not retrieve a trading name or organisation name" should {
+
+      "return the first and last name" in new Test {
+        val exampleCustomerInfo: CustomerInformation = CustomerInformation(
+          None,
+          Some("John"),
+          Some("Smith"),
+          None
+        )
+
+        (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
+          .expects(*, *, *)
+          .returns(Future.successful(Right(exampleCustomerInfo)))
+
+        val result: Option[String] = await(service.getEntityName(User("999999999")))
+
+        result shouldBe Some("John Smith")
+      }
+    }
+
+    "the connector does not retrieve a trading name or a first and last name" should {
+
+      "return the organisation name" in new Test {
+        val exampleCustomerInfo: CustomerInformation = CustomerInformation(
+          Some("My organisation name"),
+          None,
+          None,
+          None
+        )
+
+        (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
+          .expects(*, *, *)
+          .returns(Future.successful(Right(exampleCustomerInfo)))
+
+        val result: Option[String] = await(service.getEntityName(User("999999999")))
+
+        result shouldBe Some("My organisation name")
+      }
+    }
+
+    "the connector does not retrieve a trading name, organisation name, or individual names" should {
+
+      "return None" in new Test {
+        val exampleCustomerInfo: CustomerInformation = CustomerInformation(
+          None,
+          None,
+          None,
+          None
+        )
+
+        (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
+          .expects(*, *, *)
+          .returns(Future.successful(Right(exampleCustomerInfo)))
+
+        val result: Option[String] = await(service.getEntityName(User("999999999")))
+
+        result shouldBe None
+      }
+    }
+
+    "the connector returns an error" should {
+
+      "return None" in new Test {
+        (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
+          .expects(*, *, *)
+          .returns(Future.successful(Left(BadRequestError("", ""))))
+
+        val result: Option[String] = await(service.getEntityName(User("999999999")))
+
+        result shouldBe None
+      }
     }
   }
 }

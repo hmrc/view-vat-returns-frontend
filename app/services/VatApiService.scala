@@ -18,7 +18,6 @@ package services
 
 import javax.inject.Inject
 
-import connectors.httpParsers.CustomerInfoHttpParser.HttpGetResult
 import connectors.VatApiConnector
 import models.{CustomerInformation, User}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -27,8 +26,13 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class VatApiService @Inject()(connector: VatApiConnector) {
 
-  def getCustomerInfo(user: User)
-                    (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[CustomerInformation]] = {
-    connector.getCustomerInfo(user.vrn)
+  def getEntityName(user: User)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[String]] = {
+    connector.getCustomerInfo(user.vrn).map {
+      case Right(CustomerInformation(None, None, None, None)) => None
+      case Right(CustomerInformation(None, Some(firstName), Some(lastName), None)) => Some(s"$firstName $lastName")
+      case Right(CustomerInformation(organisationName, None, None, None)) => organisationName
+      case Right(CustomerInformation(_, _, _, tradingName)) => tradingName
+      case Left(_) => None
+    }
   }
 }

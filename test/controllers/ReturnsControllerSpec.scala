@@ -18,7 +18,7 @@ package controllers
 
 import java.time.LocalDate
 
-import models.{CustomerInformation, User, VatReturn}
+import models.{User, VatReturn}
 import play.api.http.Status
 import play.api.test.Helpers._
 import services.{EnrolmentsAuthService, ReturnsService, VatApiService}
@@ -47,11 +47,6 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       55454,
       545645
     )
-    val exampleCustomerInfo: CustomerInformation = CustomerInformation(
-      "John",
-      "Smith",
-      "Cheapo Clothing Ltd"
-    )
     val serviceCall: Boolean = true
     val authResult: Future[_]
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
@@ -68,9 +63,9 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
           .expects(*, *, *, *, *)
           .returns(Future.successful(Right(exampleVatReturn)))
 
-        (mockVatApiService.getCustomerInfo(_: User)(_: HeaderCarrier, _: ExecutionContext))
+        (mockVatApiService.getEntityName(_: User)(_: HeaderCarrier, _: ExecutionContext))
           .expects(*, *, *)
-          .returns(Future.successful(Right(exampleCustomerInfo)))
+          .returns(Future.successful(Some("My trading name")))
       }
     }
 
