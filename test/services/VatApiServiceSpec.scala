@@ -95,6 +95,26 @@ class VatApiServiceSpec extends ControllerBaseSpec {
       }
     }
 
+    "the connector does not retrieve a trading name, organisation name, or individual names" should {
+
+      "return None" in new Test {
+        val exampleCustomerInfo: CustomerInformation = CustomerInformation(
+          None,
+          None,
+          None,
+          None
+        )
+
+        (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
+          .expects(*, *, *)
+          .returns(Future.successful(Right(exampleCustomerInfo)))
+
+        val result: Option[String] = await(service.getEntityName(User("999999999")))
+
+        result shouldBe None
+      }
+    }
+
     "the connector returns an error" should {
 
       "return None" in new Test {

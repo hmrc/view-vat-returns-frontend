@@ -19,7 +19,7 @@ package services
 import javax.inject.Inject
 
 import connectors.VatApiConnector
-import models.User
+import models.{CustomerInformation, User}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -28,14 +28,10 @@ class VatApiService @Inject()(connector: VatApiConnector) {
 
   def getEntityName(user: User)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[String]] = {
     connector.getCustomerInfo(user.vrn).map {
-      case Right(customerInfo) =>
-        customerInfo.tradingName match {
-          case Some(_) => customerInfo.tradingName
-          case None => (customerInfo.firstName, customerInfo.lastName) match {
-            case (Some(first), Some(last)) => Some(s"$first $last")
-            case _ => customerInfo.organisationName
-          }
-        }
+      case Right(CustomerInformation(None, None, None, None)) => None
+      case Right(CustomerInformation(None, Some(firstName), Some(lastName), None)) => Some(s"$firstName $lastName")
+      case Right(CustomerInformation(organisationName, None, None, None)) => organisationName
+      case Right(CustomerInformation(_, _, _, tradingName)) => tradingName
       case Left(_) => None
     }
   }

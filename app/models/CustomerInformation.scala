@@ -30,8 +30,8 @@ object CustomerInformation {
 
   implicit val customerInformationReads: Reads[CustomerInformation] = (
     (JsPath \ "organisationDetails" \ "organisationName").readNullable[String] and
-      (JsPath \ "organisationDetails" \ "individualName" \ "firstName").readNullable[String] and
-      (JsPath \ "organisationDetails" \ "individualName" \ "lastName").readNullable[String] and
-      (JsPath \ "organisationDetails" \ "tradingName").readNullable[String]
-    ) (CustomerInformation.apply _)
+    (JsPath \ "organisationDetails" \ "individualName" \ "firstName").readNullable[String] and
+    (JsPath \ "organisationDetails" \ "individualName" \ "lastName").readNullable[String] and
+    (JsPath \ "organisationDetails" \ "tradingName").readNullable[String]
+  ) (CustomerInformation.apply _)
 }
