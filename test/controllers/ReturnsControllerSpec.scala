@@ -18,7 +18,7 @@ package controllers
 
 import java.time.LocalDate
 
-import connectors.httpParsers
+import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
 import models.errors.{UnexpectedStatusError, UnknownError}
 import models.viewModels.VatReturnViewModel
 import models.{User, VatReturn}
@@ -36,7 +36,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
   val goodEnrolments: Enrolments = Enrolments(
     Set(
-      Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("", "999999999")), "Active")
+      Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("VATRegNo", "999999999")), "Active")
     )
   )
   val exampleVatReturn: VatReturn = VatReturn(
@@ -59,7 +59,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
   private trait Test {
     val serviceCall: Boolean = true
     val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
-    val vatReturnResult: Future[httpParsers.HttpGetResult[VatReturn]] = Future.successful(Right(exampleVatReturn))
+    val vatReturnResult: Future[HttpGetResult[VatReturn]] = Future.successful(Right(exampleVatReturn))
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
     val mockVatReturnService: ReturnsService = mock[ReturnsService]
     val mockVatApiService: VatApiService = mock[VatApiService]
@@ -131,7 +131,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     "the specified VAT return is not found" should {
 
       "return 404 (Not Found)" in new Test {
-        override val vatReturnResult: Future[httpParsers.HttpGetResult[VatReturn]] =
+        override val vatReturnResult: Future[HttpGetResult[VatReturn]] =
           Future.successful(Left(UnexpectedStatusError(404)))
         private val result = target.vatReturnDetails("2017-04-30", "2017-07-31")(fakeRequest)
         status(result) shouldBe Status.NOT_FOUND
@@ -141,7 +141,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     "a different error is retrieved" should {
 
       "return 500 (Internal Server Error)" in new Test {
-        override val vatReturnResult: Future[httpParsers.HttpGetResult[VatReturn]] =
+        override val vatReturnResult: Future[HttpGetResult[VatReturn]] =
           Future.successful(Left(UnknownError))
         private val result = target.vatReturnDetails("2017-04-30", "2017-07-31")(fakeRequest)
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR

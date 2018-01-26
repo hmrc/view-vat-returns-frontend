@@ -47,7 +47,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
         } yield {
           vatReturnResult match {
             case Right(vatReturn) => Ok(views.html.returns.vatReturnDetails(constructViewModel(customerInfo, vatReturn)))
-            case Left(UnexpectedStatusError(404)) => NotFound(views.html.errors.notFoundError())
+            case Left(UnexpectedStatusError(404)) => NotFound(views.html.errors.notFound())
             case Left(_) => InternalServerError(views.html.errors.serverError())
           }
         }

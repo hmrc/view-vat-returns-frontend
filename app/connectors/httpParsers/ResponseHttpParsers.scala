@@ -36,3 +36,7 @@ trait ResponseHttpParsers {
     }
   }
 }
+
+object ResponseHttpParsers {
+  type HttpGetResult[T] = Either[HttpError, T]
+}

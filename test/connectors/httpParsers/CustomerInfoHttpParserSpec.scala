@@ -60,13 +60,13 @@ class CustomerInfoHttpParserSpec extends UnitSpec {
 
       val httpResponse = HttpResponse(Status.BAD_REQUEST, responseJson = Some(
         Json.obj(
-          "code" -> "VRN_INVALID",
+          "code" -> "777",
           "message" -> "Fail!"
         )
       ))
 
       val expected = Left(BadRequestError(
-        code = "VRN_INVALID",
+        code = "777",
         message = "Fail!"
       ))
 
@@ -85,13 +85,13 @@ class CustomerInfoHttpParserSpec extends UnitSpec {
           "message" -> "Fail!",
           "errors" -> Json.arr(
             Json.obj(
-              "code" -> "INVALID_DATE_FROM",
-              "message" -> "Bad 'from' date",
+              "code" -> "777",
+              "message" -> "Fail!",
               "path" -> "/from"
             ),
             Json.obj(
-              "code" -> "INVALID_DATE_TO",
-              "message" -> "Bad 'to' date",
+              "code" -> "778",
+              "message" -> "Fail!",
               "path" -> "/to"
             )
           )

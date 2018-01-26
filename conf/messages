@@ -10,7 +10,7 @@ unauthorised.title = Unauthorised access
 unauthorised.instructions = To view your VAT returns, you''ll have to sign in using your Government Gateway ID.
 
 notFound.title = Page not found
-notFound.heading = This page can't be found
+notFound.heading = This page can''t be found
 notFound.message = Please check that you have entered the correct web address.
 
 serverError.title = Internal server error
