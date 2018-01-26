@@ -20,7 +20,7 @@ import java.time.LocalDate
 import javax.inject.{Inject, Singleton}
 
 import config.AppConfig
-import connectors.httpParsers.{CustomerInfoHttpParser, VatReturnHttpParser, VatReturnObligationsHttpParser}
+import connectors.httpParsers.HttpGetResult
 import models.VatReturnObligation.Status
 import models.{CustomerInformation, VatReturn, VatReturnObligations}
 import play.api.Logger
@@ -38,7 +38,7 @@ class VatApiConnector @Inject()(http: HttpClient, appConfig: AppConfig) {
   // TODO: Replace with a real call to an endpoint once it becomes available. This returns static data for now.
   def getVatReturnDetails(vrn: String, start: LocalDate, end: LocalDate)
                          (implicit hc: HeaderCarrier, ec: ExecutionContext):
-                          Future[VatReturnHttpParser.HttpGetResult[VatReturn]] = {
+                          Future[HttpGetResult[VatReturn]] = {
     Future.successful(Right(
       VatReturn(
         start,
@@ -60,7 +60,7 @@ class VatApiConnector @Inject()(http: HttpClient, appConfig: AppConfig) {
 
   def getVatReturnObligations(vrn: String, from: LocalDate, to: LocalDate, status: Status.Value)
                           (implicit hc: HeaderCarrier, ec: ExecutionContext):
-                          Future[VatReturnObligationsHttpParser.HttpGetResult[VatReturnObligations]] = {
+                          Future[HttpGetResult[VatReturnObligations]] = {
     import connectors.httpParsers.VatReturnObligationsHttpParser.VatReturnObligationsReads
 
     http.GET(obligationsUrl(vrn), Seq("from" -> from.toString, "to" -> to.toString, "status" -> status.toString)).map {
@@ -72,7 +72,7 @@ class VatApiConnector @Inject()(http: HttpClient, appConfig: AppConfig) {
   }
 
   def getCustomerInfo(vrn: String)(implicit hc: HeaderCarrier, ec: ExecutionContext):
-                      Future[CustomerInfoHttpParser.HttpGetResult[CustomerInformation]] = {
+                      Future[HttpGetResult[CustomerInformation]] = {
     import connectors.httpParsers.CustomerInfoHttpParser.CustomerInfoReads
 
     http.GET(customerInfoUrl(vrn)).map {

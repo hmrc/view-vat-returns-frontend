@@ -18,7 +18,7 @@ package services
 
 import java.time.LocalDate
 
-import connectors.httpParsers.VatReturnHttpParser.HttpGetResult
+import connectors.httpParsers.HttpGetResult
 import connectors.VatApiConnector
 import controllers.ControllerBaseSpec
 import models.VatReturnObligation.Status

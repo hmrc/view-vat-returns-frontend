@@ -20,6 +20,9 @@ import java.time.LocalDate
 import javax.inject.{Inject, Singleton}
 
 import config.AppConfig
+import models.VatReturn
+import models.errors.UnexpectedStatusError
+import models.viewModels.VatReturnViewModel
 import play.api.i18n.MessagesApi
 import play.api.mvc._
 import services.{EnrolmentsAuthService, ReturnsService, VatApiService}
@@ -35,9 +38,37 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
   def vatReturnDetails(start: String, end: String): Action[AnyContent] = authorisedAction {
     implicit request =>
       implicit user =>
+        val vatReturnCall = returnsService.getVatReturnDetails(user, LocalDate.parse(start), LocalDate.parse(end))
+        val entityNameCall = vatApiService.getEntityName(user)
+
         for {
-          vatReturn <- returnsService.getVatReturnDetails(user, LocalDate.parse(start), LocalDate.parse(end))
-          customerInfo <- vatApiService.getEntityName(user)
-        } yield Ok(views.html.returns.vatReturnDetails(vatReturn.right.get, customerInfo.get))
+          vatReturnResult <- vatReturnCall
+          customerInfo <- entityNameCall
+        } yield {
+          vatReturnResult match {
+            case Right(vatReturn) => Ok(views.html.returns.vatReturnDetails(constructViewModel(customerInfo, vatReturn)))
+            case Left(UnexpectedStatusError(404)) => NotFound(views.html.errors.notFoundError())
+            case Left(_) => InternalServerError(views.html.errors.serverError())
+          }
+        }
+  }
+
+  private[controllers] def constructViewModel(entityName: Option[String], vatReturn: VatReturn): VatReturnViewModel = {
+    VatReturnViewModel(
+      entityName = entityName,
+      periodFrom = vatReturn.startDate,
+      periodTo = vatReturn.endDate,
+      dueDate = vatReturn.dueDate,
+      dateSubmitted = vatReturn.dateSubmitted,
+      boxOne = vatReturn.ukVatDue,
+      boxTwo = vatReturn.euVatDue,
+      boxThree = vatReturn.totalVatDue,
+      boxFour = vatReturn.totalVatReclaimed,
+      boxFive = vatReturn.totalOwed,
+      boxSix = vatReturn.totalSales,
+      boxSeven = vatReturn.totalCosts,
+      boxEight = vatReturn.euTotalSales,
+      boxNine = vatReturn.euTotalCosts
+    )
   }
 }

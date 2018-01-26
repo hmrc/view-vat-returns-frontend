@@ -21,8 +21,6 @@ import play.api.libs.json.JsValue
 
 trait ResponseHttpParsers {
 
-  type HttpGetResult[T] = Either[HttpError, T]
-
   protected def handleBadRequest(json: JsValue): Left[HttpError, Nothing] = {
     val errorResponse = json.asOpt[ApiMultiError]
       .orElse(json.asOpt[ApiSingleError])
