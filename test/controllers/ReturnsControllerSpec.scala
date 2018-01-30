@@ -18,6 +18,9 @@ package controllers
 
 import java.time.LocalDate
 
+import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
+import models.errors.{UnexpectedStatusError, UnknownError}
+import models.viewModels.VatReturnViewModel
 import models.{User, VatReturn}
 import play.api.http.Status
 import play.api.test.Helpers._
@@ -31,24 +34,32 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ReturnsControllerSpec extends ControllerBaseSpec {
 
-  private trait Test {
-    val exampleVatReturn: VatReturn = VatReturn(
-      LocalDate.parse("2017-01-01"),
-      LocalDate.parse("2017-03-31"),
-      LocalDate.parse("2017-04-06"),
-      LocalDate.parse("2017-04-08"),
-      1297,
-      5755,
-      7052,
-      5732,
-      1320,
-      77656,
-      765765,
-      55454,
-      545645
+  val goodEnrolments: Enrolments = Enrolments(
+    Set(
+      Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("VATRegNo", "999999999")), "Active")
     )
+  )
+  val exampleVatReturn: VatReturn = VatReturn(
+    LocalDate.parse("2017-01-01"),
+    LocalDate.parse("2017-03-31"),
+    LocalDate.parse("2017-04-06"),
+    LocalDate.parse("2017-04-08"),
+    1297,
+    5755,
+    7052,
+    5732,
+    1320,
+    77656,
+    765765,
+    55454,
+    545645
+  )
+  val exampleEntityName = Some("Cheapo Clothing")
+
+  private trait Test {
     val serviceCall: Boolean = true
-    val authResult: Future[_]
+    val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
+    val vatReturnResult: Future[HttpGetResult[VatReturn]] = Future.successful(Right(exampleVatReturn))
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
     val mockVatReturnService: ReturnsService = mock[ReturnsService]
     val mockVatApiService: VatApiService = mock[VatApiService]
@@ -61,11 +72,11 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       if(serviceCall) {
         (mockVatReturnService.getVatReturnDetails(_: User, _: LocalDate, _: LocalDate)(_: HeaderCarrier, _: ExecutionContext))
           .expects(*, *, *, *, *)
-          .returns(Future.successful(Right(exampleVatReturn)))
+          .returns(vatReturnResult)
 
         (mockVatApiService.getEntityName(_: User)(_: HeaderCarrier, _: ExecutionContext))
           .expects(*, *, *)
-          .returns(Future.successful(Some("My trading name")))
+          .returns(Future.successful(exampleEntityName))
       }
     }
 
@@ -79,34 +90,25 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
   "Calling the .yourVatReturn action" when {
 
-    "A user is logged in and enrolled to HMRC-MTD-VAT" should {
-
-      val goodEnrolments: Enrolments = Enrolments(
-        Set(
-          Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("", "999999999")), "Active")
-        )
-      )
+    "a user is logged in and enrolled to HMRC-MTD-VAT" should {
 
       "return 200" in new Test {
-        override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
         private val result = target.vatReturnDetails("2017-04-30", "2017-07-31")(fakeRequest)
         status(result) shouldBe Status.OK
       }
 
       "return HTML" in new Test {
-        override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
         private val result = target.vatReturnDetails("2017-04-30", "2017-07-31")(fakeRequest)
         contentType(result) shouldBe Some("text/html")
       }
 
       "return charset of utf-8" in new Test {
-        override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
         private val result = target.vatReturnDetails("2017-04-30", "2017-07-31")(fakeRequest)
         charset(result) shouldBe Some("utf-8")
       }
     }
 
-    "A user is not authorised" should {
+    "a user is not authorised" should {
 
       "return 403 (Forbidden)" in new Test {
         override val serviceCall = false
@@ -116,7 +118,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       }
     }
 
-    "A user is not authenticated" should {
+    "a user is not authenticated" should {
 
       "return 401 (Unauthorised)" in new Test {
         override val serviceCall = false
@@ -124,6 +126,57 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         private val result = target.vatReturnDetails("2017-04-30", "2017-07-31")(fakeRequest)
         status(result) shouldBe Status.UNAUTHORIZED
       }
+    }
+
+    "the specified VAT return is not found" should {
+
+      "return 404 (Not Found)" in new Test {
+        override val vatReturnResult: Future[HttpGetResult[VatReturn]] =
+          Future.successful(Left(UnexpectedStatusError(404)))
+        private val result = target.vatReturnDetails("2017-04-30", "2017-07-31")(fakeRequest)
+        status(result) shouldBe Status.NOT_FOUND
+      }
+    }
+
+    "a different error is retrieved" should {
+
+      "return 500 (Internal Server Error)" in new Test {
+        override val vatReturnResult: Future[HttpGetResult[VatReturn]] =
+          Future.successful(Left(UnknownError))
+        private val result = target.vatReturnDetails("2017-04-30", "2017-07-31")(fakeRequest)
+        status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+      }
+    }
+  }
+
+  "Calling .constructViewModel" should {
+
+    val mockVatReturnService: ReturnsService = mock[ReturnsService]
+    val mockVatApiService: VatApiService = mock[VatApiService]
+    val mockAuthConnector: AuthConnector = mock[AuthConnector]
+    val mockEnrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
+    val target = new ReturnsController(messages, mockEnrolmentsAuthService, mockVatReturnService, mockVatApiService, mockConfig)
+
+    "populate a VatReturnViewModel" in {
+
+      val expectedViewModel = VatReturnViewModel(
+        entityName = exampleEntityName,
+        periodFrom = exampleVatReturn.startDate,
+        periodTo = exampleVatReturn.endDate,
+        dueDate = exampleVatReturn.dueDate,
+        dateSubmitted = exampleVatReturn.dateSubmitted,
+        boxOne = exampleVatReturn.ukVatDue,
+        boxTwo = exampleVatReturn.euVatDue,
+        boxThree = exampleVatReturn.totalVatDue,
+        boxFour = exampleVatReturn.totalVatReclaimed,
+        boxFive = exampleVatReturn.totalOwed,
+        boxSix = exampleVatReturn.totalSales,
+        boxSeven = exampleVatReturn.totalCosts,
+        boxEight = exampleVatReturn.euTotalSales,
+        boxNine = exampleVatReturn.euTotalCosts
+      )
+      val result: VatReturnViewModel = target.constructViewModel(exampleEntityName, exampleVatReturn)
+      result shouldBe expectedViewModel
     }
   }
 }

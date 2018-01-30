@@ -19,7 +19,7 @@ package services
 import java.time.LocalDate
 import javax.inject.{Inject, Singleton}
 
-import connectors.httpParsers.VatReturnHttpParser.HttpGetResult
+import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
 import connectors.VatApiConnector
 import models.VatReturnObligation.Status
 import models.{User, VatReturn, VatReturnObligations}

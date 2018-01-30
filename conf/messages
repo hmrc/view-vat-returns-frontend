@@ -9,6 +9,13 @@ sessionTimeout.helpThree = using your Government Gateway ID.
 unauthorised.title = Unauthorised access
 unauthorised.instructions = To view your VAT returns, you''ll have to sign in using your Government Gateway ID.
 
+notFound.title = Page not found
+notFound.heading = This page can''t be found
+notFound.message = Please check that you have entered the correct web address.
+
+serverError.title = Internal server error
+serverError.message = Something went wrong. Please try again later.
+
 yourVatReturn.title = VAT return
 yourVatReturn.vrn = VAT registration number (VRN):
 yourVatReturn.moneyOwed = You owed:
