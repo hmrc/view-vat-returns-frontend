@@ -103,19 +103,19 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
       "return 200" in new Test {
         override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
-        private val result = target.completedReturns()(fakeRequest)
+        private val result = target.completedReturns(LocalDate.now().getYear -1)(fakeRequest)
         status(result) shouldBe Status.OK
       }
 
       "return HTML" in new Test {
         override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
-        private val result = target.completedReturns()(fakeRequest)
+        private val result = target.completedReturns(LocalDate.now().getYear -1)(fakeRequest)
         contentType(result) shouldBe Some("text/html")
       }
 
       "return charset of utf-8" in new Test {
         override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
-        private val result = target.completedReturns()(fakeRequest)
+        private val result = target.completedReturns(LocalDate.now().getYear -1)(fakeRequest)
         charset(result) shouldBe Some("utf-8")
       }
     }
@@ -125,7 +125,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
       "return 403 (Forbidden)" in new Test {
         override val serviceCall = false
         override val authResult: Future[Nothing] = Future.failed(InsufficientEnrolments())
-        private val result = target.completedReturns()(fakeRequest)
+        private val result = target.completedReturns(LocalDate.now().getYear -1)(fakeRequest)
         status(result) shouldBe Status.FORBIDDEN
       }
     }
@@ -135,9 +135,20 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
       "return 401 (Unauthorised)" in new Test {
         override val serviceCall = false
         override val authResult: Future[Nothing] = Future.failed(MissingBearerToken())
-        private val result = target.completedReturns()(fakeRequest)
+        private val result = target.completedReturns(LocalDate.now().getYear -1)(fakeRequest)
         status(result) shouldBe Status.UNAUTHORIZED
       }
+    }
+
+    "A user enters an invalid search year for their completed returns" should {
+
+      "return 404 (Not Found)" in new Test {
+        override val serviceCall = false
+        override val authResult: Future[_] = Future.successful(goodEnrolments)
+        private val result = target.completedReturns(LocalDate.now().getYear +3)(fakeRequest)
+        status(result) shouldBe Status.NOT_FOUND
+      }
+
     }
   }
 
@@ -205,7 +216,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
             )))
           )
         }
-        private val result = await(target.handleReturnObligations(testUser))
+        private val result = await(target.getReturnObligations(testUser, 2017))
         result shouldBe vatServiceResult.b
       }
     }
@@ -216,9 +227,84 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         override val vatServiceResult: Future[Either[HttpError, VatReturnObligations]] = Future.successful {
           Left(BadRequestError("", ""))
         }
-        private val result = await(target.handleReturnObligations(testUser))
+        private val result = await(target.getReturnObligations(testUser, 2017))
         result shouldBe VatReturnObligations(Seq())
       }
     }
   }
+
+  "Calling .validateSearchYear" when {
+
+    "the year is on the upper search boundary" should {
+
+      "return true" in new Test {
+        override val authResult: Future[_] = Future.successful("")
+
+        override def setup(): Any = "" // Prevent the unused mocks causing trouble
+
+        val result: Boolean = target.validateSearchYear(2018, 2018)
+
+        result shouldBe true
+      }
+
+    }
+
+    "the year is above the upper search boundary" should {
+
+      "return false" in new Test {
+        override val authResult: Future[_] = Future.successful("")
+
+        override def setup(): Any = "" // Prevent the unused mocks causing trouble
+
+        val result: Boolean = target.validateSearchYear(2019, 2018)
+
+        result shouldBe false
+      }
+
+    }
+
+    "the year is on the lower boundary" should {
+
+      "return true" in new Test {
+        override val authResult: Future[_] = Future.successful("")
+
+        override def setup(): Any = "" // Prevent the unused mocks causing trouble
+
+        val result: Boolean = target.validateSearchYear(2015, 2018)
+
+        result shouldBe true
+      }
+
+    }
+
+    "the year is below the lower boundary" should {
+
+      "return false" in new Test {
+        override val authResult: Future[_] = Future.successful("")
+
+        override def setup(): Any = "" // Prevent the unused mocks causing trouble
+
+        val result: Boolean = target.validateSearchYear(2014, 2018)
+
+        result shouldBe false
+      }
+
+    }
+
+    "the year is between the upper and lower boundaries" should {
+
+      "return true" in new Test {
+        override val authResult: Future[_] = Future.successful("")
+
+        override def setup(): Any = "" // Prevent the unused mocks causing trouble
+
+        val result: Boolean = target.validateSearchYear(2017, 2018)
+
+        result shouldBe true
+      }
+
+    }
+
+  }
+
 }

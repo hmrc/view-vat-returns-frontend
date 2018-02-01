@@ -16,11 +16,8 @@
 
 package pages
 
-import java.time.LocalDate
-
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import helpers.IntegrationBaseSpec
-import models.{VatReturnObligation, VatReturnObligations}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.http.Status
@@ -34,7 +31,7 @@ class CompletedReturnsPageSpec extends IntegrationBaseSpec {
 
     def request(): WSRequest = {
       setupStubs()
-      buildRequest("/returns")
+      buildRequest("/returns?year=2017")
     }
   }
 

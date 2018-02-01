@@ -35,11 +35,15 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
                                             implicit val appConfig: AppConfig)
   extends AuthorisedController {
 
-  def completedReturns(): Action[AnyContent] = authorisedAction { implicit request =>
+  def completedReturns(year: Int): Action[AnyContent] = authorisedAction { implicit request =>
     implicit user =>
-      for {
-        returnObligations <- handleReturnObligations(user)
-      } yield Ok(views.html.returns.completedReturns(returnObligations))
+      if(validateSearchYear(year)) {
+        getReturnObligations(user, year).map { returnObligations =>
+          Ok(views.html.returns.completedReturns(returnObligations))
+        }
+      } else {
+        Future.successful(NotFound(views.html.errors.notFound()))
+      }
   }
 
   def returnDeadlines(): Action[AnyContent] = authorisedAction { implicit request =>
@@ -51,8 +55,12 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
       )))
   }
 
-  private[controllers] def handleReturnObligations(user: User)(implicit hc: HeaderCarrier): Future[VatReturnObligations] = {
-    returnsService.getReturnObligationsForYear(user, 2017).map {
+  private[controllers] def validateSearchYear(year: Int, upperBound: Int = LocalDate.now().getYear) = {
+    year <= upperBound && year >= upperBound - 3
+  }
+
+  private[controllers] def getReturnObligations(user: User, year: Int)(implicit hc: HeaderCarrier): Future[VatReturnObligations] = {
+    returnsService.getReturnObligationsForYear(user, year).map {
       case Right(vatReturnObligations) => vatReturnObligations
       case Left(_) => VatReturnObligations(Seq())
     }
