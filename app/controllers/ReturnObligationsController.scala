@@ -45,7 +45,9 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
   def returnDeadlines(): Action[AnyContent] = authorisedAction { implicit request =>
     implicit user =>
       Future.successful(Ok(views.html.returns.returnDeadlines(
-        ReturnDeadline(LocalDate.parse("2018-08-07"), LocalDate.parse("2018-06-30"))
+        ReturnDeadline(LocalDate.parse("2018-08-07"),
+          LocalDate.parse("2017-08-01"),
+          LocalDate.parse("2017-10-31"))
       )))
   }
 

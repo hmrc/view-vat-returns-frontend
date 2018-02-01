@@ -1,5 +1,4 @@
 common.dateRangeSeparator = to
-common.submitReturns = You submit returns through your accounting software.
 
 sessionTimeout.title = Your session has timed out
 sessionTimeout.helpOne = To view your VAT returns, you''ll have to
@@ -45,6 +44,7 @@ yourVatReturn.adjustments = If there are any errors, you can make adjustments th
 yourVatReturn.paymentProcessed = Your payment has been processed. There is nothing more you need to do with this return.
 
 completedReturns.title = VAT returns
+completedReturns.submitMethod = You submit returns through your accounting software.
 completedReturns.periodEnding = Period ending
 completedReturns.status = Status
 completedReturns.returnDetails = Return details
@@ -60,13 +60,13 @@ completedReturns.noReturns = You have no returns.
 completedReturns.tableCaption = VAT returns found since opting in for Making Tax Digital For Business
 
 returnDeadlines.title = Return deadlines
-returnDeadlines.periodEnding = for the period ending {0}
+returnDeadlines.submitBy = You must use your accounting software to submit a return by:
+returnDeadlines.periodEnding = for the period {0}
 returnDeadlines.howToSubmit = How to do this
-returnDeadlines.softwareOne = Download accounting software from a
-returnDeadlines.softwareTwo = listed supplier
-returnDeadlines.softwareThree = , if you haven''t already.
-returnDeadlines.vatRecords = Keep your VAT records in that accounting software.
-returnDeadlines.sendReturns = Send HMRC your returns using that same accounting software.
+returnDeadlines.softwareOne = Choose accounting software that supports this service (opens in a new tab)
+returnDeadlines.softwareTwo = if you haven''t already.
+returnDeadlines.vatRecords = Keep your VAT records in your accounting software.
+returnDeadlines.sendReturns = Submit any VAT Returns before your deadlines.
 
 featureSwitch.title = Feature switches
 featureSwitch.heading = Features

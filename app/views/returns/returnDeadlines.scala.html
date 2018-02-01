@@ -23,23 +23,35 @@
 
   <div class="grid-row">
     <div class="column-two-thirds">
+
       <h1 class="heading-xlarge">@messages("returnDeadlines.title")</h1>
+
+      <p>@messages("returnDeadlines.submitBy")</p>
+
       <div class="form-group">
         <ul class="list list-bullet">
           <li class="bold-small">
             @displayDate(deadline.due)
-            <span class="form-hint">@messages("returnDeadlines.periodEnding", displayDate(deadline.end))</span>
+            <span class="form-hint">
+              @messages("returnDeadlines.periodEnding", displayDateRange(deadline.start, deadline.end))
+            </span>
           </li>
         </ul>
       </div>
-      <p>@messages("common.submitReturns")</p>
+
       <details>
+
         <summary><span class="summary">@messages("returnDeadlines.howToSubmit")</span></summary>
+
         <div class="panel panel-border-narrow">
-          <p>@messages("returnDeadlines.softwareOne")
-            <a href="#">@messages("returnDeadlines.softwareTwo")</a>@messages("returnDeadlines.softwareThree")</p>
-          <p>@messages("returnDeadlines.vatRecords")</p>
-          <p>@messages("returnDeadlines.sendReturns")</p>
+          <ul class="list list-number">
+            <li>
+              <a href="#">@messages("returnDeadlines.softwareOne")</a>
+              @messages("returnDeadlines.softwareTwo")
+            </li>
+            <li>@messages("returnDeadlines.vatRecords")</li>
+            <li>@messages("returnDeadlines.sendReturns")</li>
+          </ul>
         </div>
       </details>
     </div>
