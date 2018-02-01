@@ -100,7 +100,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       val expectedDescriptions = Array(
         "VAT on United Kingdom sales and other outputs",
         "VAT on European Community sales and related costs",
-        "Total VAT you owe HMRC",
+        "VAT sales subtotal",
         "Total VAT reclaimed from anywhere",
         "Total you owe",
         "Total sales and other outputs from anywhere, minus VAT",
