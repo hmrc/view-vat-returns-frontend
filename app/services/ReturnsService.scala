@@ -25,19 +25,18 @@ import models.VatReturnObligation.Status
 import models.{User, VatReturn, VatReturnObligations}
 import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ReturnsService @Inject()(connector: VatApiConnector) {
 
   def getVatReturnDetails(user: User, start: LocalDate, end: LocalDate)
-                         (implicit hc: HeaderCarrier): Future[HttpGetResult[VatReturn]] = {
+                         (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[VatReturn]] = {
     connector.getVatReturnDetails(user.vrn, start, end)
   }
 
   def getReturnObligationsForYear(user: User, searchYear: Int)
-                                 (implicit hc: HeaderCarrier): Future[HttpGetResult[VatReturnObligations]] = {
+                                 (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[VatReturnObligations]] = {
     val from: LocalDate = LocalDate.parse(s"$searchYear-01-01")
     val to: LocalDate = LocalDate.parse(s"$searchYear-12-31")
 

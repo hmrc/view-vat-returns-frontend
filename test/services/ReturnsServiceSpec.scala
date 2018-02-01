@@ -25,6 +25,7 @@ import models.VatReturnObligation.Status
 import models.{User, VatReturn, VatReturnObligation, VatReturnObligations}
 import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext.Implicits._
 
 class ReturnsServiceSpec extends ControllerBaseSpec {
 
