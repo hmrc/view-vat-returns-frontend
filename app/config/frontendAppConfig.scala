@@ -16,6 +16,7 @@
 
 package config
 
+import java.time.LocalDate
 import java.util.Base64
 import javax.inject.{Inject, Singleton}
 
@@ -67,7 +68,7 @@ class FrontendAppConfig @Inject()(val runModeConfiguration: Configuration, val e
   private lazy val signInBaseUrl: String = getString(Keys.signInBaseUrl)
   private lazy val signInContinueBaseUrl: String = runModeConfiguration.getString(Keys.signInContinueBaseUrl).getOrElse("")
   private lazy val signInContinueUrl: String = ContinueUrl(signInContinueBaseUrl +
-    controllers.routes.ReturnObligationsController.completedReturns().url).encodedUrl
+    controllers.routes.ReturnObligationsController.completedReturns(LocalDate.now().getYear).url).encodedUrl
   private lazy val signInOrigin = getString("appName")
   override lazy val signInUrl: String = s"$signInBaseUrl?continue=$signInContinueUrl&origin=$signInOrigin"
 

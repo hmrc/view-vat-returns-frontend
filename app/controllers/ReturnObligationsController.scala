@@ -35,11 +35,15 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
                                             implicit val appConfig: AppConfig)
   extends AuthorisedController {
 
-  def completedReturns(): Action[AnyContent] = authorisedAction { implicit request =>
+  def completedReturns(year: Int): Action[AnyContent] = authorisedAction { implicit request =>
     implicit user =>
-      for {
-        returnObligations <- handleReturnObligations(user)
-      } yield Ok(views.html.returns.completedReturns(returnObligations))
+      if(validateSearchYear(year)) {
+        for {
+          returnObligations <- handleReturnObligations(user)
+        } yield Ok(views.html.returns.completedReturns(returnObligations))
+      } else {
+        Future.successful(NotFound(views.html.errors.notFound()))
+      }
   }
 
   def returnDeadlines(): Action[AnyContent] = authorisedAction { implicit request =>
@@ -49,6 +53,10 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
           LocalDate.parse("2017-08-01"),
           LocalDate.parse("2017-10-31"))
       )))
+  }
+
+  private[controllers] def validateSearchYear(year: Int, upperBound: Int = LocalDate.now().getYear) = {
+    year <= upperBound && year >= upperBound - 3
   }
 
   private[controllers] def handleReturnObligations(user: User)(implicit hc: HeaderCarrier): Future[VatReturnObligations] = {
