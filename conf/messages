@@ -44,11 +44,12 @@ yourVatReturn.adjustments = If there are any errors, you can make adjustments th
 yourVatReturn.paymentProcessed = Your payment has been processed. There is nothing more you need to do with this return.
 
 completedReturns.title = VAT returns
-completedReturns.submitMethod = You submit returns through your accounting software.
-completedReturns.periodEnding = Period ending
-completedReturns.status = Status
-completedReturns.returnDetails = Return details
-completedReturns.notSubmitted = Not yet submitted
+completedReturns.yearReturns = {0} Returns
+completedReturns.period = For the period:
+completedReturns.otherReturnsHeading = Other returns
+completedReturns.otherReturnsOne = You can also
+completedReturns.otherReturnsTwo = view returns submitted before using accounting software (opens in new tab).
+
 completedReturns.due = Due
 completedReturns.received = Received
 completedReturns.viewReturnOne = View
@@ -58,6 +59,8 @@ completedReturns.viewEarlierReturnsTwo = view earlier returns
 completedReturns.viewEarlierReturnsThree = you submitted before using accounting software.
 completedReturns.noReturns = You have no returns.
 completedReturns.tableCaption = VAT returns found since opting in for Making Tax Digital For Business
+completedReturns.activeTab = Currently viewing returns from {0}
+completedReturns.inactiveTab = View returns from {0}
 
 returnDeadlines.title = Return deadlines
 returnDeadlines.submitBy = You must use your accounting software to submit a return by:
