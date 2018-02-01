@@ -25,18 +25,31 @@ import models.VatReturnObligation.Status
 import models.{User, VatReturn, VatReturnObligations}
 import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class ReturnsService @Inject()(connector: VatApiConnector) {
 
   def getVatReturnDetails(user: User, start: LocalDate, end: LocalDate)
-                         (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[VatReturn]] = {
+                         (implicit hc: HeaderCarrier): Future[HttpGetResult[VatReturn]] = {
     connector.getVatReturnDetails(user.vrn, start, end)
   }
 
-  def getAllReturns(user: User, upTo: LocalDate)
-                   (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[VatReturnObligations]] = {
-    connector.getVatReturnObligations(vrn = user.vrn, from = upTo.minusYears(1), to = upTo, status = Status.All)
+  def getReturnObligationsForYear(user: User, searchYear: Int)
+                                 (implicit hc: HeaderCarrier): Future[HttpGetResult[VatReturnObligations]] = {
+    val from: LocalDate = LocalDate.parse(s"$searchYear-01-01")
+    val to: LocalDate = LocalDate.parse(s"$searchYear-12-31")
+
+    connector.getVatReturnObligations(user.vrn, from, to, Status.All).map {
+      case Right(obligations) => Right(filterObligationsByDueDate(obligations, searchYear))
+      case error@Left(_) => error
+    }
+  }
+
+  private[services] def filterObligationsByDueDate(obligations: VatReturnObligations, searchYear: Int): VatReturnObligations = {
+    VatReturnObligations(
+      obligations.obligations.filter(_.end.getYear == searchYear)
+    )
   }
 }

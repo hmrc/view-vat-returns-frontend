@@ -50,7 +50,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
   }
 
   private[controllers] def handleReturnObligations(user: User)(implicit hc: HeaderCarrier): Future[VatReturnObligations] = {
-    returnsService.getAllReturns(user, LocalDate.now()).map {
+    returnsService.getReturnObligationsForYear(user, 2017).map {
       case Right(vatReturnObligations) => vatReturnObligations
       case Left(_) => VatReturnObligations(Seq())
     }

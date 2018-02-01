@@ -63,8 +63,8 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         .returns(authResult)
 
       if (serviceCall) {
-        (mockVatReturnService.getAllReturns(_: User, _: LocalDate)(_: HeaderCarrier, _: ExecutionContext))
-          .expects(*, *, *, *)
+        (mockVatReturnService.getReturnObligationsForYear(_: User, _: Int)(_: HeaderCarrier))
+          .expects(*, *, *)
           .returns(Future.successful(Right(exampleObligations)))
       }
     }
@@ -86,8 +86,8 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     implicit val hc: HeaderCarrier = HeaderCarrier()
 
     def setup(): Any = {
-      (mockVatReturnService.getAllReturns(_: User, _: LocalDate)(_: HeaderCarrier, _: ExecutionContext))
-        .expects(*, *, *, *)
+      (mockVatReturnService.getReturnObligationsForYear(_: User, _: Int)(_: HeaderCarrier))
+        .expects(*, *, *)
         .returns(vatServiceResult)
     }
 
