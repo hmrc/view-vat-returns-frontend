@@ -35,7 +35,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
                                   implicit val appConfig: AppConfig)
   extends AuthorisedController {
 
-  def vatReturnDetails(start: String, end: String): Action[AnyContent] = authorisedAction {
+  def vatReturnDetails(start: String, end: String, periodKey: String = ""): Action[AnyContent] = authorisedAction {
     implicit request =>
       implicit user =>
         val vatReturnCall = returnsService.getVatReturnDetails(user, LocalDate.parse(start), LocalDate.parse(end))

@@ -44,6 +44,7 @@ yourVatReturn.adjustments = If there are any errors, you can make adjustments th
 yourVatReturn.paymentProcessed = Your payment has been processed. There is nothing more you need to do with this return.
 
 completedReturns.title = VAT returns
+completedReturns.submitMethod = You submit returns through your accounting software.
 completedReturns.yearReturns = {0} Returns
 completedReturns.period = For the period:
 completedReturns.otherReturnsHeading = Other returns

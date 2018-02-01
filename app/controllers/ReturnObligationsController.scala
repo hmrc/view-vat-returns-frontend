@@ -39,7 +39,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
     implicit user =>
       if(validateSearchYear(year)) {
         getReturnObligations(user, year).map { returnObligations =>
-          Ok(views.html.returns.completedReturns(returnObligations, Seq(2018, 2017, 2016, 2015), 2016))
+          Ok(views.html.returns.completedReturns(returnObligations, Seq(2018, 2017, 2016, 2015), year))
         }
       } else {
         Future.successful(NotFound(views.html.errors.notFound()))
