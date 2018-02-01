@@ -38,9 +38,9 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
   def completedReturns(year: Int): Action[AnyContent] = authorisedAction { implicit request =>
     implicit user =>
       if(validateSearchYear(year)) {
-        for {
-          returnObligations <- handleReturnObligations(user, year)
-        } yield Ok(views.html.returns.completedReturns(returnObligations))
+        getReturnObligations(user, year).map { returnObligations =>
+          Ok(views.html.returns.completedReturns(returnObligations))
+        }
       } else {
         Future.successful(NotFound(views.html.errors.notFound()))
       }
@@ -59,7 +59,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
     year <= upperBound && year >= upperBound - 3
   }
 
-  private[controllers] def handleReturnObligations(user: User, year: Int)(implicit hc: HeaderCarrier): Future[VatReturnObligations] = {
+  private[controllers] def getReturnObligations(user: User, year: Int)(implicit hc: HeaderCarrier): Future[VatReturnObligations] = {
     returnsService.getReturnObligationsForYear(user, year).map {
       case Right(vatReturnObligations) => vatReturnObligations
       case Left(_) => VatReturnObligations(Seq())
