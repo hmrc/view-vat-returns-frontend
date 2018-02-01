@@ -30,41 +30,6 @@ import stubs.{AuthStub, VatApiStub}
 class CompletedReturnsPageSpec extends IntegrationBaseSpec {
 
   private trait Test {
-    val vatReturnList = VatReturnObligations(Seq(
-      VatReturnObligation(
-        LocalDate.parse("2017-10-31"),
-        LocalDate.parse("2018-01-31"),
-        LocalDate.parse("2018-02-28"),
-        "O",
-        None,
-        "#001"
-      ),
-      VatReturnObligation(
-        LocalDate.parse("2017-07-31"),
-        LocalDate.parse("2017-10-31"),
-        LocalDate.parse("2017-11-30"),
-        "F",
-        Some(LocalDate.parse("2017-11-27")),
-        "#002"
-      ),
-      VatReturnObligation(
-        LocalDate.parse("2017-04-30"),
-        LocalDate.parse("2017-07-31"),
-        LocalDate.parse("2017-08-31"),
-        "F",
-        Some(LocalDate.parse("2017-08-30")),
-        "#003"
-      ),
-      VatReturnObligation(
-        LocalDate.parse("2017-01-31"),
-        LocalDate.parse("2017-04-30"),
-        LocalDate.parse("2017-05-31"),
-        "F",
-        Some(LocalDate.parse("2017-05-28")),
-        "#004"
-      )
-    ))
-
     def setupStubs(): StubMapping
 
     def request(): WSRequest = {
@@ -75,7 +40,7 @@ class CompletedReturnsPageSpec extends IntegrationBaseSpec {
 
   "Calling the returns route" when {
 
-    "the user is authenticated and has four obligations" should {
+    "the user is authenticated and has three 2017 obligations" should {
 
       "return 200" in new Test {
         override def setupStubs(): StubMapping = {
@@ -86,7 +51,7 @@ class CompletedReturnsPageSpec extends IntegrationBaseSpec {
         response.status shouldBe Status.OK
       }
 
-      "return the four obligations" in new Test {
+      "return the three obligations" in new Test {
 
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
@@ -98,7 +63,7 @@ class CompletedReturnsPageSpec extends IntegrationBaseSpec {
 
         val rowSelector = "#completedReturns tbody tr"
 
-        document.select(rowSelector).size() shouldBe 4
+        document.select(rowSelector).size() shouldBe 3
       }
     }
   }

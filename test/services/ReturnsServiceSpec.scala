@@ -24,9 +24,8 @@ import controllers.ControllerBaseSpec
 import models.VatReturnObligation.Status
 import models.{User, VatReturn, VatReturnObligation, VatReturnObligations}
 import uk.gov.hmrc.http.HeaderCarrier
-
-import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext.Implicits._
 
 class ReturnsServiceSpec extends ControllerBaseSpec {
 
@@ -67,13 +66,13 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
     }
   }
 
-  "Calling .getAllReturns" should {
+  "Calling .getReturnObligationsForYear" should {
 
     val exampleObligations: VatReturnObligations = VatReturnObligations(
       Seq(
         VatReturnObligation(
           LocalDate.parse("2017-01-01"),
-          LocalDate.parse("2017-12-31"),
+          LocalDate.parse("2018-12-31"),
           LocalDate.parse("2018-01-31"),
           "O",
           None,
@@ -88,9 +87,38 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
         .returns(Future.successful(Right(exampleObligations)))
 
       lazy val result: HttpGetResult[VatReturnObligations] =
-        await(service.getAllReturns(User("999999999"), LocalDate.parse("2017-01-01")))
+        await(service.getReturnObligationsForYear(User("999999999"), 2018))
 
       result shouldBe Right(exampleObligations)
+    }
+  }
+
+  "Calling .filterObligationsByDueDate" should {
+
+    "when supplied with no obligations with end dates in the requested year" should {
+
+      val date = LocalDate.parse("2016-10-10")
+      val obligation = VatReturnObligation(date, date, date, "O", None, "")
+      val obligations = VatReturnObligations(Seq(obligation, obligation))
+
+      "return an empty sequence of obligations" in new Test {
+        lazy val result = service.filterObligationsByDueDate(obligations, 2017)
+
+        result shouldEqual VatReturnObligations(Seq())
+      }
+    }
+
+    "when supplied with obligations with end dates in the requested year" should {
+
+      val date = LocalDate.parse("2017-10-10")
+      val obligation = VatReturnObligation(date, date, date, "O", None, "")
+      val obligations = VatReturnObligations(Seq(obligation, obligation))
+
+      "return an sequence containing obligations" in new Test {
+        lazy val result = service.filterObligationsByDueDate(obligations, 2017)
+
+        result shouldEqual VatReturnObligations(Seq(obligation, obligation))
+      }
     }
   }
 }
