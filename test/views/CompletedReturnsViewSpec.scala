@@ -18,7 +18,7 @@ package views
 
 import java.time.LocalDate
 
-import models.{VatReturnObligation, VatReturnObligations}
+import models.viewModels.{ReturnObligationsViewModel, VatReturnsViewModel}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
@@ -49,7 +49,7 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
 
   "Rendering the VAT Returns page with no returns for the selected year of 2018" should {
 
-    lazy val view = views.html.returns.completedReturns(VatReturnObligations(Seq()), returnYears, 2018)
+    lazy val view = views.html.returns.completedReturns(VatReturnsViewModel(returnYears, 2018, Seq()))
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct document title" in {
@@ -150,28 +150,21 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
 
   "Rendering the VAT Returns page with multiple returns for the selected year of 2018" should {
 
-    lazy val exampleReturns: VatReturnObligations = VatReturnObligations(
+    lazy val exampleReturns: Seq[ReturnObligationsViewModel] =
       Seq(
-        VatReturnObligation(
+        ReturnObligationsViewModel(
           LocalDate.parse("2017-01-01"),
           LocalDate.parse("2017-12-31"),
-          LocalDate.parse("2018-01-31"),
-          "O",
-          None,
           "#001"
         ),
-        VatReturnObligation(
+        ReturnObligationsViewModel(
           LocalDate.parse("2017-01-01"),
           LocalDate.parse("2017-09-30"),
-          LocalDate.parse("2018-10-31"),
-          "O",
-          None,
           "#001"
         )
       )
-    )
 
-    lazy val view = views.html.returns.completedReturns(exampleReturns, returnYears, 2018)
+    lazy val view = views.html.returns.completedReturns(VatReturnsViewModel(returnYears, 2018, exampleReturns))
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct return heading" in {

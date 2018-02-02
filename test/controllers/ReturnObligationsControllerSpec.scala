@@ -19,6 +19,7 @@ package controllers
 import java.time.LocalDate
 
 import models.errors.{BadRequestError, HttpError}
+import models.viewModels.{ReturnObligationsViewModel, VatReturnsViewModel}
 import models.{User, VatReturnObligation, VatReturnObligations}
 import play.api.http.Status
 import play.api.test.Helpers._
@@ -203,7 +204,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
     "the vatReturnsService retrieves a valid list of VatReturnObligations" should {
 
-      "return the VatReturnObligations" in new HandleReturnObligationsTest {
+      "return a VatReturnsViewModel with valid obligations" in new HandleReturnObligationsTest {
         override val vatServiceResult: Future[Right[HttpError, VatReturnObligations]] = Future.successful {
           Right(
             VatReturnObligations(Seq(VatReturnObligation(
@@ -216,19 +217,41 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
             )))
           )
         }
+
+        val currentYear: Int = LocalDate.now().getYear
+        val expectedResult = VatReturnsViewModel(
+          Seq(currentYear, currentYear - 1, currentYear - 2, currentYear - 3),
+          2017,
+          Seq(
+            ReturnObligationsViewModel(
+              LocalDate.parse("2017-01-01"),
+              LocalDate.parse("2017-01-01"),
+              "#001"
+            )
+          )
+        )
+
         private val result = await(target.getReturnObligations(testUser, 2017))
-        result shouldBe vatServiceResult.b
+        result shouldBe expectedResult
       }
     }
 
     "the vatReturnsService retrieves an error" should {
 
-      "return an empty VatReturnObligations" in new HandleReturnObligationsTest {
+      "return a VatReturnsViewModel with empty obligations" in new HandleReturnObligationsTest {
         override val vatServiceResult: Future[Either[HttpError, VatReturnObligations]] = Future.successful {
           Left(BadRequestError("", ""))
         }
+
+        val currentYear: Int = LocalDate.now().getYear
+        val expectedResult = VatReturnsViewModel(
+          Seq(currentYear, currentYear - 1, currentYear - 2, currentYear - 3),
+          2017,
+          Seq()
+        )
+
         private val result = await(target.getReturnObligations(testUser, 2017))
-        result shouldBe VatReturnObligations(Seq())
+        result shouldBe expectedResult
       }
     }
   }

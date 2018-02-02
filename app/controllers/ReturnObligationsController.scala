@@ -20,8 +20,8 @@ import java.time.LocalDate
 import javax.inject.Inject
 
 import config.AppConfig
-import models.viewModels.ReturnDeadline
-import models.{User, VatReturnObligations}
+import models.viewModels.{ReturnDeadline, ReturnObligationsViewModel, VatReturnsViewModel}
+import models.User
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent}
 import services.{EnrolmentsAuthService, ReturnsService}
@@ -38,8 +38,8 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
   def completedReturns(year: Int): Action[AnyContent] = authorisedAction { implicit request =>
     implicit user =>
       if(validateSearchYear(year)) {
-        getReturnObligations(user, year).map { returnObligations =>
-          Ok(views.html.returns.completedReturns(returnObligations, Seq(2018, 2017, 2016, 2015), year))
+        getReturnObligations(user, year).map { model =>
+          Ok(views.html.returns.completedReturns(model))
         }
       } else {
         Future.successful(NotFound(views.html.errors.notFound()))
@@ -59,10 +59,23 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
     year <= upperBound && year >= upperBound - 3
   }
 
-  private[controllers] def getReturnObligations(user: User, year: Int)(implicit hc: HeaderCarrier): Future[VatReturnObligations] = {
+  private[controllers] def getReturnObligations(user: User, year: Int)(implicit hc: HeaderCarrier): Future[VatReturnsViewModel] = {
+    val currentYear: Int = LocalDate.now().getYear
+    val yearsToDisplay: Seq[Int] = (currentYear to currentYear - 3) by -1
+
     returnsService.getReturnObligationsForYear(user, year).map {
-      case Right(vatReturnObligations) => vatReturnObligations
-      case Left(_) => VatReturnObligations(Seq())
+      case Right(obligations) => VatReturnsViewModel(
+        yearsToDisplay,
+        year,
+        obligations.obligations.map( obligation =>
+          ReturnObligationsViewModel(
+            obligation.start,
+            obligation.end,
+            obligation.periodKey
+          )
+        )
+      )
+      case Left(_) => VatReturnsViewModel(yearsToDisplay, year, Seq())
     }
   }
 }
