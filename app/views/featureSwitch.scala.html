@@ -31,10 +31,10 @@
         </legend>
 
         @views.html.templates.inputs.singleCheckbox(form(ConfigKeys.simpleAuthFeature), messages(ConfigKeys.simpleAuthFeature))
+        @views.html.templates.inputs.singleCheckbox(form(ConfigKeys.userResearchBannerFeature), messages(ConfigKeys.userResearchBannerFeature))
       </fieldset>
     </div>
 
     <button class="button" type="submit" id="continue-button">@messages("featureSwitch.submit")</button>
-
   }
 }
