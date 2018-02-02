@@ -33,5 +33,5 @@ object ConfigKeys {
   val signInContinueBaseUrl: String = "signIn.continueBaseUrl"
 
   val simpleAuthFeature: String = "features.simpleAuth.enabled"
-
+  val userResearchBannerFeature: String = "features.userResearchBanner.enabled"
 }

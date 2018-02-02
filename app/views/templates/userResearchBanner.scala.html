@@ -14,13 +14,17 @@
  * limitations under the License.
  *@
 
-<div class="js-hidden notice-banner" id="notice-banner">
-  <div class="notice-banner__wrapper grid-layout">
-    <div class="centered-content">
-      <div class="grid-layout__column--2-3">
-        <h3 class="notice-banner__content">Please help us improve our service</h3>
-        <a class="notice-banner__content" href="https://signup.take-part-in-research.service.gov.uk/?utm_campaign=VATviewchange&utm_source=Other&utm_medium=other&t=HMRC&id=34">Enter our survey</a>
+@(appConfig: config.AppConfig)
+
+@if(appConfig.features.userResearchBanner()) {
+  <div class="js-hidden notice-banner" id="notice-banner">
+    <div class="notice-banner__wrapper grid-layout">
+      <div class="centered-content">
+        <div class="grid-layout__column--2-3">
+          <h3 class="notice-banner__content">Please help us improve our service</h3>
+          <a class="notice-banner__content" href="https://signup.take-part-in-research.service.gov.uk/?utm_campaign=VATviewchange&utm_source=Other&utm_medium=other&t=HMRC&id=34">Enter our survey</a>
+        </div>
       </div>
     </div>
   </div>
-</div>
+}
