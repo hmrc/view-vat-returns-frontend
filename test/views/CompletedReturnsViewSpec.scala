@@ -40,7 +40,7 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
     val period = ".divider--bottom p"
     def obligation(number: Int): String = s".divider--bottom .list-bullet li:nth-of-type($number)"
     def obligationLink(number: Int): String = s".divider--bottom .list-bullet li:nth-of-type($number) > a"
-    val otherReturns = "h3"
+    val otherReturns = "div.column-two-thirds > h3"
     val otherReturnsGuidance = "div > div > p:nth-child(6)"
     val otherReturnsLink = "div > div > p:nth-child(6) > a"
   }
