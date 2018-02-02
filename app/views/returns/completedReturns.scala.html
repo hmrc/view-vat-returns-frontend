@@ -18,8 +18,6 @@
 
 @(returns: VatReturnObligations, obligationYears: Seq[Int], selectedYear: Int)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
-@url = {controllers.routes.ReturnsController.vatReturnDetails("", "h", "h").url}
-
 @views.html.main_template(title = messages("completedReturns.title"), bodyClasses = None, appConfig = appConfig) {
 
   <div class="grid-row">
@@ -30,23 +28,26 @@
 
         <ul class="tabs-nav">
 
-          @for(year <- obligationYears) {
+          @for(yearToDisplay <- obligationYears) {
 
-            @if(year == selectedYear) {
+            @if(yearToDisplay == selectedYear) {
 
               <li class="tabs-nav__tab tabs-nav__tab--active font-medium">
-                @year
-                <span class="visuallyhidden">@messages("completedReturns.activeTab", year.toString())</span>
+                @yearToDisplay
+                <span class="visuallyhidden">@messages("completedReturns.activeTab", yearToDisplay.toString())</span>
               </li>
+
             } else {
 
               <li class="tabs-nav__tab font-medium">
-                <a href="@controllers.routes.ReturnObligationsController.completedReturns(year).url">@year
-                  <span class="visuallyhidden">@messages("completedReturns.inactiveTab", year.toString())</span>
+                <a href="@controllers.routes.ReturnObligationsController.completedReturns(yearToDisplay).url">
+                  @yearToDisplay
+                  <span class="visuallyhidden">@messages("completedReturns.inactiveTab", yearToDisplay.toString())</span>
                 </a>
               </li>
             }
           }
+
         </ul>
 
         <section class="divider--bottom">
@@ -54,14 +55,16 @@
           <h2>@messages("completedReturns.yearReturns", selectedYear.toString())</h2>
 
           @if(returns.obligations.isEmpty) {
-            <!--TODO: alternate content-->
+            <!--TODO: update with content from design team-->
             <p>Alternate Content</p>
           } else {
 
             <p>@messages("completedReturns.period")</p>
 
             <ul class="list list-bullet">
+
               @for(obligation <- returns.obligations) {
+
                 <li>
                     <!--TODO: update to pass period key instead of date range-->
                     <a href="@controllers.routes.ReturnsController.vatReturnDetails(obligation.start.toString(), obligation.end.toString()).url">
@@ -69,8 +72,10 @@
                     </a>
                 </li>
               }
+
             </ul>
           }
+
         </section>
 
         <h3>@messages("completedReturns.otherReturnsHeading")</h3>

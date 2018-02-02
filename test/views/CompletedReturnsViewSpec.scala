@@ -127,7 +127,7 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
       elementText(Selectors.returnsHeading) shouldBe "2018 Returns"
     }
 
-    "have the correct alternate content for when no returns are found" in {
+    "have the correct alternate content when no returns are found" in {
       // TODO: this will change next iteration
       elementText(Selectors.noReturnsFound) shouldBe "Alternate Content"
     }
