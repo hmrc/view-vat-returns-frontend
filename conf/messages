@@ -50,16 +50,6 @@ completedReturns.period = For the period:
 completedReturns.otherReturnsHeading = Other returns
 completedReturns.otherReturnsOne = You can also
 completedReturns.otherReturnsTwo = view returns submitted before using accounting software (opens in new tab).
-
-completedReturns.due = Due
-completedReturns.received = Received
-completedReturns.viewReturnOne = View
-completedReturns.viewReturnTwo = Return
-completedReturns.viewEarlierReturnsOne = You can also
-completedReturns.viewEarlierReturnsTwo = view earlier returns
-completedReturns.viewEarlierReturnsThree = you submitted before using accounting software.
-completedReturns.noReturns = You have no returns.
-completedReturns.tableCaption = VAT returns found since opting in for Making Tax Digital For Business
 completedReturns.activeTab = Currently viewing returns from {0}
 completedReturns.inactiveTab = View returns from {0}
 

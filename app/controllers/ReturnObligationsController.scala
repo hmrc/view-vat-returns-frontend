@@ -59,14 +59,14 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
     year <= upperBound && year >= upperBound - 3
   }
 
-  private[controllers] def getReturnObligations(user: User, year: Int)(implicit hc: HeaderCarrier): Future[VatReturnsViewModel] = {
+  private[controllers] def getReturnObligations(user: User, selectedYear: Int)(implicit hc: HeaderCarrier): Future[VatReturnsViewModel] = {
     val currentYear: Int = LocalDate.now().getYear
-    val yearsToDisplay: Seq[Int] = (currentYear to currentYear - 3) by -1
+    val returnYears: Seq[Int] = (currentYear to currentYear - 3) by -1
 
-    returnsService.getReturnObligationsForYear(user, year).map {
+    returnsService.getReturnObligationsForYear(user, selectedYear).map {
       case Right(obligations) => VatReturnsViewModel(
-        yearsToDisplay,
-        year,
+        returnYears,
+        selectedYear,
         obligations.obligations.map( obligation =>
           ReturnObligationsViewModel(
             obligation.start,
@@ -75,7 +75,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
           )
         )
       )
-      case Left(_) => VatReturnsViewModel(yearsToDisplay, year, Seq())
+      case Left(_) => VatReturnsViewModel(returnYears, selectedYear, Seq())
     }
   }
 }

@@ -64,7 +64,7 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
       elementText(Selectors.submitThroughSoftware) shouldBe "You submit returns through your accounting software."
     }
 
-    "have tabs for each return year which" should {
+    "have tabs for each return year" should {
 
       "tab one" should {
 
