@@ -38,7 +38,9 @@
 
 @headerNavLinks = {}
 
-@afterHeader = {}
+@afterHeader = {
+  @views.html.templates.userResearchBanner()
+}
 
 @insideHeader = {
     @uiLayouts.header_nav(
@@ -62,22 +64,22 @@
 @footerLinks = {}
 
 @phaseBanner = {
-<!--TODO:Update href to feedback controller when in beta-->
-<div class="alpha-banner">
-    <p>
-        <strong id="phase" class="phase-tag">ALPHA</strong>
-        <!--TODO: Update the URL and implement Feedback controller-->
-        <span>This is a new service – your <a id="alpha-banner-feedback" href="dummyUrl">feedback</a> will help us to improve it.</span>
-    </p>
-</div>
+  <!--TODO:Update href to feedback controller when in beta-->
+  <div class="alpha-banner">
+      <p>
+          <strong id="phase" class="phase-tag">ALPHA</strong>
+          <!--TODO: Update the URL and implement Feedback controller-->
+          <span>This is a new service – your <a id="alpha-banner-feedback" href="dummyUrl">feedback</a> will help us to improve it.</span>
+      </p>
+  </div>
 }
 
 @serviceInfo = {
-@views.html.templates.userResearchBanner()
-@uiLayouts.serviceInfo(
-betaBanner = phaseBanner,
-includeGridWrapper = false,
-serviceInfoContent = Some(serviceInfoContent))
+  @uiLayouts.serviceInfo(
+    betaBanner = phaseBanner,
+    includeGridWrapper = false,
+    serviceInfoContent = Some(serviceInfoContent)
+  )
 }
 
 @mainContentHeader = {
@@ -96,7 +98,8 @@ serviceInfoContent = Some(serviceInfoContent))
       mainContentHeader = mainContentHeader,
       serviceInfo = serviceInfo,
       getHelpForm = getHelpForm,
-      sidebar = sidebar)
+      sidebar = sidebar
+    )
 }
 
 @hmrcGovUkTemplate(Some(title), bodyClasses)(head, bodyEnd, insideHeader, afterHeader, footerTop, Some(uiLayouts.footer_links()), true)(content)

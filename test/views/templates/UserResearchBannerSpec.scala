@@ -25,7 +25,6 @@ class UserResearchBannerSpec extends ViewBaseSpec {
   object Selectors {
     val userResearchHeading = "h3.notice-banner__content"
     val userResearchSurvey = "a.notice-banner__content"
-    val userResearchClose = ".notice-banner__close"
   }
 
   "The User Research banner" should {
@@ -44,10 +43,6 @@ class UserResearchBannerSpec extends ViewBaseSpec {
     "have the correct link to the survey" in {
       element(Selectors.userResearchSurvey).attr("href") shouldBe
         "https://signup.take-part-in-research.service.gov.uk/?utm_campaign=VATviewchange&utm_source=Other&utm_medium=other&t=HMRC&id=34"
-    }
-
-    "have the correct rejection text" in {
-      elementText(Selectors.userResearchClose) shouldBe "No thanks"
     }
   }
 }
