@@ -16,6 +16,6 @@
 
 package models.viewModels
 
-case class VatReturnsViewModel(yearsToDisplay: Seq[Int],
+case class VatReturnsViewModel(returnYears: Seq[Int],
                                selectedYear: Int,
                                obligations: Seq[ReturnObligationsViewModel])
