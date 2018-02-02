@@ -15,58 +15,75 @@
  *@
 
 @import views.html.templates.formatters.dates._
+@import models.viewModels._
 
-@(returns: VatReturnObligations)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
+@(model: VatReturnsViewModel)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
 @views.html.main_template(title = messages("completedReturns.title"), bodyClasses = None, appConfig = appConfig) {
 
   <div class="grid-row">
     <div class="column-two-thirds">
       <h1 class="heading-xlarge">@messages("completedReturns.title")</h1>
-      <p>@messages("completedReturns.submitMethod")</p>
-      @if(returns.obligations.isEmpty) {
-        <h2 class="heading-medium">@messages("completedReturns.noReturns")</h2>
-      } else {
-        <table id="completedReturns" class="form-group">
-          <caption class="visually-hidden">@messages("completedReturns.tableCaption")</caption>
-          <thead>
-            <tr>
-              <th>@messages("completedReturns.periodEnding")</th>
-              <th>@messages("completedReturns.status")</th>
-              <th>@messages("completedReturns.returnDetails")</th>
-            </tr>
-          </thead>
-          <tbody>
-            @returns.obligations.collect {
-              case obligation if obligation.status == "O" => {
-                <tr>
-                  <td>@displayDate(obligation.end)</td>
-                  <td>@messages("completedReturns.due") @displayDate(obligation.due)</td>
-                  <td>@messages("completedReturns.notSubmitted")</td>
-                </tr>
-              }
-            }
-            @returns.obligations.collect {
-              case obligation if obligation.status == "F" => {
-                <tr>
-                  <td>@displayDate(obligation.end)</td>
-                  <td>@messages("completedReturns.received")</td>
-                  <td>
-                    <a href="@controllers.routes.ReturnsController.vatReturnDetails(obligation.start.toString, obligation.end.toString)">
-                      @messages("completedReturns.viewReturnOne") @displayDate(obligation.end) @messages("completedReturns.viewReturnTwo")
-                    </a>
-                  </td>
-                </tr>
-              }
-            }
-          </tbody>
-        </table>
-      }
 
-      <p>@messages("completedReturns.viewEarlierReturnsOne")
-        <a href="@appConfig.portalUrl">@messages("completedReturns.viewEarlierReturnsTwo")</a>
-        @messages("completedReturns.viewEarlierReturnsThree")
-      </p>
+      <p>@messages("completedReturns.submitMethod")</p>
+
+        <ul class="tabs-nav">
+
+          @for(yearToDisplay <- model.returnYears) {
+
+            @if(yearToDisplay == model.selectedYear) {
+
+              <li class="tabs-nav__tab tabs-nav__tab--active font-medium">
+                @yearToDisplay
+                <span class="visuallyhidden">@messages("completedReturns.activeTab", yearToDisplay.toString())</span>
+              </li>
+
+            } else {
+
+              <li class="tabs-nav__tab font-medium">
+                <a href="@controllers.routes.ReturnObligationsController.completedReturns(yearToDisplay).url">
+                  @yearToDisplay
+                  <span class="visuallyhidden">@messages("completedReturns.inactiveTab", yearToDisplay.toString())</span>
+                </a>
+              </li>
+            }
+          }
+
+        </ul>
+
+        <section class="divider--bottom">
+
+          <h2>@messages("completedReturns.yearReturns", model.selectedYear.toString())</h2>
+
+          @if(model.obligations.isEmpty) {
+            <!--TODO: update with content from design team-->
+            <p>Alternate Content</p>
+          } else {
+
+            <p>@messages("completedReturns.period")</p>
+
+            <ul class="list list-bullet">
+
+              @for(obligation <- model.obligations) {
+
+                <li>
+                    <!--TODO: update to pass period key instead of date range-->
+                    <a href="@controllers.routes.ReturnsController.vatReturnDetails(obligation.start.toString(), obligation.end.toString()).url">
+                        @displayDateRange(obligation.start, obligation.end)
+                    </a>
+                </li>
+              }
+
+            </ul>
+          }
+
+        </section>
+
+        <h3>@messages("completedReturns.otherReturnsHeading")</h3>
+        <p>
+            @messages("completedReturns.otherReturnsOne")
+            <a href="@appConfig.portalUrl">@messages("completedReturns.otherReturnsTwo")</a>
+        </p>
 
     </div>
   </div>
