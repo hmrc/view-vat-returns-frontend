@@ -31,13 +31,13 @@ class CompletedReturnsPageSpec extends IntegrationBaseSpec {
 
     def request(): WSRequest = {
       setupStubs()
-      buildRequest("/returns?year=2017")
+      buildRequest("/returns/2017")
     }
   }
 
-  "Calling the returns route" when {
+  "Calling the returns route with an authenticated user with three obligation end dates in 2017 and one in 2018" when {
 
-    "the user is authenticated and has three 2017 obligations" should {
+    "calling the 2017 route" should {
 
       "return 200" in new Test {
         override def setupStubs(): StubMapping = {
@@ -58,9 +58,46 @@ class CompletedReturnsPageSpec extends IntegrationBaseSpec {
 
         lazy implicit val document: Document = Jsoup.parse(response.body)
 
-        val rowSelector = "#completedReturns tbody tr"
+        val bulletPointSelector = ".list-bullet li"
 
-        document.select(rowSelector).size() shouldBe 3
+        document.select(bulletPointSelector).size() shouldBe 3
+      }
+    }
+
+    "calling the 2018 route" should {
+
+      "return 200" in new Test {
+        override def setupStubs(): StubMapping = {
+          AuthStub.authorised()
+          VatApiStub.stubPrototypeObligations
+        }
+        override def request(): WSRequest = {
+          setupStubs()
+          buildRequest("/returns/2018")
+        }
+
+        val response: WSResponse = await(request().get())
+        response.status shouldBe Status.OK
+      }
+
+      "return one obligation" in new Test {
+
+        override def setupStubs(): StubMapping = {
+          AuthStub.authorised()
+          VatApiStub.stubPrototypeObligations
+        }
+        override def request(): WSRequest = {
+          setupStubs()
+          buildRequest("/returns/2018")
+        }
+
+        val response: WSResponse = await(request().get())
+
+        lazy implicit val document: Document = Jsoup.parse(response.body)
+
+        val bulletPointSelector = ".list-bullet li"
+
+        document.select(bulletPointSelector).size() shouldBe 1
       }
     }
   }
