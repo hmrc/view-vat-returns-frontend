@@ -29,7 +29,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
 
     def request(): WSRequest = {
       setupStubs()
-      buildRequest("/return?start=2017-04-30&end=2017-07-31")
+      buildRequest("/return/0001")
     }
   }
 

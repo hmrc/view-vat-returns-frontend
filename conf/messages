@@ -1,5 +1,4 @@
 common.dateRangeSeparator = to
-common.vat = VAT
 
 sessionTimeout.title = Your session has timed out
 sessionTimeout.helpOne = To view your VAT returns, you''ll have to
@@ -21,6 +20,9 @@ userResearch.enterSurvey = Enter our survey
 userResearch.close = No thanks
 
 breadcrumbs.bta = Business tax account
+breadcrumbs.vat = VAT
+breadcrumbs.vatPayments = VAT payments
+breadcrumbs.vatReturn = VAT return: {0}
 
 yourVatReturn.title = VAT return
 yourVatReturn.vrn = VAT registration number (VRN):
