@@ -33,7 +33,8 @@ class ReturnsService @Inject()(vatApiConnector: VatApiConnector, financialDataCo
 
   def getVatReturnDetails(user: User, start: LocalDate, end: LocalDate)
                          (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[VatReturn]] = {
-    vatApiConnector.getVatReturnDetails(user.vrn, start, end)
+
+    vatApiConnector.getVatReturnDetails(user.vrn, "111") // TODO: Pass in an actual period key
   }
 
   def getReturnObligationsForYear(user: User, searchYear: Int)

@@ -57,8 +57,8 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
     )
 
     "return a VAT Return" in new Test {
-      (mockVatApiConnector.getVatReturnDetails(_: String, _: LocalDate, _: LocalDate)(_: HeaderCarrier, _: ExecutionContext))
-        .expects(*, *, *, *, *)
+      (mockVatApiConnector.getVatReturnDetails(_: String, _: String)(_: HeaderCarrier, _: ExecutionContext))
+        .expects(*, *, *, *)
         .returns(Future.successful(Right(exampleVatReturn)))
 
       lazy val result: HttpGetResult[VatReturn] = await(
