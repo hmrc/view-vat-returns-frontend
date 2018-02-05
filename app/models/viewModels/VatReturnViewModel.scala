@@ -31,4 +31,5 @@ case class VatReturnViewModel(entityName: Option[String],
                               boxSix: BigDecimal,
                               boxSeven: BigDecimal,
                               boxEight: BigDecimal,
-                              boxNine: BigDecimal)
+                              boxNine: BigDecimal,
+                              showReturnsLink: Boolean)

@@ -93,17 +93,17 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     "a user is logged in and enrolled to HMRC-MTD-VAT" should {
 
       "return 200" in new Test {
-        private val result = target.vatReturnDetails("2017-04-30", "2017-07-31")(fakeRequest)
+        private val result = target.vatReturnDetails("#001")(fakeRequest)
         status(result) shouldBe Status.OK
       }
 
       "return HTML" in new Test {
-        private val result = target.vatReturnDetails("2017-04-30", "2017-07-31")(fakeRequest)
+        private val result = target.vatReturnDetails("#001")(fakeRequest)
         contentType(result) shouldBe Some("text/html")
       }
 
       "return charset of utf-8" in new Test {
-        private val result = target.vatReturnDetails("2017-04-30", "2017-07-31")(fakeRequest)
+        private val result = target.vatReturnDetails("#001")(fakeRequest)
         charset(result) shouldBe Some("utf-8")
       }
     }
@@ -113,7 +113,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       "return 403 (Forbidden)" in new Test {
         override val serviceCall = false
         override val authResult: Future[Nothing] = Future.failed(InsufficientEnrolments())
-        private val result = target.vatReturnDetails("2017-04-30", "2017-07-31")(fakeRequest)
+        private val result = target.vatReturnDetails("#001")(fakeRequest)
         status(result) shouldBe Status.FORBIDDEN
       }
     }
@@ -123,7 +123,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       "return 401 (Unauthorised)" in new Test {
         override val serviceCall = false
         override val authResult: Future[Nothing] = Future.failed(MissingBearerToken())
-        private val result = target.vatReturnDetails("2017-04-30", "2017-07-31")(fakeRequest)
+        private val result = target.vatReturnDetails("#001")(fakeRequest)
         status(result) shouldBe Status.UNAUTHORIZED
       }
     }
@@ -133,7 +133,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       "return 404 (Not Found)" in new Test {
         override val vatReturnResult: Future[HttpGetResult[VatReturn]] =
           Future.successful(Left(UnexpectedStatusError(404)))
-        private val result = target.vatReturnDetails("2017-04-30", "2017-07-31")(fakeRequest)
+        private val result = target.vatReturnDetails("#001")(fakeRequest)
         status(result) shouldBe Status.NOT_FOUND
       }
     }
@@ -143,7 +143,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       "return 500 (Internal Server Error)" in new Test {
         override val vatReturnResult: Future[HttpGetResult[VatReturn]] =
           Future.successful(Left(UnknownError))
-        private val result = target.vatReturnDetails("2017-04-30", "2017-07-31")(fakeRequest)
+        private val result = target.vatReturnDetails("#001")(fakeRequest)
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
       }
     }
@@ -173,9 +173,10 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         boxSix = exampleVatReturn.totalSales,
         boxSeven = exampleVatReturn.totalCosts,
         boxEight = exampleVatReturn.euTotalSales,
-        boxNine = exampleVatReturn.euTotalCosts
+        boxNine = exampleVatReturn.euTotalCosts,
+        showReturnsLink = true
       )
-      val result: VatReturnViewModel = target.constructViewModel(exampleEntityName, exampleVatReturn)
+      val result: VatReturnViewModel = target.constructViewModel(exampleEntityName, exampleVatReturn, showReturnsLink = true)
       result shouldBe expectedViewModel
     }
   }

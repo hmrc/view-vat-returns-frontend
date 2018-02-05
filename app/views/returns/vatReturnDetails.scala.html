@@ -17,10 +17,21 @@
 @import models.viewModels.VatReturnViewModel
 @import views.html.templates.formatters.dates._
 @import views.html.templates.formatters.money._
+@import views.html.templates.formatters.breadcrumbs._
 
 @(vatReturnViewModel: VatReturnViewModel)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
 @views.html.main_template(title = messages("yourVatReturn.title"), bodyClasses = None, appConfig = appConfig) {
+
+  @navigationBreadcrumb(
+    links = Map(
+      appConfig.btaHomeUrl -> messages("breadcrumbs.bta"),
+      appConfig.vatDetailsUrl -> messages("vatDetails.title"),
+      if(vatReturnViewModel.showReturnsLink) appConfig.vatDetailsUrl -> messages("vatDetails.title")
+      else appConfig.vatDetailsUrl -> messages("vatDetails.title")),
+    currentPage = messages("completedReturns.title")
+  )
+
   <div class="grid-row column-two-thirds">
     <h1 class="heading-xlarge">@messages("yourVatReturn.title")
       <span class="heading-secondary">

@@ -21,10 +21,17 @@ import uk.gov.hmrc.play.test.UnitSpec
 
 class RouteSpec extends UnitSpec with GuiceOneAppPerSuite {
 
-  "The route for the submitted 9 box returns" should {
-    "be /view-your-vat-returns/return" in {
-      controllers.routes.ReturnsController.vatReturnDetails("2017-04-30", "2017-07-31").url shouldBe
-        "/view-your-vat-returns/return?start=2017-04-30&end=2017-07-31"
+  "The route for the submitted 9 box returns via the returns page route" should {
+    "be /view-your-vat-returns/return/%23001" in {
+      controllers.routes.ReturnsController.vatReturnDetails("#001").url shouldBe
+        "/view-your-vat-returns/return/%23001"
+    }
+  }
+
+  "The route for the submitted 9 box returns via the payments page route" should {
+    "be /view-your-vat-returns/payments/return" in {
+      controllers.routes.ReturnsController.vatPaymentReturnDetails("#001").url shouldBe
+        "/view-your-vat-returns/payments/return/%23001"
     }
   }
 

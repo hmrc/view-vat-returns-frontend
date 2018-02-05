@@ -61,7 +61,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       77656,
       765765,
       55454,
-      545645
+      545645,
+      showReturnsLink = true
     )
 
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)

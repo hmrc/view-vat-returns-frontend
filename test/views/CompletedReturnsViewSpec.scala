@@ -210,7 +210,7 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
       }
 
       "contains the correct link to view a specific return" in {
-        element(Selectors.obligationLink(1)).attr("href") shouldBe controllers.routes.ReturnsController.vatReturnDetails("2017-01-01", "2017-12-31").url
+        element(Selectors.obligationLink(1)).attr("href") shouldBe controllers.routes.ReturnsController.vatReturnDetails("#001").url
       }
     }
 
@@ -221,7 +221,7 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
       }
 
       "contains the correct link to view a specific return" in {
-        element(Selectors.obligationLink(2)).attr("href") shouldBe controllers.routes.ReturnsController.vatReturnDetails("2017-01-01", "2017-09-30").url
+        element(Selectors.obligationLink(2)).attr("href") shouldBe controllers.routes.ReturnsController.vatReturnDetails("#001").url
       }
     }
   }

@@ -16,6 +16,7 @@
 
 package controllers
 
+import java.net.URLDecoder
 import java.time.LocalDate
 import javax.inject.{Inject, Singleton}
 
@@ -35,10 +36,12 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
                                   implicit val appConfig: AppConfig)
   extends AuthorisedController {
 
-  def vatReturnDetails(start: String, end: String): Action[AnyContent] = authorisedAction {
+  def vatReturnDetails(periodKey: String, showReturnsLink: Boolean = true): Action[AnyContent] = authorisedAction {
     implicit request =>
       implicit user =>
-        val vatReturnCall = returnsService.getVatReturnDetails(user, LocalDate.parse(start), LocalDate.parse(end))
+        //TODO: use period key for service request
+        val decodedPeriodKey: String = URLDecoder.decode(periodKey, "UTF-8")
+        val vatReturnCall = returnsService.getVatReturnDetails(user, LocalDate.now(), LocalDate.now())
         val entityNameCall = vatApiService.getEntityName(user)
 
         for {
@@ -46,14 +49,16 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
           customerInfo <- entityNameCall
         } yield {
           vatReturnResult match {
-            case Right(vatReturn) => Ok(views.html.returns.vatReturnDetails(constructViewModel(customerInfo, vatReturn)))
+            case Right(vatReturn) => Ok(views.html.returns.vatReturnDetails(constructViewModel(customerInfo, vatReturn, showReturnsLink)))
             case Left(UnexpectedStatusError(404)) => NotFound(views.html.errors.notFound())
             case Left(_) => InternalServerError(views.html.errors.serverError())
           }
         }
   }
 
-  private[controllers] def constructViewModel(entityName: Option[String], vatReturn: VatReturn): VatReturnViewModel = {
+  def vatPaymentReturnDetails(periodKey: String): Action[AnyContent] = vatReturnDetails(periodKey, showReturnsLink = false)
+
+  private[controllers] def constructViewModel(entityName: Option[String], vatReturn: VatReturn, showReturnsLink: Boolean): VatReturnViewModel = {
     VatReturnViewModel(
       entityName = entityName,
       periodFrom = vatReturn.startDate,
@@ -68,7 +73,8 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
       boxSix = vatReturn.totalSales,
       boxSeven = vatReturn.totalCosts,
       boxEight = vatReturn.euTotalSales,
-      boxNine = vatReturn.euTotalCosts
+      boxNine = vatReturn.euTotalCosts,
+      showReturnsLink = showReturnsLink
     )
   }
 }
