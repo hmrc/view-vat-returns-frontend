@@ -16,6 +16,10 @@ notFound.message = Please check that you have entered the correct web address.
 serverError.title = Internal server error
 serverError.message = Something went wrong. Please try again later.
 
+userResearch.heading = Please help us improve our service
+userResearch.enterSurvey = Enter our survey
+userResearch.close = No thanks
+
 breadcrumbs.bta = Business tax account
 
 yourVatReturn.title = VAT return
