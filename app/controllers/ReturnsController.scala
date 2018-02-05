@@ -74,7 +74,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
       boxSeven = vatReturn.totalCosts,
       boxEight = vatReturn.euTotalSales,
       boxNine = vatReturn.euTotalCosts,
-      showReturnsLink = showReturnsLink
+      showReturnsBreadcrumb = showReturnsLink
     )
   }
 }

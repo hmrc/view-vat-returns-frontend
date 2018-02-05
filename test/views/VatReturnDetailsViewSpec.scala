@@ -70,7 +70,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       765765,
       55454,
       545645,
-      showReturnsLink = true
+      showReturnsBreadcrumb = true
     )
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
     lazy implicit val document: Document = Jsoup.parse(view.body)
@@ -173,7 +173,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       765765,
       55454,
       545645,
-      showReturnsLink = false
+      showReturnsBreadcrumb = false
     )
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
     lazy implicit val document: Document = Jsoup.parse(view.body)
