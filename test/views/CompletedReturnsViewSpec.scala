@@ -26,6 +26,11 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
 
   object Selectors {
     val pageHeading = "h1"
+    val btaBreadcrumb = "div.breadcrumbs li:nth-of-type(1)"
+    val btaBreadcrumbLink = s"$btaBreadcrumb a"
+    val vatBreadcrumb = "div.breadcrumbs li:nth-of-type(2)"
+    val vatBreadcrumbLink = s"$vatBreadcrumb a"
+    val completedReturnsBreadcrumb = "div.breadcrumbs li:nth-of-type(3)"
     val submitThroughSoftware = "div > div > p:nth-child(2)"
     val noReturnsFound = "div > div > section > p"
     val tabOne = ".tabs-nav li:nth-of-type(1)"
@@ -62,6 +67,29 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
 
     "have the correct message regarding submitting returns through software" in {
       elementText(Selectors.submitThroughSoftware) shouldBe "You submit returns through your accounting software."
+    }
+
+    "render breadcrumbs which" should {
+
+      "have the text 'Business tax account'" in {
+        elementText(Selectors.btaBreadcrumb) shouldBe "Business tax account"
+      }
+
+      "link to BTA" in {
+        element(Selectors.btaBreadcrumbLink).attr("href") shouldBe "bta-url"
+      }
+
+      "have the text 'VAT'" in {
+        elementText(Selectors.vatBreadcrumb) shouldBe "VAT"
+      }
+
+      "link to the VAT Details page" in {
+        element(Selectors.vatBreadcrumbLink).attr("href") shouldBe "vat-details-url"
+      }
+
+      "have the text 'VAT returns'" in {
+        elementText(Selectors.completedReturnsBreadcrumb) shouldBe "VAT returns"
+      }
     }
 
     "have tabs for each return year" should {
