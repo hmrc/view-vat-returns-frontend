@@ -176,7 +176,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         boxNine = exampleVatReturn.euTotalCosts,
         showReturnsBreadcrumb = true
       )
-      val result: VatReturnViewModel = target.constructViewModel(exampleEntityName, exampleVatReturn, showReturnsLink = true)
+      val result: VatReturnViewModel = target.constructViewModel(exampleEntityName, exampleVatReturn, isReturnsPageRequest = true)
       result shouldBe expectedViewModel
     }
   }

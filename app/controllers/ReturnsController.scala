@@ -36,7 +36,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
                                   implicit val appConfig: AppConfig)
   extends AuthorisedController {
 
-  def vatReturnDetails(periodKey: String, showReturnsLink: Boolean = true): Action[AnyContent] = authorisedAction {
+  def vatReturnDetails(periodKey: String, isReturnsPageRequest: Boolean = true): Action[AnyContent] = authorisedAction {
     implicit request =>
       implicit user =>
         //TODO: use period key for service request
@@ -49,16 +49,16 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
           customerInfo <- entityNameCall
         } yield {
           vatReturnResult match {
-            case Right(vatReturn) => Ok(views.html.returns.vatReturnDetails(constructViewModel(customerInfo, vatReturn, showReturnsLink)))
+            case Right(vatReturn) => Ok(views.html.returns.vatReturnDetails(constructViewModel(customerInfo, vatReturn, isReturnsPageRequest)))
             case Left(UnexpectedStatusError(404)) => NotFound(views.html.errors.notFound())
             case Left(_) => InternalServerError(views.html.errors.serverError())
           }
         }
   }
 
-  def vatPaymentReturnDetails(periodKey: String): Action[AnyContent] = vatReturnDetails(periodKey, showReturnsLink = false)
+  def vatPaymentReturnDetails(periodKey: String): Action[AnyContent] = vatReturnDetails(periodKey, isReturnsPageRequest = false)
 
-  private[controllers] def constructViewModel(entityName: Option[String], vatReturn: VatReturn, showReturnsLink: Boolean): VatReturnViewModel = {
+  private[controllers] def constructViewModel(entityName: Option[String], vatReturn: VatReturn, isReturnsPageRequest: Boolean): VatReturnViewModel = {
     VatReturnViewModel(
       entityName = entityName,
       periodFrom = vatReturn.startDate,
@@ -74,7 +74,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
       boxSeven = vatReturn.totalCosts,
       boxEight = vatReturn.euTotalSales,
       boxNine = vatReturn.euTotalCosts,
-      showReturnsBreadcrumb = showReturnsLink
+      showReturnsBreadcrumb = isReturnsPageRequest
     )
   }
 }

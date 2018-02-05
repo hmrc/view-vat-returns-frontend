@@ -1,7 +1,7 @@
 # microservice specific routes
 
 GET        /payments/return/:periodKey  controllers.ReturnsController.vatPaymentReturnDetails(periodKey: String)
-GET        /return/:periodKey           controllers.ReturnsController.vatReturnDetails(periodKey: String, showReturnsLink: Boolean = true)
+GET        /return/:periodKey           controllers.ReturnsController.vatReturnDetails(periodKey: String, isReturnsPageRequest: Boolean = true)
 GET        /returns/:year               controllers.ReturnObligationsController.completedReturns(year: Int)
 GET        /return-deadlines            controllers.ReturnObligationsController.returnDeadlines
 GET        /feature-switch              controllers.FeatureSwitchController.featureSwitch
