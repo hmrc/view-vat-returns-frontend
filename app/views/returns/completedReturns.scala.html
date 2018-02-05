@@ -25,7 +25,7 @@
   @navigationBreadcrumb(
     links = Map(
       appConfig.btaHomeUrl -> messages("breadcrumbs.bta"),
-      appConfig.vatDetailsUrl -> messages("common.vat")),
+      appConfig.vatDetailsUrl -> messages("breadcrumbs.vat")),
     currentPage = messages("completedReturns.title")
   )
 
@@ -75,8 +75,7 @@
               @for(obligation <- model.obligations) {
 
                 <li>
-                    <!--TODO: update to pass period key instead of date range-->
-                    <a href="@controllers.routes.ReturnsController.vatReturnDetails(obligation.start.toString(), obligation.end.toString()).url">
+                    <a href="@controllers.routes.ReturnsController.vatReturnDetails(obligation.periodKey)">
                         @displayDateRange(obligation.start, obligation.end)
                     </a>
                 </li>

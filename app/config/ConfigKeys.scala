@@ -40,4 +40,5 @@ object ConfigKeys {
 
   val vatSummaryBase: String = "vat-summary-frontend.host"
   val vatDetailsUrl: String = "vat-summary-frontend.detailsUrl"
+  val vatPaymentsUrl: String = "vat-summary-frontend.paymentsUrl"
 }
