@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 HM Revenue & Customs
+ * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ package connectors.httpParsers
 
 import java.time.LocalDate
 
+import connectors.httpParsers.PaymentsHttpParser.PaymentsReads
+import models.errors.{BadRequestError, MultipleErrors, ServerSideError, UnexpectedStatusError}
 import models.payments.{Payment, Payments}
 import play.api.http.Status
 import play.api.libs.json.Json
@@ -28,7 +30,7 @@ class PaymentsHttpParserSpec extends UnitSpec {
 
   "PaymentsReads" when {
 
-    "a http response of 200 is received" should {
+    "a http response of 200 (OK) is received" should {
 
       val httpResponse = HttpResponse(Status.OK, responseJson = Some(
         Json.obj(
@@ -56,7 +58,7 @@ class PaymentsHttpParserSpec extends UnitSpec {
         )))
       )
 
-      val result = PaymentsReads.reads("","", httpResponse)
+      val result = PaymentsReads.read("","", httpResponse)
 
       "return a Payments instance" in {
         result shouldBe expectedResult
@@ -64,6 +66,99 @@ class PaymentsHttpParserSpec extends UnitSpec {
 
     }
 
-  }
+    "a http response of 400 BAD_REQUEST (single error)" should {
 
+      val httpResponse = HttpResponse(Status.BAD_REQUEST,
+        responseJson = Some(Json.obj(
+          "code" -> "INVALID DATE FROM",
+          "message" -> "Bad date from"
+        ))
+      )
+
+      val expected = Left(BadRequestError(
+        code = "INVALID DATE FROM",
+        message = "Bad date from"
+      ))
+
+      val result = PaymentsReads.read("", "", httpResponse)
+
+      "return a BadRequestError" in {
+        result shouldEqual expected
+      }
+    }
+
+    "a http response of 400 BAD_REQUEST (multiple errors)" should {
+
+      val httpResponse = HttpResponse(Status.BAD_REQUEST,
+        responseJson = Some(Json.obj(
+          "code" -> "BAD_REQUEST",
+          "message" -> "bad request",
+          "errors" -> Json.arr(
+            Json.obj(
+              "code" -> "INVALID DATE FROM",
+              "message" -> "Bad date from",
+              "path" -> "/from"
+            ),
+            Json.obj(
+              "code" -> "INVALID DATE TO",
+              "message" -> "Bad date to",
+              "path" -> "/to"
+            )
+          )
+        ))
+      )
+
+      val expected = Left(MultipleErrors)
+
+      val result = PaymentsReads.read("", "", httpResponse)
+
+      "return a MultipleErrors" in {
+        result shouldEqual expected
+      }
+    }
+
+    "a http response of 400 BAD_REQUEST (unknown API error json)" should {
+
+      val httpResponse = HttpResponse(Status.BAD_REQUEST,
+        responseJson = Some(Json.obj(
+          "foo" -> "ERROR",
+          "bar" -> "unknown_error"
+        ))
+      )
+
+      val expected = Left(UnknownError)
+
+      val result = PaymentsReads.read("", "", httpResponse)
+
+      "return a UnknownError" in {
+        result shouldEqual expected
+      }
+    }
+
+    "the http response status is 5xx" should {
+
+      val httpResponse = HttpResponse(Status.INTERNAL_SERVER_ERROR)
+
+      val expected = Left(ServerSideError)
+
+      val result = PaymentsReads.read("", "", httpResponse)
+
+      "return a ServerSideError" in {
+        result shouldEqual expected
+      }
+    }
+
+    "the http response status is isn't handled" should {
+
+      val httpResponse = HttpResponse(Status.CREATED)
+
+      val expected = Left(UnexpectedStatusError(Status.CREATED))
+
+      val result = PaymentsReads.read("", "", httpResponse)
+
+      "return a UnexpectedStatusError" in {
+        result shouldEqual expected
+      }
+    }
+  }
 }
