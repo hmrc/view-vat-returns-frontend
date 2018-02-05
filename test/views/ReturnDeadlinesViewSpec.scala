@@ -34,6 +34,12 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
     val downloadSoftwareLink = ".list-number li:nth-child(1) a"
     val vatRecords = ".list-number li:nth-child(2)"
     val sendReturns= ".list-number li:nth-child(3)"
+
+    val btaBreadcrumb = "div.breadcrumbs li:nth-of-type(1)"
+    val btaBreadCrumbLink = "div.breadcrumbs li:nth-of-type(1) a"
+    val vatDetailsBreadCrumb = "div.breadcrumbs li:nth-of-type(2)"
+    val vatDetailsBreadcrumbLink = "div.breadcrumbs li:nth-of-type(2) a"
+    val returnDeadlinesBreadCrumb = "div.breadcrumbs li:nth-of-type(3)"
   }
 
   "Rendering the Return deadlines page" should {
@@ -42,6 +48,29 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
 
     lazy val view = views.html.returns.returnDeadlines(exampleDeadline)
     lazy implicit val document: Document = Jsoup.parse(view.body)
+
+    "render the breadcrumbs which" should {
+
+      "have the 'Business tax account' title" in {
+        elementText(Selectors.btaBreadcrumb) shouldBe "Business tax account"
+      }
+
+      "and links to the BTA service" in {
+        element(Selectors.btaBreadCrumbLink).attr("href") shouldBe "bta-url"
+      }
+
+      "have the 'VAT' title" in {
+        elementText(Selectors.vatDetailsBreadCrumb) shouldBe "VAT"
+      }
+
+      "and links to the VAT Summary service" in {
+        element(Selectors.vatDetailsBreadcrumbLink).attr("href") shouldBe "vat-details-url"
+      }
+
+      "have the 'Return deadlines' title" in {
+        elementText(Selectors.returnDeadlinesBreadCrumb) shouldBe "Return deadlines"
+      }
+    }
 
     "have the correct document title" in {
       document.title shouldBe "Return deadlines"

@@ -1,4 +1,5 @@
 common.dateRangeSeparator = to
+common.vat = VAT
 
 sessionTimeout.title = Your session has timed out
 sessionTimeout.helpOne = To view your VAT returns, you''ll have to
@@ -14,6 +15,8 @@ notFound.message = Please check that you have entered the correct web address.
 
 serverError.title = Internal server error
 serverError.message = Something went wrong. Please try again later.
+
+breadcrumbs.bta = Business tax account
 
 yourVatReturn.title = VAT return
 yourVatReturn.vrn = VAT registration number (VRN):
