@@ -18,6 +18,7 @@ package models
 
 import java.time.LocalDate
 
+import models.payments.{Payment, Payments}
 import play.api.libs.json.Json
 import uk.gov.hmrc.play.test.UnitSpec
 
@@ -49,4 +50,47 @@ class PaymentsSpec extends UnitSpec {
     }
   }
 
+  "Payments" should {
+
+    val examplePayments = Payments(
+      Seq(
+        Payment(
+          LocalDate.parse("2017-06-01"),
+          LocalDate.parse("2017-07-01"),
+          LocalDate.parse("2017-07-21"),
+          10000,
+          "#004"
+        ),
+        Payment(
+          LocalDate.parse("2017-07-01"),
+          LocalDate.parse("2017-08-01"),
+          LocalDate.parse("2017-08-21"),
+          4000,
+          "#005"
+        )
+      )
+    )
+
+    val exampleInputString =
+      """{
+        |"financialTransactions": [{
+        |"taxPeriodFrom":"2017-06-01",
+        |"taxPeriodTo":"2017-07-01",
+        |"items":[{"dueDate":"2017-07-21"}, {"dueDate":"2017-07-22"}],
+        |"outstandingAmount":10000,
+        |"periodKey":"#004"
+        |},{
+        |"taxPeriodFrom":"2017-07-01",
+        |"taxPeriodTo":"2017-08-01",
+        |"items":[{"dueDate":"2017-08-21"}, {"dueDate":"2017-08-22"}],
+        |"outstandingAmount":4000,
+        |"periodKey":"#005"
+        |}]}"""
+        .stripMargin.replace("\n", "")
+
+    "be parsed from appropriate JSON" in {
+      val result = Json.parse(exampleInputString).as[Payments]
+      result shouldEqual examplePayments
+    }
+  }
 }
