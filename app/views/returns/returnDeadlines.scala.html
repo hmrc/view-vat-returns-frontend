@@ -15,11 +15,18 @@
  *@
 
 @import models.viewModels.ReturnDeadline
+@import views.html.templates.formatters.breadcrumbs._
 @import views.html.templates.formatters.dates._
 
 @(deadline: ReturnDeadline)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
 @views.html.main_template(title = messages("returnDeadlines.title"), bodyClasses = None, appConfig = appConfig) {
+
+  @navigationBreadcrumb(Map(
+    appConfig.btaHomeUrl -> messages("breadcrumbs.bta"),
+    appConfig.vatDetailsUrl -> messages("common.vat")),
+    currentPage = messages("returnDeadlines.title")
+  )
 
   <div class="grid-row">
     <div class="column-two-thirds">
