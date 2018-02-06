@@ -41,10 +41,7 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
   "Calling .getVatReturn" should {
 
     val exampleVatReturn: VatReturn = VatReturn(
-      LocalDate.parse("2017-01-01"),
-      LocalDate.parse("2017-03-31"),
-      LocalDate.parse("2017-04-06"),
-      LocalDate.parse("2017-04-08"),
+      "#001",
       1297,
       5755,
       7052,

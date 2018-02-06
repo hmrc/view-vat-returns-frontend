@@ -20,7 +20,7 @@ import java.time.LocalDate
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import helpers.WireMockMethods
-import models.{VatReturnObligation, VatReturnObligations}
+import models.{VatReturn, VatReturnObligation, VatReturnObligations}
 import models.errors.{ApiMultiError, ApiSingleError}
 import play.api.http.Status._
 import play.api.libs.json.Json
@@ -28,6 +28,7 @@ import play.api.libs.json.Json
 object VatApiStub extends WireMockMethods {
 
   private val obligationsUri = "/vat/([0-9]+)/obligations"
+  private val returnsUri = "/vat/([0-9]+)/returns/(.+)"
   private val customerInfoApiUri = "/customer-information/vat/([0-9]+)"
   private val dateRegex = "([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))"
 
@@ -66,11 +67,21 @@ object VatApiStub extends WireMockMethods {
       .thenReturn(status = OK, body = Json.toJson(noObligations))
   }
 
-  def stubInvalidVrn: StubMapping = {
+  def stubInvalidVrnForObligations: StubMapping = {
     when(method = GET, uri = obligationsUri, queryParams = Map(
       "from" -> dateRegex, "to" -> dateRegex, "status" -> "O"
     ))
       .thenReturn(BAD_REQUEST, body = Json.toJson(invalidVrn))
+  }
+
+  def stubInvalidVrnForReturns: StubMapping = {
+    when(method = GET, uri = returnsUri)
+      .thenReturn(BAD_REQUEST, body = Json.toJson(invalidVrn))
+  }
+
+  def stubInvalidPeriodKey: StubMapping = {
+    when(method = GET, uri = returnsUri)
+      .thenReturn(BAD_REQUEST, body = Json.toJson(invalidPeriodKey))
   }
 
   def stubInvalidFromDate: StubMapping = {
@@ -116,6 +127,11 @@ object VatApiStub extends WireMockMethods {
   def stubFailureCustomerInfo: StubMapping = {
     when(method = GET, uri = customerInfoApiUri)
       .thenReturn(status = BAD_REQUEST, body = Json.toJson(apiError))
+  }
+
+  def stubSuccessfulVatReturn: StubMapping = {
+    when(method = GET, uri = returnsUri)
+      .thenReturn(status = OK, body = validVatReturn)
   }
 
   private val pastFulfilledObligation = VatReturnObligation(
@@ -202,6 +218,24 @@ object VatApiStub extends WireMockMethods {
       .stripMargin
   )
 
+  private val validVatReturn = Json.parse(
+    """
+      |{
+      |  "periodKey": "#001",
+      |  "vatDueSales": 100.00,
+      |  "vatDueAcquisitions": 100.00,
+      |  "totalVatDue": 200,
+      |  "vatReclaimedCurrPeriod": 100.00,
+      |  "netVatDue": 100,
+      |  "totalValueSalesExVAT": 500,
+      |  "totalValuePurchasesExVAT": 500,
+      |  "totalValueGoodsSuppliedExVAT": 500,
+      |  "totalAcquisitionsExVAT": 500
+      |}
+    """.stripMargin
+  )
+
+
   private val apiError: ApiSingleError = ApiSingleError("", "", None)
 
   private val invalidVrn = ApiSingleError("VRN_INVALID", "", None)
@@ -209,6 +243,7 @@ object VatApiStub extends WireMockMethods {
   private val invalidToDate = ApiSingleError("INVALID_DATE_TO", "", None)
   private val invalidDateRange = ApiSingleError("INVALID_DATE_RANGE", "", None)
   private val invalidStatus = ApiSingleError("INVALID_STATUS", "", None)
+  private val invalidPeriodKey = ApiSingleError("PERIOD_KEY_INVALID", "", None)
 
   private val multipleErrors = ApiMultiError("BAD_REQUEST", "", Seq(
     ApiSingleError("ERROR_1", "", None),
