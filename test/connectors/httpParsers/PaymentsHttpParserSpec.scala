@@ -19,7 +19,7 @@ package connectors.httpParsers
 import java.time.LocalDate
 
 import connectors.httpParsers.PaymentsHttpParser.PaymentsReads
-import models.errors.{BadRequestError, MultipleErrors, ServerSideError, UnexpectedStatusError}
+import models.errors._
 import models.payments.{Payment, Payments}
 import play.api.http.Status
 import play.api.libs.json.Json

@@ -35,6 +35,7 @@ class MockAppConfig(val runModeConfiguration: Configuration, val mode: Mode = Mo
   override val features: Features = new Features(runModeConfiguration)
   override val portalUrl: String = ""
   override val vatApiBaseUrl: String = ""
+  override val financialDataBaseUrl: String = ""
   override val btaHomeUrl = "bta-url"
   override val vatDetailsUrl = "vat-details-url"
   override val vatPaymentsUrl: String = "vat-payments-url"

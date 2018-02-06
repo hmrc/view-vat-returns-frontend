@@ -37,7 +37,7 @@ class ControllerBaseSpec extends UnitSpec with MockFactory with GuiceOneAppPerSu
   implicit val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   implicit class CSRFTokenAdder[T](req: FakeRequest[T]) {
-    def addToken: FakeRequest[T] = {
+    def addToken(): FakeRequest[T] = {
       val csrfConfig = app.injector.instanceOf[CSRFConfigProvider].get
       val csrfFilter = app.injector.instanceOf[CSRFFilter]
       val token = csrfFilter.tokenProvider.generateToken
