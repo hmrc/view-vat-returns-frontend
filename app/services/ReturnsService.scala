@@ -53,8 +53,8 @@ class ReturnsService @Inject()(vatApiConnector: VatApiConnector, financialDataCo
     )
   }
 
-  def getOpenPayments(vrn: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[Payments]] = {
-    financialDataConnector.getOpenPayments(vrn)
+  def getOpenPayments(user: User)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[Payments]] = {
+    financialDataConnector.getOpenPayments(user)
   }
 
 }
