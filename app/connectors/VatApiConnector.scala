@@ -32,10 +32,10 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class VatApiConnector @Inject()(http: HttpClient, appConfig: AppConfig) {
 
-  private[connectors] def obligationsUrl(vrn: String): String = s"${appConfig.vatApiBaseUrl}/vat/$vrn/obligations"
+  private[connectors] def obligationsUrl(vrn: String): String = s"${appConfig.vatApiBaseUrl}/$vrn/obligations"
   private[connectors] def customerInfoUrl(vrn: String): String = s"${appConfig.vatApiBaseUrl}/customer-information/vat/$vrn"
   private[connectors] def returnUrl(vrn: String, periodKey: Option[String] = None) = {
-    s"${appConfig.vatApiBaseUrl}/vat/$vrn/returns${periodKey.fold("")(key => s"/$key")}"
+    s"${appConfig.vatApiBaseUrl}/$vrn/returns${periodKey.fold("")(key => s"/$key")}"
   }
 
   def getVatReturnDetails(vrn: String, periodKey: String)

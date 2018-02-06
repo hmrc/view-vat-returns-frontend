@@ -26,7 +26,7 @@ class VatApiConnectorSpec extends ControllerBaseSpec {
   "VatApiConnector" should {
 
     "generate the correct obligations url" in {
-      connector.obligationsUrl("808") shouldBe "/vat/808/obligations"
+      connector.obligationsUrl("808") shouldBe "/808/obligations"
     }
 
     "generate the correct customer information url" in {
@@ -34,11 +34,11 @@ class VatApiConnectorSpec extends ControllerBaseSpec {
     }
 
     "generate the correct returns url without a period key" in {
-      connector.returnUrl("111") shouldBe "/vat/111/returns"
+      connector.returnUrl("111") shouldBe "/111/returns"
     }
 
     "generate the correct returns url with a period key" in {
-      connector.returnUrl("111", Some("123")) shouldBe "/vat/111/returns/123"
+      connector.returnUrl("111", Some("123")) shouldBe "/111/returns/123"
     }
   }
 }
