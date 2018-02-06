@@ -20,19 +20,20 @@ import java.time.LocalDate
 import javax.inject.{Inject, Singleton}
 
 import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
-import connectors.VatApiConnector
+import connectors.{FinancialDataConnector, VatApiConnector}
 import models.VatReturnObligation.Status
+import models.payments.Payments
 import models.{User, VatReturn, VatReturnObligations}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ReturnsService @Inject()(connector: VatApiConnector) {
+class ReturnsService @Inject()(vatApiConnector: VatApiConnector, financialDataConnector: FinancialDataConnector) {
 
   def getVatReturnDetails(user: User, start: LocalDate, end: LocalDate)
                          (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[VatReturn]] = {
-    connector.getVatReturnDetails(user.vrn, start, end)
+    vatApiConnector.getVatReturnDetails(user.vrn, start, end)
   }
 
   def getReturnObligationsForYear(user: User, searchYear: Int)
@@ -40,7 +41,7 @@ class ReturnsService @Inject()(connector: VatApiConnector) {
     val from: LocalDate = LocalDate.parse(s"$searchYear-01-01")
     val to: LocalDate = LocalDate.parse(s"$searchYear-12-31")
 
-    connector.getVatReturnObligations(user.vrn, from, to, Status.All).map {
+    vatApiConnector.getVatReturnObligations(user.vrn, from, to, Status.All).map {
       case Right(obligations) => Right(filterObligationsByDueDate(obligations, searchYear))
       case error@Left(_) => error
     }
@@ -51,4 +52,9 @@ class ReturnsService @Inject()(connector: VatApiConnector) {
       obligations.obligations.filter(_.end.getYear == searchYear)
     )
   }
+
+  def getOpenPayments(vrn: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[Payments]] = {
+    financialDataConnector.getOpenPayments(vrn)
+  }
+
 }

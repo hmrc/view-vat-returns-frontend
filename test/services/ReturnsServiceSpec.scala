@@ -19,19 +19,22 @@ package services
 import java.time.LocalDate
 
 import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
-import connectors.VatApiConnector
+import connectors.{FinancialDataConnector, VatApiConnector}
 import controllers.ControllerBaseSpec
 import models.VatReturnObligation.Status
+import models.payments.{Payment, Payments}
 import models.{User, VatReturn, VatReturnObligation, VatReturnObligations}
 import uk.gov.hmrc.http.HeaderCarrier
+
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits._
 
 class ReturnsServiceSpec extends ControllerBaseSpec {
 
   private trait Test {
-    val mockConnector: VatApiConnector = mock[VatApiConnector]
-    val service = new ReturnsService(mockConnector)
+    val mockVatApiConnector: VatApiConnector = mock[VatApiConnector]
+    val mockFinancialDataApiConnector: FinancialDataConnector = mock[FinancialDataConnector]
+    val service = new ReturnsService(mockVatApiConnector, mockFinancialDataApiConnector)
     implicit val hc: HeaderCarrier = HeaderCarrier()
   }
 
@@ -54,7 +57,7 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
     )
 
     "return a VAT Return" in new Test {
-      (mockConnector.getVatReturnDetails(_: String, _: LocalDate, _: LocalDate)(_: HeaderCarrier, _: ExecutionContext))
+      (mockVatApiConnector.getVatReturnDetails(_: String, _: LocalDate, _: LocalDate)(_: HeaderCarrier, _: ExecutionContext))
         .expects(*, *, *, *, *)
         .returns(Future.successful(Right(exampleVatReturn)))
 
@@ -82,7 +85,7 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
     )
 
     "return all of a user's VAT return obligations" in new Test {
-      (mockConnector.getVatReturnObligations(_: String, _: LocalDate, _: LocalDate, _: Status.Value)(_: HeaderCarrier, _: ExecutionContext))
+      (mockVatApiConnector.getVatReturnObligations(_: String, _: LocalDate, _: LocalDate, _: Status.Value)(_: HeaderCarrier, _: ExecutionContext))
         .expects(*, *, *, *, *, *)
         .returns(Future.successful(Right(exampleObligations)))
 
@@ -102,7 +105,7 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
       val obligations = VatReturnObligations(Seq(obligation, obligation))
 
       "return an empty sequence of obligations" in new Test {
-        lazy val result = service.filterObligationsByDueDate(obligations, 2017)
+        lazy val result: VatReturnObligations = service.filterObligationsByDueDate(obligations, 2017)
 
         result shouldEqual VatReturnObligations(Seq())
       }
@@ -115,10 +118,36 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
       val obligations = VatReturnObligations(Seq(obligation, obligation))
 
       "return an sequence containing obligations" in new Test {
-        lazy val result = service.filterObligationsByDueDate(obligations, 2017)
+        lazy val result: VatReturnObligations = service.filterObligationsByDueDate(obligations, 2017)
 
         result shouldEqual VatReturnObligations(Seq(obligation, obligation))
       }
     }
+  }
+
+  "Calling .getOpenPayments" should {
+
+    val examplePayments: Payments = Payments(
+      Seq(
+        Payment(
+          LocalDate.parse("2017-01-01"),
+          LocalDate.parse("2017-02-01"),
+          LocalDate.parse("2017-02-02"),
+          5000,
+          "#003"
+        )
+      )
+    )
+
+    "return all of a user's open payments" in new Test {
+      (mockFinancialDataApiConnector.getOpenPayments(_: String)(_: HeaderCarrier, _:ExecutionContext))
+        .expects(*,*,*)
+        .returns(Future.successful(Right(examplePayments)))
+
+      lazy val result: HttpGetResult[Payments] = await(service.getOpenPayments("111111111"))
+
+      result shouldBe Right(examplePayments)
+    }
+
   }
 }
