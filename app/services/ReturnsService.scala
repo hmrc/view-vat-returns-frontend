@@ -31,10 +31,9 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class ReturnsService @Inject()(vatApiConnector: VatApiConnector, financialDataConnector: FinancialDataConnector) {
 
-  def getVatReturnDetails(user: User, start: LocalDate, end: LocalDate)
+  def getVatReturnDetails(user: User, periodKey: String)
                          (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[VatReturn]] = {
-
-    vatApiConnector.getVatReturnDetails(user.vrn, "111") // TODO: Pass in an actual period key
+    vatApiConnector.getVatReturnDetails(user.vrn, periodKey)
   }
 
   def getReturnObligationsForYear(user: User, searchYear: Int)

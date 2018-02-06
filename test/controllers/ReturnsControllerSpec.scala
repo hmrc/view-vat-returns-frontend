@@ -67,8 +67,8 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         .returns(authResult)
 
       if(serviceCall) {
-        (mockVatReturnService.getVatReturnDetails(_: User, _: LocalDate, _: LocalDate)(_: HeaderCarrier, _: ExecutionContext))
-          .expects(*, *, *, *, *)
+        (mockVatReturnService.getVatReturnDetails(_: User, _: String)(_: HeaderCarrier, _: ExecutionContext))
+          .expects(*, *, *, *)
           .returns(vatReturnResult)
 
         (mockVatApiService.getEntityName(_: User)(_: HeaderCarrier, _: ExecutionContext))

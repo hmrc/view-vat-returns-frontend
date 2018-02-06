@@ -41,7 +41,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
       implicit user =>
         //TODO: use period key for service request
         val decodedPeriodKey: String = URLDecoder.decode(periodKey, "UTF-8")
-        val vatReturnCall = returnsService.getVatReturnDetails(user, LocalDate.now(), LocalDate.now())
+        val vatReturnCall = returnsService.getVatReturnDetails(user, decodedPeriodKey)
         val entityNameCall = vatApiService.getEntityName(user)
 
         for {

@@ -59,7 +59,7 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
         .returns(Future.successful(Right(exampleVatReturn)))
 
       lazy val result: HttpGetResult[VatReturn] = await(
-        service.getVatReturnDetails(User("999999999"), LocalDate.parse("2017-04-30"), LocalDate.parse("2017-07-31"))
+        service.getVatReturnDetails(User("999999999"), "#001")
       )
 
       result shouldBe Right(exampleVatReturn)
