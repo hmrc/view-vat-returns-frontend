@@ -20,6 +20,7 @@ import java.time.LocalDate
 
 import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
 import models.errors.{UnexpectedStatusError, UnknownError}
+import models.payments.Payment
 import models.viewModels.VatReturnViewModel
 import models.{User, VatReturn}
 import play.api.http.Status
@@ -51,7 +52,15 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     55454,
     545645
   )
-  val exampleEntityName = Some("Cheapo Clothing")
+  val exampleEntityName: Option[String] = Some("Cheapo Clothing")
+
+  val examplePayment: Option[Payment] = Some(Payment(
+    LocalDate.parse("2017-01-01"),
+    LocalDate.parse("2017-02-01"),
+    LocalDate.parse("2017-02-02"),
+    1000.00,
+    "#001")
+  )
 
   private trait Test {
     val serviceCall: Boolean = true
@@ -164,6 +173,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         dateSubmitted = LocalDate.parse("2018-04-02"),
         boxOne = exampleVatReturn.vatDueSales,
         boxTwo = exampleVatReturn.vatDueAcquisitions,
+        outstandingAmount = examplePayment.get.outstandingAmount,
         boxThree = exampleVatReturn.totalVatDue,
         boxFour = exampleVatReturn.vatReclaimedCurrPeriod,
         boxFive = exampleVatReturn.netVatDue,
@@ -173,7 +183,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         boxNine = exampleVatReturn.totalAcquisitionsExVAT,
         showReturnsBreadcrumb = true
       )
-      val result: VatReturnViewModel = target.constructViewModel(exampleEntityName, exampleVatReturn, isReturnsPageRequest = true)
+      val result: VatReturnViewModel = target.constructViewModel(exampleEntityName, examplePayment, exampleVatReturn, isReturnsPageRequest = true)
       result shouldBe expectedViewModel
     }
   }
