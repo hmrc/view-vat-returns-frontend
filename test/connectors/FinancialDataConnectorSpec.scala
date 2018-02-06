@@ -14,21 +14,20 @@
  * limitations under the License.
  */
 
-package models
+package connectors
 
-import java.time.LocalDate
+import controllers.ControllerBaseSpec
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
-trait Obligation {
+class FinancialDataConnectorSpec extends ControllerBaseSpec {
 
-  def due: LocalDate
+  "FinancialDataConnector" should {
 
-}
+    "generate the correct payments url" in {
 
-object Obligation {
+      val connector = new FinancialDataConnector(mock[HttpClient], mockConfig)
 
-  object Status extends Enumeration {
-    val All: Status.Value = Value("A")
-    val Outstanding: Status.Value = Value("O")
-    val Fulfilled: Status.Value = Value("F")
+      connector.paymentsUrl("111111111") shouldEqual "/financial-transactions/vat/111111111"
+    }
   }
 }

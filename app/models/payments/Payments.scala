@@ -14,21 +14,12 @@
  * limitations under the License.
  */
 
-package models
+package models.payments
 
-import java.time.LocalDate
+import play.api.libs.json.{Json, Reads}
 
-trait Obligation {
+case class Payments(financialTransactions: Seq[Payment])
 
-  def due: LocalDate
-
-}
-
-object Obligation {
-
-  object Status extends Enumeration {
-    val All: Status.Value = Value("A")
-    val Outstanding: Status.Value = Value("O")
-    val Fulfilled: Status.Value = Value("F")
-  }
+object Payments {
+  implicit val reads: Reads[Payments] = Json.reads[Payments]
 }
