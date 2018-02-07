@@ -16,7 +16,7 @@
 
 package controllers
 
-import java.net.URLDecoder
+import java.net.{URLDecoder, URLEncoder}
 import java.time.LocalDate
 import javax.inject.{Inject, Singleton}
 
@@ -39,9 +39,10 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
   def vatReturnDetails(periodKey: String, isReturnsPageRequest: Boolean = true): Action[AnyContent] = authorisedAction {
     implicit request =>
       implicit user =>
-        //TODO: use period key for service request
-        val decodedPeriodKey: String = URLDecoder.decode(periodKey, "UTF-8")
-        val vatReturnCall = returnsService.getVatReturnDetails(user, LocalDate.now(), LocalDate.now())
+        // Play automatically URL decodes the period key so re-encode it
+        val encodedPeriodKey: String = URLEncoder.encode(periodKey, "UTF-8")
+
+        val vatReturnCall = returnsService.getVatReturnDetails(user, encodedPeriodKey)
         val entityNameCall = vatApiService.getEntityName(user)
 
         for {
@@ -61,19 +62,19 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
   private[controllers] def constructViewModel(entityName: Option[String], vatReturn: VatReturn, isReturnsPageRequest: Boolean): VatReturnViewModel = {
     VatReturnViewModel(
       entityName = entityName,
-      periodFrom = vatReturn.startDate,
-      periodTo = vatReturn.endDate,
-      dueDate = vatReturn.dueDate,
-      dateSubmitted = vatReturn.dateSubmitted,
-      boxOne = vatReturn.ukVatDue,
-      boxTwo = vatReturn.euVatDue,
+      periodFrom = LocalDate.parse("2018-01-01"),
+      periodTo = LocalDate.parse("2018-03-31"),
+      dueDate = LocalDate.parse("2018-05-07"),
+      dateSubmitted = LocalDate.parse("2018-04-02"),
+      boxOne = vatReturn.vatDueSales,
+      boxTwo = vatReturn.vatDueAcquisitions,
       boxThree = vatReturn.totalVatDue,
-      boxFour = vatReturn.totalVatReclaimed,
-      boxFive = vatReturn.totalOwed,
-      boxSix = vatReturn.totalSales,
-      boxSeven = vatReturn.totalCosts,
-      boxEight = vatReturn.euTotalSales,
-      boxNine = vatReturn.euTotalCosts,
+      boxFour = vatReturn.vatReclaimedCurrPeriod,
+      boxFive = vatReturn.netVatDue,
+      boxSix = vatReturn.totalValueSalesExVAT,
+      boxSeven = vatReturn.totalValuePurchasesExVAT,
+      boxEight = vatReturn.totalValueGoodsSuppliedExVAT,
+      boxNine = vatReturn.totalAcquisitionsExVAT,
       showReturnsBreadcrumb = isReturnsPageRequest
     )
   }

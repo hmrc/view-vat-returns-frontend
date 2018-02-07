@@ -40,10 +40,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     )
   )
   val exampleVatReturn: VatReturn = VatReturn(
-    LocalDate.parse("2017-01-01"),
-    LocalDate.parse("2017-03-31"),
-    LocalDate.parse("2017-04-06"),
-    LocalDate.parse("2017-04-08"),
+    "#001",
     1297,
     5755,
     7052,
@@ -70,8 +67,8 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         .returns(authResult)
 
       if(serviceCall) {
-        (mockVatReturnService.getVatReturnDetails(_: User, _: LocalDate, _: LocalDate)(_: HeaderCarrier, _: ExecutionContext))
-          .expects(*, *, *, *, *)
+        (mockVatReturnService.getVatReturnDetails(_: User, _: String)(_: HeaderCarrier, _: ExecutionContext))
+          .expects(*, *, *, *)
           .returns(vatReturnResult)
 
         (mockVatApiService.getEntityName(_: User)(_: HeaderCarrier, _: ExecutionContext))
@@ -161,19 +158,19 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
       val expectedViewModel = VatReturnViewModel(
         entityName = exampleEntityName,
-        periodFrom = exampleVatReturn.startDate,
-        periodTo = exampleVatReturn.endDate,
-        dueDate = exampleVatReturn.dueDate,
-        dateSubmitted = exampleVatReturn.dateSubmitted,
-        boxOne = exampleVatReturn.ukVatDue,
-        boxTwo = exampleVatReturn.euVatDue,
+        periodFrom = LocalDate.parse("2018-01-01"),
+        periodTo = LocalDate.parse("2018-03-31"),
+        dueDate = LocalDate.parse("2018-05-07"),
+        dateSubmitted = LocalDate.parse("2018-04-02"),
+        boxOne = exampleVatReturn.vatDueSales,
+        boxTwo = exampleVatReturn.vatDueAcquisitions,
         boxThree = exampleVatReturn.totalVatDue,
-        boxFour = exampleVatReturn.totalVatReclaimed,
-        boxFive = exampleVatReturn.totalOwed,
-        boxSix = exampleVatReturn.totalSales,
-        boxSeven = exampleVatReturn.totalCosts,
-        boxEight = exampleVatReturn.euTotalSales,
-        boxNine = exampleVatReturn.euTotalCosts,
+        boxFour = exampleVatReturn.vatReclaimedCurrPeriod,
+        boxFive = exampleVatReturn.netVatDue,
+        boxSix = exampleVatReturn.totalValueSalesExVAT,
+        boxSeven = exampleVatReturn.totalValuePurchasesExVAT,
+        boxEight = exampleVatReturn.totalValueGoodsSuppliedExVAT,
+        boxNine = exampleVatReturn.totalAcquisitionsExVAT,
         showReturnsBreadcrumb = true
       )
       val result: VatReturnViewModel = target.constructViewModel(exampleEntityName, exampleVatReturn, isReturnsPageRequest = true)

@@ -16,8 +16,6 @@
 
 package connectors.httpParsers
 
-import java.time.LocalDate
-
 import connectors.httpParsers.VatReturnHttpParser.VatReturnReads
 import models.VatReturn
 import play.api.http.Status
@@ -32,26 +30,20 @@ class VatReturnHttpParserSpec extends UnitSpec {
     "the HTTP response is OK (200)" should {
 
       val httpResponse = HttpResponse(Status.OK, responseJson = Some(Json.obj(
-        "startDate" -> "2017-01-01",
-        "endDate" -> "2017-03-31",
-        "dateSubmitted" -> "2017-04-06",
-        "dueDate" -> "2017-04-08",
-        "ukVatDue" -> 1297,
-        "euVatDue" -> 5755,
+        "periodKey" -> "#001",
+        "vatDueSales" -> 1297,
+        "vatDueAcquisitions" -> 5755,
         "totalVatDue" -> 7052,
-        "totalVatReclaimed" -> 5732,
-        "totalOwed" -> 1320,
-        "totalSales" -> 77656,
-        "totalCosts" -> 765765,
-        "euTotalSales" -> 55454,
-        "euTotalCosts" -> 545645
+        "vatReclaimedCurrPeriod" -> 5732,
+        "netVatDue" -> 1320,
+        "totalValueSalesExVAT" -> 77656,
+        "totalValuePurchasesExVAT" -> 765765,
+        "totalValueGoodsSuppliedExVAT" -> 55454,
+        "totalAcquisitionsExVAT" -> 545645
       )))
 
       val expected = Right(VatReturn(
-        LocalDate.parse("2017-01-01"),
-        LocalDate.parse("2017-03-31"),
-        LocalDate.parse("2017-04-06"),
-        LocalDate.parse("2017-04-08"),
+        "#001",
         1297,
         5755,
         7052,

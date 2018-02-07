@@ -32,29 +32,19 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class VatApiConnector @Inject()(http: HttpClient, appConfig: AppConfig) {
 
-  private[connectors] def obligationsUrl(vrn: String): String = s"${appConfig.vatApiBaseUrl}/vat/$vrn/obligations"
+  private[connectors] def obligationsUrl(vrn: String): String = s"${appConfig.vatApiBaseUrl}/$vrn/obligations"
   private[connectors] def customerInfoUrl(vrn: String): String = s"${appConfig.vatApiBaseUrl}/customer-information/vat/$vrn"
+  private[connectors] def returnUrl(vrn: String, periodKey: String) = s"${appConfig.vatApiBaseUrl}/$vrn/returns/$periodKey"
 
-  // TODO: Replace with a real call to an endpoint once it becomes available. This returns static data for now.
-  def getVatReturnDetails(vrn: String, start: LocalDate, end: LocalDate)
+  def getVatReturnDetails(vrn: String, periodKey: String)
                          (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[VatReturn]] = {
-    Future.successful(Right(
-      VatReturn(
-        start,
-        end,
-        LocalDate.parse("2017-04-06"),
-        LocalDate.parse("2017-04-08"),
-        1297,
-        5755,
-        7052,
-        5732,
-        1320,
-        77656,
-        765765,
-        55454,
-        545645
-      )
-    ))
+    import connectors.httpParsers.VatReturnHttpParser.VatReturnReads
+    http.GET(returnUrl(vrn, periodKey)).map {
+      case nineBox@Right(_) => nineBox
+      case httpError@Left(error) =>
+        Logger.info("VatApiConnector received error: " + error.message)
+        httpError
+    }
   }
 
   def getVatReturnObligations(vrn: String, from: LocalDate, to: LocalDate, status: Status.Value)

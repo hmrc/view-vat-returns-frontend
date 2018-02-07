@@ -44,12 +44,13 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
 
   "Calling the /return route" when {
 
-    "the user is authenticated and the Customer Information API returns a valid response" should {
+    "the user is authenticated and all dependant APIs return a valid response" should {
 
       "return 200" in new ReturnRouteTest {
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
           VatApiStub.stubSuccessfulCustomerInfo
+          VatApiStub.stubSuccessfulVatReturn
         }
 
         val response: WSResponse = await(request().get())
@@ -90,6 +91,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
           VatApiStub.stubSuccessfulCustomerInfo
+          VatApiStub.stubSuccessfulVatReturn
         }
 
         val response: WSResponse = await(request().get())

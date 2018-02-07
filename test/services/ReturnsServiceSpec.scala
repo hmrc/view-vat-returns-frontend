@@ -41,10 +41,7 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
   "Calling .getVatReturn" should {
 
     val exampleVatReturn: VatReturn = VatReturn(
-      LocalDate.parse("2017-01-01"),
-      LocalDate.parse("2017-03-31"),
-      LocalDate.parse("2017-04-06"),
-      LocalDate.parse("2017-04-08"),
+      "#001",
       1297,
       5755,
       7052,
@@ -57,12 +54,12 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
     )
 
     "return a VAT Return" in new Test {
-      (mockVatApiConnector.getVatReturnDetails(_: String, _: LocalDate, _: LocalDate)(_: HeaderCarrier, _: ExecutionContext))
-        .expects(*, *, *, *, *)
+      (mockVatApiConnector.getVatReturnDetails(_: String, _: String)(_: HeaderCarrier, _: ExecutionContext))
+        .expects(*, *, *, *)
         .returns(Future.successful(Right(exampleVatReturn)))
 
       lazy val result: HttpGetResult[VatReturn] = await(
-        service.getVatReturnDetails(User("999999999"), LocalDate.parse("2017-04-30"), LocalDate.parse("2017-07-31"))
+        service.getVatReturnDetails(User("999999999"), "#001")
       )
 
       result shouldBe Right(exampleVatReturn)

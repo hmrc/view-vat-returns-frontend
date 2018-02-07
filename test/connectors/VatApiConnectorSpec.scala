@@ -21,16 +21,20 @@ import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 class VatApiConnectorSpec extends ControllerBaseSpec {
 
+  lazy val connector = new VatApiConnector(mock[HttpClient], mockConfig)
+
   "VatApiConnector" should {
 
     "generate the correct obligations url" in {
-      val connector = new VatApiConnector(mock[HttpClient], mockConfig)
-      connector.obligationsUrl("808") shouldBe "/vat/808/obligations"
+      connector.obligationsUrl("808") shouldBe "/808/obligations"
     }
 
     "generate the correct customer information url" in {
-      val connector = new VatApiConnector(mock[HttpClient], mockConfig)
       connector.customerInfoUrl("123456789") shouldBe "/customer-information/vat/123456789"
+    }
+
+    "generate the correct returns url with a period key" in {
+      connector.returnUrl("111", "123") shouldBe "/111/returns/123"
     }
   }
 }
