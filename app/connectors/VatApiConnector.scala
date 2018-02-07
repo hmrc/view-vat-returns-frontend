@@ -34,14 +34,12 @@ class VatApiConnector @Inject()(http: HttpClient, appConfig: AppConfig) {
 
   private[connectors] def obligationsUrl(vrn: String): String = s"${appConfig.vatApiBaseUrl}/$vrn/obligations"
   private[connectors] def customerInfoUrl(vrn: String): String = s"${appConfig.vatApiBaseUrl}/customer-information/vat/$vrn"
-  private[connectors] def returnUrl(vrn: String, periodKey: Option[String] = None) = {
-    s"${appConfig.vatApiBaseUrl}/$vrn/returns${periodKey.fold("")(key => s"/$key")}"
-  }
+  private[connectors] def returnUrl(vrn: String, periodKey: String) = s"${appConfig.vatApiBaseUrl}/$vrn/returns/$periodKey"
 
   def getVatReturnDetails(vrn: String, periodKey: String)
                          (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[VatReturn]] = {
     import connectors.httpParsers.VatReturnHttpParser.VatReturnReads
-    http.GET(returnUrl(vrn, Some(periodKey))).map {
+    http.GET(returnUrl(vrn, periodKey)).map {
       case nineBox@Right(_) => nineBox
       case httpError@Left(error) =>
         Logger.info("VatApiConnector received error: " + error.message)

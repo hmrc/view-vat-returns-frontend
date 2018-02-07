@@ -33,12 +33,8 @@ class VatApiConnectorSpec extends ControllerBaseSpec {
       connector.customerInfoUrl("123456789") shouldBe "/customer-information/vat/123456789"
     }
 
-    "generate the correct returns url without a period key" in {
-      connector.returnUrl("111") shouldBe "/111/returns"
-    }
-
     "generate the correct returns url with a period key" in {
-      connector.returnUrl("111", Some("123")) shouldBe "/111/returns/123"
+      connector.returnUrl("111", "123") shouldBe "/111/returns/123"
     }
   }
 }
