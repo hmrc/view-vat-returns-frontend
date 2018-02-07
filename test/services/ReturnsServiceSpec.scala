@@ -136,15 +136,22 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
       )
     )
 
+    val examplePayment: Payment = Payment(
+      LocalDate.parse("2017-01-01"),
+      LocalDate.parse("2017-02-01"),
+      LocalDate.parse("2017-02-02"),
+      5000,
+      "#003"
+    )
+
     "return all of a user's open payments" in new Test {
-      (mockFinancialDataApiConnector.getOpenPayments(_: String)(_: HeaderCarrier, _:ExecutionContext))
+      (mockFinancialDataApiConnector.getOpenPayments(_: User)(_: HeaderCarrier, _:ExecutionContext))
         .expects(*,*,*)
         .returns(Future.successful(Right(examplePayments)))
 
-      lazy val result: HttpGetResult[Payments] = await(service.getOpenPayments("111111111"))
+      lazy val result: Option[Payment] = await(service.getPayment(User("111111111"), "#003"))
 
-      result shouldBe Right(examplePayments)
+      result shouldBe Some(examplePayment)
     }
-
   }
 }

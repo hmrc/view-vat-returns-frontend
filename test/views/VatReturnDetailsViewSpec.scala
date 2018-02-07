@@ -60,6 +60,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       LocalDate.parse("2017-01-01"),
       LocalDate.parse("2017-03-31"),
       LocalDate.parse("2017-04-06"),
+      1000.00,
       LocalDate.parse("2017-04-08"),
       1297,
       5755,
@@ -116,7 +117,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     }
 
     "have the correct subheading" in {
-      elementText(Selectors.subHeading) shouldBe "You owed: £1,320"
+      elementText(Selectors.subHeading) shouldBe "You owed: £1,000"
     }
 
     "have the correct trading name" in {
@@ -163,6 +164,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       LocalDate.parse("2017-01-01"),
       LocalDate.parse("2017-03-31"),
       LocalDate.parse("2017-04-06"),
+      1000.00,
       LocalDate.parse("2017-04-08"),
       1297,
       5755,

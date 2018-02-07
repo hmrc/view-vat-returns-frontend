@@ -20,6 +20,7 @@ import java.time.LocalDate
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import helpers.IntegrationBaseSpec
+import models.User
 import models.errors.BadRequestError
 import models.payments.{Payment, Payments}
 import stubs.FinancialDataStub
@@ -59,7 +60,7 @@ class FinancialDataConnectorISpec extends IntegrationBaseSpec {
       )))
 
       setupStubs()
-      private val result = await(connector.getOpenPayments("111111111"))
+      private val result = await(connector.getOpenPayments(User("111111111")))
 
       result shouldEqual expected
     }
@@ -70,7 +71,7 @@ class FinancialDataConnectorISpec extends IntegrationBaseSpec {
       val expected = Right(Payments(Seq.empty))
 
       setupStubs()
-      private val result = await(connector.getOpenPayments("111111111"))
+      private val result = await(connector.getOpenPayments(User("111111111")))
 
       result shouldEqual expected
     }
@@ -86,7 +87,7 @@ class FinancialDataConnectorISpec extends IntegrationBaseSpec {
         ))
 
         setupStubs()
-        private val result = await(connector.getOpenPayments("111"))
+        private val result = await(connector.getOpenPayments(User("111")))
 
         result shouldEqual expected
       }

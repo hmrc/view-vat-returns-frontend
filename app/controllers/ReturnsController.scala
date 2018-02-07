@@ -16,13 +16,14 @@
 
 package controllers
 
-import java.net.{URLDecoder, URLEncoder}
+import java.net.URLEncoder
 import java.time.LocalDate
 import javax.inject.{Inject, Singleton}
 
 import config.AppConfig
 import models.VatReturn
 import models.errors.UnexpectedStatusError
+import models.payments.Payment
 import models.viewModels.VatReturnViewModel
 import play.api.i18n.MessagesApi
 import play.api.mvc._
@@ -44,13 +45,16 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
 
         val vatReturnCall = returnsService.getVatReturnDetails(user, encodedPeriodKey)
         val entityNameCall = vatApiService.getEntityName(user)
+        val financialDataCall = returnsService.getPayment(user, periodKey)
 
         for {
           vatReturnResult <- vatReturnCall
           customerInfo <- entityNameCall
+          payment <- financialDataCall
+
         } yield {
           vatReturnResult match {
-            case Right(vatReturn) => Ok(views.html.returns.vatReturnDetails(constructViewModel(customerInfo, vatReturn, isReturnsPageRequest)))
+            case Right(vatReturn) => Ok(views.html.returns.vatReturnDetails(constructViewModel(customerInfo, payment, vatReturn, isReturnsPageRequest)))
             case Left(UnexpectedStatusError(404)) => NotFound(views.html.errors.notFound())
             case Left(_) => InternalServerError(views.html.errors.serverError())
           }
@@ -59,7 +63,12 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
 
   def vatPaymentReturnDetails(periodKey: String): Action[AnyContent] = vatReturnDetails(periodKey, isReturnsPageRequest = false)
 
-  private[controllers] def constructViewModel(entityName: Option[String], vatReturn: VatReturn, isReturnsPageRequest: Boolean): VatReturnViewModel = {
+  private[controllers] def constructViewModel(entityName: Option[String], payment: Option[Payment], vatReturn: VatReturn,
+                                              isReturnsPageRequest: Boolean): VatReturnViewModel = {
+
+    // TODO: update this value to reflect partial payments
+    val amountToShow = vatReturn.netVatDue
+
     VatReturnViewModel(
       entityName = entityName,
       periodFrom = LocalDate.parse("2018-01-01"),
@@ -68,6 +77,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
       dateSubmitted = LocalDate.parse("2018-04-02"),
       boxOne = vatReturn.vatDueSales,
       boxTwo = vatReturn.vatDueAcquisitions,
+      outstandingAmount = amountToShow,
       boxThree = vatReturn.totalVatDue,
       boxFour = vatReturn.vatReclaimedCurrPeriod,
       boxFive = vatReturn.netVatDue,

@@ -40,7 +40,7 @@
       </span>
     </h1>
     <p>@messages("yourVatReturn.paymentProcessed")</p>
-    <h2 class="heading-large">@messages("yourVatReturn.moneyOwed") @displayMoney(vatReturnViewModel.boxFive)</h2>
+    <h2 class="heading-large">@messages("yourVatReturn.moneyOwed") @displayMoney(vatReturnViewModel.outstandingAmount)</h2>
     <ul>
       <li>@messages("yourVatReturn.returnDueDate") @displayDate(vatReturnViewModel.dueDate)</li>
       <li>@messages("yourVatReturn.dateSubmitted") @displayDate(vatReturnViewModel.dateSubmitted)</li>

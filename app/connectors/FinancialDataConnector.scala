@@ -21,6 +21,7 @@ import javax.inject.{Inject, Singleton}
 import config.AppConfig
 import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
 import models.Obligation.Status
+import models.User
 import models.payments.Payments
 import play.api.Logger
 import uk.gov.hmrc.http.HeaderCarrier
@@ -35,8 +36,8 @@ class FinancialDataConnector @Inject()(http: HttpClient, appConfig: AppConfig) {
 
   private[connectors] def paymentsUrl(vrn: String): String = s"${appConfig.financialDataBaseUrl}/financial-transactions/vat/$vrn"
 
-  def getOpenPayments(vrn: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[Payments]] = {
-    http.GET(paymentsUrl(vrn), Seq("status" -> Status.Outstanding.toString))
+  def getOpenPayments(user: User)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[Payments]] = {
+    http.GET(paymentsUrl(user.vrn), Seq("status" -> Status.Outstanding.toString))
         .map {
           case payments@Right(_) => payments
           case httpError@Left(error) =>

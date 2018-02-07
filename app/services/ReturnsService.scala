@@ -22,7 +22,7 @@ import javax.inject.{Inject, Singleton}
 import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
 import connectors.{FinancialDataConnector, VatApiConnector}
 import models.VatReturnObligation.Status
-import models.payments.Payments
+import models.payments.{Payment, Payments}
 import models.{User, VatReturn, VatReturnObligations}
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -53,8 +53,15 @@ class ReturnsService @Inject()(vatApiConnector: VatApiConnector, financialDataCo
     )
   }
 
-  def getOpenPayments(vrn: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[Payments]] = {
-    financialDataConnector.getOpenPayments(vrn)
+  def getPayment(user: User, requiredPeriod: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[Payment]] = {
+    financialDataConnector.getOpenPayments(user).map {
+      case Right(payments) => filterPaymentsByPeriodKey(payments, requiredPeriod)
+      case Left(_) => None
+    }
+  }
+
+  private[services] def filterPaymentsByPeriodKey(payments: Payments, requiredPeriod: String): Option[Payment] = {
+    payments.financialTransactions.find(_.periodKey == requiredPeriod)
   }
 
 }
