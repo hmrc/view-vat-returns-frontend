@@ -149,7 +149,7 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
         .expects(*,*,*)
         .returns(Future.successful(Right(examplePayments)))
 
-      lazy val result: Option[Payment] = await(service.getOpenPayments(User("111111111"), "#003"))
+      lazy val result: Option[Payment] = await(service.getPayment(User("111111111"), "#003"))
 
       result shouldBe Some(examplePayment)
     }

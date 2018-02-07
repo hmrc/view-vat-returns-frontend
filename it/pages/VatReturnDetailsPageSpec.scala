@@ -20,7 +20,7 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import helpers.IntegrationBaseSpec
 import play.api.http.Status
 import play.api.libs.ws.{WSRequest, WSResponse}
-import stubs.{AuthStub, VatApiStub}
+import stubs.{AuthStub, FinancialDataStub, VatApiStub}
 
 class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
 
@@ -51,6 +51,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
           AuthStub.authorised()
           VatApiStub.stubSuccessfulCustomerInfo
           VatApiStub.stubSuccessfulVatReturn
+          FinancialDataStub.stubAllOutstandingPayments
         }
 
         val response: WSResponse = await(request().get())
@@ -92,6 +93,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
           AuthStub.authorised()
           VatApiStub.stubSuccessfulCustomerInfo
           VatApiStub.stubSuccessfulVatReturn
+          FinancialDataStub.stubAllOutstandingPayments
         }
 
         val response: WSResponse = await(request().get())

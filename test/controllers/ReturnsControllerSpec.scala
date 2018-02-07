@@ -81,7 +81,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
           .expects(*, *, *, *)
           .returns(vatReturnResult)
 
-        (mockVatReturnService.getOpenPayments(_: User, _: String)(_: HeaderCarrier, _: ExecutionContext))
+        (mockVatReturnService.getPayment(_: User, _: String)(_: HeaderCarrier, _: ExecutionContext))
           .expects(*, *, *, *)
           .returns(paymentResult)
 

@@ -45,7 +45,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
 
         val vatReturnCall = returnsService.getVatReturnDetails(user, encodedPeriodKey)
         val entityNameCall = vatApiService.getEntityName(user)
-        val financialDataCall = returnsService.getOpenPayments(user, periodKey)
+        val financialDataCall = returnsService.getPayment(user, periodKey)
 
         for {
           vatReturnResult <- vatReturnCall

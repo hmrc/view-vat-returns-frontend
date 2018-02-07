@@ -53,7 +53,7 @@ class ReturnsService @Inject()(vatApiConnector: VatApiConnector, financialDataCo
     )
   }
 
-  def getOpenPayments(user: User, requiredPeriod: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[Payment]] = {
+  def getPayment(user: User, requiredPeriod: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[Payment]] = {
     financialDataConnector.getOpenPayments(user).map {
       case Right(payments) => filterPaymentsByPeriodKey(payments, requiredPeriod)
       case Left(_) => None
