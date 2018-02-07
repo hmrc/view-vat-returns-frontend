@@ -16,7 +16,7 @@
 
 package controllers
 
-import java.net.URLDecoder
+import java.net.{URLDecoder, URLEncoder}
 import java.time.LocalDate
 import javax.inject.{Inject, Singleton}
 
@@ -39,9 +39,10 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
   def vatReturnDetails(periodKey: String, isReturnsPageRequest: Boolean = true): Action[AnyContent] = authorisedAction {
     implicit request =>
       implicit user =>
-        //TODO: use period key for service request
-        val decodedPeriodKey: String = URLDecoder.decode(periodKey, "UTF-8")
-        val vatReturnCall = returnsService.getVatReturnDetails(user, decodedPeriodKey)
+        // Play automatically URL decodes the period key so re-encode it
+        val encodedPeriodKey: String = URLEncoder.encode(periodKey, "UTF-8")
+
+        val vatReturnCall = returnsService.getVatReturnDetails(user, encodedPeriodKey)
         val entityNameCall = vatApiService.getEntityName(user)
 
         for {
