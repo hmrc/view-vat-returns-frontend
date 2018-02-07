@@ -66,12 +66,8 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
   private[controllers] def constructViewModel(entityName: Option[String], payment: Option[Payment], vatReturn: VatReturn,
                                               isReturnsPageRequest: Boolean): VatReturnViewModel = {
 
-    //TODO: Update the view message (owed, you owe, etc) dependent on the amount to show (scenarios on the board)
-
-    val amountToShow = payment match {
-      case Some(_) => if (payment.get.outstandingAmount < 0) payment.get.outstandingAmount else BigDecimal(0.0)
-      case None => BigDecimal(0.0)
-    }
+    // TODO: update this value to reflect partial payments
+    val amountToShow = vatReturn.netVatDue
 
     VatReturnViewModel(
       entityName = entityName,

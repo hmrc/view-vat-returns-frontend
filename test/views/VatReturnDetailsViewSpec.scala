@@ -117,7 +117,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     }
 
     "have the correct subheading" in {
-      elementText(Selectors.subHeading) shouldBe "You owed: £1,320"
+      elementText(Selectors.subHeading) shouldBe "You owed: £1,000"
     }
 
     "have the correct trading name" in {

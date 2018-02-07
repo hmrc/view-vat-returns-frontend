@@ -58,7 +58,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     LocalDate.parse("2017-01-01"),
     LocalDate.parse("2017-02-01"),
     LocalDate.parse("2017-02-02"),
-    1000.00,
+    1320.00,
     "#001")
   )
 
@@ -66,6 +66,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     val serviceCall: Boolean = true
     val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
     val vatReturnResult: Future[HttpGetResult[VatReturn]] = Future.successful(Right(exampleVatReturn))
+    val paymentResult: Future[Option[Payment]] = Future.successful(examplePayment)
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
     val mockVatReturnService: ReturnsService = mock[ReturnsService]
     val mockVatApiService: VatApiService = mock[VatApiService]
@@ -79,6 +80,10 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         (mockVatReturnService.getVatReturnDetails(_: User, _: String)(_: HeaderCarrier, _: ExecutionContext))
           .expects(*, *, *, *)
           .returns(vatReturnResult)
+
+        (mockVatReturnService.getOpenPayments(_: User, _: String)(_: HeaderCarrier, _: ExecutionContext))
+          .expects(*, *, *, *)
+          .returns(paymentResult)
 
         (mockVatApiService.getEntityName(_: User)(_: HeaderCarrier, _: ExecutionContext))
           .expects(*, *, *)
