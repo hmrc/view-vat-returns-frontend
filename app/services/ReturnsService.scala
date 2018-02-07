@@ -23,7 +23,7 @@ import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
 import connectors.{FinancialDataConnector, VatApiConnector}
 import models.VatReturnObligation.Status
 import models.payments.{Payment, Payments}
-import models.{User, VatReturn, VatReturnObligations}
+import models.{User, VatReturn, VatReturnObligation, VatReturnObligations}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -44,6 +44,13 @@ class ReturnsService @Inject()(vatApiConnector: VatApiConnector, financialDataCo
     vatApiConnector.getVatReturnObligations(user.vrn, from, to, Status.All).map {
       case Right(obligations) => Right(filterObligationsByDueDate(obligations, searchYear))
       case error@Left(_) => error
+    }
+  }
+
+  def getObligationWithMatchingPeriodKey(periodKey: String)(obligations: HttpGetResult[VatReturnObligations]): Option[VatReturnObligation] = {
+    obligations match {
+      case Right(obs) => obs.obligations.find(_.periodKey == periodKey)
+      case Left(_) => None
     }
   }
 
