@@ -75,7 +75,7 @@
               @for(obligation <- model.obligations) {
 
                 <li>
-                    <a href="@controllers.routes.ReturnsController.vatReturnDetails(obligation.periodKey)">
+                    <a href="@controllers.routes.ReturnsController.vatReturnDetails(obligation.periodKey, model.selectedYear)">
                         @displayDateRange(obligation.start, obligation.end)
                     </a>
                 </li>

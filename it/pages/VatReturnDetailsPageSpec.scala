@@ -29,7 +29,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
 
     def request(): WSRequest = {
       setupStubs()
-      buildRequest("/return/0001")
+      buildRequest("/return/%23001?yearEnd=2018")
     }
   }
 
@@ -38,7 +38,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
 
     def request(): WSRequest = {
       setupStubs()
-      buildRequest("/payments/return/0001")
+      buildRequest("/payments/return/%23001?yearEnd=2018")
     }
   }
 
@@ -51,6 +51,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
           AuthStub.authorised()
           VatApiStub.stubSuccessfulCustomerInfo
           VatApiStub.stubSuccessfulVatReturn
+          VatApiStub.stubPrototypeObligations
           FinancialDataStub.stubAllOutstandingPayments
         }
 
@@ -93,6 +94,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
           AuthStub.authorised()
           VatApiStub.stubSuccessfulCustomerInfo
           VatApiStub.stubSuccessfulVatReturn
+          VatApiStub.stubPrototypeObligations
           FinancialDataStub.stubAllOutstandingPayments
         }
 

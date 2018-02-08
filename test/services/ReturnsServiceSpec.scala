@@ -122,7 +122,7 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
     }
   }
 
-  "Calling .getOpenPayments" should {
+  "Calling .getPayment" should {
 
     val examplePayments: Payments = Payments(
       Seq(
@@ -153,5 +153,50 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
 
       result shouldBe Some(examplePayment)
     }
+  }
+
+  "Calling .getObligationWithMatchingPeriodKey" should {
+
+    val exampleObligations = Right(VatReturnObligations(Seq(
+      VatReturnObligation(
+        LocalDate.parse("2017-01-01"),
+        LocalDate.parse("2018-12-31"),
+        LocalDate.parse("2018-01-31"),
+        "F",
+        Some(LocalDate.parse("2018-01-31")),
+        "#001"
+      )
+    )))
+
+    "return the obligation with the matching period key" in new Test {
+
+      val expected = VatReturnObligation(
+        LocalDate.parse("2017-01-01"),
+        LocalDate.parse("2018-12-31"),
+        LocalDate.parse("2018-01-31"),
+        "F",
+        Some(LocalDate.parse("2018-01-31")),
+        "#001"
+      )
+
+      val result: Option[VatReturnObligation] = service.getObligationWithMatchingPeriodKey("#001")(exampleObligations)
+      result shouldBe Some(expected)
+    }
+
+    "return None" in new Test {
+
+      val expected = VatReturnObligation(
+        LocalDate.parse("2017-01-01"),
+        LocalDate.parse("2018-12-31"),
+        LocalDate.parse("2018-01-31"),
+        "F",
+        Some(LocalDate.parse("2018-01-31")),
+        "#001"
+      )
+
+      val result: Option[VatReturnObligation] = service.getObligationWithMatchingPeriodKey("#002")(exampleObligations)
+      result shouldBe None
+    }
+
   }
 }
