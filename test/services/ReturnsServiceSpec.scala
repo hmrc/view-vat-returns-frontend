@@ -26,8 +26,8 @@ import models.payments.{Payment, Payments}
 import models.{User, VatReturn, VatReturnObligation, VatReturnObligations}
 import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits._
+import scala.concurrent.{ExecutionContext, Future}
 
 class ReturnsServiceSpec extends ControllerBaseSpec {
 
@@ -145,8 +145,8 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
     )
 
     "return all of a user's open payments" in new Test {
-      (mockFinancialDataApiConnector.getOpenPayments(_: User)(_: HeaderCarrier, _:ExecutionContext))
-        .expects(*,*,*)
+      (mockFinancialDataApiConnector.getOpenPayments(_: User)(_: HeaderCarrier, _: ExecutionContext))
+        .expects(*, *, *)
         .returns(Future.successful(Right(examplePayments)))
 
       lazy val result: Option[Payment] = await(service.getPayment(User("111111111"), "#003"))
@@ -157,16 +157,34 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
 
   "Calling .getObligationWithMatchingPeriodKey" should {
 
-    val exampleObligations = Right(VatReturnObligations(Seq(
-      VatReturnObligation(
-        LocalDate.parse("2017-01-01"),
-        LocalDate.parse("2018-12-31"),
-        LocalDate.parse("2018-01-31"),
-        "F",
-        Some(LocalDate.parse("2018-01-31")),
-        "#001"
+    val exampleObligations: VatReturnObligations = VatReturnObligations(
+      Seq(
+        VatReturnObligation(
+          LocalDate.parse("2017-01-01"),
+          LocalDate.parse("2018-12-31"),
+          LocalDate.parse("2018-01-31"),
+          "F",
+          Some(LocalDate.parse("2018-01-31")),
+          "#001"
+        ),
+        VatReturnObligation(
+          LocalDate.parse("2017-01-01"),
+          LocalDate.parse("2018-12-31"),
+          LocalDate.parse("2018-01-31"),
+          "F",
+          Some(LocalDate.parse("2018-01-31")),
+          "#002"
+        ),
+        VatReturnObligation(
+          LocalDate.parse("2017-01-01"),
+          LocalDate.parse("2018-12-31"),
+          LocalDate.parse("2018-01-31"),
+          "F",
+          Some(LocalDate.parse("2018-01-31")),
+          "#003"
+        )
       )
-    )))
+    )
 
     "return the obligation with the matching period key" in new Test {
 
@@ -179,22 +197,21 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
         "#001"
       )
 
-      val result: Option[VatReturnObligation] = service.getObligationWithMatchingPeriodKey("#001")(exampleObligations)
+      (mockVatApiConnector.getVatReturnObligations(_: String, _: LocalDate, _: LocalDate, _: Status.Value)(_: HeaderCarrier, _: ExecutionContext))
+        .expects(*, *, *, *, *, *)
+        .returns(Future.successful(Right(exampleObligations)))
+
+      val result: Option[VatReturnObligation] = await(service.getObligationWithMatchingPeriodKey(User("111111111"), 2018, "#001"))
       result shouldBe Some(expected)
     }
 
     "return None" in new Test {
 
-      val expected = VatReturnObligation(
-        LocalDate.parse("2017-01-01"),
-        LocalDate.parse("2018-12-31"),
-        LocalDate.parse("2018-01-31"),
-        "F",
-        Some(LocalDate.parse("2018-01-31")),
-        "#001"
-      )
+      (mockVatApiConnector.getVatReturnObligations(_: String, _: LocalDate, _: LocalDate, _: Status.Value)(_: HeaderCarrier, _: ExecutionContext))
+        .expects(*, *, *, *, *, *)
+        .returns(Future.successful(Right(exampleObligations)))
 
-      val result: Option[VatReturnObligation] = service.getObligationWithMatchingPeriodKey("#002")(exampleObligations)
+      val result: Option[VatReturnObligation] = await(service.getObligationWithMatchingPeriodKey(User("111111111"), 2018, "#004"))
       result shouldBe None
     }
 

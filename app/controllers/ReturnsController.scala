@@ -16,15 +16,14 @@
 
 package controllers
 
-import java.net.URLEncoder
 import java.time.LocalDate
 import javax.inject.{Inject, Singleton}
 
 import config.AppConfig
-import models.{VatReturn, VatReturnObligation}
 import models.errors.UnexpectedStatusError
 import models.payments.Payment
 import models.viewModels.VatReturnViewModel
+import models.{VatReturn, VatReturnObligation}
 import play.api.i18n.MessagesApi
 import play.api.mvc._
 import services.{EnrolmentsAuthService, ReturnsService, VatApiService}
@@ -40,14 +39,11 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
   def vatReturnDetails(periodKey: String, yearEnd: Int, isReturnsPageRequest: Boolean = true): Action[AnyContent] = authorisedAction {
     implicit request =>
       implicit user =>
-        // Play automatically URL decodes the period key so re-encode it
-        val encodedPeriodKey: String = URLEncoder.encode(periodKey, "UTF-8")
 
-        val vatReturnCall = returnsService.getVatReturnDetails(user, encodedPeriodKey)
+        val vatReturnCall = returnsService.getVatReturnDetails(user, periodKey)
         val entityNameCall = vatApiService.getEntityName(user)
         val financialDataCall = returnsService.getPayment(user, periodKey)
-        val obligationCall = returnsService.getReturnObligationsForYear(user, yearEnd)
-          .map(returnsService.getObligationWithMatchingPeriodKey(periodKey))
+        val obligationCall = returnsService.getObligationWithMatchingPeriodKey(user, yearEnd, periodKey)
 
         for {
           vatReturnResult <- vatReturnCall
@@ -56,9 +52,9 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
           obligation <- obligationCall
         } yield {
           (vatReturnResult, obligation) match {
-            case (Right(vatReturn), Some(ob)) => Ok(views.html.returns.vatReturnDetails(
-              constructViewModel(customerInfo, ob, payment, vatReturn, isReturnsPageRequest)
-            ))
+            case (Right(vatReturn), Some(ob)) =>
+              val viewModel = constructViewModel(customerInfo, ob, payment, vatReturn, isReturnsPageRequest)
+              Ok(views.html.returns.vatReturnDetails(viewModel))
             case (Right(_), None) => NotFound(views.html.errors.notFound())
             case (Left(UnexpectedStatusError(404)), _) => NotFound(views.html.errors.notFound())
             case (Left(_), _) => InternalServerError(views.html.errors.serverError())
@@ -68,12 +64,16 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
 
   def vatPaymentReturnDetails(periodKey: String, yearEnd: Int): Action[AnyContent] = vatReturnDetails(periodKey, yearEnd, isReturnsPageRequest = false)
 
-  private[controllers] def constructViewModel(entityName: Option[String], obligation: VatReturnObligation,
-                                              payment: Option[Payment], vatReturn: VatReturn,
+  private[controllers] def constructViewModel(entityName: Option[String],
+                                              obligation: VatReturnObligation,
+                                              payment: Option[Payment],
+                                              vatReturn: VatReturn,
                                               isReturnsPageRequest: Boolean): VatReturnViewModel = {
 
     // TODO: update this value to reflect partial payments
-    val amountToShow = vatReturn.netVatDue
+    val amountToShow: BigDecimal = payment.fold(vatReturn.netVatDue) {
+      _.outstandingAmount
+    }
 
     VatReturnViewModel(
       entityName = entityName,
