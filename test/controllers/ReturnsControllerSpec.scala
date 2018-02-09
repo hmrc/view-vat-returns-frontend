@@ -90,12 +90,8 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
           .expects(*, *, *, *)
           .returns(vatReturnResult)
 
-        (mockVatReturnService.getReturnObligationsForYear(_: User, _: Int)(_: HeaderCarrier, _: ExecutionContext))
-          .expects(*, *, *, *)
-          .returns(Right(VatReturnObligations(Seq(exampleObligation))))
-
-        (mockVatReturnService.getObligationWithMatchingPeriodKey(_: String)(_: HttpGetResult[VatReturnObligations]))
-          .expects(*, *)
+        (mockVatReturnService.getObligationWithMatchingPeriodKey(_: User, _: Int, _: String)(_: HeaderCarrier, _: ExecutionContext))
+          .expects(*, *, *, *, *)
           .returns(Some(exampleObligation))
 
         (mockVatReturnService.getPayment(_: User, _: String)(_: HeaderCarrier, _: ExecutionContext))

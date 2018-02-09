@@ -47,8 +47,9 @@ class ReturnsService @Inject()(vatApiConnector: VatApiConnector, financialDataCo
     }
   }
 
-  def getObligationWithMatchingPeriodKey(periodKey: String)(obligations: HttpGetResult[VatReturnObligations]): Option[VatReturnObligation] = {
-    obligations match {
+  def getObligationWithMatchingPeriodKey(user: User, year: Int, periodKey: String)
+                                        (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[VatReturnObligation]] = {
+    getReturnObligationsForYear(user, year).map {
       case Right(obs) => obs.obligations.find(_.periodKey == periodKey)
       case Left(_) => None
     }

@@ -16,6 +16,8 @@
 
 package connectors
 
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets.UTF_8
 import java.time.LocalDate
 import javax.inject.{Inject, Singleton}
 
@@ -34,7 +36,7 @@ class VatApiConnector @Inject()(http: HttpClient, appConfig: AppConfig) {
 
   private[connectors] def obligationsUrl(vrn: String): String = s"${appConfig.vatApiBaseUrl}/$vrn/obligations"
   private[connectors] def customerInfoUrl(vrn: String): String = s"${appConfig.vatApiBaseUrl}/customer-information/vat/$vrn"
-  private[connectors] def returnUrl(vrn: String, periodKey: String) = s"${appConfig.vatApiBaseUrl}/$vrn/returns/$periodKey"
+  private[connectors] def returnUrl(vrn: String, periodKey: String) = s"${appConfig.vatApiBaseUrl}/$vrn/returns/${URLEncoder.encode(periodKey, UTF_8.name())}"
 
   def getVatReturnDetails(vrn: String, periodKey: String)
                          (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[VatReturn]] = {
