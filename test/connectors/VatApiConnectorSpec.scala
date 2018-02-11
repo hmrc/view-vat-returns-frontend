@@ -17,11 +17,12 @@
 package connectors
 
 import controllers.ControllerBaseSpec
+import mocks.MockMetricsService
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 class VatApiConnectorSpec extends ControllerBaseSpec {
 
-  lazy val connector = new VatApiConnector(mock[HttpClient], mockConfig)
+  lazy val connector = new VatApiConnector(mock[HttpClient], mockConfig, MockMetricsService)
 
   "VatApiConnector" should {
 
@@ -33,4 +34,5 @@ class VatApiConnectorSpec extends ControllerBaseSpec {
       connector.returnUrl("111", "123") shouldBe "/111/returns/123"
     }
   }
+
 }
