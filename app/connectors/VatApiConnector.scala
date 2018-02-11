@@ -24,7 +24,7 @@ import javax.inject.{Inject, Singleton}
 import config.AppConfig
 import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
 import models.VatReturnObligation.Status
-import models.{CustomerInformation, VatReturn, VatReturnObligations}
+import models.{VatReturn, VatReturnObligations}
 import play.api.Logger
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
@@ -35,7 +35,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class VatApiConnector @Inject()(http: HttpClient, appConfig: AppConfig) {
 
   private[connectors] def obligationsUrl(vrn: String): String = s"${appConfig.vatApiBaseUrl}/$vrn/obligations"
-  private[connectors] def customerInfoUrl(vrn: String): String = s"${appConfig.vatApiBaseUrl}/customer-information/vat/$vrn"
+
   private[connectors] def returnUrl(vrn: String, periodKey: String) = s"${appConfig.vatApiBaseUrl}/$vrn/returns/${URLEncoder.encode(periodKey, UTF_8.name())}"
 
   def getVatReturnDetails(vrn: String, periodKey: String)
@@ -50,22 +50,11 @@ class VatApiConnector @Inject()(http: HttpClient, appConfig: AppConfig) {
   }
 
   def getVatReturnObligations(vrn: String, from: LocalDate, to: LocalDate, status: Status.Value)
-                          (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[VatReturnObligations]] = {
+                             (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[VatReturnObligations]] = {
     import connectors.httpParsers.VatReturnObligationsHttpParser.VatReturnObligationsReads
 
     http.GET(obligationsUrl(vrn), Seq("from" -> from.toString, "to" -> to.toString, "status" -> status.toString)).map {
       case vatReturns@Right(_) => vatReturns
-      case httpError@Left(error) =>
-        Logger.info("VatApiConnector received error: " + error.message)
-        httpError
-    }
-  }
-
-  def getCustomerInfo(vrn: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[CustomerInformation]] = {
-    import connectors.httpParsers.CustomerInfoHttpParser.CustomerInfoReads
-
-    http.GET(customerInfoUrl(vrn)).map {
-      case customerInfo@Right(_) => customerInfo
       case httpError@Left(error) =>
         Logger.info("VatApiConnector received error: " + error.message)
         httpError

@@ -19,18 +19,15 @@ package connectors
 import controllers.ControllerBaseSpec
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
-class VatApiConnectorSpec extends ControllerBaseSpec {
+class VatSubscriptionConnectorSpec extends ControllerBaseSpec {
 
-  lazy val connector = new VatApiConnector(mock[HttpClient], mockConfig)
+  lazy val connector = new VatSubscriptionConnector(mock[HttpClient], mockConfig)
 
-  "VatApiConnector" should {
+  "VatSubscriptionConnector" should {
 
-    "generate the correct obligations url" in {
-      connector.obligationsUrl("808") shouldBe "/808/obligations"
+    "generate the correct customer information url" in {
+      connector.customerInfoUrl("123456789") shouldBe "/customer-information/vat/123456789"
     }
 
-    "generate the correct returns url with a period key" in {
-      connector.returnUrl("111", "123") shouldBe "/111/returns/123"
-    }
   }
 }

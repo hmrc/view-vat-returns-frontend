@@ -26,13 +26,13 @@ import models.viewModels.VatReturnViewModel
 import models.{VatReturn, VatReturnObligation}
 import play.api.i18n.MessagesApi
 import play.api.mvc._
-import services.{EnrolmentsAuthService, ReturnsService, VatApiService}
+import services.{EnrolmentsAuthService, ReturnsService, SubscriptionService}
 
 @Singleton
 class ReturnsController @Inject()(val messagesApi: MessagesApi,
                                   val enrolmentsAuthService: EnrolmentsAuthService,
                                   returnsService: ReturnsService,
-                                  vatApiService: VatApiService,
+                                  subscriptionService: SubscriptionService,
                                   implicit val appConfig: AppConfig)
   extends AuthorisedController {
 
@@ -41,7 +41,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
       implicit user =>
 
         val vatReturnCall = returnsService.getVatReturnDetails(user, periodKey)
-        val entityNameCall = vatApiService.getEntityName(user)
+        val entityNameCall = subscriptionService.getEntityName(user)
         val financialDataCall = returnsService.getPayment(user, periodKey)
         val obligationCall = returnsService.getObligationWithMatchingPeriodKey(user, yearEnd, periodKey)
 

@@ -16,15 +16,16 @@
 
 package services
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
-import connectors.VatApiConnector
+import connectors.VatSubscriptionConnector
 import models.{CustomerInformation, User}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class VatApiService @Inject()(connector: VatApiConnector) {
+@Singleton
+class SubscriptionService @Inject()(connector: VatSubscriptionConnector) {
 
   def getEntityName(user: User)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[String]] = {
     connector.getCustomerInfo(user.vrn).map {
