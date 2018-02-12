@@ -16,7 +16,7 @@
 
 package services
 
-import connectors.VatApiConnector
+import connectors.VatSubscriptionConnector
 import controllers.ControllerBaseSpec
 import models.errors.BadRequestError
 import models.{CustomerInformation, User}
@@ -25,11 +25,11 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.{ExecutionContext, Future}
 
-class VatApiServiceSpec extends ControllerBaseSpec {
+class SubscriptionServiceSpec extends ControllerBaseSpec {
 
   private trait Test {
-    val mockConnector: VatApiConnector = mock[VatApiConnector]
-    val service: VatApiService = new VatApiService(mockConnector)
+    val mockConnector: VatSubscriptionConnector = mock[VatSubscriptionConnector]
+    val service: SubscriptionService = new SubscriptionService(mockConnector)
     implicit val hc: HeaderCarrier = HeaderCarrier()
   }
 

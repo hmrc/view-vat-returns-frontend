@@ -20,9 +20,7 @@ import javax.inject.{Inject, Singleton}
 
 import config.AppConfig
 import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
-import models.Obligation.Status
-import models.User
-import models.payments.Payments
+import models.CustomerInformation
 import play.api.Logger
 import services.MetricsService
 import uk.gov.hmrc.http.HeaderCarrier
@@ -31,27 +29,26 @@ import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class FinancialDataConnector @Inject()(http: HttpClient,
-                                       appConfig: AppConfig,
-                                       metrics: MetricsService) {
+class VatSubscriptionConnector @Inject()(http: HttpClient,
+                                         appConfig: AppConfig,
+                                         metrics: MetricsService) {
 
-  import connectors.httpParsers.PaymentsHttpParser.PaymentsReads
+  private[connectors] def customerInfoUrl(vrn: String): String = s"${appConfig.vatApiBaseUrl}/customer-information/vat/$vrn"
 
-  private[connectors] def paymentsUrl(vrn: String): String = s"${appConfig.financialDataBaseUrl}/financial-transactions/vat/$vrn"
+  def getCustomerInfo(vrn: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[CustomerInformation]] = {
 
-  def getOpenPayments(user: User)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[Payments]] = {
+    import connectors.httpParsers.CustomerInfoHttpParser.CustomerInfoReads
 
     val timer = metrics.getCustomerInfoTimer.time()
 
-    http.GET(paymentsUrl(user.vrn), Seq("status" -> Status.Outstanding.toString))
-        .map {
-          case payments@Right(_) =>
-            timer.stop()
-            payments
-          case httpError@Left(error) =>
-            metrics.getCustomerInfoCallFailureCounter.inc()
-            Logger.warn("FinancialDataConnector received error: " + error.message)
-            httpError
-        }
+    http.GET(customerInfoUrl(vrn)).map {
+      case customerInfo@Right(_) =>
+        timer.stop()
+        customerInfo
+      case httpError@Left(error) =>
+        metrics.getCustomerInfoCallFailureCounter.inc()
+        Logger.info("VatApiConnector received error: " + error.message)
+        httpError
+    }
   }
 }

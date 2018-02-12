@@ -22,7 +22,7 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import helpers.IntegrationBaseSpec
 import models.VatReturnObligation.Status
 import models.errors.{BadRequestError, MultipleErrors}
-import models.{CustomerInformation, VatReturn, VatReturnObligation, VatReturnObligations}
+import models.{VatReturn, VatReturnObligation, VatReturnObligations}
 import stubs.VatApiStub
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -247,38 +247,6 @@ class VatApiConnectorISpec extends IntegrationBaseSpec {
     }
   }
 
-  "Calling getCustomerInfo" when {
-
-    "the API returns a valid response" should {
-
-      "provide a user's information" in new Test {
-        override def setupStubs(): StubMapping = VatApiStub.stubSuccessfulCustomerInfo
-        setupStubs()
-        val expected = Right(CustomerInformation(
-          Some("Cheapo Clothing Ltd"),
-          Some("John"),
-          Some("Smith"),
-          Some("Cheapo Clothing")
-        ))
-        private val result = await(connector.getCustomerInfo("999999999"))
-
-        result shouldBe expected
-      }
-    }
-
-    "the API returns an error" should {
-
-      "return an error" in new Test {
-        override def setupStubs(): StubMapping = VatApiStub.stubFailureCustomerInfo
-        setupStubs()
-        val expected = Left(BadRequestError("", ""))
-        private val result = await(connector.getCustomerInfo("999999999"))
-
-        result shouldBe expected
-      }
-    }
-  }
-
   "Calling getReturnDetails" when {
 
     "the supplied data is all correct" should {
@@ -287,7 +255,7 @@ class VatApiConnectorISpec extends IntegrationBaseSpec {
         override def setupStubs(): StubMapping = VatApiStub.stubSuccessfulVatReturn
 
         val expected = Right(VatReturn(
-          "",0,0,0,0,0,0,0,0,0
+          "", 0, 0, 0, 0, 0, 0, 0, 0, 0
         ))
 
         setupStubs()

@@ -22,10 +22,10 @@ import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
 import models.errors.{UnexpectedStatusError, UnknownError}
 import models.payments.Payment
 import models.viewModels.VatReturnViewModel
-import models.{User, VatReturn, VatReturnObligation, VatReturnObligations}
+import models.{User, VatReturn, VatReturnObligation}
 import play.api.http.Status
 import play.api.test.Helpers._
-import services.{EnrolmentsAuthService, ReturnsService, VatApiService}
+import services.{EnrolmentsAuthService, ReturnsService, SubscriptionService}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.Retrieval
@@ -78,14 +78,14 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     val paymentResult: Future[Option[Payment]] = Future.successful(examplePayment)
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
     val mockVatReturnService: ReturnsService = mock[ReturnsService]
-    val mockVatApiService: VatApiService = mock[VatApiService]
+    val mockSubscriptionService: SubscriptionService = mock[SubscriptionService]
 
     def setup(): Any = {
       (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
         .expects(*, *, *, *)
         .returns(authResult)
 
-      if(serviceCall) {
+      if (serviceCall) {
         (mockVatReturnService.getVatReturnDetails(_: User, _: String)(_: HeaderCarrier, _: ExecutionContext))
           .expects(*, *, *, *)
           .returns(vatReturnResult)
@@ -98,7 +98,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
           .expects(*, *, *, *)
           .returns(paymentResult)
 
-        (mockVatApiService.getEntityName(_: User)(_: HeaderCarrier, _: ExecutionContext))
+        (mockSubscriptionService.getEntityName(_: User)(_: HeaderCarrier, _: ExecutionContext))
           .expects(*, *, *)
           .returns(Future.successful(exampleEntityName))
       }
@@ -108,7 +108,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
     def target: ReturnsController = {
       setup()
-      new ReturnsController(messages, mockEnrolmentsAuthService, mockVatReturnService, mockVatApiService, mockConfig)
+      new ReturnsController(messages, mockEnrolmentsAuthService, mockVatReturnService, mockSubscriptionService, mockConfig)
     }
   }
 
@@ -176,7 +176,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
   "Calling .constructViewModel" should {
 
     val mockVatReturnService: ReturnsService = mock[ReturnsService]
-    val mockVatApiService: VatApiService = mock[VatApiService]
+    val mockVatApiService: SubscriptionService = mock[SubscriptionService]
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
     val mockEnrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
     val target = new ReturnsController(messages, mockEnrolmentsAuthService, mockVatReturnService, mockVatApiService, mockConfig)

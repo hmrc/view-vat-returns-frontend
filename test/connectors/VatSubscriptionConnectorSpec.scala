@@ -20,13 +20,14 @@ import controllers.ControllerBaseSpec
 import mocks.MockMetricsService
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
-class FinancialDataConnectorSpec extends ControllerBaseSpec {
+class VatSubscriptionConnectorSpec extends ControllerBaseSpec {
 
-  "FinancialDataConnector" should {
+  lazy val connector = new VatSubscriptionConnector(mock[HttpClient], mockConfig, MockMetricsService)
 
-    "generate the correct payments url" in {
-      val connector = new FinancialDataConnector(mock[HttpClient], mockConfig, MockMetricsService)
-      connector.paymentsUrl("111111111") shouldEqual "/financial-transactions/vat/111111111"
+  "VatSubscriptionConnector" should {
+
+    "generate the correct customer information url" in {
+      connector.customerInfoUrl("123456789") shouldBe "/customer-information/vat/123456789"
     }
 
   }
