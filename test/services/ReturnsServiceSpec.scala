@@ -145,7 +145,7 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
     )
 
     "return all of a user's open payments" in new Test {
-      (mockFinancialDataApiConnector.getOpenPayments(_: User)(_: HeaderCarrier, _: ExecutionContext))
+      (mockFinancialDataApiConnector.getPayments(_: String)(_: HeaderCarrier, _: ExecutionContext))
         .expects(*, *, *)
         .returns(Future.successful(Right(examplePayments)))
 

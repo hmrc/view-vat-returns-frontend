@@ -27,21 +27,21 @@ object FinancialDataStub extends WireMockMethods{
   private val financialDataUri = "/financial-transactions/vat/([0-9]+)"
 
   def stubAllOutstandingPayments: StubMapping = {
-    when(method = GET, uri = financialDataUri, queryParams = Map("status" -> "O"))
-      .thenReturn(status = OK, body = allOutStandingPayments)
+    when(method = GET, uri = financialDataUri)
+      .thenReturn(status = OK, body = allPayments)
   }
 
   def stubNoPayments: StubMapping = {
-    when(method = GET, uri = financialDataUri, queryParams = Map("status" -> "O"))
+    when(method = GET, uri = financialDataUri)
       .thenReturn(status = OK, body = Json.toJson(noPayments))
   }
 
   def stubInvalidVrn: StubMapping = {
-    when(method = GET, uri = financialDataUri, queryParams = Map("status" -> "O"))
+    when(method = GET, uri = financialDataUri)
       .thenReturn(BAD_REQUEST, body = Json.toJson(invalidVrn))
   }
 
-  private val allOutStandingPayments: JsValue = Json.parse(
+  private val allPayments: JsValue = Json.parse(
     """{
       |    "idType" : "VRN",
       |    "idNumber" : 555555555,
@@ -94,7 +94,7 @@ object FinancialDataStub extends WireMockMethods{
       |        "mainTransaction" : "1234",
       |        "subTransaction" : "1174",
       |        "originalAmount" : 4000,
-      |        "outstandingAmount" : 4000,
+      |        "outstandingAmount" : 0,
       |        "clearedAmount" : 4000,
       |        "items" : [
       |          {

@@ -39,19 +39,16 @@ class FinancialDataConnector @Inject()(http: HttpClient,
 
   private[connectors] def paymentsUrl(vrn: String): String = s"${appConfig.financialDataBaseUrl}/financial-transactions/vat/$vrn"
 
-  def getOpenPayments(user: User)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[Payments]] = {
-
-    val timer = metrics.getCustomerInfoTimer.time()
-
-    http.GET(paymentsUrl(user.vrn), Seq("status" -> Status.Outstanding.toString))
-        .map {
-          case payments@Right(_) =>
-            timer.stop()
-            payments
-          case httpError@Left(error) =>
-            metrics.getCustomerInfoCallFailureCounter.inc()
-            Logger.warn("FinancialDataConnector received error: " + error.message)
-            httpError
-        }
+  def getPayments(vrn: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[Payments]] = {
+    val timer = metrics.getPaymentsTimer.time()
+    http.GET(paymentsUrl(vrn)).map {
+      case payments@Right(_) =>
+        timer.stop()
+        payments
+      case httpError@Left(error) =>
+        metrics.getPaymentsCallFailureCounter.inc()
+        Logger.warn("FinancialDataConnector received error: " + error.message)
+        httpError
+    }
   }
 }
