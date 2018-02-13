@@ -29,7 +29,6 @@ object VatApiStub extends WireMockMethods {
 
   private val obligationsUri = "/([0-9]+)/obligations"
   private val returnsUri = "/([0-9]+)/returns/(.+)"
-  private val customerInfoApiUri = "/customer-information/vat/([0-9]+)"
   private val dateRegex = "([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))"
 
   def stubAllObligations: StubMapping = {
@@ -119,16 +118,6 @@ object VatApiStub extends WireMockMethods {
       .thenReturn(BAD_REQUEST, body = Json.toJson(multipleErrors))
   }
 
-  def stubSuccessfulCustomerInfo: StubMapping = {
-    when(method = GET, uri = customerInfoApiUri)
-      .thenReturn(status = OK, body = validCustomerInfo)
-  }
-
-  def stubFailureCustomerInfo: StubMapping = {
-    when(method = GET, uri = customerInfoApiUri)
-      .thenReturn(status = BAD_REQUEST, body = Json.toJson(apiError))
-  }
-
   def stubSuccessfulVatReturn: StubMapping = {
     when(method = GET, uri = returnsUri)
       .thenReturn(status = OK, body = validVatReturn)
@@ -203,20 +192,6 @@ object VatApiStub extends WireMockMethods {
   )
 
   private val noObligations = VatReturnObligations(Seq.empty)
-
-  private val validCustomerInfo = Json.parse(
-    """{
-      | "organisationDetails":{
-      |   "organisationName":"Cheapo Clothing Ltd",
-      |   "individualName":{
-      |     "firstName":"John",
-      |     "lastName":"Smith"
-      |   },
-      |   "tradingName":"Cheapo Clothing"
-      | }
-      |}"""
-      .stripMargin
-  )
 
   private val validVatReturn = Json.parse(
     """

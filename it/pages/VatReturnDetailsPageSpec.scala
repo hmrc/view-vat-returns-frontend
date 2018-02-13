@@ -20,7 +20,7 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import helpers.IntegrationBaseSpec
 import play.api.http.Status
 import play.api.libs.ws.{WSRequest, WSResponse}
-import stubs.{AuthStub, FinancialDataStub, VatApiStub}
+import stubs.{AuthStub, CustomerInfoStub, FinancialDataStub, VatApiStub}
 
 class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
 
@@ -49,7 +49,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
       "return 200" in new ReturnRouteTest {
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
-          VatApiStub.stubSuccessfulCustomerInfo
+          CustomerInfoStub.stubCustomerInfo
           VatApiStub.stubSuccessfulVatReturn
           VatApiStub.stubPrototypeObligations
           FinancialDataStub.stubAllOutstandingPayments
@@ -92,7 +92,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
       "return 200" in new PaymentReturnRouteTest {
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
-          VatApiStub.stubSuccessfulCustomerInfo
+          CustomerInfoStub.stubCustomerInfo
           VatApiStub.stubSuccessfulVatReturn
           VatApiStub.stubPrototypeObligations
           FinancialDataStub.stubAllOutstandingPayments

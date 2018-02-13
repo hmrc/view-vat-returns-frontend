@@ -19,8 +19,8 @@ package connectors
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import helpers.IntegrationBaseSpec
 import models.CustomerInformation
-import models.errors.BadRequestError
-import stubs.VatApiStub
+import models.errors.{BadRequestError, ServerSideError}
+import stubs.CustomerInfoStub
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -39,13 +39,13 @@ class VatSubscriptionConnectorISpec extends IntegrationBaseSpec {
     "the API returns a valid response" should {
 
       "provide a user's information" in new Test {
-        override def setupStubs(): StubMapping = VatApiStub.stubSuccessfulCustomerInfo
+        override def setupStubs(): StubMapping = CustomerInfoStub.stubCustomerInfo
 
         setupStubs()
         val expected = Right(CustomerInformation(
           Some("Cheapo Clothing Ltd"),
-          Some("John"),
-          Some("Smith"),
+          Some("Vincent"),
+          Some("Vatreturn"),
           Some("Cheapo Clothing")
         ))
         private val result = await(connector.getCustomerInfo("999999999"))
@@ -57,10 +57,9 @@ class VatSubscriptionConnectorISpec extends IntegrationBaseSpec {
     "the API returns an error" should {
 
       "return an error" in new Test {
-        override def setupStubs(): StubMapping = VatApiStub.stubFailureCustomerInfo
-
+        override def setupStubs(): StubMapping = CustomerInfoStub.stubErrorFromApi
         setupStubs()
-        val expected = Left(BadRequestError("", ""))
+        val expected = Left(ServerSideError)
         private val result = await(connector.getCustomerInfo("999999999"))
 
         result shouldBe expected
