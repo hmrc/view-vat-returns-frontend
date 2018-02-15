@@ -52,11 +52,18 @@ object VatApiStub extends WireMockMethods {
       .thenReturn(status = OK, body = Json.toJson(fulfilledObligations))
   }
 
-  def stubPrototypeObligations: StubMapping = {
+  def stub2018Obligations: StubMapping = {
     when(method = GET, uri = obligationsUri, queryParams = Map(
-      "from" -> dateRegex, "to" -> dateRegex, "status" -> "A"
+      "from" -> dateRegex, "to" -> dateRegex, "status" -> "F"
     ))
-      .thenReturn(status = OK, body = Json.toJson(prototypeObligations))
+      .thenReturn(status = OK, body = Json.toJson(obligationsFor2018))
+  }
+
+  def stub2017Obligations: StubMapping = {
+    when(method = GET, uri = obligationsUri, queryParams = Map(
+      "from" -> dateRegex, "to" -> dateRegex, "status" -> "F"
+    ))
+      .thenReturn(status = OK, body = Json.toJson(obligationsFor2017))
   }
 
   def stubNoObligations: StubMapping = {
@@ -124,18 +131,18 @@ object VatApiStub extends WireMockMethods {
   }
 
   private val pastFulfilledObligation = VatReturnObligation(
-    start = LocalDate.now().minusDays(80L),
-    end = LocalDate.now().minusDays(50L),
-    due = LocalDate.now().minusDays(40L),
+    start = LocalDate.parse("2018-01-01"),
+    end = LocalDate.parse("2018-03-31"),
+    due = LocalDate.parse("2018-05-07"),
     status = "F",
-    received = Some(LocalDate.now().minusDays(45L)),
+    received = Some(LocalDate.parse("2018-04-15")),
     periodKey = "#001"
   )
 
   private val pastOutstandingObligation = VatReturnObligation(
-    start = LocalDate.now().minusDays(70L),
-    end = LocalDate.now().minusDays(40L),
-    due = LocalDate.now().minusDays(30L),
+    start = LocalDate.parse("2018-01-01"),
+    end = LocalDate.parse("2018-03-31"),
+    due = LocalDate.parse("2018-05-07"),
     status = "O",
     received = None,
     periodKey = "#004"
@@ -148,15 +155,18 @@ object VatApiStub extends WireMockMethods {
     )
   )
 
-  private val prototypeObligations = VatReturnObligations(Seq(
+  private val obligationsFor2018 = VatReturnObligations(Seq(
     VatReturnObligation(
-      LocalDate.parse("2017-10-31"),
-      LocalDate.parse("2018-01-31"),
-      LocalDate.parse("2018-02-28"),
-      "O",
-      None,
-      "#001"
-    ),
+      LocalDate.parse("2018-07-31"),
+      LocalDate.parse("2018-10-31"),
+      LocalDate.parse("2018-11-30"),
+      "F",
+      Some(LocalDate.parse("2018-11-27")),
+      "#002"
+    )
+  ))
+
+  private val obligationsFor2017 = VatReturnObligations(Seq(
     VatReturnObligation(
       LocalDate.parse("2017-07-31"),
       LocalDate.parse("2017-10-31"),
