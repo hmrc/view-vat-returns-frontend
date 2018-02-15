@@ -1,8 +1,16 @@
 # microservice specific routes
 
-GET        /payments/return/:periodKey  controllers.ReturnsController.vatPaymentReturnDetails(periodKey: String, yearEnd: Int)
-GET        /return/:periodKey           controllers.ReturnsController.vatReturnDetails(periodKey: String, yearEnd: Int, isReturnsPageRequest: Boolean = true)
-GET        /returns/:year               controllers.ReturnObligationsController.completedReturns(year: Int)
-GET        /return-deadlines            controllers.ReturnObligationsController.returnDeadlines
 GET        /feature-switch              controllers.FeatureSwitchController.featureSwitch
 POST       /feature-switch              controllers.FeatureSwitchController.submitFeatureSwitch
+
+# Get return deadlines
+GET        /return-deadlines            controllers.ReturnObligationsController.returnDeadlines
+
+# Get submitted returns for a year
+GET        /submitted/:year             controllers.ReturnObligationsController.completedReturns(year: Int)
+
+# Get a return via the submitted returns page
+GET        /submitted/:year/:periodKey  controllers.ReturnsController.vatReturn(year: Int, periodKey: String)
+
+# Get a return via the payments page
+GET        /:periodKey                  controllers.ReturnsController.vatReturnViaPayments(periodKey: String)

@@ -31,7 +31,7 @@ class CompletedReturnsPageSpec extends IntegrationBaseSpec {
 
     def request(): WSRequest = {
       setupStubs()
-      buildRequest("/returns/2017")
+      buildRequest("/submitted/2017")
     }
   }
 
@@ -73,7 +73,7 @@ class CompletedReturnsPageSpec extends IntegrationBaseSpec {
         }
         override def request(): WSRequest = {
           setupStubs()
-          buildRequest("/returns/2018")
+          buildRequest("/submitted/2018")
         }
 
         val response: WSResponse = await(request().get())
@@ -88,7 +88,7 @@ class CompletedReturnsPageSpec extends IntegrationBaseSpec {
         }
         override def request(): WSRequest = {
           setupStubs()
-          buildRequest("/returns/2018")
+          buildRequest("/submitted/2018")
         }
 
         val response: WSResponse = await(request().get())

@@ -53,8 +53,8 @@ object FinancialDataStub extends WireMockMethods{
       |        "mainType" : "VAT Officer's Assessment",
       |        "periodKey" : "#001",
       |        "periodKeyDescription" : "March 2015",
-      |        "taxPeriodFrom" : "2017-05-01",
-      |        "taxPeriodTo" : "2017-06-20",
+      |        "taxPeriodFrom" : "2018-05-01",
+      |        "taxPeriodTo" : "2018-06-20",
       |        "businessPartner" : "0",
       |        "contractAccountCategory" : "33",
       |        "contractAccount" : "X",
@@ -71,7 +71,7 @@ object FinancialDataStub extends WireMockMethods{
       |        "items" : [
       |          {
       |            "subItem" : "000",
-      |            "dueDate" : "2017-06-21",
+      |            "dueDate" : "2018-06-21",
       |            "amount" : 4000
       |          }
       |        ]
@@ -81,8 +81,8 @@ object FinancialDataStub extends WireMockMethods{
       |        "mainType" : "VAT Officer's Assessment",
       |        "periodKey" : "#002",
       |        "periodKeyDescription" : "March 2015",
-      |        "taxPeriodFrom" : "2017-05-01",
-      |        "taxPeriodTo" : "2017-06-20",
+      |        "taxPeriodFrom" : "2018-05-01",
+      |        "taxPeriodTo" : "2018-06-20",
       |        "businessPartner" : "0",
       |        "contractAccountCategory" : "33",
       |        "contractAccount" : "X",
@@ -99,7 +99,7 @@ object FinancialDataStub extends WireMockMethods{
       |        "items" : [
       |          {
       |            "subItem" : "000",
-      |            "dueDate" : "2017-06-21",
+      |            "dueDate" : "2018-06-21",
       |            "amount" : 4000
       |          }
       |        ]
