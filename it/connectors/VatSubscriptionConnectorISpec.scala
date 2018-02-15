@@ -19,7 +19,7 @@ package connectors
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import helpers.IntegrationBaseSpec
 import models.CustomerInformation
-import models.errors.{BadRequestError, ServerSideError}
+import models.errors.ServerSideError
 import stubs.CustomerInfoStub
 import uk.gov.hmrc.http.HeaderCarrier
 

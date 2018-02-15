@@ -51,7 +51,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
           AuthStub.authorised()
           CustomerInfoStub.stubCustomerInfo
           VatApiStub.stubSuccessfulVatReturn
-          VatApiStub.stubAllObligations
+          VatApiStub.stubFulfilledObligations
           FinancialDataStub.stubAllOutstandingPayments
         }
 
@@ -94,7 +94,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
           AuthStub.authorised()
           CustomerInfoStub.stubCustomerInfo
           VatApiStub.stubSuccessfulVatReturn
-          VatApiStub.stubAllObligations
+          VatApiStub.stubFulfilledObligations
           FinancialDataStub.stubAllOutstandingPayments
         }
 

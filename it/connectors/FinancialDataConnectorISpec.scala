@@ -20,7 +20,6 @@ import java.time.LocalDate
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import helpers.IntegrationBaseSpec
-import models.User
 import models.errors.BadRequestError
 import models.payments.{Payment, Payments}
 import stubs.FinancialDataStub

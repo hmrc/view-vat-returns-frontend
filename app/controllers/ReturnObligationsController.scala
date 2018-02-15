@@ -59,8 +59,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
     year <= upperBound && year >= upperBound - 3
   }
 
-  private[controllers] def getReturnObligations(user: User, selectedYear: Int,
-                                                status: VatReturnObligation.Status.Value = VatReturnObligation.Status.All)
+  private[controllers] def getReturnObligations(user: User, selectedYear: Int, status: VatReturnObligation.Status.Value)
                                                (implicit hc: HeaderCarrier): Future[VatReturnsViewModel] = {
     val currentYear: Int = LocalDate.now().getYear
     val returnYears: Seq[Int] = (currentYear to currentYear - 3) by -1

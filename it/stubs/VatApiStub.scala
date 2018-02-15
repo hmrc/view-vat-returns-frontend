@@ -20,7 +20,7 @@ import java.time.LocalDate
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import helpers.WireMockMethods
-import models.{VatReturn, VatReturnObligation, VatReturnObligations}
+import models.{VatReturnObligation, VatReturnObligations}
 import models.errors.{ApiMultiError, ApiSingleError}
 import play.api.http.Status._
 import play.api.libs.json.Json
@@ -219,9 +219,6 @@ object VatApiStub extends WireMockMethods {
       |}
     """.stripMargin
   )
-
-
-  private val apiError: ApiSingleError = ApiSingleError("", "", None)
 
   private val invalidVrn = ApiSingleError("VRN_INVALID", "", None)
   private val invalidFromDate = ApiSingleError("INVALID_DATE_FROM", "", None)
