@@ -87,7 +87,7 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
         .returns(Future.successful(Right(exampleObligations)))
 
       lazy val result: HttpGetResult[VatReturnObligations] =
-        await(service.getReturnObligationsForYear(User("999999999"), 2018))
+        await(service.getReturnObligationsForYear(User("999999999"), 2018, VatReturnObligation.Status.All))
 
       result shouldBe Right(exampleObligations)
     }
@@ -145,7 +145,7 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
     )
 
     "return all of a user's open payments" in new Test {
-      (mockFinancialDataApiConnector.getOpenPayments(_: User)(_: HeaderCarrier, _: ExecutionContext))
+      (mockFinancialDataApiConnector.getPayments(_: String)(_: HeaderCarrier, _: ExecutionContext))
         .expects(*, *, *)
         .returns(Future.successful(Right(examplePayments)))
 

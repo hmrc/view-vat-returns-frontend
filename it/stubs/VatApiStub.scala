@@ -20,7 +20,7 @@ import java.time.LocalDate
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import helpers.WireMockMethods
-import models.{VatReturn, VatReturnObligation, VatReturnObligations}
+import models.{VatReturnObligation, VatReturnObligations}
 import models.errors.{ApiMultiError, ApiSingleError}
 import play.api.http.Status._
 import play.api.libs.json.Json
@@ -29,7 +29,6 @@ object VatApiStub extends WireMockMethods {
 
   private val obligationsUri = "/([0-9]+)/obligations"
   private val returnsUri = "/([0-9]+)/returns/(.+)"
-  private val customerInfoApiUri = "/customer-information/vat/([0-9]+)"
   private val dateRegex = "([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))"
 
   def stubAllObligations: StubMapping = {
@@ -53,11 +52,18 @@ object VatApiStub extends WireMockMethods {
       .thenReturn(status = OK, body = Json.toJson(fulfilledObligations))
   }
 
-  def stubPrototypeObligations: StubMapping = {
+  def stub2018Obligations: StubMapping = {
     when(method = GET, uri = obligationsUri, queryParams = Map(
-      "from" -> dateRegex, "to" -> dateRegex, "status" -> "A"
+      "from" -> dateRegex, "to" -> dateRegex, "status" -> "F"
     ))
-      .thenReturn(status = OK, body = Json.toJson(prototypeObligations))
+      .thenReturn(status = OK, body = Json.toJson(obligationsFor2018))
+  }
+
+  def stub2017Obligations: StubMapping = {
+    when(method = GET, uri = obligationsUri, queryParams = Map(
+      "from" -> dateRegex, "to" -> dateRegex, "status" -> "F"
+    ))
+      .thenReturn(status = OK, body = Json.toJson(obligationsFor2017))
   }
 
   def stubNoObligations: StubMapping = {
@@ -119,34 +125,24 @@ object VatApiStub extends WireMockMethods {
       .thenReturn(BAD_REQUEST, body = Json.toJson(multipleErrors))
   }
 
-  def stubSuccessfulCustomerInfo: StubMapping = {
-    when(method = GET, uri = customerInfoApiUri)
-      .thenReturn(status = OK, body = validCustomerInfo)
-  }
-
-  def stubFailureCustomerInfo: StubMapping = {
-    when(method = GET, uri = customerInfoApiUri)
-      .thenReturn(status = BAD_REQUEST, body = Json.toJson(apiError))
-  }
-
   def stubSuccessfulVatReturn: StubMapping = {
     when(method = GET, uri = returnsUri)
       .thenReturn(status = OK, body = validVatReturn)
   }
 
   private val pastFulfilledObligation = VatReturnObligation(
-    start = LocalDate.now().minusDays(80L),
-    end = LocalDate.now().minusDays(50L),
-    due = LocalDate.now().minusDays(40L),
+    start = LocalDate.parse("2018-01-01"),
+    end = LocalDate.parse("2018-03-31"),
+    due = LocalDate.parse("2018-05-07"),
     status = "F",
-    received = Some(LocalDate.now().minusDays(45L)),
+    received = Some(LocalDate.parse("2018-04-15")),
     periodKey = "#001"
   )
 
   private val pastOutstandingObligation = VatReturnObligation(
-    start = LocalDate.now().minusDays(70L),
-    end = LocalDate.now().minusDays(40L),
-    due = LocalDate.now().minusDays(30L),
+    start = LocalDate.parse("2018-01-01"),
+    end = LocalDate.parse("2018-03-31"),
+    due = LocalDate.parse("2018-05-07"),
     status = "O",
     received = None,
     periodKey = "#004"
@@ -159,15 +155,18 @@ object VatApiStub extends WireMockMethods {
     )
   )
 
-  private val prototypeObligations = VatReturnObligations(Seq(
+  private val obligationsFor2018 = VatReturnObligations(Seq(
     VatReturnObligation(
-      LocalDate.parse("2017-10-31"),
-      LocalDate.parse("2018-01-31"),
-      LocalDate.parse("2018-02-28"),
-      "O",
-      None,
-      "#001"
-    ),
+      LocalDate.parse("2018-07-31"),
+      LocalDate.parse("2018-10-31"),
+      LocalDate.parse("2018-11-30"),
+      "F",
+      Some(LocalDate.parse("2018-11-27")),
+      "#002"
+    )
+  ))
+
+  private val obligationsFor2017 = VatReturnObligations(Seq(
     VatReturnObligation(
       LocalDate.parse("2017-07-31"),
       LocalDate.parse("2017-10-31"),
@@ -204,20 +203,6 @@ object VatApiStub extends WireMockMethods {
 
   private val noObligations = VatReturnObligations(Seq.empty)
 
-  private val validCustomerInfo = Json.parse(
-    """{
-      | "organisationDetails":{
-      |   "organisationName":"Cheapo Clothing Ltd",
-      |   "individualName":{
-      |     "firstName":"John",
-      |     "lastName":"Smith"
-      |   },
-      |   "tradingName":"Cheapo Clothing"
-      | }
-      |}"""
-      .stripMargin
-  )
-
   private val validVatReturn = Json.parse(
     """
       |{
@@ -234,9 +219,6 @@ object VatApiStub extends WireMockMethods {
       |}
     """.stripMargin
   )
-
-
-  private val apiError: ApiSingleError = ApiSingleError("", "", None)
 
   private val invalidVrn = ApiSingleError("VRN_INVALID", "", None)
   private val invalidFromDate = ApiSingleError("INVALID_DATE_FROM", "", None)

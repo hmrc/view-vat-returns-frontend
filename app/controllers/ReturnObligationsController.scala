@@ -21,7 +21,7 @@ import javax.inject.Inject
 
 import config.AppConfig
 import models.viewModels.{ReturnDeadline, ReturnObligationsViewModel, VatReturnsViewModel}
-import models.User
+import models.{User, VatReturnObligation}
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent}
 import services.{EnrolmentsAuthService, ReturnsService}
@@ -38,7 +38,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
   def completedReturns(year: Int): Action[AnyContent] = authorisedAction { implicit request =>
     implicit user =>
       if(validateSearchYear(year)) {
-        getReturnObligations(user, year).map { model =>
+        getReturnObligations(user, year, VatReturnObligation.Status.Fulfilled).map { model =>
           Ok(views.html.returns.completedReturns(model))
         }
       } else {
@@ -59,11 +59,12 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
     year <= upperBound && year >= upperBound - 3
   }
 
-  private[controllers] def getReturnObligations(user: User, selectedYear: Int)(implicit hc: HeaderCarrier): Future[VatReturnsViewModel] = {
+  private[controllers] def getReturnObligations(user: User, selectedYear: Int, status: VatReturnObligation.Status.Value)
+                                               (implicit hc: HeaderCarrier): Future[VatReturnsViewModel] = {
     val currentYear: Int = LocalDate.now().getYear
     val returnYears: Seq[Int] = (currentYear to currentYear - 3) by -1
 
-    returnsService.getReturnObligationsForYear(user, selectedYear).map {
+    returnsService.getReturnObligationsForYear(user, selectedYear, status).map {
       case Right(obligations) => VatReturnsViewModel(
         returnYears,
         selectedYear,

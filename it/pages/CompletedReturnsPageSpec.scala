@@ -42,7 +42,7 @@ class CompletedReturnsPageSpec extends IntegrationBaseSpec {
       "return 200" in new Test {
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
-          VatApiStub.stubPrototypeObligations
+          VatApiStub.stub2017Obligations
         }
         val response: WSResponse = await(request().get())
         response.status shouldBe Status.OK
@@ -52,7 +52,7 @@ class CompletedReturnsPageSpec extends IntegrationBaseSpec {
 
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
-          VatApiStub.stubPrototypeObligations
+          VatApiStub.stub2017Obligations
         }
         val response: WSResponse = await(request().get())
 
@@ -69,7 +69,7 @@ class CompletedReturnsPageSpec extends IntegrationBaseSpec {
       "return 200" in new Test {
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
-          VatApiStub.stubPrototypeObligations
+          VatApiStub.stub2018Obligations
         }
         override def request(): WSRequest = {
           setupStubs()
@@ -84,7 +84,7 @@ class CompletedReturnsPageSpec extends IntegrationBaseSpec {
 
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
-          VatApiStub.stubPrototypeObligations
+          VatApiStub.stub2018Obligations
         }
         override def request(): WSRequest = {
           setupStubs()

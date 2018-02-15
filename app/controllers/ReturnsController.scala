@@ -71,9 +71,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
                                               isReturnsPageRequest: Boolean): VatReturnViewModel = {
 
     // TODO: update this value to reflect partial payments
-    val amountToShow: BigDecimal = payment.fold(vatReturn.netVatDue) {
-      _.outstandingAmount
-    }
+    val amountToShow: BigDecimal = vatReturn.netVatDue
 
     VatReturnViewModel(
       entityName = entityName,
