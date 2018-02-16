@@ -22,28 +22,28 @@ import uk.gov.hmrc.play.test.UnitSpec
 class RouteSpec extends UnitSpec with GuiceOneAppPerSuite {
 
   "The route for the submitted 9 box returns via the returns page route" should {
-    "be /view-your-vat-returns/return/%23001" in {
-      controllers.routes.ReturnsController.vatReturnDetails("#001", 2018).url shouldBe
-        "/view-your-vat-returns/return/%23001?yearEnd=2018"
+    "be /vat-through-software/vat-returns/submitted/2018/%23001" in {
+      controllers.routes.ReturnsController.vatReturn(2018, "#001").url shouldBe
+        "/vat-through-software/vat-returns/submitted/2018/%23001"
     }
   }
 
   "The route for the submitted 9 box returns via the payments page route" should {
-    "be /view-your-vat-returns/payments/return" in {
-      controllers.routes.ReturnsController.vatPaymentReturnDetails("#001", 2018).url shouldBe
-        "/view-your-vat-returns/payments/return/%23001?yearEnd=2018"
+    "be /vat-through-software/vat-returns/%23001" in {
+      controllers.routes.ReturnsController.vatReturnViaPayments("#001").url shouldBe
+        "/vat-through-software/vat-returns/%23001"
     }
   }
 
   "The route for the list of returns" should {
-    "be /view-your-vat-returns/returns" in {
-      controllers.routes.ReturnObligationsController.completedReturns(2017).url shouldBe "/view-your-vat-returns/returns/2017"
+    "be /vat-through-software/vat-returns/submitted/2017" in {
+      controllers.routes.ReturnObligationsController.completedReturns(2017).url shouldBe "/vat-through-software/vat-returns/submitted/2017"
     }
   }
 
   "The route for the return deadlines" should {
-    "be /view-your-vat-returns/return-deadlines" in {
-      controllers.routes.ReturnObligationsController.returnDeadlines().url shouldBe "/view-your-vat-returns/return-deadlines"
+    "be /vat-through-software/vat-returns/return-deadlines" in {
+      controllers.routes.ReturnObligationsController.returnDeadlines().url shouldBe "/vat-through-software/vat-returns/return-deadlines"
     }
   }
 }

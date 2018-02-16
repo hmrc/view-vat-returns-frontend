@@ -29,7 +29,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
 
     def request(): WSRequest = {
       setupStubs()
-      buildRequest("/return/%23001?yearEnd=2018")
+      buildRequest("/submitted/2018/%23001")
     }
   }
 
@@ -38,11 +38,11 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
 
     def request(): WSRequest = {
       setupStubs()
-      buildRequest("/payments/return/%23001?yearEnd=2018")
+      buildRequest("/%23001")
     }
   }
 
-  "Calling the /return route" when {
+  "Calling the /submitted/:year/:periodKey route" when {
 
     "the user is authenticated and all dependent APIs return a valid response" should {
 
@@ -85,7 +85,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
     }
   }
 
-  "Calling the /payments/return route" when {
+  "Calling the /:periodKey route" when {
 
     "the user is authenticated and the Customer Information API returns a valid response" should {
 
