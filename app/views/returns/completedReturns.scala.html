@@ -75,7 +75,8 @@
               @for(obligation <- model.obligations) {
 
                 <li>
-                    <a href="@controllers.routes.ReturnsController.vatReturnDetails(obligation.periodKey, model.selectedYear)">
+                    <a href="@controllers.routes.ReturnsController.vatReturnDetails(obligation.periodKey, model.selectedYear)"
+                       data-journey-click="returns:view-return @{obligation.start}-to-@{obligation.end}:completed-returns">
                         @displayDateRange(obligation.start, obligation.end)
                     </a>
                 </li>
@@ -89,7 +90,7 @@
         <h3>@messages("completedReturns.otherReturnsHeading")</h3>
         <p>
             @messages("completedReturns.otherReturnsOne")
-            <a href="@appConfig.portalUrl">@messages("completedReturns.otherReturnsTwo")</a>
+            <a href="@appConfig.portalUrl" data-journey-click="return:view-portal-returns:completed-returns">@messages("completedReturns.otherReturnsTwo")</a>
         </p>
 
     </div>

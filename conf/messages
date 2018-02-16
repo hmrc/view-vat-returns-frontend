@@ -51,6 +51,8 @@ yourVatReturn.boxNine = Box 9
 yourVatReturn.boxNineDescription = Total value of acquisitions of goods from European Community, minus VAT
 yourVatReturn.adjustments = If there are any errors, you can make adjustments through your software.
 yourVatReturn.paymentProcessed = Your payment has been processed. There is nothing more you need to do with this return.
+yourVatReturn.paymentNow = Pay this now
+
 
 completedReturns.title = VAT returns
 completedReturns.submitMethod = You submit returns through your accounting software.
