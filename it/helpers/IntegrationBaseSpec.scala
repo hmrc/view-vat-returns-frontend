@@ -30,7 +30,7 @@ trait IntegrationBaseSpec extends UnitSpec with WireMockHelper with GuiceOneServ
 
   val mockHost: String = WireMockHelper.host
   val mockPort: String = WireMockHelper.wireMockPort.toString
-  val appRouteContext: String = "/view-your-vat-returns"
+  val appRouteContext: String = "/vat-through-software/vat-returns"
 
   lazy val client: WSClient = app.injector.instanceOf[WSClient]
 

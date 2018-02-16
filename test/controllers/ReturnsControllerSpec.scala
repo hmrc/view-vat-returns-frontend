@@ -19,10 +19,10 @@ package controllers
 import java.time.LocalDate
 
 import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
-import models.errors.{UnexpectedStatusError, UnknownError}
+import models.errors.{ServerSideError, UnexpectedStatusError, UnknownError}
 import models.payments.Payment
 import models.viewModels.VatReturnViewModel
-import models.{User, VatReturn, VatReturnObligation}
+import models.{ReturnsControllerData, User, VatReturn, VatReturnObligation}
 import play.api.http.Status
 import play.api.test.Helpers._
 import services.{EnrolmentsAuthService, ReturnsService, SubscriptionService}
@@ -112,22 +112,22 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     }
   }
 
-  "Calling the .yourVatReturn action" when {
+  "Calling the .vatReturn action" when {
 
     "a user is logged in and enrolled to HMRC-MTD-VAT" should {
 
       "return 200" in new Test {
-        private val result = target.vatReturnDetails("#001", 2018)(fakeRequest)
+        private val result = target.vatReturn(2018, "#001")(fakeRequest)
         status(result) shouldBe Status.OK
       }
 
       "return HTML" in new Test {
-        private val result = target.vatReturnDetails("#001", 2018)(fakeRequest)
+        private val result = target.vatReturn(2018, "#001")(fakeRequest)
         contentType(result) shouldBe Some("text/html")
       }
 
       "return charset of utf-8" in new Test {
-        private val result = target.vatReturnDetails("#001", 2018)(fakeRequest)
+        private val result = target.vatReturn(2018, "#001")(fakeRequest)
         charset(result) shouldBe Some("utf-8")
       }
     }
@@ -137,7 +137,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       "return 403 (Forbidden)" in new Test {
         override val serviceCall = false
         override val authResult: Future[Nothing] = Future.failed(InsufficientEnrolments())
-        private val result = target.vatReturnDetails("#001", 2018)(fakeRequest)
+        private val result = target.vatReturn(2018, "#001")(fakeRequest)
         status(result) shouldBe Status.FORBIDDEN
       }
     }
@@ -147,7 +147,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       "return 401 (Unauthorised)" in new Test {
         override val serviceCall = false
         override val authResult: Future[Nothing] = Future.failed(MissingBearerToken())
-        private val result = target.vatReturnDetails("#001", 2018)(fakeRequest)
+        private val result = target.vatReturn(2018, "#001")(fakeRequest)
         status(result) shouldBe Status.UNAUTHORIZED
       }
     }
@@ -157,7 +157,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       "return 404 (Not Found)" in new Test {
         override val vatReturnResult: Future[HttpGetResult[VatReturn]] =
           Future.successful(Left(UnexpectedStatusError(404)))
-        private val result = target.vatReturnDetails("#001", 2018)(fakeRequest)
+        private val result = target.vatReturn(2018, "#001")(fakeRequest)
         status(result) shouldBe Status.NOT_FOUND
       }
     }
@@ -167,7 +167,68 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       "return 500 (Internal Server Error)" in new Test {
         override val vatReturnResult: Future[HttpGetResult[VatReturn]] =
           Future.successful(Left(UnknownError))
-        private val result = target.vatReturnDetails("#001", 2018)(fakeRequest)
+        private val result = target.vatReturn(2018, "#001")(fakeRequest)
+        status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+      }
+    }
+  }
+
+  "Calling the .vatReturnViaPayments action" when {
+
+    "a user is logged in and enrolled to HMRC-MTD-VAT" should {
+
+      "return 200" in new Test {
+        private val result = target.vatReturnViaPayments("#001")(fakeRequest)
+        status(result) shouldBe Status.OK
+      }
+
+      "return HTML" in new Test {
+        private val result = target.vatReturnViaPayments("#001")(fakeRequest)
+        contentType(result) shouldBe Some("text/html")
+      }
+
+      "return charset of utf-8" in new Test {
+        private val result = target.vatReturnViaPayments("#001")(fakeRequest)
+        charset(result) shouldBe Some("utf-8")
+      }
+    }
+
+    "a user is not authorised" should {
+
+      "return 403 (Forbidden)" in new Test {
+        override val serviceCall = false
+        override val authResult: Future[Nothing] = Future.failed(InsufficientEnrolments())
+        private val result = target.vatReturnViaPayments("#001")(fakeRequest)
+        status(result) shouldBe Status.FORBIDDEN
+      }
+    }
+
+    "a user is not authenticated" should {
+
+      "return 401 (Unauthorised)" in new Test {
+        override val serviceCall = false
+        override val authResult: Future[Nothing] = Future.failed(MissingBearerToken())
+        private val result = target.vatReturnViaPayments("#001")(fakeRequest)
+        status(result) shouldBe Status.UNAUTHORIZED
+      }
+    }
+
+    "the specified VAT return is not found" should {
+
+      "return 404 (Not Found)" in new Test {
+        override val vatReturnResult: Future[HttpGetResult[VatReturn]] =
+          Future.successful(Left(UnexpectedStatusError(404)))
+        private val result = target.vatReturnViaPayments("#001")(fakeRequest)
+        status(result) shouldBe Status.NOT_FOUND
+      }
+    }
+
+    "a different error is retrieved" should {
+
+      "return 500 (Internal Server Error)" in new Test {
+        override val vatReturnResult: Future[HttpGetResult[VatReturn]] =
+          Future.successful(Left(UnknownError))
+        private val result = target.vatReturnViaPayments("#001")(fakeRequest)
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
       }
     }
@@ -210,5 +271,63 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       )
       result shouldBe expectedViewModel
     }
+  }
+
+  "Calling .renderResult" when {
+
+    val mockVatReturnService: ReturnsService = mock[ReturnsService]
+    val mockVatApiService: SubscriptionService = mock[SubscriptionService]
+    val mockAuthConnector: AuthConnector = mock[AuthConnector]
+    val mockEnrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
+    val target = new ReturnsController(messages, mockEnrolmentsAuthService, mockVatReturnService, mockVatApiService, mockConfig)
+
+    "Right(vatReturn) and Some(ob)" should {
+
+      "return an OK status" in {
+        val data = ReturnsControllerData(Right(exampleVatReturn), None, None, Some(exampleObligation))
+
+        val result = target.renderResult(data, isReturnsPageRequest = true)(fakeRequest)
+
+        result.header.status shouldBe Status.OK
+      }
+
+    }
+
+    "Right(_) and None" should {
+
+      "return a Not Found status" in {
+        val data = ReturnsControllerData(Right(exampleVatReturn), None, None, None)
+
+        val result = target.renderResult(data, isReturnsPageRequest = true)(fakeRequest)
+
+        result.header.status shouldBe Status.NOT_FOUND
+      }
+
+    }
+
+    "Left(UnexpectedStatusError(404))" should {
+
+      "return a Not Found status" in {
+        val data = ReturnsControllerData(Left(UnexpectedStatusError(404)), None, None, None)
+
+        val result = target.renderResult(data, isReturnsPageRequest = true)(fakeRequest)
+
+        result.header.status shouldBe Status.NOT_FOUND
+      }
+
+    }
+
+    "Left(_)" should {
+
+      "return an Internal Server Error status" in {
+        val data = ReturnsControllerData(Left(ServerSideError), None, None, None)
+
+        val result = target.renderResult(data, isReturnsPageRequest = true)(fakeRequest)
+
+        result.header.status shouldBe Status.INTERNAL_SERVER_ERROR
+      }
+
+    }
+
   }
 }

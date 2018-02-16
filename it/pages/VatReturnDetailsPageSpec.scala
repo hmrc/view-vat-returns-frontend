@@ -20,7 +20,7 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import helpers.IntegrationBaseSpec
 import play.api.http.Status
 import play.api.libs.ws.{WSRequest, WSResponse}
-import stubs.{AuthStub, FinancialDataStub, VatApiStub}
+import stubs.{AuthStub, CustomerInfoStub, FinancialDataStub, VatApiStub}
 
 class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
 
@@ -29,7 +29,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
 
     def request(): WSRequest = {
       setupStubs()
-      buildRequest("/return/%23001?yearEnd=2018")
+      buildRequest("/submitted/2018/%23001")
     }
   }
 
@@ -38,20 +38,20 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
 
     def request(): WSRequest = {
       setupStubs()
-      buildRequest("/payments/return/%23001?yearEnd=2018")
+      buildRequest("/%23001")
     }
   }
 
-  "Calling the /return route" when {
+  "Calling the /submitted/:year/:periodKey route" when {
 
-    "the user is authenticated and all dependant APIs return a valid response" should {
+    "the user is authenticated and all dependent APIs return a valid response" should {
 
       "return 200" in new ReturnRouteTest {
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
-          VatApiStub.stubSuccessfulCustomerInfo
+          CustomerInfoStub.stubCustomerInfo
           VatApiStub.stubSuccessfulVatReturn
-          VatApiStub.stubPrototypeObligations
+          VatApiStub.stubFulfilledObligations
           FinancialDataStub.stubAllOutstandingPayments
         }
 
@@ -85,16 +85,16 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
     }
   }
 
-  "Calling the /payments/return route" when {
+  "Calling the /:periodKey route" when {
 
     "the user is authenticated and the Customer Information API returns a valid response" should {
 
       "return 200" in new PaymentReturnRouteTest {
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
-          VatApiStub.stubSuccessfulCustomerInfo
+          CustomerInfoStub.stubCustomerInfo
           VatApiStub.stubSuccessfulVatReturn
-          VatApiStub.stubPrototypeObligations
+          VatApiStub.stubFulfilledObligations
           FinancialDataStub.stubAllOutstandingPayments
         }
 

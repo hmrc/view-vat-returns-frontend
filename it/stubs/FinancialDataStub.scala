@@ -27,21 +27,21 @@ object FinancialDataStub extends WireMockMethods{
   private val financialDataUri = "/financial-transactions/vat/([0-9]+)"
 
   def stubAllOutstandingPayments: StubMapping = {
-    when(method = GET, uri = financialDataUri, queryParams = Map("status" -> "O"))
-      .thenReturn(status = OK, body = allOutStandingPayments)
+    when(method = GET, uri = financialDataUri)
+      .thenReturn(status = OK, body = allPayments)
   }
 
   def stubNoPayments: StubMapping = {
-    when(method = GET, uri = financialDataUri, queryParams = Map("status" -> "O"))
+    when(method = GET, uri = financialDataUri)
       .thenReturn(status = OK, body = Json.toJson(noPayments))
   }
 
   def stubInvalidVrn: StubMapping = {
-    when(method = GET, uri = financialDataUri, queryParams = Map("status" -> "O"))
+    when(method = GET, uri = financialDataUri)
       .thenReturn(BAD_REQUEST, body = Json.toJson(invalidVrn))
   }
 
-  private val allOutStandingPayments: JsValue = Json.parse(
+  private val allPayments: JsValue = Json.parse(
     """{
       |    "idType" : "VRN",
       |    "idNumber" : 555555555,
@@ -51,10 +51,10 @@ object FinancialDataStub extends WireMockMethods{
       |      {
       |        "chargeType" : "VAT 0A Debit Charge",
       |        "mainType" : "VAT Officer's Assessment",
-      |        "periodKey" : "#003",
+      |        "periodKey" : "#001",
       |        "periodKeyDescription" : "March 2015",
-      |        "taxPeriodFrom" : "2017-05-01",
-      |        "taxPeriodTo" : "2017-06-20",
+      |        "taxPeriodFrom" : "2018-05-01",
+      |        "taxPeriodTo" : "2018-06-20",
       |        "businessPartner" : "0",
       |        "contractAccountCategory" : "33",
       |        "contractAccount" : "X",
@@ -71,7 +71,7 @@ object FinancialDataStub extends WireMockMethods{
       |        "items" : [
       |          {
       |            "subItem" : "000",
-      |            "dueDate" : "2017-06-21",
+      |            "dueDate" : "2018-06-21",
       |            "amount" : 4000
       |          }
       |        ]
@@ -79,10 +79,10 @@ object FinancialDataStub extends WireMockMethods{
       |      {
       |        "chargeType" : "VAT 0A Debit Charge",
       |        "mainType" : "VAT Officer's Assessment",
-      |        "periodKey" : "#003",
+      |        "periodKey" : "#002",
       |        "periodKeyDescription" : "March 2015",
-      |        "taxPeriodFrom" : "2017-05-01",
-      |        "taxPeriodTo" : "2017-06-20",
+      |        "taxPeriodFrom" : "2018-05-01",
+      |        "taxPeriodTo" : "2018-06-20",
       |        "businessPartner" : "0",
       |        "contractAccountCategory" : "33",
       |        "contractAccount" : "X",
@@ -94,12 +94,12 @@ object FinancialDataStub extends WireMockMethods{
       |        "mainTransaction" : "1234",
       |        "subTransaction" : "1174",
       |        "originalAmount" : 4000,
-      |        "outstandingAmount" : 4000,
+      |        "outstandingAmount" : 0,
       |        "clearedAmount" : 4000,
       |        "items" : [
       |          {
       |            "subItem" : "000",
-      |            "dueDate" : "2017-06-21",
+      |            "dueDate" : "2018-06-21",
       |            "amount" : 4000
       |          }
       |        ]
