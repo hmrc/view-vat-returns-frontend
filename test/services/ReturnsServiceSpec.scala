@@ -23,7 +23,7 @@ import connectors.{FinancialDataConnector, VatApiConnector}
 import controllers.ControllerBaseSpec
 import models.VatReturnObligation.Status
 import models.payments.{Payment, Payments}
-import models.{User, VatReturn, VatReturnObligation, VatReturnObligations}
+import models._
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits._
@@ -36,9 +36,6 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
     val mockFinancialDataApiConnector: FinancialDataConnector = mock[FinancialDataConnector]
     val service = new ReturnsService(mockVatApiConnector, mockFinancialDataApiConnector)
     implicit val hc: HeaderCarrier = HeaderCarrier()
-  }
-
-  "Calling .getVatReturn" should {
 
     val exampleVatReturn: VatReturn = VatReturn(
       "#001",
@@ -53,13 +50,24 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
       545645
     )
 
+    val examplePayment: Payment = Payment(
+      LocalDate.parse("2017-01-01"),
+      LocalDate.parse("2017-02-01"),
+      LocalDate.parse("2017-02-02"),
+      5000,
+      "#003"
+    )
+  }
+
+  "Calling .getVatReturn" should {
+
     "return a VAT Return" in new Test {
       (mockVatApiConnector.getVatReturnDetails(_: String, _: String)(_: HeaderCarrier, _: ExecutionContext))
         .expects(*, *, *, *)
         .returns(Future.successful(Right(exampleVatReturn)))
 
       lazy val result: HttpGetResult[VatReturn] = await(
-        service.getVatReturnDetails(User("999999999"), "#001")
+        service.getVatReturn(User("999999999"), "#001")
       )
 
       result shouldBe Right(exampleVatReturn)
@@ -124,27 +132,12 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
 
   "Calling .getPayment" should {
 
-    val examplePayments: Payments = Payments(
-      Seq(
-        Payment(
-          LocalDate.parse("2017-01-01"),
-          LocalDate.parse("2017-02-01"),
-          LocalDate.parse("2017-02-02"),
-          5000,
-          "#003"
-        )
-      )
-    )
-
-    val examplePayment: Payment = Payment(
-      LocalDate.parse("2017-01-01"),
-      LocalDate.parse("2017-02-01"),
-      LocalDate.parse("2017-02-02"),
-      5000,
-      "#003"
-    )
-
     "return all of a user's open payments" in new Test {
+
+      val examplePayments: Payments = Payments(
+        Seq(examplePayment)
+      )
+
       (mockFinancialDataApiConnector.getPayments(_: String)(_: HeaderCarrier, _: ExecutionContext))
         .expects(*, *, *)
         .returns(Future.successful(Right(examplePayments)))
@@ -214,6 +207,18 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
       val result: Option[VatReturnObligation] = await(service.getObligationWithMatchingPeriodKey(User("111111111"), 2018, "#004"))
       result shouldBe None
     }
+  }
 
+  "Calling the .constructReturnDetailsModel function" should {
+
+    "create a VatReturnDetails object" in new Test {
+      val expected: VatReturnDetails = VatReturnDetails(
+        exampleVatReturn, moneyOwed = true, isRepayment = false, examplePayment
+      )
+
+      val result: VatReturnDetails = service.constructReturnDetailsModel(exampleVatReturn, examplePayment)
+
+      result shouldBe expected
+    }
   }
 }
