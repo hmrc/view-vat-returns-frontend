@@ -66,11 +66,13 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       5755,
       7052,
       5732,
-      1320,
+      1000,
       77656,
       765765,
       55454,
       545645,
+      moneyOwed = false,
+      isRepayment = false,
       showReturnsBreadcrumb = true
     )
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
@@ -117,7 +119,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     }
 
     "have the correct subheading" in {
-      elementText(Selectors.subHeading) shouldBe "You owed: £1,000"
+      elementText(Selectors.subHeading) shouldBe "You paid: £1,000"
     }
 
     "have the correct trading name" in {
@@ -143,7 +145,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
         "VAT on European Community sales and related costs",
         "VAT sales subtotal",
         "Total VAT reclaimed from anywhere",
-        "Total you owe",
+        "Total you owed",
         "Total sales and other outputs from anywhere, minus VAT",
         "Total purchases from anywhere, minus VAT",
         "Total supplies, goods and related costs to European Community, minus VAT",
@@ -175,6 +177,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       765765,
       55454,
       545645,
+      moneyOwed = false,
+      isRepayment = false,
       showReturnsBreadcrumb = false
     )
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
