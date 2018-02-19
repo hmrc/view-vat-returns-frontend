@@ -23,7 +23,7 @@ import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
 import connectors.{FinancialDataConnector, VatApiConnector}
 import models.VatReturnObligation.Status
 import models.payments.{Payment, Payments}
-import models.{User, VatReturn, VatReturnObligation, VatReturnObligations}
+import models._
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -31,8 +31,8 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class ReturnsService @Inject()(vatApiConnector: VatApiConnector, financialDataConnector: FinancialDataConnector) {
 
-  def getVatReturnDetails(user: User, periodKey: String)
-                         (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[VatReturn]] = {
+  def getVatReturn(user: User, periodKey: String)
+                  (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[VatReturn]] = {
     vatApiConnector.getVatReturnDetails(user.vrn, periodKey)
   }
 
@@ -61,7 +61,8 @@ class ReturnsService @Inject()(vatApiConnector: VatApiConnector, financialDataCo
     )
   }
 
-  def getPayment(user: User, requiredPeriod: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[Payment]] = {
+  def getPayment(user: User, requiredPeriod: String)
+                (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[Payment]] = {
     financialDataConnector.getPayments(user.vrn).map {
       case Right(payments) => filterPaymentsByPeriodKey(payments, requiredPeriod)
       case Left(_) => None
@@ -72,4 +73,9 @@ class ReturnsService @Inject()(vatApiConnector: VatApiConnector, financialDataCo
     payments.financialTransactions.find(_.periodKey == requiredPeriod)
   }
 
+  def constructReturnDetailsModel(vatReturn: VatReturn, payment: Payment): VatReturnDetails = {
+    val moneyOwed = payment.outstandingAmount != 0
+    val isRepayment = vatReturn.netVatDue < 0
+    VatReturnDetails(vatReturn, moneyOwed, isRepayment, payment)
+  }
 }

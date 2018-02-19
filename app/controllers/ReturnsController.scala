@@ -42,7 +42,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
       implicit user =>
         val isReturnsPageRequest = true
 
-        val vatReturnCall = returnsService.getVatReturnDetails(user, periodKey)
+        val vatReturnCall = returnsService.getVatReturn(user, periodKey)
         val entityNameCall = subscriptionService.getEntityName(user)
         val financialDataCall = returnsService.getPayment(user, periodKey)
         val obligationCall = returnsService.getObligationWithMatchingPeriodKey(user, year, periodKey)
@@ -63,7 +63,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
       implicit user =>
         val isReturnsPageRequest = false
 
-        val vatReturnCall = returnsService.getVatReturnDetails(user, periodKey)
+        val vatReturnCall = returnsService.getVatReturn(user, periodKey)
         val entityNameCall = subscriptionService.getEntityName(user)
         val financialDataCall = returnsService.getPayment(user, periodKey)
         def obligationCall(payment: Option[Payment]) = {
