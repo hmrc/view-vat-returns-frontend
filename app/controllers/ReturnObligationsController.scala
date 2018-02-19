@@ -37,7 +37,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
 
   def completedReturns(year: Int): Action[AnyContent] = authorisedAction { implicit request =>
     implicit user =>
-      if(validateSearchYear(year)) {
+      if(isValidSearchYear(year)) {
         getReturnObligations(user, year, VatReturnObligation.Status.Fulfilled).map { model =>
           Ok(views.html.returns.completedReturns(model))
         }
@@ -55,14 +55,14 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
       )))
   }
 
-  private[controllers] def validateSearchYear(year: Int, upperBound: Int = LocalDate.now().getYear) = {
-    year <= upperBound && year >= upperBound - 3
+  private[controllers] def isValidSearchYear(year: Int, upperBound: Int = LocalDate.now().getYear) = {
+    year <= upperBound && year >= upperBound - 1
   }
 
   private[controllers] def getReturnObligations(user: User, selectedYear: Int, status: VatReturnObligation.Status.Value)
                                                (implicit hc: HeaderCarrier): Future[VatReturnsViewModel] = {
     val currentYear: Int = LocalDate.now().getYear
-    val returnYears: Seq[Int] = (currentYear to currentYear - 3) by -1
+    val returnYears: Seq[Int] = (currentYear to currentYear - 1) by -1
 
     returnsService.getReturnObligationsForYear(user, selectedYear, status).map {
       case Right(obligations) => VatReturnsViewModel(
