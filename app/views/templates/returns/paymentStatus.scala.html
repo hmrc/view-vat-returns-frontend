@@ -22,12 +22,12 @@
 
 @(moneyOwed, isRepayment) match {
   case (true, true) => {
-    <p><@messages("paymentStatus.repaymentProcessing")</p>
-    <h2 class="heading-large">@messages("paymentStatus.hmrcWillPay") @displayMoney(amount * -1)</h2>
+    <p>@messages("paymentStatus.repaymentProcessing")</p>
+    <h2 class="heading-large">@messages("paymentStatus.hmrcWillPay") @displayMoney(amount)</h2>
   }
   case (false, true) => {
     <p>@messages("paymentStatus.paymentProcessed")</p>
-    <h2 class="heading-large">@messages("paymentStatus.hmrcPaid") @displayMoney(amount * -1)</h2>
+    <h2 class="heading-large">@messages("paymentStatus.hmrcPaid") @displayMoney(amount)</h2>
   }
   case (true, false) => {
     <p>@messages("paymentStatus.billToPay", displayDate(dueDate))</p>
