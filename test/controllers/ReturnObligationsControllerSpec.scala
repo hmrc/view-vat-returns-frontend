@@ -222,7 +222,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
         val currentYear: Int = LocalDate.now().getYear
         val expectedResult = VatReturnsViewModel(
-          Seq(currentYear, currentYear - 1, currentYear - 2, currentYear - 3),
+          Seq(currentYear, currentYear - 1),
           2017,
           Seq(
             ReturnObligationsViewModel(
@@ -247,7 +247,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
         val currentYear: Int = LocalDate.now().getYear
         val expectedResult = VatReturnsViewModel(
-          Seq(currentYear, currentYear - 1, currentYear - 2, currentYear - 3),
+          Seq(currentYear, currentYear - 1),
           2017,
           Seq()
         )
@@ -258,7 +258,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     }
   }
 
-  "Calling .validateSearchYear" when {
+  "Calling .isValidSearchYear" when {
 
     "the year is on the upper search boundary" should {
 
@@ -267,7 +267,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
         override def setup(): Any = "" // Prevent the unused mocks causing trouble
 
-        val result: Boolean = target.validateSearchYear(2018, 2018)
+        val result: Boolean = target.isValidSearchYear(2018, 2018)
 
         result shouldBe true
       }
@@ -281,7 +281,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
         override def setup(): Any = "" // Prevent the unused mocks causing trouble
 
-        val result: Boolean = target.validateSearchYear(2019, 2018)
+        val result: Boolean = target.isValidSearchYear(2019, 2018)
 
         result shouldBe false
       }
@@ -295,7 +295,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
         override def setup(): Any = "" // Prevent the unused mocks causing trouble
 
-        val result: Boolean = target.validateSearchYear(2015, 2018)
+        val result: Boolean = target.isValidSearchYear(2017, 2018)
 
         result shouldBe true
       }
@@ -309,7 +309,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
         override def setup(): Any = "" // Prevent the unused mocks causing trouble
 
-        val result: Boolean = target.validateSearchYear(2014, 2018)
+        val result: Boolean = target.isValidSearchYear(2014, 2018)
 
         result shouldBe false
       }
@@ -323,7 +323,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
         override def setup(): Any = "" // Prevent the unused mocks causing trouble
 
-        val result: Boolean = target.validateSearchYear(2017, 2018)
+        val result: Boolean = target.isValidSearchYear(2017, 2018)
 
         result shouldBe true
       }
