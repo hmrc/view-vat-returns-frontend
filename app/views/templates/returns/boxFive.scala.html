@@ -14,20 +14,11 @@
  * limitations under the License.
  *@
 
-@import views.html.templates.formatters.money._
+@(moneyOwed: Boolean, isRepayment: Boolean)(implicit messages: Messages)
 
-@(amount: BigDecimal, moneyOwed: Boolean, isRepayment: Boolean)(implicit messages: Messages)
-
-<div class="column-one-quarter heading-small">@messages("yourVatReturn.boxFive")</div>
-<div class="column-one-half heading-small">
-  @(moneyOwed, isRepayment) match {
-    case (true, true) => { @messages("boxFiveDescription.hmrcWillPay") }
-    case (false, true) => { @messages("boxFiveDescription.hmrcPaid") }
-    case (true, false) => { @messages("boxFiveDescription.totalYouOwe") }
-    case (false, false) => { @messages("boxFiveDescription.totalYouOwed") }
-  }
-</div>
-<div class="column-one-quarter heading-small text--right">
-  @if(amount < 0) { @displayMoney(amount * -1) } else { @displayMoney(amount) }
-</div>
-
+@(moneyOwed, isRepayment) match {
+  case (true, true) => { @messages("boxFiveDescription.hmrcWillPay") }
+  case (false, true) => { @messages("boxFiveDescription.hmrcPaid") }
+  case (true, false) => { @messages("boxFiveDescription.totalYouOwe") }
+  case (false, false) => { @messages("boxFiveDescription.totalYouOwed") }
+}
