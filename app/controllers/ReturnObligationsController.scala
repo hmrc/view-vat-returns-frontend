@@ -48,11 +48,12 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
 
   def returnDeadlines(): Action[AnyContent] = authorisedAction { implicit request =>
     implicit user =>
-      Future.successful(Ok(views.html.returns.returnDeadlines(
-        Seq(ReturnDeadlineViewModel(LocalDate.parse("2018-08-07"),
-          LocalDate.parse("2017-08-01"),
-          LocalDate.parse("2017-10-31"))
-      ))))
+      returnsService.getReturnObligationsForYear(user, LocalDate.now().getYear, VatReturnObligation.Status.Outstanding).map {
+        case Right(obligations) =>
+          val deadlines = obligations.obligations.map(ob => ReturnDeadlineViewModel(ob.due, ob.start, ob.end))
+          Ok(views.html.returns.returnDeadlines(deadlines))
+        case Left(_) => throw new Exception //non-graceful error handling for MVP
+      }
   }
 
   private[controllers] def isValidSearchYear(year: Int, upperBound: Int = LocalDate.now().getYear) = {

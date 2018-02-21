@@ -33,36 +33,41 @@
 
       <h1 class="heading-xlarge">@messages("returnDeadlines.title")</h1>
 
-      <p>@messages("returnDeadlines.submitBy")</p>
+      @if(deadlines.isEmpty) {
+        <p>@messages("returnDeadlines.noReturns")</p>
+        <p>@messages("returnDeadlines.useSoftware")</p>
+      } else {
+        <p>@messages("returnDeadlines.submitBy")</p>
 
-      <div class="form-group">
-        <ul class="list list-bullet">
-          @for(deadline <- deadlines){
-            <li class="bold-small">
-              @displayDate(deadline.due)
-              <span class="form-hint">
-                @messages("returnDeadlines.periodEnding", displayDateRange(deadline.start, deadline.end))
-              </span>
-            </li>
-          }
-        </ul>
-      </div>
-
-      <details>
-
-        <summary><span class="summary">@messages("returnDeadlines.howToSubmit")</span></summary>
-
-        <div class="panel panel-border-narrow">
-          <ul class="list list-number">
-            <li>
-              <a href="#">@messages("returnDeadlines.softwareOne")</a>
-              @messages("returnDeadlines.softwareTwo")
-            </li>
-            <li>@messages("returnDeadlines.vatRecords")</li>
-            <li>@messages("returnDeadlines.sendReturns")</li>
+        <div class="form-group">
+          <ul class="list list-bullet">
+            @for(deadline <- deadlines){
+              <li class="bold-small">
+                @displayDate(deadline.due)
+                <span class="form-hint">
+                  @messages("returnDeadlines.periodEnding", displayDateRange(deadline.start, deadline.end))
+                </span>
+              </li>
+            }
           </ul>
         </div>
-      </details>
+
+        <details>
+
+          <summary><span class="summary">@messages("returnDeadlines.howToSubmit")</span></summary>
+
+          <div class="panel panel-border-narrow">
+            <ul class="list list-number">
+              <li>
+                <a href="#">@messages("returnDeadlines.softwareOne")</a>
+                @messages("returnDeadlines.softwareTwo")
+              </li>
+              <li>@messages("returnDeadlines.vatRecords")</li>
+              <li>@messages("returnDeadlines.sendReturns")</li>
+            </ul>
+          </div>
+        </details>
+      }
     </div>
   </div>
 }
