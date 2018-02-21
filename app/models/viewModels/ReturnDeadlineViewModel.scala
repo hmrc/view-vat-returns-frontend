@@ -18,6 +18,6 @@ package models.viewModels
 
 import java.time.LocalDate
 
-case class ReturnDeadline(due: LocalDate,
-                          start: LocalDate,
-                          end: LocalDate)
+case class ReturnDeadlineViewModel(due: LocalDate,
+                                   start: LocalDate,
+                                   end: LocalDate)
