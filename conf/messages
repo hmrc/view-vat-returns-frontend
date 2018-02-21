@@ -65,7 +65,7 @@ completedReturns.activeTab = Currently viewing returns from {0}
 completedReturns.inactiveTab = View returns from {0}
 
 returnDeadlines.title = Return deadlines
-returnDeadlines.submitBy = You must use your accounting software to submit a return by:
+returnDeadlines.submitBy = You must use accounting software to submit a return by:
 returnDeadlines.periodEnding = for the period {0}
 returnDeadlines.howToSubmit = How to do this
 returnDeadlines.softwareOne = Choose accounting software that supports this service (opens in a new tab)

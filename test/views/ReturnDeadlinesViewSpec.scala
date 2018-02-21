@@ -81,7 +81,7 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
     }
 
     "have the correct message regarding submitting returns through software" in {
-      elementText(Selectors.submitThroughSoftware) shouldBe "You must use your accounting software to submit a return by:"
+      elementText(Selectors.submitThroughSoftware) shouldBe "You must use accounting software to submit a return by:"
     }
 
     "have the correct obligation due date" in {
