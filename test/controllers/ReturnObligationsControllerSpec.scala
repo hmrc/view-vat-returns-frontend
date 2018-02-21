@@ -151,7 +151,6 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         private val result = target.completedReturns(LocalDate.now().getYear +3)(fakeRequest)
         status(result) shouldBe Status.NOT_FOUND
       }
-
     }
   }
 
@@ -160,21 +159,18 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     "A user is logged in and enrolled to HMRC-MTD-VAT" should {
 
       "return 200" in new Test {
-        override val serviceCall = false
         override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
         private val result = target.returnDeadlines()(fakeRequest)
         status(result) shouldBe Status.OK
       }
 
       "return HTML" in new Test {
-        override val serviceCall = false
         override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
         private val result = target.returnDeadlines()(fakeRequest)
         contentType(result) shouldBe Some("text/html")
       }
 
       "return charset of utf-8" in new Test {
-        override val serviceCall = false
         override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
         private val result = target.returnDeadlines()(fakeRequest)
         charset(result) shouldBe Some("utf-8")
@@ -198,6 +194,20 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         override val authResult: Future[Nothing] = Future.failed(MissingBearerToken())
         private val result = target.returnDeadlines()(fakeRequest)
         status(result) shouldBe Status.UNAUTHORIZED
+      }
+    }
+
+    "the Obligations API call fails" should {
+
+      "throw an exception" in new Test {
+        (mockVatReturnService.getReturnObligationsForYear(_: User, _: Int, _: VatReturnObligation.Status.Value)
+        (_: HeaderCarrier, _: ExecutionContext))
+        .expects(*, *, *, *, *)
+          .returns(Future.successful(Left(BadRequestError("", ""))))
+
+        override val serviceCall = false
+        override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
+        intercept[Exception](await(target.returnDeadlines()(fakeRequest)))
       }
     }
   }
