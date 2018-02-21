@@ -42,9 +42,10 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       nineBoxElemSelector("8", "2"), nineBoxElemSelector("9", "2"), nineBoxElemSelector("13", "2"),
       nineBoxElemSelector("14", "2"), nineBoxElemSelector("15", "2"), nineBoxElemSelector("16", "2")
     )
-    val boxFiveDescription = nineBoxElemSelector("10", "2")
-    val boxFiveDescriptionYouOweMoney = nineBoxElemSelector("11", "2")
+    val boxFiveDescription: String = nineBoxElemSelector("10", "2")
+    val boxFiveDescriptionYouOweMoney: String = nineBoxElemSelector("11", "2")
     val adjustments = "#adjustments"
+    val paymentButton = ".button"
     val btaBreadcrumb = "div.breadcrumbs li:nth-of-type(1)"
     val btaBreadcrumbLink = "div.breadcrumbs li:nth-of-type(1) a"
     val vatBreadcrumb = "div.breadcrumbs li:nth-of-type(2)"
@@ -249,6 +250,10 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
 
     "have the correct box 5 description in the table" in {
       elementText(Selectors.boxFiveDescriptionYouOweMoney) shouldBe "Total you owe"
+    }
+
+    "have the pay button" in {
+      element(Selectors.paymentButton).attr("value") shouldBe "Pay this now"
     }
   }
 
