@@ -14,11 +14,11 @@
  * limitations under the License.
  *@
 
-@import models.viewModels.ReturnDeadline
+@import models.viewModels.ReturnDeadlineViewModel
 @import views.html.templates.formatters.breadcrumbs._
 @import views.html.templates.formatters.dates._
 
-@(deadline: ReturnDeadline)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
+@(deadlines: Seq[ReturnDeadlineViewModel])(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
 @views.html.main_template(title = messages("returnDeadlines.title"), bodyClasses = None, appConfig = appConfig) {
 
@@ -37,12 +37,14 @@
 
       <div class="form-group">
         <ul class="list list-bullet">
-          <li class="bold-small">
-            @displayDate(deadline.due)
-            <span class="form-hint">
-              @messages("returnDeadlines.periodEnding", displayDateRange(deadline.start, deadline.end))
-            </span>
-          </li>
+          @for(deadline <- deadlines){
+            <li class="bold-small">
+              @displayDate(deadline.due)
+              <span class="form-hint">
+                @messages("returnDeadlines.periodEnding", displayDateRange(deadline.start, deadline.end))
+              </span>
+            </li>
+          }
         </ul>
       </div>
 

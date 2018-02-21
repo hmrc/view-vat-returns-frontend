@@ -20,7 +20,7 @@ import java.time.LocalDate
 import javax.inject.Inject
 
 import config.AppConfig
-import models.viewModels.{ReturnDeadline, ReturnObligationsViewModel, VatReturnsViewModel}
+import models.viewModels.{ReturnDeadlineViewModel, ReturnObligationsViewModel, VatReturnsViewModel}
 import models.{User, VatReturnObligation}
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent}
@@ -49,10 +49,10 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
   def returnDeadlines(): Action[AnyContent] = authorisedAction { implicit request =>
     implicit user =>
       Future.successful(Ok(views.html.returns.returnDeadlines(
-        ReturnDeadline(LocalDate.parse("2018-08-07"),
+        Seq(ReturnDeadlineViewModel(LocalDate.parse("2018-08-07"),
           LocalDate.parse("2017-08-01"),
           LocalDate.parse("2017-10-31"))
-      )))
+      ))))
   }
 
   private[controllers] def isValidSearchYear(year: Int, upperBound: Int = LocalDate.now().getYear) = {

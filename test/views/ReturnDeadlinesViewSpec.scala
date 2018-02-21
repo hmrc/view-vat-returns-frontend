@@ -18,7 +18,7 @@ package views
 
 import java.time.LocalDate
 
-import models.viewModels.ReturnDeadline
+import models.viewModels.ReturnDeadlineViewModel
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
@@ -27,13 +27,16 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
   object Selectors {
     val pageHeading = "#content h1"
     val submitThroughSoftware = "#content > article > div > div > p"
-    val dueDate = ".list-bullet li"
-    val period = ".list-bullet li .form-hint"
     val howToDoThis = "details > summary > span"
     val downloadSoftware = ".list-number li:nth-child(1)"
     val downloadSoftwareLink = ".list-number li:nth-child(1) a"
     val vatRecords = ".list-number li:nth-child(2)"
     val sendReturns= ".list-number li:nth-child(3)"
+
+    val firstDeadlineDueDate = ".list-bullet li:nth-of-type(1)"
+    val firstDeadlinePeriod = ".list-bullet li:nth-of-type(1) .form-hint"
+    val secondDeadlineDueDate = ".list-bullet li:nth-of-type(2)"
+    val secondDeadlinePeriod = ".list-bullet li:nth-of-type(2) .form-hint"
 
     val btaBreadcrumb = "div.breadcrumbs li:nth-of-type(1)"
     val btaBreadCrumbLink = "div.breadcrumbs li:nth-of-type(1) a"
@@ -42,11 +45,16 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
     val returnDeadlinesBreadCrumb = "div.breadcrumbs li:nth-of-type(3)"
   }
 
-  "Rendering the Return deadlines page" should {
+  "Rendering the Return deadlines page with a single deadline" should {
 
-    val exampleDeadline: ReturnDeadline = ReturnDeadline(LocalDate.parse("2018-02-02"), LocalDate.parse("2018-01-01"), LocalDate.parse("2018-01-01"))
+    val singleDeadline = Seq(
+      ReturnDeadlineViewModel(
+        LocalDate.parse("2018-02-02"),
+        LocalDate.parse("2018-01-01"),
+        LocalDate.parse("2018-01-01"))
+    )
 
-    lazy val view = views.html.returns.returnDeadlines(exampleDeadline)
+    lazy val view = views.html.returns.returnDeadlines(singleDeadline)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "render the breadcrumbs which" should {
@@ -85,11 +93,11 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
     }
 
     "have the correct obligation due date" in {
-      elementText(Selectors.dueDate) should include ("2 February 2018")
+      elementText(Selectors.firstDeadlineDueDate) should include ("2 February 2018")
     }
 
     "have the correct obligation start and end date text" in {
-      elementText(Selectors.period) shouldBe "for the period 1 January to 1 January 2018"
+      elementText(Selectors.firstDeadlinePeriod) shouldBe "for the period 1 January to 1 January 2018"
     }
 
     "have the correct hint box title" in {
@@ -110,6 +118,39 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
 
     "have the correct message regarding sending HMRC VAT returns in the hint box" in {
       elementText(Selectors.sendReturns) shouldBe "Submit any VAT Returns before your deadlines."
+    }
+  }
+
+  "Rendering the Return deadlines page with multiple deadlines" should {
+
+    val multipleDeadlines = Seq(
+      ReturnDeadlineViewModel(
+        LocalDate.parse("2018-02-02"),
+        LocalDate.parse("2018-01-01"),
+        LocalDate.parse("2018-01-01")),
+      ReturnDeadlineViewModel(
+        LocalDate.parse("2018-10-12"),
+        LocalDate.parse("2018-09-07"),
+        LocalDate.parse("2018-09-07"))
+    )
+
+    lazy val view = views.html.returns.returnDeadlines(multipleDeadlines)
+    lazy implicit val document: Document = Jsoup.parse(view.body)
+
+    "have the correct obligation due date for the first deadline" in {
+      elementText(Selectors.firstDeadlineDueDate) should include("2 February 2018")
+    }
+
+    "have the correct obligation start and end date text for the first deadline" in {
+      elementText(Selectors.firstDeadlinePeriod) shouldBe "for the period 1 January to 1 January 2018"
+    }
+
+    "have the correct obligation due date for the second deadline" in {
+      elementText(Selectors.secondDeadlineDueDate) should include("12 October 2018")
+    }
+
+    "have the correct obligation start and end date text for the second deadline" in {
+      elementText(Selectors.secondDeadlinePeriod) shouldBe "for the period 7 September to 7 September 2018"
     }
   }
 }
