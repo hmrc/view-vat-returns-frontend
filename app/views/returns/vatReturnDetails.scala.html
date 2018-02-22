@@ -29,7 +29,8 @@
       appConfig.btaHomeUrl -> messages("breadcrumbs.bta"),
       appConfig.vatDetailsUrl -> messages("breadcrumbs.vat"),
       if(vatReturnViewModel.showReturnsBreadcrumb) controllers.routes.ReturnObligationsController.completedReturns(LocalDate.now().getYear).url -> messages("completedReturns.title")
-      else appConfig.vatPaymentsUrl -> messages("breadcrumbs.vatPayments")),
+      else appConfig.vatPaymentsUrl -> messages("breadcrumbs.vatPayments")
+    ),
     currentPage = messages("breadcrumbs.vatReturn", displayDateRange(vatReturnViewModel.periodFrom, vatReturnViewModel.periodTo))
   )
 
@@ -39,8 +40,14 @@
         @displayDateRange(vatReturnViewModel.periodFrom, vatReturnViewModel.periodTo)
       </span>
     </h1>
-    <p>@messages("yourVatReturn.paymentProcessed")</p>
-    <h2 class="heading-large">@messages("yourVatReturn.moneyOwed") @displayMoney(vatReturnViewModel.outstandingAmount)</h2>
+
+    @views.html.templates.returns.paymentStatus(
+      vatReturnViewModel.boxFive,
+      vatReturnViewModel.dueDate,
+      vatReturnViewModel.moneyOwed,
+      vatReturnViewModel.isRepayment
+    )
+
     <ul>
       <li>@messages("yourVatReturn.returnDueDate") @displayDate(vatReturnViewModel.dueDate)</li>
       <li>@messages("yourVatReturn.dateSubmitted") @displayDate(vatReturnViewModel.dateSubmitted)</li>
@@ -49,18 +56,19 @@
       <h2 class="heading-medium">@entityName</h2>
     }
     <div class="grid-row">
-      <h3 class="column-two-thirds bold-small">@messages("yourVatReturn.vatDetails")</h3>
+      <h3 class="column-two-thirds bold-small section">@messages("yourVatReturn.vatDetails")</h3>
     </div>
-    <br>
-    <div class="grid-row">
-      <div class="column-one-quarter form-hint">@messages("yourVatReturn.boxOne")</div>
-      <div class="column-one-half form-hint">@messages("yourVatReturn.boxOneDescription")</div>
-      <div class="column-one-quarter form-hint text--right">@displayMoney(vatReturnViewModel.boxOne)</div>
-    </div>
-    <div class="grid-row">
-      <div class="column-one-quarter form-hint">@messages("yourVatReturn.boxTwo")</div>
-      <div class="column-one-half form-hint">@messages("yourVatReturn.boxTwoDescription")</div>
-      <div class="column-one-quarter form-hint text--right">@displayMoney(vatReturnViewModel.boxTwo)</div>
+    <div class="form-group">
+      <div class="grid-row">
+        <div class="column-one-quarter form-hint">@messages("yourVatReturn.boxOne")</div>
+        <div class="column-one-half form-hint">@messages("yourVatReturn.boxOneDescription")</div>
+        <div class="column-one-quarter form-hint text--right">@displayMoney(vatReturnViewModel.boxOne)</div>
+      </div>
+      <div class="grid-row">
+        <div class="column-one-quarter form-hint">@messages("yourVatReturn.boxTwo")</div>
+        <div class="column-one-half form-hint">@messages("yourVatReturn.boxTwoDescription")</div>
+        <div class="column-one-quarter form-hint text--right">@displayMoney(vatReturnViewModel.boxTwo)</div>
+      </div>
     </div>
     <div class="grid-row">
       <div class="column-one-quarter form-hint">@messages("yourVatReturn.boxThree")</div>
@@ -74,14 +82,18 @@
     </div>
     <div class="grid-row">
       <div class="column-one-quarter heading-small">@messages("yourVatReturn.boxFive")</div>
-      <div class="column-one-half heading-small">@messages("yourVatReturn.boxFiveDescription")</div>
+      <div class="column-one-half heading-small">
+        @views.html.templates.returns.boxFiveDescription(
+          vatReturnViewModel.moneyOwed,
+          vatReturnViewModel.isRepayment
+        )
+      </div>
       <div class="column-one-quarter heading-small text--right">@displayMoney(vatReturnViewModel.boxFive)</div>
     </div>
     <hr>
     <div class="grid-row">
-      <div class="column-two-thirds bold-small">@messages("yourVatReturn.additionalInfo")</div>
+      <div class="column-two-thirds bold-small section">@messages("yourVatReturn.additionalInfo")</div>
     </div>
-    <br>
     <div class="grid-row">
       <div class="column-one-quarter form-hint">@messages("yourVatReturn.boxSix")</div>
       <div class="column-one-half form-hint">@messages("yourVatReturn.boxSixDescription")</div>
@@ -102,10 +114,11 @@
       <div class="column-one-half form-hint">@messages("yourVatReturn.boxNineDescription")</div>
       <div class="column-one-quarter form-hint text--right">@displayMoney(vatReturnViewModel.boxNine)</div>
     </div>
-    <br>
     <p id="adjustments">@messages("yourVatReturn.adjustments")</p>
-    <div>
-      <input class="button" type="submit" value='@Messages("yourVatReturn.paymentNow")' data-journey-click="return:make-payment:vat-return-details"/>
-    </div>
+    @if(vatReturnViewModel.moneyOwed && !vatReturnViewModel.isRepayment) {
+      <div>
+        <input class="button" type="submit" value='@messages("yourVatReturn.paymentNow")' data-journey-click="return:make-payment:vat-return-details"/>
+      </div>
+    }
   </div>
 }

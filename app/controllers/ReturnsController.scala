@@ -22,7 +22,7 @@ import config.AppConfig
 import models.errors.UnexpectedStatusError
 import models.payments.Payment
 import models.viewModels.VatReturnViewModel
-import models.{ReturnsControllerData, VatReturn, VatReturnObligation}
+import models.{ReturnsControllerData, VatReturnDetails, VatReturnObligation}
 import play.api.i18n.MessagesApi
 import play.api.mvc._
 import services.{EnrolmentsAuthService, ReturnsService, SubscriptionService}
@@ -41,19 +41,18 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
     implicit request =>
       implicit user =>
         val isReturnsPageRequest = true
-
         val vatReturnCall = returnsService.getVatReturn(user, periodKey)
         val entityNameCall = subscriptionService.getEntityName(user)
         val financialDataCall = returnsService.getPayment(user, periodKey)
         val obligationCall = returnsService.getObligationWithMatchingPeriodKey(user, year, periodKey)
 
         for {
-          vatReturnResult <- vatReturnCall
+          vatReturn <- vatReturnCall
           customerInfo <- entityNameCall
           payment <- financialDataCall
           obligation <- obligationCall
         } yield {
-          val data = ReturnsControllerData(vatReturnResult, customerInfo, payment, obligation)
+          val data = ReturnsControllerData(vatReturn, customerInfo, payment, obligation)
           renderResult(data, isReturnsPageRequest)
         }
   }
@@ -62,7 +61,6 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
     implicit request =>
       implicit user =>
         val isReturnsPageRequest = false
-
         val vatReturnCall = returnsService.getVatReturn(user, periodKey)
         val entityNameCall = subscriptionService.getEntityName(user)
         val financialDataCall = returnsService.getPayment(user, periodKey)
@@ -85,48 +83,44 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
   }
 
   private[controllers] def renderResult(pageData: ReturnsControllerData, isReturnsPageRequest: Boolean)(implicit req: Request[_]) = {
-    (pageData.vatReturnResult, pageData.obligation) match {
-      case (Right(vatReturn), Some(ob)) =>
-        val viewModel = constructViewModel(pageData.customerInfo, ob, pageData.payment, vatReturn, isReturnsPageRequest)
+    (pageData.vatReturnResult, pageData.obligation, pageData.payment) match {
+      case (Right(vatReturn), Some(ob), Some(pay)) =>
+        val returnDetails = returnsService.constructReturnDetailsModel(vatReturn, pay)
+        val viewModel = constructViewModel(pageData.customerInfo, ob, returnDetails, isReturnsPageRequest)
         Ok(views.html.returns.vatReturnDetails(viewModel))
-      case (Right(_), None) => NotFound(views.html.errors.notFound())
-      case (Left(UnexpectedStatusError(404)), _) => NotFound(views.html.errors.notFound())
-      case (Left(_), _) => InternalServerError(views.html.errors.serverError())
+      case (Right(_), None, _) => NotFound(views.html.errors.notFound())
+      case (Right(_), _, None) => NotFound(views.html.errors.notFound())
+      case (Left(UnexpectedStatusError(404)), _, _) => NotFound(views.html.errors.notFound())
+      case _ => InternalServerError(views.html.errors.serverError())
     }
   }
 
   private[controllers] def constructViewModel(entityName: Option[String],
                                               obligation: VatReturnObligation,
-                                              payment: Option[Payment],
-                                              vatReturn: VatReturn,
+                                              returnDetails: VatReturnDetails,
                                               isReturnsPageRequest: Boolean): VatReturnViewModel = {
 
     // TODO: update this value to reflect partial payments
-    val amountToShow: BigDecimal = vatReturn.netVatDue
-
-    val periodFrom = payment.fold(obligation.start)(_.start)
-
-    val periodTo = payment.fold(obligation.end)(_.end)
-
-    val dueDate = payment.fold(obligation.due)(_.due)
-
+    val amountToShow: BigDecimal = returnDetails.vatReturn.netVatDue
 
     VatReturnViewModel(
       entityName = entityName,
-      periodFrom = periodFrom,
-      periodTo = periodTo,
-      dueDate = dueDate,
-      dateSubmitted = obligation.received.get,
-      boxOne = vatReturn.vatDueSales,
-      boxTwo = vatReturn.vatDueAcquisitions,
+      periodFrom = obligation.start,
+      periodTo = obligation.end,
+      dueDate = obligation.due,
       outstandingAmount = amountToShow,
-      boxThree = vatReturn.totalVatDue,
-      boxFour = vatReturn.vatReclaimedCurrPeriod,
-      boxFive = vatReturn.netVatDue,
-      boxSix = vatReturn.totalValueSalesExVAT,
-      boxSeven = vatReturn.totalValuePurchasesExVAT,
-      boxEight = vatReturn.totalValueGoodsSuppliedExVAT,
-      boxNine = vatReturn.totalAcquisitionsExVAT,
+      dateSubmitted = obligation.received.get,
+      boxOne = returnDetails.vatReturn.vatDueSales,
+      boxTwo = returnDetails.vatReturn.vatDueAcquisitions,
+      boxThree = returnDetails.vatReturn.totalVatDue,
+      boxFour = returnDetails.vatReturn.vatReclaimedCurrPeriod,
+      boxFive = returnDetails.vatReturn.netVatDue,
+      boxSix = returnDetails.vatReturn.totalValueSalesExVAT,
+      boxSeven = returnDetails.vatReturn.totalValuePurchasesExVAT,
+      boxEight = returnDetails.vatReturn.totalValueGoodsSuppliedExVAT,
+      boxNine = returnDetails.vatReturn.totalAcquisitionsExVAT,
+      moneyOwed = returnDetails.moneyOwed,
+      isRepayment = returnDetails.isRepayment,
       showReturnsBreadcrumb = isReturnsPageRequest
     )
   }

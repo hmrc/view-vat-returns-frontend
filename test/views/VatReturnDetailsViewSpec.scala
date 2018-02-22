@@ -26,21 +26,26 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
   object Selectors {
     val pageHeading = "#content h1"
     val subHeading = "#content h2.heading-large"
-    val tradingNameHeading = "#content h2.heading-medium"
-    val tableHeadingOne = "#content > article > div > div:nth-child(6) > h3"
-
-    val tableHeadingTwo = "#content > article > div > div:nth-child(14) > div"
+    val entityNameHeading = "#content h2.heading-medium"
+    val mainInformationText = "#content > article > div.grid-row.column-two-thirds > p:nth-child(2)"
+    val extraInformationText = "#content > article > div.grid-row.column-two-thirds > p:nth-child(3)"
+    val tableHeadingOne = "#content h3"
+    val tableHeadingTwo = "#content > article > div.grid-row.column-two-thirds > div:nth-child(12) > div"
     val boxes = Array(
+      nineBoxElemSelector("1", "1", inFormGroup = true), nineBoxElemSelector("2", "1", inFormGroup = true),
       nineBoxElemSelector("8", "1"), nineBoxElemSelector("9", "1"), nineBoxElemSelector("10", "1"),
-      nineBoxElemSelector("11", "1"), nineBoxElemSelector("12", "1"), nineBoxElemSelector("16", "1"),
-      nineBoxElemSelector("17", "1"), nineBoxElemSelector("18", "1"), nineBoxElemSelector("19", "1")
+      nineBoxElemSelector("13", "1"), nineBoxElemSelector("14", "1"), nineBoxElemSelector("15", "1"),
+      nineBoxElemSelector("16", "1")
     )
     val rowDescriptions = Array(
-      nineBoxElemSelector("8", "2"), nineBoxElemSelector("9", "2"), nineBoxElemSelector("10", "2"),
-      nineBoxElemSelector("11", "2"), nineBoxElemSelector("12", "2"), nineBoxElemSelector("16", "2"),
-      nineBoxElemSelector("17", "2"), nineBoxElemSelector("18", "2"), nineBoxElemSelector("19", "2")
+      nineBoxElemSelector("1", "2", inFormGroup = true), nineBoxElemSelector("2", "2", inFormGroup = true),
+      nineBoxElemSelector("8", "2"), nineBoxElemSelector("9", "2"), nineBoxElemSelector("13", "2"),
+      nineBoxElemSelector("14", "2"), nineBoxElemSelector("15", "2"), nineBoxElemSelector("16", "2")
     )
+    val boxFiveDescription: String = nineBoxElemSelector("10", "2")
+    val boxFiveDescriptionYouOweMoney: String = nineBoxElemSelector("11", "2")
     val adjustments = "#adjustments"
+    val paymentButton = ".button"
     val btaBreadcrumb = "div.breadcrumbs li:nth-of-type(1)"
     val btaBreadcrumbLink = "div.breadcrumbs li:nth-of-type(1) a"
     val vatBreadcrumb = "div.breadcrumbs li:nth-of-type(2)"
@@ -50,8 +55,10 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     val currentPage = "div.breadcrumbs li:nth-of-type(4)"
   }
 
-  def nineBoxElemSelector(divNumber: String, columnNumber: String): String =
-    s"#content > article > div > div:nth-child($divNumber) > div:nth-child($columnNumber)"
+  def nineBoxElemSelector(divNumber: String, columnNumber: String, inFormGroup: Boolean = false): String = {
+    val formDiv = if(inFormGroup) "div.form-group >" else ""
+    s"#content > article > div.grid-row.column-two-thirds > $formDiv div:nth-child($divNumber) > div:nth-child($columnNumber)"
+  }
 
   "Rendering the vat return details page from the returns route" should {
 
@@ -66,11 +73,13 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       5755,
       7052,
       5732,
-      1320,
+      1000,
       77656,
       765765,
       55454,
       545645,
+      moneyOwed = false,
+      isRepayment = false,
       showReturnsBreadcrumb = true
     )
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
@@ -117,11 +126,16 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     }
 
     "have the correct subheading" in {
-      elementText(Selectors.subHeading) shouldBe "You owed: £1,000"
+      elementText(Selectors.subHeading) shouldBe "You paid: £1,000"
     }
 
     "have the correct trading name" in {
-      elementText(Selectors.tradingNameHeading) shouldBe vatReturnViewModel.entityName.get
+      elementText(Selectors.entityNameHeading) shouldBe vatReturnViewModel.entityName.get
+    }
+
+    "have the correct information text under the heading" in {
+      elementText(Selectors.mainInformationText) shouldBe
+        "Your payment has been processed. There is nothing more you need to do with this return."
     }
 
     "have the correct heading for the first section of the return" in {
@@ -143,7 +157,6 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
         "VAT on European Community sales and related costs",
         "VAT sales subtotal",
         "Total VAT reclaimed from anywhere",
-        "Total you owe",
         "Total sales and other outputs from anywhere, minus VAT",
         "Total purchases from anywhere, minus VAT",
         "Total supplies, goods and related costs to European Community, minus VAT",
@@ -152,8 +165,12 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       expectedDescriptions.indices.foreach(i => elementText(Selectors.rowDescriptions(i)) shouldBe expectedDescriptions(i))
     }
 
+    "have the correct box 5 description in the table" in {
+      elementText(Selectors.boxFiveDescription) shouldBe "Total you owed"
+    }
+
     "have the correct info regarding making adjustments" in {
-      elementText(Selectors.adjustments) shouldBe "If there are any errors, you can make adjustments through your software."
+      elementText(Selectors.adjustments) shouldBe "If there are any errors, add or subtract them in your next return."
     }
   }
 
@@ -175,6 +192,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       765765,
       55454,
       545645,
+      moneyOwed = false,
+      isRepayment = false,
       showReturnsBreadcrumb = false
     )
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
@@ -189,6 +208,129 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       s"link to 'vat-payments-url'" in {
         element(Selectors.previousPageBreadcrumbLink).attr("href") shouldBe "vat-payments-url"
       }
+    }
+  }
+
+  "Rendering the vat return details page when money is owed on the return" should {
+
+    val vatReturnViewModel = VatReturnViewModel(
+      Some("Cheapo Clothing"),
+      LocalDate.parse("2017-01-01"),
+      LocalDate.parse("2017-03-31"),
+      LocalDate.parse("2017-04-06"),
+      1000.00,
+      LocalDate.parse("2017-04-08"),
+      1297,
+      5755,
+      7052,
+      5732,
+      1000,
+      77656,
+      765765,
+      55454,
+      545645,
+      moneyOwed = true,
+      isRepayment = false,
+      showReturnsBreadcrumb = false
+    )
+    lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
+    lazy implicit val document: Document = Jsoup.parse(view.body)
+
+    "have the correct subheading" in {
+      elementText(Selectors.subHeading) shouldBe "Return total: £1,000"
+    }
+
+    "have the correct information text under the heading" in {
+      elementText(Selectors.mainInformationText) shouldBe "This bill needs to be paid before 6 April 2017."
+    }
+
+    "have the correct extra information text under the heading" in {
+      elementText(Selectors.extraInformationText) shouldBe "Payments can take between 4 and 7 days to appear here."
+    }
+
+    "have the correct box 5 description in the table" in {
+      elementText(Selectors.boxFiveDescriptionYouOweMoney) shouldBe "Total you owe"
+    }
+
+    "have the pay button" in {
+      element(Selectors.paymentButton).attr("value") shouldBe "Pay this now"
+    }
+  }
+
+  "Rendering the vat return details page when HMRC owe money on the return" should {
+
+    val vatReturnViewModel = VatReturnViewModel(
+      Some("Cheapo Clothing"),
+      LocalDate.parse("2017-01-01"),
+      LocalDate.parse("2017-03-31"),
+      LocalDate.parse("2017-04-06"),
+      1000.00,
+      LocalDate.parse("2017-04-08"),
+      1297,
+      5755,
+      7052,
+      5732,
+      1000,
+      77656,
+      765765,
+      55454,
+      545645,
+      moneyOwed = true,
+      isRepayment = true,
+      showReturnsBreadcrumb = false
+    )
+    lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
+    lazy implicit val document: Document = Jsoup.parse(view.body)
+
+    "have the correct subheading" in {
+      elementText(Selectors.subHeading) shouldBe "HMRC will pay you: £1,000"
+    }
+
+    "have the correct information text under the heading" in {
+      elementText(Selectors.mainInformationText) shouldBe "It can take up to 30 days for you to receive a repayment."
+    }
+
+    "have the correct box 5 description in the table" in {
+      elementText(Selectors.boxFiveDescription) shouldBe "HMRC will pay you"
+    }
+  }
+
+  "Rendering the vat return details page when HMRC have paid what they owe on the return" should {
+
+    val vatReturnViewModel = VatReturnViewModel(
+      Some("Cheapo Clothing"),
+      LocalDate.parse("2017-01-01"),
+      LocalDate.parse("2017-03-31"),
+      LocalDate.parse("2017-04-06"),
+      1000.00,
+      LocalDate.parse("2017-04-08"),
+      1297,
+      5755,
+      7052,
+      5732,
+      1000,
+      77656,
+      765765,
+      55454,
+      545645,
+      moneyOwed = false,
+      isRepayment = true,
+      showReturnsBreadcrumb = false
+    )
+    lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
+    lazy implicit val document: Document = Jsoup.parse(view.body)
+
+    "have the correct subheading" in {
+      elementText(Selectors.subHeading) shouldBe "HMRC paid you: £1,000"
+    }
+
+    "have the correct information text under the heading" in {
+      elementText(Selectors.mainInformationText) shouldBe
+        "Your payment has been processed. There is nothing more you need to do with this return."
+    }
+
+    "have the correct box 5 description in the table" in {
+      elementText(Selectors.boxFiveDescription) shouldBe "Total amount HMRC owed you"
     }
   }
 }

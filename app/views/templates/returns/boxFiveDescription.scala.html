@@ -14,14 +14,11 @@
  * limitations under the License.
  *@
 
-@import java.time.LocalDate
-@import java.time.format.{DateTimeFormatter, ResolverStyle}
+@(moneyOwed: Boolean, isRepayment: Boolean)(implicit messages: Messages)
 
-@(date: LocalDate, showYear: Boolean = true)
-
-@defining( {
-  val format = "d MMMM" + (if (showYear) " uuuu" else "")
-  val formatter = DateTimeFormatter.ofPattern(format).withResolverStyle(ResolverStyle.STRICT)
-  formatter.format(date)
-  }) { displayDate =>
-  @displayDate}
+@(moneyOwed, isRepayment) match {
+  case (true, true) => { @messages("boxFiveDescription.hmrcWillPay") }
+  case (false, true) => { @messages("boxFiveDescription.hmrcPaid") }
+  case (true, false) => { @messages("boxFiveDescription.totalYouOwe") }
+  case (false, false) => { @messages("boxFiveDescription.totalYouOwed") }
+}

@@ -26,7 +26,6 @@ breadcrumbs.vatReturn = VAT return: {0}
 
 yourVatReturn.title = VAT return
 yourVatReturn.vrn = VAT registration number (VRN):
-yourVatReturn.moneyOwed = You owed:
 yourVatReturn.dateSubmitted = Date submitted:
 yourVatReturn.returnDueDate = Return due date:
 yourVatReturn.vatDetails = VAT details
@@ -40,7 +39,6 @@ yourVatReturn.boxThreeDescription = VAT sales subtotal
 yourVatReturn.boxFour = Box 4
 yourVatReturn.boxFourDescription = Total VAT reclaimed from anywhere
 yourVatReturn.boxFive = Box 5
-yourVatReturn.boxFiveDescription = Total you owe
 yourVatReturn.boxSix = Box 6
 yourVatReturn.boxSixDescription = Total sales and other outputs from anywhere, minus VAT
 yourVatReturn.boxSeven = Box 7
@@ -49,10 +47,22 @@ yourVatReturn.boxEight = Box 8
 yourVatReturn.boxEightDescription = Total supplies, goods and related costs to European Community, minus VAT
 yourVatReturn.boxNine = Box 9
 yourVatReturn.boxNineDescription = Total value of acquisitions of goods from European Community, minus VAT
-yourVatReturn.adjustments = If there are any errors, you can make adjustments through your software.
-yourVatReturn.paymentProcessed = Your payment has been processed. There is nothing more you need to do with this return.
+yourVatReturn.adjustments = If there are any errors, add or subtract them in your next return.
 yourVatReturn.paymentNow = Pay this now
 
+paymentStatus.youPaid = You paid:
+paymentStatus.returnTotal = Return total:
+paymentStatus.hmrcWillPay = HMRC will pay you:
+paymentStatus.hmrcPaid = HMRC paid you:
+paymentStatus.billToPay = This bill needs to be paid before {0}.
+paymentStatus.paymentProcessing = Payments can take between 4 and 7 days to appear here.
+paymentStatus.repaymentProcessing = It can take up to 30 days for you to receive a repayment.
+paymentStatus.paymentProcessed = Your payment has been processed. There is nothing more you need to do with this return.
+
+boxFiveDescription.totalYouOwed = Total you owed
+boxFiveDescription.totalYouOwe = Total you owe
+boxFiveDescription.hmrcWillPay = HMRC will pay you
+boxFiveDescription.hmrcPaid = Total amount HMRC owed you
 
 completedReturns.title = VAT returns
 completedReturns.submitMethod = You submit returns through your accounting software.
