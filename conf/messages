@@ -1,4 +1,5 @@
 common.dateRangeSeparator = to
+common.overdue = overdue
 
 sessionTimeout.title = Your session has timed out
 sessionTimeout.helpOne = To view your VAT returns, you''ll have to

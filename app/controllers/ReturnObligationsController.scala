@@ -50,8 +50,9 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
     implicit user =>
       returnsService.getReturnObligationsForYear(user, LocalDate.now().getYear, VatReturnObligation.Status.Outstanding).map {
         case Right(obligations) =>
-          val deadlines = obligations.obligations.map(ob => ReturnDeadlineViewModel(ob.due, ob.start, ob.end))
-          Ok(views.html.returns.returnDeadlines(deadlines))
+          val deadlines = obligations.obligations.map(ob =>
+            ReturnDeadlineViewModel(ob.due, ob.start, ob.end, ob.due.isBefore(LocalDate.now())))
+            Ok(views.html.returns.returnDeadlines(deadlines))
         case Left(_) => throw new Exception //non-graceful error handling for MVP
       }
   }

@@ -44,6 +44,11 @@
             @for(deadline <- deadlines){
               <li class="bold-small">
                 @displayDate(deadline.due)
+                @if(deadline.overdue) {
+                  <span>
+                    <strong class="task-overdue">@messages("common.overdue")</strong>
+                  </span>
+                }
                 <span class="form-hint">
                   @messages("returnDeadlines.periodEnding", displayDateRange(deadline.start, deadline.end))
                 </span>
