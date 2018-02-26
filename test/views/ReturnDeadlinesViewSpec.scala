@@ -43,6 +43,8 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
     val vatDetailsBreadCrumb = "div.breadcrumbs li:nth-of-type(2)"
     val vatDetailsBreadcrumbLink = "div.breadcrumbs li:nth-of-type(2) a"
     val returnDeadlinesBreadCrumb = "div.breadcrumbs li:nth-of-type(3)"
+
+    val overdueLabel = ".task-overdue"
   }
 
   "Rendering the Return deadlines page with a single deadline" should {
@@ -131,7 +133,8 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
       ReturnDeadlineViewModel(
         LocalDate.parse("2018-10-12"),
         LocalDate.parse("2018-09-07"),
-        LocalDate.parse("2018-09-07"))
+        LocalDate.parse("2018-09-07"),
+        overdue = true)
     )
 
     lazy val view = views.html.returns.returnDeadlines(multipleDeadlines)
@@ -151,6 +154,10 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
 
     "have the correct obligation start and end date text for the second deadline" in {
       elementText(Selectors.secondDeadlinePeriod) shouldBe "for the period 7 September to 7 September 2018"
+    }
+
+    "have the overdue label" in {
+      elementText(Selectors.overdueLabel) shouldBe "overdue"
     }
   }
 }

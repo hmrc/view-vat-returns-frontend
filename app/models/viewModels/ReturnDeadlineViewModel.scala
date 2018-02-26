@@ -20,4 +20,5 @@ import java.time.LocalDate
 
 case class ReturnDeadlineViewModel(due: LocalDate,
                                    start: LocalDate,
-                                   end: LocalDate)
+                                   end: LocalDate,
+                                   overdue: Boolean = false)
