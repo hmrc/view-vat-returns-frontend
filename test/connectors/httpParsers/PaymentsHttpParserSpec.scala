@@ -71,7 +71,7 @@ class PaymentsHttpParserSpec extends UnitSpec {
       val httpResponse = HttpResponse(Status.BAD_REQUEST,
         responseJson = Some(Json.obj(
           "code" -> "INVALID DATE FROM",
-          "message" -> "Bad date from"
+          "reason" -> "Bad date from"
         ))
       )
 
@@ -91,18 +91,14 @@ class PaymentsHttpParserSpec extends UnitSpec {
 
       val httpResponse = HttpResponse(Status.BAD_REQUEST,
         responseJson = Some(Json.obj(
-          "code" -> "BAD_REQUEST",
-          "message" -> "bad request",
-          "errors" -> Json.arr(
+          "failures" -> Json.arr(
             Json.obj(
               "code" -> "INVALID DATE FROM",
-              "message" -> "Bad date from",
-              "path" -> "/from"
+              "reason" -> "Bad date from"
             ),
             Json.obj(
               "code" -> "INVALID DATE TO",
-              "message" -> "Bad date to",
-              "path" -> "/to"
+              "reason" -> "Bad date to"
             )
           )
         ))

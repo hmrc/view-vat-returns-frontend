@@ -94,13 +94,11 @@ class VatReturnObligationsHttpParserSpec extends UnitSpec {
           "errors" -> Json.arr(
             Json.obj(
               "code" -> "INVALID_DATE_FROM",
-              "message" -> "Bad 'from' date",
-              "path" -> "/from"
+              "message" -> "Bad 'from' date"
             ),
             Json.obj(
               "code" -> "INVALID_DATE_TO",
-              "message" -> "Bad 'to' date",
-              "path" -> "/to"
+              "message" -> "Bad 'to' date"
             )
           )
         )
