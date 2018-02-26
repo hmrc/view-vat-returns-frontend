@@ -82,8 +82,8 @@ class FinancialDataConnectorISpec extends IntegrationBaseSpec {
       override def setupStubs(): StubMapping = FinancialDataStub.stubInvalidVrn
 
       val expected = Left(BadRequestError(
-        code = "VRN_INVALID",
-        message = ""
+        code = "INVALID_VRN",
+        message = "VRN was invalid!"
       ))
 
       setupStubs()

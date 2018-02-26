@@ -38,7 +38,7 @@ object FinancialDataStub extends WireMockMethods{
 
   def stubInvalidVrn: StubMapping = {
     when(method = GET, uri = financialDataUri)
-      .thenReturn(BAD_REQUEST, body = Json.toJson(invalidVrn))
+      .thenReturn(BAD_REQUEST, body = invalidVrn)
   }
 
   private val allPayments: JsValue = Json.parse(
@@ -118,7 +118,8 @@ object FinancialDataStub extends WireMockMethods{
       |  }""".stripMargin
   )
 
-  private val invalidVrn: ApiSingleError = ApiSingleError("VRN_INVALID", "", None)
-
-
+  private val invalidVrn = Json.obj(
+    "code" -> "INVALID_VRN",
+    "reason" -> "VRN was invalid!"
+  )
 }
