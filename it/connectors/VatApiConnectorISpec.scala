@@ -255,11 +255,22 @@ class VatApiConnectorISpec extends IntegrationBaseSpec {
         override def setupStubs(): StubMapping = VatApiStub.stubSuccessfulVatReturn
 
         val expected = Right(VatReturn(
-          "", 0, 0, 0, 0, 0, 0, 0, 0, 0
+          "#001",
+          100,
+          100,
+          200,
+          100,
+          100,
+          500,
+          500,
+          500,
+          500
         ))
 
         setupStubs()
         private val result = await(connector.getVatReturnDetails("123456789", "%23001"))
+
+        result shouldBe expected
       }
     }
 

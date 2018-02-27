@@ -18,6 +18,7 @@ package connectors.httpParsers
 
 import connectors.httpParsers.VatReturnHttpParser.VatReturnReads
 import models.VatReturn
+import models.errors.{BadRequestError, MultipleErrors, ServerSideError, UnexpectedStatusError, UnknownError}
 import play.api.http.Status
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HttpResponse
@@ -58,6 +59,95 @@ class VatReturnHttpParserSpec extends UnitSpec {
       val result = VatReturnReads.read("", "", httpResponse)
 
       "return a VatReturn" in {
+        result shouldBe expected
+      }
+    }
+
+    "the HTTP response status is BAD_REQUEST (400) (single error)" should {
+
+      val httpResponse = HttpResponse(Status.BAD_REQUEST, responseJson = Some(
+        Json.obj(
+          "code" -> "INVALID",
+          "message" -> "Fail!"
+        )
+      ))
+
+      val expected = Left(BadRequestError(
+        code = "INVALID",
+        message = "Fail!"
+      ))
+
+      val result = VatReturnReads.read("", "", httpResponse)
+
+      "return a BadRequestError" in {
+        result shouldBe expected
+      }
+    }
+
+    "the HTTP response status is BAD_REQUEST (400) (multiple errors)" should {
+
+      val httpResponse = HttpResponse(Status.BAD_REQUEST, responseJson = Some(
+        Json.obj(
+          "code" -> "BAD_REQUEST",
+          "message" -> "Fail!",
+          "errors" -> Json.arr(
+            Json.obj(
+              "code" -> "INVALID",
+              "message" -> "Fail!"
+            ),
+            Json.obj(
+              "code" -> "INVALID_2",
+              "message" -> "Fail!"
+            )
+          )
+        )
+      ))
+
+      val expected = Left(MultipleErrors)
+
+      val result = VatReturnReads.read("", "", httpResponse)
+
+      "return a MultipleErrors" in {
+        result shouldBe expected
+      }
+    }
+
+    "the HTTP response status is BAD_REQUEST (400) (unknown error)" should {
+
+      val httpResponse = HttpResponse(Status.BAD_REQUEST, responseJson = Some(
+        Json.obj(
+          "foo" -> "RED_CAR",
+          "bar" -> "Fail!"
+        )
+      ))
+
+      val expected = Left(UnknownError)
+
+      val result = VatReturnReads.read("", "", httpResponse)
+
+      "return an UnknownError" in {
+        result shouldBe expected
+      }
+    }
+
+    "the HTTP response status is 5xx" should {
+
+      val httpResponse = HttpResponse(Status.INTERNAL_SERVER_ERROR)
+      val expected = Left(ServerSideError)
+      val result = VatReturnReads.read("", "", httpResponse)
+
+      "return a ServerSideError" in {
+        result shouldBe expected
+      }
+    }
+
+    "the HTTP response status isn't handled" should {
+
+      val httpResponse = HttpResponse(Status.CREATED)
+      val expected = Left(UnexpectedStatusError(Status.CREATED))
+      val result = VatReturnReads.read("", "", httpResponse)
+
+      "return an UnexpectedStatusError" in {
         result shouldBe expected
       }
     }
