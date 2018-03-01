@@ -36,7 +36,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
   private trait Test {
     val goodEnrolments: Enrolments = Enrolments(
       Set(
-        Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("VATRegNo", "999999999")), "Active")
+        Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("VRN", "999999999")), "Active")
       )
     )
 
