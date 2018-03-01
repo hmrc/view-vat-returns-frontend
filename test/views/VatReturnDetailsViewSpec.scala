@@ -111,8 +111,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
         element(Selectors.vatBreadcrumbLink).attr("href") shouldBe "vat-details-url"
       }
 
-      "have the text 'VAT returns'" in {
-        elementText(Selectors.previousPageBreadcrumb) shouldBe "VAT returns"
+      "have the text 'Submitted returns'" in {
+        elementText(Selectors.previousPageBreadcrumb) shouldBe "Submitted returns"
       }
 
       s"link to ${controllers.routes.ReturnObligationsController.completedReturns(LocalDate.now().getYear).url}" in {

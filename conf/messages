@@ -65,8 +65,7 @@ boxFiveDescription.totalYouOwe = Total you owe
 boxFiveDescription.hmrcWillPay = HMRC will pay you
 boxFiveDescription.hmrcPaid = Total amount HMRC owed you
 
-completedReturns.title = VAT returns
-completedReturns.submitMethod = You submit returns through your accounting software.
+completedReturns.title = Submitted returns
 completedReturns.yearReturns = {0} Returns
 completedReturns.period = For the period:
 completedReturns.otherReturnsHeading = Other returns
@@ -74,6 +73,7 @@ completedReturns.otherReturnsOne = You can also
 completedReturns.otherReturnsTwo = view returns submitted before using accounting software (opens in new tab).
 completedReturns.activeTab = Currently viewing returns from {0}
 completedReturns.inactiveTab = View returns from {0}
+completedReturns.noSubmitted = You haven’t submitted any returns for {0} yet. You must use accounting software to submit your returns.
 
 returnDeadlines.title = Return deadlines
 returnDeadlines.submitBy = You must use accounting software to submit a return by:

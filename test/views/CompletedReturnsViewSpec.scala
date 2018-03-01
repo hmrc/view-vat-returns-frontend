@@ -32,7 +32,7 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
     val vatBreadcrumbLink = s"$vatBreadcrumb a"
     val completedReturnsBreadcrumb = "div.breadcrumbs li:nth-of-type(3)"
     val submitThroughSoftware = "div > div > p:nth-child(2)"
-    val noReturnsFound = "div > div > section > p"
+    val noReturnsFound = ".column-two-thirds p"
     val tabOne = ".tabs-nav li:nth-of-type(1)"
     val tabOneHiddenText = ".tabs-nav li:nth-of-type(1) span"
     val tabTwo = ".tabs-nav li:nth-of-type(2)"
@@ -41,10 +41,10 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
     val tabThreeHiddenText = ".tabs-nav li:nth-of-type(3) span"
     val tabFour = ".tabs-nav li:nth-of-type(4)"
     val tabFourHiddenText = ".tabs-nav li:nth-of-type(4) span"
-    val returnsHeading = ".divider--bottom h2"
-    val period = ".divider--bottom p"
-    def obligation(number: Int): String = s".divider--bottom .list-bullet li:nth-of-type($number)"
-    def obligationLink(number: Int): String = s".divider--bottom .list-bullet li:nth-of-type($number) > a"
+    val returnsHeading = "h2"
+    val period = ".column-two-thirds p"
+    def obligation(number: Int): String = s".list-bullet li:nth-of-type($number)"
+    def obligationLink(number: Int): String = s".list-bullet li:nth-of-type($number) > a"
     val otherReturns = "div.column-two-thirds > h3"
     val otherReturnsGuidance = "div > div > p:nth-child(6)"
     val otherReturnsLink = "div > div > p:nth-child(6) > a"
@@ -58,15 +58,11 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct document title" in {
-      document.title shouldBe "VAT returns"
+      document.title shouldBe "Submitted returns"
     }
 
     "have the correct page heading" in {
-      elementText(Selectors.pageHeading) shouldBe "VAT returns"
-    }
-
-    "have the correct message regarding submitting returns through software" in {
-      elementText(Selectors.submitThroughSoftware) shouldBe "You submit returns through your accounting software."
+      elementText(Selectors.pageHeading) shouldBe "Submitted returns"
     }
 
     "render breadcrumbs which" should {
@@ -87,8 +83,8 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
         element(Selectors.vatBreadcrumbLink).attr("href") shouldBe "vat-details-url"
       }
 
-      "have the text 'VAT returns'" in {
-        elementText(Selectors.completedReturnsBreadcrumb) shouldBe "VAT returns"
+      "have the text 'Submitted returns'" in {
+        elementText(Selectors.completedReturnsBreadcrumb) shouldBe "Submitted returns"
       }
     }
 
@@ -157,22 +153,7 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
 
     "have the correct alternate content when no returns are found" in {
       // TODO: this will change next iteration
-      elementText(Selectors.noReturnsFound) shouldBe "Alternate Content"
-    }
-
-    "the other returns guidance" should {
-
-      "have the correct title" in {
-        elementText(Selectors.otherReturns) shouldBe "Other returns"
-      }
-
-      "contain the correct text" in {
-        elementText(Selectors.otherReturnsGuidance) shouldBe "You can also view returns submitted before using accounting software (opens in new tab)."
-      }
-
-      "contain a link to ''" in {
-        element(Selectors.otherReturnsLink).attr("href") shouldBe ""
-      }
+      elementText(Selectors.noReturnsFound) shouldBe "You haven’t submitted any returns for 2018 yet. You must use accounting software to submit your returns."
     }
   }
 
