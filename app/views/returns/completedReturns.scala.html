@@ -33,8 +33,6 @@
     <div class="column-two-thirds">
       <h1 class="heading-xlarge">@messages("completedReturns.title")</h1>
 
-      <p>@messages("completedReturns.submitMethod")</p>
-
         <ul class="tabs-nav">
 
           @for(yearToDisplay <- model.returnYears) {
@@ -45,8 +43,8 @@
                 @yearToDisplay
                 <span class="visuallyhidden">@messages("completedReturns.activeTab", yearToDisplay.toString())</span>
               </li>
-
             } else {
+
 
               <li class="tabs-nav__tab font-medium">
                 <a href="@controllers.routes.ReturnObligationsController.completedReturns(yearToDisplay).url">
@@ -59,40 +57,29 @@
 
         </ul>
 
-        <section class="divider--bottom">
+        <h2>@messages("completedReturns.yearReturns", model.selectedYear.toString())</h2>
 
-          <h2>@messages("completedReturns.yearReturns", model.selectedYear.toString())</h2>
+        @if(model.obligations.isEmpty) {
 
-          @if(model.obligations.isEmpty) {
-            <!--TODO: update with content from design team-->
-            <p>Alternate Content</p>
-          } else {
+          <p>@messages("completedReturns.noSubmitted", model.selectedYear.toString())</p>
 
-            <p>@messages("completedReturns.period")</p>
+        } else {
 
-            <ul class="list list-bullet">
+          <p>@messages("completedReturns.period")</p>
 
-              @for(obligation <- model.obligations) {
+          <ul class="list list-bullet">
 
-                <li>
-                    <a href="@controllers.routes.ReturnsController.vatReturn(model.selectedYear, obligation.periodKey)"
-                       data-journey-click="returns:view-return @{obligation.start}-to-@{obligation.end}:completed-returns">
-                        @displayDateRange(obligation.start, obligation.end)
-                    </a>
-                </li>
-              }
+            @for(obligation <- model.obligations) {
 
-            </ul>
-          }
-
-        </section>
-
-        <h3>@messages("completedReturns.otherReturnsHeading")</h3>
-        <p>
-            @messages("completedReturns.otherReturnsOne")
-            <a href="@appConfig.portalUrl" data-journey-click="return:view-portal-returns:completed-returns">@messages("completedReturns.otherReturnsTwo")</a>
-        </p>
-
+              <li>
+                  <a href="@controllers.routes.ReturnsController.vatReturn(model.selectedYear, obligation.periodKey)"
+                     data-journey-click="returns:view-return @{obligation.start}-to-@{obligation.end}:completed-returns">
+                      @displayDateRange(obligation.start, obligation.end)
+                  </a>
+              </li>
+            }
+          </ul>
+        }
     </div>
   </div>
 }
