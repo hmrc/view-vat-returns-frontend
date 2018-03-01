@@ -43,8 +43,8 @@
                 @yearToDisplay
                 <span class="visuallyhidden">@messages("completedReturns.activeTab", yearToDisplay.toString())</span>
               </li>
-            } else {
 
+            } else {
 
               <li class="tabs-nav__tab font-medium">
                 <a href="@controllers.routes.ReturnObligationsController.completedReturns(yearToDisplay).url">
@@ -72,10 +72,10 @@
             @for(obligation <- model.obligations) {
 
               <li>
-                  <a href="@controllers.routes.ReturnsController.vatReturn(model.selectedYear, obligation.periodKey)"
-                     data-journey-click="returns:view-return @{obligation.start}-to-@{obligation.end}:completed-returns">
-                      @displayDateRange(obligation.start, obligation.end)
-                  </a>
+                <a href="@controllers.routes.ReturnsController.vatReturn(model.selectedYear, obligation.periodKey)"
+                   data-journey-click="returns:view-return @{obligation.start}-to-@{obligation.end}:completed-returns">
+                    @displayDateRange(obligation.start, obligation.end)
+                </a>
               </li>
             }
           </ul>
