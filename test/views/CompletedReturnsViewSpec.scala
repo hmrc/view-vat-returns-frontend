@@ -152,7 +152,6 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
     }
 
     "have the correct alternate content when no returns are found" in {
-      // TODO: this will change next iteration
       elementText(Selectors.noReturnsFound) shouldBe "You haven’t submitted any returns for 2018 yet. You must use accounting software to submit your returns."
     }
   }
@@ -209,10 +208,24 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
 
   "Rendering the VAT Returns page with only one returned year" should {
 
-    lazy val view = views.html.returns.completedReturns(VatReturnsViewModel(Seq[Int](2018), 2018, Seq()))
+    lazy val exampleReturns: Seq[ReturnObligationsViewModel] =
+      Seq(
+        ReturnObligationsViewModel(
+          LocalDate.parse("2018-01-01"),
+          LocalDate.parse("2018-12-31"),
+          "#001"
+        ),
+        ReturnObligationsViewModel(
+          LocalDate.parse("2018-01-01"),
+          LocalDate.parse("2018-09-30"),
+          "#001"
+        )
+      )
+
+    lazy val view = views.html.returns.completedReturns(VatReturnsViewModel(Seq[Int](2018), 2018, exampleReturns))
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
-    "have a tab for the returned year" should {
+    "have a tab for the returned year " should {
 
       "have the text '2018'" in {
         elementText(Selectors.tabOne) should include("2018")
@@ -236,7 +249,39 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
       "contain visually hidden text" in {
         elementText(Selectors.tabTwoHiddenText) shouldBe "View previous returns"
       }
+    }
 
+    //TODO: Add tests for hititng the previous returns tab and check the content then
+
+
+    "have the correct return heading" in {
+      elementText(Selectors.returnsHeading) shouldBe "2018 Returns"
+    }
+
+    "have the correct period text" in {
+      elementText(Selectors.period) shouldBe "For the period:"
+    }
+
+    "contain the first return which" should {
+
+      "contains the correct obligation period text" in {
+        elementText(Selectors.obligation(1)) shouldBe "1 January to 31 December 2018"
+      }
+
+      "contains the correct link to view a specific return" in {
+        element(Selectors.obligationLink(1)).attr("href") shouldBe controllers.routes.ReturnsController.vatReturn(2018, "#001").url
+      }
+    }
+
+    "contain the second return which" should {
+
+      "contains the correct obligation period text" in {
+        elementText(Selectors.obligation(2)) shouldBe "1 January to 30 September 2018"
+      }
+
+      "contains the correct link to view a specific return" in {
+        element(Selectors.obligationLink(2)).attr("href") shouldBe controllers.routes.ReturnsController.vatReturn(2018, "#001").url
+      }
     }
   }
 
