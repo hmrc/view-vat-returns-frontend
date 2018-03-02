@@ -74,6 +74,8 @@ completedReturns.otherReturnsTwo = view returns submitted before using accountin
 completedReturns.activeTab = Currently viewing returns from {0}
 completedReturns.inactiveTab = View returns from {0}
 completedReturns.noSubmitted = You haven’t submitted any returns for {0} yet. You must use accounting software to submit your returns.
+completedReturns.inactivePrevious = View previous returns
+completedReturns.previousReturns = Previous returns
 
 returnDeadlines.title = Return deadlines
 returnDeadlines.submitBy = You must use accounting software to submit a return by:

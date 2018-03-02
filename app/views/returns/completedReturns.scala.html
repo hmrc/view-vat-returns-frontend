@@ -35,6 +35,7 @@
 
         <ul class="tabs-nav">
 
+
           @for(yearToDisplay <- model.returnYears) {
 
             @if(yearToDisplay == model.selectedYear) {
@@ -53,6 +54,15 @@
                 </a>
               </li>
             }
+          }
+
+          @if(model.returnYears.length == 1){
+              <li class="tabs-nav__tab @if(model.returnYears.head != model.selectedYear) {tabs-nav__tab--active }font-medium">
+                  <a href="@controllers.routes.ReturnObligationsController.completedReturns(model.returnYears.head - 1).url">
+                      @messages("completedReturns.previousReturns")
+                      <span class="visuallyhidden">@messages("completedReturns.inactivePrevious", model.returnYears.head.toString())</span>
+                  </a>
+              </li>
           }
 
         </ul>

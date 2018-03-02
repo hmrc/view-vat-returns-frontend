@@ -206,4 +206,38 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
       }
     }
   }
+
+  "Rendering the VAT Returns page with only one returned year" should {
+
+    lazy val view = views.html.returns.completedReturns(VatReturnsViewModel(Seq[Int](2018), 2018, Seq()))
+    lazy implicit val document: Document = Jsoup.parse(view.body)
+
+    "have a tab for the returned year" should {
+
+      "have the text '2018'" in {
+        elementText(Selectors.tabOne) should include("2018")
+      }
+
+      "contain visually hidden text" in {
+        elementText(Selectors.tabOneHiddenText) shouldBe "Currently viewing returns from 2018"
+      }
+    }
+
+    "have a tab for previous returns" should {
+
+      "have the text 'Previous returns" in {
+        elementText(Selectors.tabTwo) should include("Previous returns")
+      }
+
+      s"contain a link to ${controllers.routes.ReturnObligationsController.completedReturns(2017).url}" in {
+        element(Selectors.tabTwo).select("a").attr("href") shouldBe controllers.routes.ReturnObligationsController.completedReturns(2017).url
+      }
+
+      "contain visually hidden text" in {
+        elementText(Selectors.tabTwoHiddenText) shouldBe "View previous returns"
+      }
+
+    }
+  }
+
 }
