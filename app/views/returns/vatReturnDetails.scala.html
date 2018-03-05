@@ -116,7 +116,7 @@
     </div>
     <p id="adjustments">@messages("yourVatReturn.adjustments")</p>
 
-    @if((appConfig.features.allowPayments()) && (vatReturnViewModel.moneyOwed && !vatReturnViewModel.isRepayment)) {
+    @if(appConfig.features.allowPayments() && vatReturnViewModel.moneyOwed && !vatReturnViewModel.isRepayment) {
       <div>
         <input class="button" type="submit" value='@messages("yourVatReturn.paymentNow")' data-journey-click="return:make-payment:vat-return-details"/>
       </div>
