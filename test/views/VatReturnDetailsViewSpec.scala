@@ -53,6 +53,10 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     val previousPageBreadcrumb = "div.breadcrumbs li:nth-of-type(3)"
     val previousPageBreadcrumbLink = "div.breadcrumbs li:nth-of-type(3) a"
     val currentPage = "div.breadcrumbs li:nth-of-type(4)"
+
+    val paymentServiceDetailAmount = "#payment-detail input:nth-of-type(1)"
+    val paymentServiceDetailMonth = "#payment-detail input:nth-of-type(2)"
+    val paymentServiceDetailYear = "#payment-detail input:nth-of-type(3)"
   }
 
   def nineBoxElemSelector(divNumber: String, columnNumber: String, inFormGroup: Boolean = false): String = {
@@ -123,6 +127,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       "have the correct current page text containing the obligation dates" in {
         elementText(Selectors.currentPage) shouldBe "VAT return: 1 January to 31 March 2017"
       }
+
     }
 
     "have the correct subheading" in {
@@ -224,7 +229,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       5755,
       7052,
       5732,
-      1000,
+      1000.25,
       77656,
       765765,
       55454,
@@ -237,7 +242,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct subheading" in {
-      elementText(Selectors.subHeading) shouldBe "Return total: £1,000"
+      elementText(Selectors.subHeading) shouldBe "Return total: £1,000.25"
     }
 
     "have the correct information text under the heading" in {
@@ -254,6 +259,18 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
 
     "have the pay button" in {
       element(Selectors.paymentButton).attr("value") shouldBe "Pay this now"
+    }
+
+    "render the correct value for the amount hidden input for the  payment service amount" in {
+      element(Selectors.paymentServiceDetailAmount).attr("value") shouldBe "100025"
+    }
+
+    "render the correct value for the tax period month hidden input for the  payment service month" in {
+      element(Selectors.paymentServiceDetailMonth).attr("value") shouldBe "03"
+    }
+
+    "render the correct value for the tax period year hidden input payment service year" in {
+      element(Selectors.paymentServiceDetailYear).attr("value") shouldBe "17"
     }
   }
 

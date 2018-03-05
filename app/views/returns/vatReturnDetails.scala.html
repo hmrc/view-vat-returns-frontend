@@ -19,6 +19,7 @@
 @import views.html.templates.formatters.money._
 @import views.html.templates.formatters.breadcrumbs._
 @import java.time.LocalDate
+@import uk.gov.hmrc.play.views.html.helpers.form
 
 @(vatReturnViewModel: VatReturnViewModel)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
@@ -117,8 +118,13 @@
     <p id="adjustments">@messages("yourVatReturn.adjustments")</p>
 
     @if((appConfig.features.payments()) && (vatReturnViewModel.moneyOwed && !vatReturnViewModel.isRepayment)) {
-      <div>
-        <input class="button" type="submit" value='@messages("yourVatReturn.paymentNow")' data-journey-click="return:make-payment:vat-return-details"/>
+      <div id="payment-detail">
+        @form(action = controllers.routes.MakePaymentController.makePayment()) {
+          <input type="hidden" name="amountInPence" value="@((vatReturnViewModel.boxFive * 100).toInt)">
+          <input type="hidden" name="taxPeriodMonth" value='@(vatReturnViewModel.periodTo.getMonthValue.formatted("%02d"))'>
+          <input type="hidden" name="taxPeriodYear" value="@vatReturnViewModel.periodTo.getYear.toString.takeRight(2)">
+          <input class="button" type="submit" value='@messages("yourVatReturn.paymentNow")' data-journey-click="return:make-payment:vat-return-details"/>
+        }
       </div>
     }
 
