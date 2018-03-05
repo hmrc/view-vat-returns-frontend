@@ -17,11 +17,16 @@
 package views
 
 import java.time.LocalDate
+
+import com.fasterxml.jackson.annotation.JsonFormat.Feature
+import config.ConfigKeys
+import config.features.Feature
 import models.viewModels.VatReturnViewModel
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.scalatest.BeforeAndAfterEach
 
-class VatReturnDetailsViewSpec extends ViewBaseSpec {
+class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach{
 
   object Selectors {
     val pageHeading = "#content h1"

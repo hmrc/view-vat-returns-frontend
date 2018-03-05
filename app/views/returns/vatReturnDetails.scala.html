@@ -117,7 +117,8 @@
     </div>
     <p id="adjustments">@messages("yourVatReturn.adjustments")</p>
 
-    @if((appConfig.features.payments()) && (vatReturnViewModel.moneyOwed && !vatReturnViewModel.isRepayment)) {
+
+    @if(appConfig.features.allowPayments() && vatReturnViewModel.moneyOwed && !vatReturnViewModel.isRepayment) {
       <div id="payment-detail">
         @form(action = controllers.routes.MakePaymentController.makePayment()) {
           <input type="hidden" name="amountInPence" value="@((vatReturnViewModel.boxFive * 100).toInt)">
