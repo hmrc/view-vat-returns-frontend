@@ -18,6 +18,8 @@ package common
 
 object EnrolmentKeys {
 
-  val VatEnrolmentId = "HMRC-MTD-VAT"
+  val mtdVatEnrolmentKey = "HMRC-MTD-VAT"
+  val vatDecEnrolmentKey = "HMCE-VATDEC-ORG"
+  val vatVarEnrolmentKey = "HMCE-VATVAR-ORG"
 
 }
