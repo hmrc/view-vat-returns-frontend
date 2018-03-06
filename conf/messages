@@ -66,13 +66,14 @@ boxFiveDescription.hmrcWillPay = HMRC will pay you
 boxFiveDescription.hmrcPaid = Total amount HMRC owed you
 
 completedReturns.title = Submitted returns
-completedReturns.yearReturns = {0} Returns
+completedReturns.yearReturns = {0} returns
 completedReturns.period = For the period:
 completedReturns.previousReturnsOne = If you''ve submitted returns without using the software for this new service, you can
 completedReturns.previousReturnsTwo = view you previous returns (opens in new tab).
 completedReturns.activeTab = Currently viewing returns from {0}
 completedReturns.inactiveTab = View returns from {0}
 completedReturns.noSubmitted = You haven’t submitted any returns for {0} yet. You must use accounting software to submit your returns.
+completedReturns.activePrevious = Currently viewing previous returns
 completedReturns.inactivePrevious = View previous returns
 completedReturns.previousReturns = Previous returns
 
