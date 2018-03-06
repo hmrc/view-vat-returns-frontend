@@ -36,6 +36,8 @@ object ConfigKeys {
   val simpleAuthFeature: String = "features.simpleAuth.enabled"
   val userResearchBannerFeature: String = "features.userResearchBanner.enabled"
   val allowPaymentsFeature: String = "features.allowPayments.enabled"
+  val staticDateEnabledFeature: String = "features.date-service.staticDate.enabled"
+  val staticDateValue: String = "date-service.staticDate.value"
 
   val businessTaxAccountBase: String = "business-tax-account.host"
   val businessTaxAccountUrl: String = "business-tax-account.homeUrl"
