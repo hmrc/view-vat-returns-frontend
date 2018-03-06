@@ -15,5 +15,8 @@ GET        /submitted/:year/:periodKey  controllers.ReturnsController.vatReturn(
 # Get a return via the payments page
 GET        /:periodKey                  controllers.ReturnsController.vatReturnViaPayments(periodKey: String)
 
+# hand off to payment service to make a payment
+POST       /make-payment         controllers.MakePaymentController.makePayment
+
 # Custom assets route
 GET        /assets/*file                controllers.Assets.at(path="/public", file)
