@@ -48,6 +48,8 @@ trait AppConfig extends ServicesConfig {
   val paymentsServiceUrl: String
   val paymentsServiceVatUrl: String
   val paymentsServiceReturnUrl: String
+  val feedbackFormPartialUrl: String
+  val contactFormServiceIdentifier: String
 
 }
 
@@ -57,12 +59,13 @@ class FrontendAppConfig @Inject()(val runModeConfiguration: Configuration, val e
   override val mode: Mode = environment.mode
 
   private lazy val contactHost: String = getString(Keys.contactFrontendService)
-  private lazy val contactFormServiceIdentifier: String = "VATVC"
+  override lazy val contactFormServiceIdentifier: String = "VATVC"
 
   override lazy val analyticsToken: String = getString(Keys.googleAnalyticsToken)
   override lazy val analyticsHost: String = getString(Keys.googleAnalyticsHost)
   override lazy val reportAProblemPartialUrl: String = s"$contactHost/contact/problem_reports_ajax?service=$contactFormServiceIdentifier"
   override lazy val reportAProblemNonJSUrl: String = s"$contactHost/contact/problem_reports_nonjs?service=$contactFormServiceIdentifier"
+  override lazy val feedbackFormPartialUrl: String = s"$contactHost/contact/beta-feedback/form"
 
   private def whitelistConfig(key: String): Seq[String] = Some(new String(Base64.getDecoder
     .decode(runModeConfiguration.getString(key).getOrElse("")), "UTF-8"))
