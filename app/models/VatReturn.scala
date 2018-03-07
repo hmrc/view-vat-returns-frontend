@@ -16,7 +16,8 @@
 
 package models
 
-import play.api.libs.json.{Format, Json}
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
 
 case class VatReturn(periodKey: String,
                      vatDueSales: BigDecimal,
@@ -30,6 +31,18 @@ case class VatReturn(periodKey: String,
                      totalAcquisitionsExVAT: BigDecimal)
 
 object VatReturn {
+  implicit val vatReturnWrites: Writes[VatReturn] = Json.writes[VatReturn]
 
-  implicit val format: Format[VatReturn] = Json.format[VatReturn]
+  implicit val vatReturnReads: Reads[VatReturn] = (
+    (JsPath \ "periodKey").read[String] and
+    (JsPath \ "vatDueSales").read[BigDecimal] and
+    (JsPath \ "vatDueAcquisitions").read[BigDecimal] and
+    (JsPath \ "totalVatDue").read[BigDecimal] and
+    (JsPath \ "vatReclaimedCurrPeriod").read[BigDecimal] and
+    (JsPath \ "netVatDue").read[BigDecimal] and
+    (JsPath \ "totalValueSalesExVAT").read[BigDecimal] and
+    (JsPath \ "totalValuePurchasesExVAT").read[BigDecimal] and
+    (JsPath \ "totalValueGoodsSuppliedExVAT").read[BigDecimal] and
+    (JsPath \ "totalAcquisitionsExVAT").read[BigDecimal]
+    ) (VatReturn.apply _)
 }
