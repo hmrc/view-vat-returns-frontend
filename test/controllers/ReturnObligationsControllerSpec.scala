@@ -20,7 +20,7 @@ import java.time.LocalDate
 
 import models.errors.{BadRequestError, HttpError}
 import models.viewModels.{ReturnObligationsViewModel, VatReturnsViewModel}
-import models.{User, VatReturnObligation, VatReturnObligations}
+import models.{Obligation, User, VatReturnObligation, VatReturnObligations}
 import play.api.http.Status
 import play.api.test.Helpers._
 import services.{EnrolmentsAuthService, ReturnsService}
@@ -64,7 +64,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         .returns(authResult)
 
       if (serviceCall) {
-        (mockVatReturnService.getReturnObligationsForYear(_: User, _: Int, _: VatReturnObligation.Status.Value)
+        (mockVatReturnService.getReturnObligationsForYear(_: User, _: Int, _: Obligation.Status.Value)
         (_: HeaderCarrier, _: ExecutionContext))
           .expects(*, *, *, *, *)
           .returns(Future.successful(Right(exampleObligations)))
@@ -88,7 +88,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     implicit val hc: HeaderCarrier = HeaderCarrier()
 
     def setup(): Any = {
-      (mockVatReturnService.getReturnObligationsForYear(_: User, _: Int, _: VatReturnObligation.Status.Value)
+      (mockVatReturnService.getReturnObligationsForYear(_: User, _: Int, _: Obligation.Status.Value)
       (_: HeaderCarrier, _: ExecutionContext))
         .expects(*, *, *, *, *)
         .returns(vatServiceResult)
@@ -200,7 +200,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     "the Obligations API call fails" should {
 
       "throw an exception" in new Test {
-        (mockVatReturnService.getReturnObligationsForYear(_: User, _: Int, _: VatReturnObligation.Status.Value)
+        (mockVatReturnService.getReturnObligationsForYear(_: User, _: Int, _: Obligation.Status.Value)
         (_: HeaderCarrier, _: ExecutionContext))
         .expects(*, *, *, *, *)
           .returns(Future.successful(Left(BadRequestError("", ""))))
@@ -243,7 +243,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
           )
         )
 
-        private val result = await(target.getReturnObligations(testUser, 2017, VatReturnObligation.Status.All))
+        private val result = await(target.getReturnObligations(testUser, 2017, Obligation.Status.All))
         result shouldBe expectedResult
       }
     }
@@ -262,7 +262,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
           Seq()
         )
 
-        private val result = await(target.getReturnObligations(testUser, 2017, VatReturnObligation.Status.All))
+        private val result = await(target.getReturnObligations(testUser, 2017, Obligation.Status.All))
         result shouldBe expectedResult
       }
     }

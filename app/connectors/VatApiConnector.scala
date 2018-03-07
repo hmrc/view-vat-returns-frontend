@@ -23,7 +23,7 @@ import javax.inject.{Inject, Singleton}
 
 import config.AppConfig
 import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
-import models.VatReturnObligation.Status
+import models.Obligation.Status
 import models.{VatReturn, VatReturnObligations}
 import play.api.Logger
 import services.MetricsService
