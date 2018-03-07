@@ -219,8 +219,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach{
 
     "render a breadcrumb for the payments page" should {
 
-      "have the text 'VAT payments'" in {
-        elementText(Selectors.previousPageBreadcrumb) shouldBe "VAT payments"
+      "have the text 'What you owe'" in {
+        elementText(Selectors.previousPageBreadcrumb) shouldBe "What you owe"
       }
 
       s"link to 'vat-payments-url'" in {
