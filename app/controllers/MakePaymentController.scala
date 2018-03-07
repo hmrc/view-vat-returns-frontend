@@ -42,7 +42,7 @@ class MakePaymentController @Inject()(val messagesApi: MessagesApi,
         paymentData.copy(
           taxType = "mtdfb-vat",
           taxReference = vrn,
-          returnUrl = appConfig.paymentsServiceReturnUrl,
+          returnUrl = appConfig.paymentsReturnUrl,
           taxPeriodYear = paymentData.taxPeriodYear.takeRight(2)))
 
       MakePaymentForm.form.bindFromRequest().fold(
