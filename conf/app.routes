@@ -12,11 +12,16 @@ GET        /submitted/:year             controllers.ReturnObligationsController.
 # Get a return via the submitted returns page
 GET        /submitted/:year/:periodKey  controllers.ReturnsController.vatReturn(year: Int, periodKey: String)
 
-# Get a return via the payments page
-GET        /:periodKey                  controllers.ReturnsController.vatReturnViaPayments(periodKey: String)
-
 # hand off to payment service to make a payment
-POST       /make-payment         controllers.MakePaymentController.makePayment
+POST       /make-payment                controllers.MakePaymentController.makePayment
+
+# Feedback link Routes
+GET         /feedback                   controllers.feedback.FeedbackController.show
+POST        /feedback                   controllers.feedback.FeedbackController.submit
+GET         /thankyou                   controllers.feedback.FeedbackController.thankyou
+
+# Get a return via the payments page - NOTE THIS ROUTE MUST APPEAR AT THE END OF THE LIST
+GET        /:periodKey                  controllers.ReturnsController.vatReturnViaPayments(periodKey: String)
 
 # Custom assets route
 GET        /assets/*file                controllers.Assets.at(path="/public", file)
