@@ -21,7 +21,7 @@ import javax.inject.{Inject, Singleton}
 
 import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
 import connectors.{FinancialDataConnector, VatApiConnector}
-import models.VatReturnObligation.Status
+import models.Obligation.Status
 import models.payments.{Payment, Payments}
 import models._
 import uk.gov.hmrc.http.HeaderCarrier

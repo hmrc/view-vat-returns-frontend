@@ -18,15 +18,13 @@ package controllers
 
 import java.time.LocalDate
 import javax.inject.Inject
-
 import config.AppConfig
 import models.viewModels.{ReturnDeadlineViewModel, ReturnObligationsViewModel, VatReturnsViewModel}
-import models.{User, VatReturnObligation}
+import models.{Obligation, User}
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent}
 import services.{EnrolmentsAuthService, ReturnsService}
 import uk.gov.hmrc.http.HeaderCarrier
-
 import scala.concurrent.Future
 
 class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
@@ -38,7 +36,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
   def completedReturns(year: Int): Action[AnyContent] = authorisedAction { implicit request =>
     implicit user =>
       if(isValidSearchYear(year)) {
-        getReturnObligations(user, year, VatReturnObligation.Status.Fulfilled).map { model =>
+        getReturnObligations(user, year, Obligation.Status.Fulfilled).map { model =>
           Ok(views.html.returns.completedReturns(model))
         }
       } else {
@@ -48,7 +46,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
 
   def returnDeadlines(): Action[AnyContent] = authorisedAction { implicit request =>
     implicit user =>
-      returnsService.getReturnObligationsForYear(user, LocalDate.now().getYear, VatReturnObligation.Status.Outstanding).map {
+      returnsService.getReturnObligationsForYear(user, LocalDate.now().getYear, Obligation.Status.Outstanding).map {
         case Right(obligations) =>
           val deadlines = obligations.obligations.map(ob =>
             ReturnDeadlineViewModel(ob.due, ob.start, ob.end, ob.due.isBefore(LocalDate.now())))
@@ -61,7 +59,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
     year <= upperBound && year >= upperBound - 1
   }
 
-  private[controllers] def getReturnObligations(user: User, selectedYear: Int, status: VatReturnObligation.Status.Value)
+  private[controllers] def getReturnObligations(user: User, selectedYear: Int, status: Obligation.Status.Value)
                                                (implicit hc: HeaderCarrier): Future[VatReturnsViewModel] = {
     val currentYear: Int = LocalDate.now().getYear
     val returnYears: Seq[Int] = (currentYear to currentYear - 1) by -1

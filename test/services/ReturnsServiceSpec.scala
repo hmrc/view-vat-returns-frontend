@@ -21,7 +21,7 @@ import java.time.LocalDate
 import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
 import connectors.{FinancialDataConnector, VatApiConnector}
 import controllers.ControllerBaseSpec
-import models.VatReturnObligation.Status
+import models.Obligation.Status
 import models.payments.{Payment, Payments}
 import models._
 import uk.gov.hmrc.http.HeaderCarrier
@@ -95,7 +95,7 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
         .returns(Future.successful(Right(exampleObligations)))
 
       lazy val result: HttpGetResult[VatReturnObligations] =
-        await(service.getReturnObligationsForYear(User("999999999"), 2018, VatReturnObligation.Status.All))
+        await(service.getReturnObligationsForYear(User("999999999"), 2018, Status.All))
 
       result shouldBe Right(exampleObligations)
     }

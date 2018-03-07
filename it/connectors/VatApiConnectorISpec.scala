@@ -20,7 +20,7 @@ import java.time.LocalDate
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import helpers.IntegrationBaseSpec
-import models.VatReturnObligation.Status
+import models.Obligation.Status
 import models.errors.{BadRequestError, MultipleErrors}
 import models.{VatReturn, VatReturnObligation, VatReturnObligations}
 import stubs.VatApiStub
