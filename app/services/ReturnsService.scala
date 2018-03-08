@@ -75,7 +75,7 @@ class ReturnsService @Inject()(vatApiConnector: VatApiConnector, financialDataCo
 
   def constructReturnDetailsModel(vatReturn: VatReturn, payment: Payment): VatReturnDetails = {
     val moneyOwed = payment.outstandingAmount != 0
-    val isRepayment = vatReturn.vatReclaimedCurrPeriod > vatReturn.totalVatDue
+    val isRepayment = vatReturn.vatReclaimedCurrentPeriod > vatReturn.totalVatDue
     VatReturnDetails(vatReturn, moneyOwed, isRepayment, payment)
   }
 }
