@@ -49,7 +49,7 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
     val previousReturnsLink = "div > div > p > a"
   }
 
-  val returnYears = Seq(2018, 2017, 2016, 2015)
+  val returnYears = Seq(2018, 2017)
 
   "Rendering the VAT Returns page with no returns for the selected year of 2018" should {
 
@@ -114,36 +114,6 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
           elementText(Selectors.tabTwoHiddenText) shouldBe "View returns from 2017"
         }
       }
-
-      "tab three" should {
-
-        "have the text '2016'" in {
-          elementText(Selectors.tabThree) should include("2016")
-        }
-
-        s"contain a link to ${controllers.routes.ReturnObligationsController.completedReturns(2016).url}" in {
-          element(Selectors.tabThree).select("a").attr("href") shouldBe controllers.routes.ReturnObligationsController.completedReturns(2016).url
-        }
-
-        "contain visually hidden text" in {
-          elementText(Selectors.tabThreeHiddenText) shouldBe "View returns from 2016"
-        }
-      }
-
-      "tab four" should {
-
-        "have the text '2015'" in {
-          elementText(Selectors.tabFour) should include("2015")
-        }
-
-        s"contain a link to ${controllers.routes.ReturnObligationsController.completedReturns(2015).url}" in {
-          element(Selectors.tabFour).select("a").attr("href") shouldBe controllers.routes.ReturnObligationsController.completedReturns(2015).url
-        }
-
-        "contain visually hidden text" in {
-          elementText(Selectors.tabFourHiddenText) shouldBe "View returns from 2015"
-        }
-      }
     }
 
     "have the correct return heading" in {
@@ -160,14 +130,14 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
     lazy val exampleReturns: Seq[ReturnObligationsViewModel] =
       Seq(
         ReturnObligationsViewModel(
-          LocalDate.parse("2017-01-01"),
-          LocalDate.parse("2017-12-31"),
+          LocalDate.parse("2018-01-01"),
+          LocalDate.parse("2018-12-31"),
           "#001"
         ),
         ReturnObligationsViewModel(
-          LocalDate.parse("2017-01-01"),
-          LocalDate.parse("2017-09-30"),
-          "#001"
+          LocalDate.parse("2018-01-01"),
+          LocalDate.parse("2018-09-30"),
+          "#002"
         )
       )
 
@@ -185,7 +155,7 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
     "contain the first return which" should {
 
       "contains the correct obligation period text" in {
-        elementText(Selectors.obligation(1)) shouldBe "1 January to 31 December 2017"
+        elementText(Selectors.obligation(1)) shouldBe "1 January to 31 December 2018"
       }
 
       "contains the correct link to view a specific return" in {
@@ -196,11 +166,11 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
     "contain the second return which" should {
 
       "contains the correct obligation period text" in {
-        elementText(Selectors.obligation(2)) shouldBe "1 January to 30 September 2017"
+        elementText(Selectors.obligation(2)) shouldBe "1 January to 30 September 2018"
       }
 
       "contains the correct link to view a specific return" in {
-        element(Selectors.obligationLink(2)).attr("href") shouldBe controllers.routes.ReturnsController.vatReturn(2018, "#001").url
+        element(Selectors.obligationLink(2)).attr("href") shouldBe controllers.routes.ReturnsController.vatReturn(2018, "#002").url
       }
     }
   }
@@ -217,7 +187,7 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
         ReturnObligationsViewModel(
           LocalDate.parse("2018-01-01"),
           LocalDate.parse("2018-09-30"),
-          "#001"
+          "#002"
         )
       )
 
@@ -277,7 +247,7 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
         }
 
         "contains the correct link to view a specific return" in {
-          element(Selectors.obligationLink(2)).attr("href") shouldBe controllers.routes.ReturnsController.vatReturn(2018, "#001").url
+          element(Selectors.obligationLink(2)).attr("href") shouldBe controllers.routes.ReturnsController.vatReturn(2018, "#002").url
         }
       }
     }
@@ -323,7 +293,7 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
       }
 
       "contains the link" in {
-        element(Selectors.previousReturnsText).select("a").attr("href") shouldBe ""
+        element(Selectors.previousReturnsLink).attr("href") shouldBe ""
       }
     }
   }
