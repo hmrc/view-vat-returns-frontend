@@ -49,6 +49,7 @@ trait AppConfig extends ServicesConfig {
   val paymentsReturnUrl: String
   val feedbackFormPartialUrl: String
   val contactFormServiceIdentifier: String
+  val staticDateValue: String
 }
 
 @Singleton
@@ -100,4 +101,6 @@ class FrontendAppConfig @Inject()(val runModeConfiguration: Configuration, val e
   override lazy val paymentsServiceUrl: String = paymentsBaseUrl + paymentsUrl
   private lazy val paymentsReturnBase: String = getString(Keys.paymentsReturnBase)
   override lazy val paymentsReturnUrl: String = paymentsReturnBase + getString(Keys.paymentsReturnUrl)
+
+  override lazy val staticDateValue: String = getString(Keys.staticDateValue)
 }

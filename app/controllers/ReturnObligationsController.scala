@@ -16,20 +16,22 @@
 
 package controllers
 
-import java.time.LocalDate
 import javax.inject.Inject
+
 import config.AppConfig
 import models.viewModels.{ReturnDeadlineViewModel, ReturnObligationsViewModel, VatReturnsViewModel}
 import models.{Obligation, User}
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent}
-import services.{EnrolmentsAuthService, ReturnsService}
+import services.{DateService, EnrolmentsAuthService, ReturnsService}
 import uk.gov.hmrc.http.HeaderCarrier
+
 import scala.concurrent.Future
 
 class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
                                             val enrolmentsAuthService: EnrolmentsAuthService,
                                             returnsService: ReturnsService,
+                                            dateService: DateService,
                                             implicit val appConfig: AppConfig)
   extends AuthorisedController {
 
@@ -46,22 +48,22 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
 
   def returnDeadlines(): Action[AnyContent] = authorisedAction { implicit request =>
     implicit user =>
-      returnsService.getReturnObligationsForYear(user, LocalDate.now().getYear, Obligation.Status.Outstanding).map {
+      returnsService.getReturnObligationsForYear(user, dateService.now().getYear, Obligation.Status.Outstanding).map {
         case Right(obligations) =>
           val deadlines = obligations.obligations.map(ob =>
-            ReturnDeadlineViewModel(ob.due, ob.start, ob.end, ob.due.isBefore(LocalDate.now())))
+            ReturnDeadlineViewModel(ob.due, ob.start, ob.end, ob.due.isBefore(dateService.now())))
             Ok(views.html.returns.returnDeadlines(deadlines))
         case Left(_) => throw new Exception //non-graceful error handling for MVP
       }
   }
 
-  private[controllers] def isValidSearchYear(year: Int, upperBound: Int = LocalDate.now().getYear) = {
+  private[controllers] def isValidSearchYear(year: Int, upperBound: Int = dateService.now().getYear) = {
     year <= upperBound && year >= upperBound - 1
   }
 
   private[controllers] def getReturnObligations(user: User, selectedYear: Int, status: Obligation.Status.Value)
                                                (implicit hc: HeaderCarrier): Future[VatReturnsViewModel] = {
-    val currentYear: Int = LocalDate.now().getYear
+    val currentYear: Int = dateService.now().getYear
     val returnYears: Seq[Int] = (currentYear to currentYear - 1) by -1
 
     returnsService.getReturnObligationsForYear(user, selectedYear, status).map {

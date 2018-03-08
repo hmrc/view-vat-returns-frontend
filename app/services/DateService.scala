@@ -14,9 +14,18 @@
  * limitations under the License.
  */
 
-package models
+package services
 
-case class FeatureSwitchModel(simpleAuthEnabled: Boolean,
-                              userResearchBannerEnabled: Boolean,
-                              allowPaymentsEnabled: Boolean,
-                              staticDateEnabled: Boolean)
+import java.time.LocalDate
+import javax.inject.Inject
+
+class DateService @Inject()(appConfig: config.AppConfig) {
+
+  def now(): LocalDate = {
+    if (appConfig.features.staticDateEnabled()) {
+      LocalDate.parse(appConfig.staticDateValue)
+    } else {
+      LocalDate.now()
+    }
+  }
+}
