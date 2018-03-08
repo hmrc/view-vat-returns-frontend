@@ -23,7 +23,7 @@ import models.viewModels.{ReturnObligationsViewModel, VatReturnsViewModel}
 import models.{Obligation, User, VatReturnObligation, VatReturnObligations}
 import play.api.http.Status
 import play.api.test.Helpers._
-import services.{EnrolmentsAuthService, ReturnsService}
+import services.{DateService, EnrolmentsAuthService, ReturnsService}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.Retrieval
@@ -57,8 +57,11 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     val authResult: Future[_]
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
     val mockVatReturnService: ReturnsService = mock[ReturnsService]
+    val mockDateService: DateService = mock[DateService]
 
     def setup(): Any = {
+      (mockDateService.now: () => LocalDate).stubs().returns(LocalDate.parse("2018-05-01"))
+
       (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
         .expects(*, *, *, *)
         .returns(authResult)
@@ -75,7 +78,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
     def target: ReturnObligationsController = {
       setup()
-      new ReturnObligationsController(messages, mockEnrolmentsAuthService, mockVatReturnService, mockConfig)
+      new ReturnObligationsController(messages, mockEnrolmentsAuthService, mockVatReturnService, mockDateService, mockConfig)
     }
   }
 
@@ -83,11 +86,14 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     val vatServiceResult: Future[Either[HttpError, VatReturnObligations]]
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
     val mockVatReturnService: ReturnsService = mock[ReturnsService]
+    val mockDateService: DateService = mock[DateService]
     val mockEnrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
     val testUser: User = User("999999999")
     implicit val hc: HeaderCarrier = HeaderCarrier()
 
     def setup(): Any = {
+      (mockDateService.now: () => LocalDate).stubs().returns(LocalDate.parse("2018-05-01"))
+
       (mockVatReturnService.getReturnObligationsForYear(_: User, _: Int, _: Obligation.Status.Value)
       (_: HeaderCarrier, _: ExecutionContext))
         .expects(*, *, *, *, *)
@@ -96,7 +102,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
     def target: ReturnObligationsController = {
       setup()
-      new ReturnObligationsController(messages, mockEnrolmentsAuthService, mockVatReturnService, mockConfig)
+      new ReturnObligationsController(messages, mockEnrolmentsAuthService, mockVatReturnService, mockDateService, mockConfig)
     }
   }
 
