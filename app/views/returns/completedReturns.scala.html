@@ -41,7 +41,7 @@
 
               <li class="tabs-nav__tab tabs-nav__tab--active font-medium">
                 @yearToDisplay
-                <span class="visuallyhidden">@messages("completedReturns.activeTab", yearToDisplay.toString())</span>
+                <span class="visuallyhidden">@messages("completedReturns.activeTab", yearToDisplay.toString)</span>
               </li>
 
             } else {
@@ -49,21 +49,45 @@
               <li class="tabs-nav__tab font-medium">
                 <a href="@controllers.routes.ReturnObligationsController.completedReturns(yearToDisplay).url">
                   @yearToDisplay
-                  <span class="visuallyhidden">@messages("completedReturns.inactiveTab", yearToDisplay.toString())</span>
+                  <span class="visuallyhidden">@messages("completedReturns.inactiveTab", yearToDisplay.toString)</span>
                 </a>
               </li>
             }
           }
 
+          @if(model.returnYears.length == 1){
+
+              @if(model.returnYears.head != model.selectedYear) {
+                  <li class="tabs-nav__tab tabs-nav__tab--active font-medium">
+                    @messages("completedReturns.previousReturns")
+                      <span class="visuallyhidden">@messages("completedReturns.activePrevious")</span>
+                  </li>
+              } else {
+                  <li class="tabs-nav__tab font-medium">
+                      <a href="@controllers.routes.ReturnObligationsController.completedReturns(model.returnYears.head - 1).url">
+                          @messages("completedReturns.previousReturns") <span class="visuallyhidden">@messages("completedReturns.inactivePrevious")</span>
+                      </a>
+                  </li>
+              }
+          }
+
         </ul>
 
-        <h2>@messages("completedReturns.yearReturns", model.selectedYear.toString())</h2>
+        @if(model.returnYears.length == 1 && model.returnYears.head != model.selectedYear) {
+            <h2>@messages("completedReturns.previousReturns")</h2>
+            <p>
+                @messages("completedReturns.previousReturnsOne")
+                <a href="@appConfig.portalUrl" data-journey-click="return:view-portal-returns:completed-returns">@messages("completedReturns.previousReturnsTwo")</a>
+            </p>
+        } else { @if(model.obligations.isEmpty) {
 
-        @if(model.obligations.isEmpty) {
+        <h2>@messages("completedReturns.yearReturns", model.selectedYear.toString)</h2>
 
-          <p>@messages("completedReturns.noSubmitted", model.selectedYear.toString())</p>
+          <p>@messages("completedReturns.noSubmitted", model.selectedYear.toString)</p>
 
         } else {
+
+        <h2>@messages("completedReturns.yearReturns", model.selectedYear.toString)</h2>
 
           <p>@messages("completedReturns.period")</p>
 
@@ -79,7 +103,8 @@
               </li>
             }
           </ul>
-        }
+        }}
+
     </div>
   </div>
 }

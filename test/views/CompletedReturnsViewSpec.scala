@@ -45,12 +45,11 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
     val period = ".column-two-thirds p"
     def obligation(number: Int): String = s".list-bullet li:nth-of-type($number)"
     def obligationLink(number: Int): String = s".list-bullet li:nth-of-type($number) > a"
-    val otherReturns = "div.column-two-thirds > h3"
-    val otherReturnsGuidance = "div > div > p:nth-child(6)"
-    val otherReturnsLink = "div > div > p:nth-child(6) > a"
+    val previousReturnsText = ".column-two-thirds p"
+    val previousReturnsLink = "div > div > p > a"
   }
 
-  val returnYears = Seq(2018, 2017, 2016, 2015)
+  val returnYears = Seq(2018, 2017)
 
   "Rendering the VAT Returns page with no returns for the selected year of 2018" should {
 
@@ -115,44 +114,13 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
           elementText(Selectors.tabTwoHiddenText) shouldBe "View returns from 2017"
         }
       }
-
-      "tab three" should {
-
-        "have the text '2016'" in {
-          elementText(Selectors.tabThree) should include("2016")
-        }
-
-        s"contain a link to ${controllers.routes.ReturnObligationsController.completedReturns(2016).url}" in {
-          element(Selectors.tabThree).select("a").attr("href") shouldBe controllers.routes.ReturnObligationsController.completedReturns(2016).url
-        }
-
-        "contain visually hidden text" in {
-          elementText(Selectors.tabThreeHiddenText) shouldBe "View returns from 2016"
-        }
-      }
-
-      "tab four" should {
-
-        "have the text '2015'" in {
-          elementText(Selectors.tabFour) should include("2015")
-        }
-
-        s"contain a link to ${controllers.routes.ReturnObligationsController.completedReturns(2015).url}" in {
-          element(Selectors.tabFour).select("a").attr("href") shouldBe controllers.routes.ReturnObligationsController.completedReturns(2015).url
-        }
-
-        "contain visually hidden text" in {
-          elementText(Selectors.tabFourHiddenText) shouldBe "View returns from 2015"
-        }
-      }
     }
 
     "have the correct return heading" in {
-      elementText(Selectors.returnsHeading) shouldBe "2018 Returns"
+      elementText(Selectors.returnsHeading) shouldBe "2018 returns"
     }
 
     "have the correct alternate content when no returns are found" in {
-      // TODO: this will change next iteration
       elementText(Selectors.noReturnsFound) shouldBe "You haven’t submitted any returns for 2018 yet. You must use accounting software to submit your returns."
     }
   }
@@ -162,14 +130,14 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
     lazy val exampleReturns: Seq[ReturnObligationsViewModel] =
       Seq(
         ReturnObligationsViewModel(
-          LocalDate.parse("2017-01-01"),
-          LocalDate.parse("2017-12-31"),
+          LocalDate.parse("2018-01-01"),
+          LocalDate.parse("2018-12-31"),
           "#001"
         ),
         ReturnObligationsViewModel(
-          LocalDate.parse("2017-01-01"),
-          LocalDate.parse("2017-09-30"),
-          "#001"
+          LocalDate.parse("2018-01-01"),
+          LocalDate.parse("2018-09-30"),
+          "#002"
         )
       )
 
@@ -177,7 +145,7 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct return heading" in {
-      elementText(Selectors.returnsHeading) shouldBe "2018 Returns"
+      elementText(Selectors.returnsHeading) shouldBe "2018 returns"
     }
 
     "have the correct period text" in {
@@ -187,7 +155,7 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
     "contain the first return which" should {
 
       "contains the correct obligation period text" in {
-        elementText(Selectors.obligation(1)) shouldBe "1 January to 31 December 2017"
+        elementText(Selectors.obligation(1)) shouldBe "1 January to 31 December 2018"
       }
 
       "contains the correct link to view a specific return" in {
@@ -198,11 +166,134 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
     "contain the second return which" should {
 
       "contains the correct obligation period text" in {
-        elementText(Selectors.obligation(2)) shouldBe "1 January to 30 September 2017"
+        elementText(Selectors.obligation(2)) shouldBe "1 January to 30 September 2018"
       }
 
       "contains the correct link to view a specific return" in {
-        element(Selectors.obligationLink(2)).attr("href") shouldBe controllers.routes.ReturnsController.vatReturn(2018, "#001").url
+        element(Selectors.obligationLink(2)).attr("href") shouldBe controllers.routes.ReturnsController.vatReturn(2018, "#002").url
+      }
+    }
+  }
+
+  "Rendering the VAT Returns page with only one returned year" should {
+
+    lazy val exampleReturns: Seq[ReturnObligationsViewModel] =
+      Seq(
+        ReturnObligationsViewModel(
+          LocalDate.parse("2018-01-01"),
+          LocalDate.parse("2018-12-31"),
+          "#001"
+        ),
+        ReturnObligationsViewModel(
+          LocalDate.parse("2018-01-01"),
+          LocalDate.parse("2018-09-30"),
+          "#002"
+        )
+      )
+
+    "with the first tab being selected" should {
+      lazy val view = views.html.returns.completedReturns(VatReturnsViewModel(Seq[Int](2018), 2018, exampleReturns))
+      lazy implicit val document: Document = Jsoup.parse(view.body)
+
+      "have a tab for the returned year " should {
+
+        "have the text '2018'" in {
+          elementText(Selectors.tabOne) should include("2018")
+        }
+
+        "contain visually hidden text" in {
+          elementText(Selectors.tabOneHiddenText) shouldBe "Currently viewing returns from 2018"
+        }
+      }
+
+      "have a tab for previous returns" should {
+
+        "have the text 'Previous returns" in {
+          elementText(Selectors.tabTwo) should include("Previous returns")
+        }
+
+        s"contain a link to ${controllers.routes.ReturnObligationsController.completedReturns(2017).url}" in {
+          element(Selectors.tabTwo).select("a").attr("href") shouldBe controllers.routes.ReturnObligationsController.completedReturns(2017).url
+        }
+
+        "contain visually hidden text" in {
+          elementText(Selectors.tabTwoHiddenText) shouldBe "View previous returns"
+        }
+      }
+
+      "have the correct return heading" in {
+        elementText(Selectors.returnsHeading) shouldBe "2018 returns"
+      }
+
+      "have the correct period text" in {
+        elementText(Selectors.period) shouldBe "For the period:"
+      }
+
+      "contain the first return which" should {
+
+        "contains the correct obligation period text" in {
+          elementText(Selectors.obligation(1)) shouldBe "1 January to 31 December 2018"
+        }
+
+        "contains the correct link to view a specific return" in {
+          element(Selectors.obligationLink(1)).attr("href") shouldBe controllers.routes.ReturnsController.vatReturn(2018, "#001").url
+        }
+      }
+
+      "contain the second return which" should {
+
+        "contains the correct obligation period text" in {
+          elementText(Selectors.obligation(2)) shouldBe "1 January to 30 September 2018"
+        }
+
+        "contains the correct link to view a specific return" in {
+          element(Selectors.obligationLink(2)).attr("href") shouldBe controllers.routes.ReturnsController.vatReturn(2018, "#002").url
+        }
+      }
+    }
+
+    "with the second tab being selected" should {
+
+      lazy val view = views.html.returns.completedReturns(VatReturnsViewModel(Seq[Int](2018), 2017, exampleReturns))
+      lazy implicit val document: Document = Jsoup.parse(view.body)
+
+      "have a tab for the returned year " should {
+
+        "have the text '2018'" in {
+          elementText(Selectors.tabOne) should include("2018")
+        }
+
+        s"contain a link to ${controllers.routes.ReturnObligationsController.completedReturns(2018).url}" in {
+          element(Selectors.tabOne).select("a").attr("href") shouldBe controllers.routes.ReturnObligationsController.completedReturns(2018).url
+        }
+
+        "contain visually hidden text" in {
+          elementText(Selectors.tabOneHiddenText) shouldBe "View returns from 2018"
+        }
+      }
+
+      "have a tab for previous returns" should {
+
+        "have the text 'Previous returns" in {
+          elementText(Selectors.tabTwo) should include("Previous returns")
+        }
+
+        "contain visually hidden text" in {
+          elementText(Selectors.tabTwoHiddenText) shouldBe "Currently viewing previous returns"
+        }
+      }
+
+      "have the correct return heading" in {
+        elementText(Selectors.returnsHeading) shouldBe "Previous returns"
+      }
+
+      "have the correct information text under the heading" in {
+        elementText(Selectors.previousReturnsText) shouldBe
+          "If you've submitted returns without using the software for this new service, you can view you previous returns (opens in new tab)."
+      }
+
+      "contains the link" in {
+        element(Selectors.previousReturnsLink).attr("href") shouldBe ""
       }
     }
   }

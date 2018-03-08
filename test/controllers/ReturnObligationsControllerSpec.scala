@@ -238,7 +238,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
         val currentYear: Int = LocalDate.now().getYear
         val expectedResult = VatReturnsViewModel(
-          Seq(currentYear, currentYear - 1),
+          Seq(currentYear),
           2017,
           Seq(
             ReturnObligationsViewModel(
@@ -263,7 +263,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
         val currentYear: Int = LocalDate.now().getYear
         val expectedResult = VatReturnsViewModel(
-          Seq(currentYear, currentYear - 1),
+          Seq(currentYear),
           2017,
           Seq()
         )

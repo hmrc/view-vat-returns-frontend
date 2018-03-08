@@ -31,74 +31,44 @@ class CompletedReturnsPageSpec extends IntegrationBaseSpec {
 
     def request(): WSRequest = {
       setupStubs()
-      buildRequest("/submitted/2017")
+      buildRequest("/submitted/2018")
     }
   }
 
-  "Calling the returns route with an authenticated user with three obligation end dates in 2017 and one in 2018" when {
+  "Calling the returns route with an authenticated user with one obligation end date in 2018" should {
 
-    "calling the 2017 route" should {
-
-      "return 200" in new Test {
-        override def setupStubs(): StubMapping = {
-          AuthStub.authorised()
-          VatApiStub.stub2017Obligations
-        }
-        val response: WSResponse = await(request().get())
-        response.status shouldBe Status.OK
+    "return 200" in new Test {
+      override def setupStubs(): StubMapping = {
+        AuthStub.authorised()
+        VatApiStub.stub2018Obligations
+      }
+      override def request(): WSRequest = {
+        setupStubs()
+        buildRequest("/submitted/2018")
       }
 
-      "return the three obligations" in new Test {
-
-        override def setupStubs(): StubMapping = {
-          AuthStub.authorised()
-          VatApiStub.stub2017Obligations
-        }
-        val response: WSResponse = await(request().get())
-
-        lazy implicit val document: Document = Jsoup.parse(response.body)
-
-        val bulletPointSelector = ".list-bullet li"
-
-        document.select(bulletPointSelector).size() shouldBe 3
-      }
+      val response: WSResponse = await(request().get())
+      response.status shouldBe Status.OK
     }
 
-    "calling the 2018 route" should {
+    "return one obligation" in new Test {
 
-      "return 200" in new Test {
-        override def setupStubs(): StubMapping = {
-          AuthStub.authorised()
-          VatApiStub.stub2018Obligations
-        }
-        override def request(): WSRequest = {
-          setupStubs()
-          buildRequest("/submitted/2018")
-        }
-
-        val response: WSResponse = await(request().get())
-        response.status shouldBe Status.OK
+      override def setupStubs(): StubMapping = {
+        AuthStub.authorised()
+        VatApiStub.stub2018Obligations
+      }
+      override def request(): WSRequest = {
+        setupStubs()
+        buildRequest("/submitted/2018")
       }
 
-      "return one obligation" in new Test {
+      val response: WSResponse = await(request().get())
 
-        override def setupStubs(): StubMapping = {
-          AuthStub.authorised()
-          VatApiStub.stub2018Obligations
-        }
-        override def request(): WSRequest = {
-          setupStubs()
-          buildRequest("/submitted/2018")
-        }
+      lazy implicit val document: Document = Jsoup.parse(response.body)
 
-        val response: WSResponse = await(request().get())
+      val bulletPointSelector = ".list-bullet li"
 
-        lazy implicit val document: Document = Jsoup.parse(response.body)
-
-        val bulletPointSelector = ".list-bullet li"
-
-        document.select(bulletPointSelector).size() shouldBe 1
-      }
+      document.select(bulletPointSelector).size() shouldBe 1
     }
   }
 }
