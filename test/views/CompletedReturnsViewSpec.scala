@@ -175,7 +175,7 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
     }
   }
 
-  "Rendering the VAT Returns page with only one returned year" should {
+  "Rendering the VAT Returns page with only one returned year" when {
 
     lazy val exampleReturns: Seq[ReturnObligationsViewModel] =
       Seq(
@@ -191,7 +191,7 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
         )
       )
 
-    "with the first tab being selected" should {
+    "the first tab is selected and the user has an old VAT enrolment" should {
       lazy val view = views.html.returns.completedReturns(VatReturnsViewModel(Seq[Int](2018), 2018, exampleReturns, hasNonMtdVat = true))
       lazy implicit val document: Document = Jsoup.parse(view.body)
 
@@ -252,7 +252,7 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
       }
     }
 
-    "with the second tab being selected" should {
+    "the second tab is selected and the user has an old VAT enrolment" should {
 
       lazy val view = views.html.returns.completedReturns(VatReturnsViewModel(Seq[Int](2018), 2017, exampleReturns, hasNonMtdVat = true))
       lazy implicit val document: Document = Jsoup.parse(view.body)
@@ -294,6 +294,16 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
 
       "contains the link" in {
         element(Selectors.previousReturnsLink).attr("href") shouldBe ""
+      }
+    }
+
+    "the user has no old VAT enrolment" should {
+
+      lazy val view = views.html.returns.completedReturns(VatReturnsViewModel(Seq[Int](2018), 2018, exampleReturns, hasNonMtdVat = false))
+      lazy val document: Document = Jsoup.parse(view.body)
+
+      "not show the Previous Returns tab" in {
+        document.select(Selectors.tabTwo) shouldBe empty
       }
     }
   }

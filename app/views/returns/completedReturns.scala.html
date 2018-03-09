@@ -16,6 +16,7 @@
 
 @import views.html.templates.formatters.breadcrumbs._
 @import views.html.templates.formatters.dates._
+@import views.html.templates.formatters.tabs._
 @import models.viewModels._
 @import models.User
 
@@ -34,40 +35,31 @@
     <div class="column-two-thirds">
       <h1 class="heading-xlarge">@messages("completedReturns.title")</h1>
       <ul class="tabs-nav">
-
         @for(yearToDisplay <- model.returnYears) {
 
           @if(yearToDisplay == model.selectedYear) {
-            <li class="tabs-nav__tab tabs-nav__tab--active font-medium">
-              @yearToDisplay
-              <span class="visuallyhidden">@messages("completedReturns.activeTab", yearToDisplay.toString)</span>
-            </li>
+            @activeTab(yearToDisplay.toString, messages("completedReturns.activeTab", yearToDisplay.toString))
           } else {
-            <li class="tabs-nav__tab font-medium">
-              <a href="@controllers.routes.ReturnObligationsController.completedReturns(yearToDisplay).url">
-                @yearToDisplay
-                <span class="visuallyhidden">@messages("completedReturns.inactiveTab", yearToDisplay.toString)</span>
-              </a>
-            </li>
+            @inactiveTab(
+              yearToDisplay.toString,
+              messages("completedReturns.inactiveTab", yearToDisplay.toString),
+              controllers.routes.ReturnObligationsController.completedReturns(yearToDisplay).url
+            )
           }
         }
 
         @if(model.returnYears.length == 1 && model.hasNonMtdVat) {
 
           @if(model.returnYears.head != model.selectedYear) {
-            <li class="tabs-nav__tab tabs-nav__tab--active font-medium">
-              @messages("completedReturns.previousReturns")
-              <span class="visuallyhidden">@messages("completedReturns.activePrevious")</span>
-            </li>
+            @activeTab(messages("completedReturns.previousReturns"), messages("completedReturns.activePrevious"))
           } else {
-            <li class="tabs-nav__tab font-medium">
-              <a href="@controllers.routes.ReturnObligationsController.completedReturns(model.returnYears.head - 1).url">
-                @messages("completedReturns.previousReturns") <span class="visuallyhidden">@messages("completedReturns.inactivePrevious")</span>
-              </a>
-            </li>
+            @inactiveTab(
+              messages("completedReturns.previousReturns"),
+              messages("completedReturns.inactivePrevious"),
+              controllers.routes.ReturnObligationsController.completedReturns(model.returnYears.head - 1).url
+            )
           }
         }
-
       </ul>
 
       @if(model.returnYears.length == 1 && model.returnYears.head != model.selectedYear) {
@@ -81,12 +73,9 @@
       } else {
 
         @if(model.obligations.isEmpty) {
-
           <h2>@messages("completedReturns.yearReturns", model.selectedYear.toString)</h2>
           <p>@messages("completedReturns.noSubmitted", model.selectedYear.toString)</p>
-
         } else {
-
           <h2>@messages("completedReturns.yearReturns", model.selectedYear.toString)</h2>
           <p>@messages("completedReturns.period")</p>
 
