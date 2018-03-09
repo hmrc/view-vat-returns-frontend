@@ -246,7 +246,8 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
               LocalDate.parse("2017-01-01"),
               "#001"
             )
-          )
+          ),
+          hasNonMtdVat = false
         )
 
         private val result = await(target.getReturnObligations(testUser, 2017, Obligation.Status.All))
@@ -265,7 +266,8 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         val expectedResult = VatReturnsViewModel(
           Seq(currentYear),
           2017,
-          Seq()
+          Seq(),
+          hasNonMtdVat = false
         )
 
         private val result = await(target.getReturnObligations(testUser, 2017, Obligation.Status.All))
@@ -287,7 +289,6 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
         result shouldBe true
       }
-
     }
 
     "the year is above the upper search boundary" should {
@@ -301,7 +302,6 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
         result shouldBe false
       }
-
     }
 
     "the year is on the lower boundary" should {
@@ -315,7 +315,6 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
         result shouldBe true
       }
-
     }
 
     "the year is below the lower boundary" should {
@@ -329,7 +328,6 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
         result shouldBe false
       }
-
     }
 
     "the year is between the upper and lower boundaries" should {
@@ -343,9 +341,6 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
         result shouldBe true
       }
-
     }
-
   }
-
 }

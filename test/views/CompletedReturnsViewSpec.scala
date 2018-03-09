@@ -53,7 +53,7 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
 
   "Rendering the VAT Returns page with no returns for the selected year of 2018" should {
 
-    lazy val view = views.html.returns.completedReturns(VatReturnsViewModel(returnYears, 2018, Seq()))
+    lazy val view = views.html.returns.completedReturns(VatReturnsViewModel(returnYears, 2018, Seq(), hasNonMtdVat = false))
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct document title" in {
@@ -141,7 +141,7 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
         )
       )
 
-    lazy val view = views.html.returns.completedReturns(VatReturnsViewModel(returnYears, 2018, exampleReturns))
+    lazy val view = views.html.returns.completedReturns(VatReturnsViewModel(returnYears, 2018, exampleReturns, hasNonMtdVat = false))
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct return heading" in {
@@ -192,7 +192,7 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
       )
 
     "with the first tab being selected" should {
-      lazy val view = views.html.returns.completedReturns(VatReturnsViewModel(Seq[Int](2018), 2018, exampleReturns))
+      lazy val view = views.html.returns.completedReturns(VatReturnsViewModel(Seq[Int](2018), 2018, exampleReturns, hasNonMtdVat = true))
       lazy implicit val document: Document = Jsoup.parse(view.body)
 
       "have a tab for the returned year " should {
@@ -254,7 +254,7 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
 
     "with the second tab being selected" should {
 
-      lazy val view = views.html.returns.completedReturns(VatReturnsViewModel(Seq[Int](2018), 2017, exampleReturns))
+      lazy val view = views.html.returns.completedReturns(VatReturnsViewModel(Seq[Int](2018), 2017, exampleReturns, hasNonMtdVat = true))
       lazy implicit val document: Document = Jsoup.parse(view.body)
 
       "have a tab for the returned year " should {
