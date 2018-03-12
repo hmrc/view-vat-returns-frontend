@@ -25,7 +25,7 @@ import models.payments.Payment
 import models.viewModels.VatReturnViewModel
 import play.api.http.Status
 import play.api.test.Helpers._
-import services.{EnrolmentsAuthService, ReturnsService, SubscriptionService}
+import services.{DateService, EnrolmentsAuthService, ReturnsService, SubscriptionService}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.Retrieval
@@ -82,6 +82,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
     val mockVatReturnService: ReturnsService = mock[ReturnsService]
     val mockSubscriptionService: SubscriptionService = mock[SubscriptionService]
+    val mockDateService: DateService = mock[DateService]
 
     def setup(): Any = {
       (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
@@ -110,6 +111,8 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
             .expects(*, *)
             .returns(exampleVatReturnDetails)
         }
+
+        (mockDateService.now: () => LocalDate).stubs().returns(LocalDate.parse("2018-05-01"))
       }
     }
 
@@ -117,7 +120,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
     def target: ReturnsController = {
       setup()
-      new ReturnsController(messages, mockEnrolmentsAuthService, mockVatReturnService, mockSubscriptionService, mockConfig)
+      new ReturnsController(messages, mockEnrolmentsAuthService, mockVatReturnService, mockSubscriptionService, mockDateService, mockConfig)
     }
   }
 
@@ -252,8 +255,9 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     val mockVatReturnService: ReturnsService = mock[ReturnsService]
     val mockVatApiService: SubscriptionService = mock[SubscriptionService]
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
+    val mockDateService: DateService = mock[DateService]
     val mockEnrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
-    val target = new ReturnsController(messages, mockEnrolmentsAuthService, mockVatReturnService, mockVatApiService, mockConfig)
+    val target = new ReturnsController(messages, mockEnrolmentsAuthService, mockVatReturnService, mockVatApiService, mockDateService, mockConfig)
 
     "populate a VatReturnViewModel" in {
 
@@ -275,8 +279,11 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         boxNine = exampleVatReturn.totalAcquisitionsExcludingVAT,
         moneyOwed = true,
         isRepayment = false,
-        showReturnsBreadcrumb = true
+        showReturnsBreadcrumb = true,
+        currentYear = 2018
       )
+
+      (mockDateService.now: () => LocalDate).stubs().returns(LocalDate.parse("2018-05-01"))
 
       val result: VatReturnViewModel = target.constructViewModel(
         exampleEntityName,
@@ -293,8 +300,9 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     val mockVatReturnService: ReturnsService = mock[ReturnsService]
     val mockVatApiService: SubscriptionService = mock[SubscriptionService]
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
+    val mockDateService: DateService = mock[DateService]
     val mockEnrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
-    val target = new ReturnsController(messages, mockEnrolmentsAuthService, mockVatReturnService, mockVatApiService, mockConfig)
+    val target = new ReturnsController(messages, mockEnrolmentsAuthService, mockVatReturnService, mockVatApiService, mockDateService, mockConfig)
 
     "it returns Right(vatReturn), Some(ob) and Some(pay)" should {
 
@@ -303,6 +311,8 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         (mockVatReturnService.constructReturnDetailsModel(_: VatReturn, _: Payment))
           .expects(*, *)
           .returns(exampleVatReturnDetails)
+
+        (mockDateService.now: () => LocalDate).stubs().returns(LocalDate.parse("2018-05-01"))
 
         val data = ReturnsControllerData(Right(exampleVatReturn), None, Some(examplePayment), Some(exampleObligation))
         val result = target.renderResult(data, isReturnsPageRequest = true)(fakeRequest)

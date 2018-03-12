@@ -77,6 +77,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach{
     s"#content > article > div.grid-row.column-two-thirds > $formDiv div:nth-child($divNumber) > div:nth-child($columnNumber)"
   }
 
+  val currentYear: Int = 2018
+
   "Rendering the vat return details page from the returns route" should {
 
     val vatReturnViewModel = VatReturnViewModel(
@@ -97,7 +99,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach{
       545645,
       moneyOwed = false,
       isRepayment = false,
-      showReturnsBreadcrumb = true
+      showReturnsBreadcrumb = true,
+      currentYear = currentYear
     )
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
     lazy implicit val document: Document = Jsoup.parse(view.body)
@@ -212,7 +215,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach{
       545645,
       moneyOwed = false,
       isRepayment = false,
-      showReturnsBreadcrumb = false
+      showReturnsBreadcrumb = false,
+      currentYear = currentYear
     )
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
     lazy implicit val document: Document = Jsoup.parse(view.body)
@@ -249,7 +253,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach{
       545645,
       moneyOwed = true,
       isRepayment = false,
-      showReturnsBreadcrumb = false
+      showReturnsBreadcrumb = false,
+      currentYear = currentYear
     )
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
     lazy implicit val document: Document = Jsoup.parse(view.body)
@@ -307,7 +312,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach{
       545645,
       moneyOwed = true,
       isRepayment = true,
-      showReturnsBreadcrumb = false
+      showReturnsBreadcrumb = false,
+      currentYear = currentYear
     )
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
     lazy implicit val document: Document = Jsoup.parse(view.body)
@@ -345,7 +351,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach{
       545645,
       moneyOwed = false,
       isRepayment = true,
-      showReturnsBreadcrumb = false
+      showReturnsBreadcrumb = false,
+      currentYear = currentYear
     )
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
     lazy implicit val document: Document = Jsoup.parse(view.body)

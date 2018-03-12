@@ -25,8 +25,7 @@ import models.viewModels.VatReturnViewModel
 import models.{ReturnsControllerData, VatReturnDetails, VatReturnObligation}
 import play.api.i18n.MessagesApi
 import play.api.mvc._
-import services.{EnrolmentsAuthService, ReturnsService, SubscriptionService}
-
+import services.{DateService, EnrolmentsAuthService, ReturnsService, SubscriptionService}
 import scala.concurrent.Future
 
 @Singleton
@@ -34,6 +33,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
                                   val enrolmentsAuthService: EnrolmentsAuthService,
                                   returnsService: ReturnsService,
                                   subscriptionService: SubscriptionService,
+                                  dateService: DateService,
                                   implicit val appConfig: AppConfig)
   extends AuthorisedController {
 
@@ -121,7 +121,8 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
       boxNine = returnDetails.vatReturn.totalAcquisitionsExcludingVAT,
       moneyOwed = returnDetails.moneyOwed,
       isRepayment = returnDetails.isRepayment,
-      showReturnsBreadcrumb = isReturnsPageRequest
+      showReturnsBreadcrumb = isReturnsPageRequest,
+      currentYear = dateService.now().getYear
     )
   }
 }
