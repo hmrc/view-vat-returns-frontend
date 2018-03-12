@@ -24,7 +24,7 @@ import play.api.http.Status
 import play.api.libs.ws.{WSRequest, WSResponse}
 import stubs.{AuthStub, VatApiStub}
 
-class CompletedReturnsPageSpec extends IntegrationBaseSpec {
+class SubmittedReturnsPageSpec extends IntegrationBaseSpec {
 
   private trait Test {
     def setupStubs(): StubMapping

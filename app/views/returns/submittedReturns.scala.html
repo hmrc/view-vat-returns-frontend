@@ -19,22 +19,21 @@
 @import views.html.templates.formatters.tabs._
 @import views.html.templates.returns._
 @import models.viewModels._
-@import models.User
 
 @(model: VatReturnsViewModel)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
-@views.html.main_template(title = messages("completedReturns.title"), bodyClasses = None, appConfig = appConfig) {
+@views.html.main_template(title = messages("submittedReturns.title"), bodyClasses = None, appConfig = appConfig) {
 
   @navigationBreadcrumb(
     links = Map(
       appConfig.btaHomeUrl -> messages("breadcrumbs.bta"),
       appConfig.vatDetailsUrl -> messages("breadcrumbs.vat")),
-    currentPage = messages("completedReturns.title")
+    currentPage = messages("submittedReturns.title")
   )
 
   <div class="grid-row">
     <div class="column-two-thirds">
-      <h1 class="heading-xlarge">@messages("completedReturns.title")</h1>
+      <h1 class="heading-xlarge">@messages("submittedReturns.title")</h1>
       @if(model.returnYears.length > 1) {
         <ul class="tabs-nav">
           @submittedReturnsTabs(model.returnYears, model.selectedYear)
@@ -44,12 +43,12 @@
         <ul class="tabs-nav">
           @submittedReturnsTabs(model.returnYears, model.selectedYear)
           @if(model.returnYears.head != model.selectedYear) {
-            @activeTab(messages("completedReturns.previousReturns"), messages("completedReturns.activePrevious"))
+            @activeTab(messages("submittedReturns.previousReturns"), messages("submittedReturns.activePrevious"))
           } else {
             @inactiveTab(
-              messages("completedReturns.previousReturns"),
-              messages("completedReturns.inactivePrevious"),
-              controllers.routes.ReturnObligationsController.completedReturns(model.returnYears.head - 1).url
+              messages("submittedReturns.previousReturns"),
+              messages("submittedReturns.inactivePrevious"),
+              controllers.routes.ReturnObligationsController.submittedReturns(model.returnYears.head - 1).url
             )
           }
         </ul>
@@ -57,26 +56,26 @@
 
       @if(model.returnYears.length == 1 && model.returnYears.head != model.selectedYear) {
 
-        <h2>@messages("completedReturns.previousReturns")</h2>
+        <h2>@messages("submittedReturns.previousReturns")</h2>
         <p>
-          @messages("completedReturns.previousReturnsOne")
-          <a href="@appConfig.portalUrl" data-journey-click="return:view-portal-returns:completed-returns">
-            @messages("completedReturns.previousReturnsTwo")
+          @messages("submittedReturns.previousReturnsOne")
+          <a href="@appConfig.portalUrl" data-journey-click="return:view-portal-returns:submitted-returns">
+            @messages("submittedReturns.previousReturnsTwo")
           </a>
         </p>
       } else {
 
-        <h2>@messages("completedReturns.yearReturns", model.selectedYear.toString)</h2>
+        <h2>@messages("submittedReturns.yearReturns", model.selectedYear.toString)</h2>
         @if(model.obligations.isEmpty) {
-          <p>@messages("completedReturns.noSubmitted", model.selectedYear.toString)</p>
+          <p>@messages("submittedReturns.noSubmitted", model.selectedYear.toString)</p>
         } else {
-          <p>@messages("completedReturns.period")</p>
+          <p>@messages("submittedReturns.period")</p>
 
           <ul class="list list-bullet">
             @for(obligation <- model.obligations) {
               <li>
                 <a href="@controllers.routes.ReturnsController.vatReturn(model.selectedYear, obligation.periodKey)"
-                   data-journey-click="returns:view-return @{obligation.start}-to-@{obligation.end}:completed-returns">
+                   data-journey-click="returns:view-return @{obligation.start}-to-@{obligation.end}:submitted-returns">
                     @displayDateRange(obligation.start, obligation.end)
                 </a>
               </li>

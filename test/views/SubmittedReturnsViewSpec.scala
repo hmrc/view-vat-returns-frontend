@@ -22,7 +22,7 @@ import models.viewModels.{ReturnObligationsViewModel, VatReturnsViewModel}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
-class CompletedReturnsViewSpec extends ViewBaseSpec {
+class SubmittedReturnsViewSpec extends ViewBaseSpec {
 
   object Selectors {
     val pageHeading = "h1"
@@ -30,7 +30,7 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
     val btaBreadcrumbLink = s"$btaBreadcrumb a"
     val vatBreadcrumb = "div.breadcrumbs li:nth-of-type(2)"
     val vatBreadcrumbLink = s"$vatBreadcrumb a"
-    val completedReturnsBreadcrumb = "div.breadcrumbs li:nth-of-type(3)"
+    val submittedReturnsBreadcrumb = "div.breadcrumbs li:nth-of-type(3)"
     val submitThroughSoftware = "div > div > p:nth-child(2)"
     val noReturnsFound = ".column-two-thirds p"
     val tabOne = ".tabs-nav li:nth-of-type(1)"
@@ -53,7 +53,7 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
 
   "Rendering the VAT Returns page with no returns for the selected year of 2018" should {
 
-    lazy val view = views.html.returns.completedReturns(VatReturnsViewModel(returnYears, 2018, Seq(), hasNonMtdVat = false))
+    lazy val view = views.html.returns.submittedReturns(VatReturnsViewModel(returnYears, 2018, Seq(), hasNonMtdVat = false))
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct document title" in {
@@ -83,7 +83,7 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
       }
 
       "have the text 'Submitted returns'" in {
-        elementText(Selectors.completedReturnsBreadcrumb) shouldBe "Submitted returns"
+        elementText(Selectors.submittedReturnsBreadcrumb) shouldBe "Submitted returns"
       }
     }
 
@@ -106,8 +106,8 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
           elementText(Selectors.tabTwo) should include("2017")
         }
 
-        s"contain a link to ${controllers.routes.ReturnObligationsController.completedReturns(2017).url}" in {
-          element(Selectors.tabTwo).select("a").attr("href") shouldBe controllers.routes.ReturnObligationsController.completedReturns(2017).url
+        s"contain a link to ${controllers.routes.ReturnObligationsController.submittedReturns(2017).url}" in {
+          element(Selectors.tabTwo).select("a").attr("href") shouldBe controllers.routes.ReturnObligationsController.submittedReturns(2017).url
         }
 
         "contain visually hidden text" in {
@@ -141,7 +141,7 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
         )
       )
 
-    lazy val view = views.html.returns.completedReturns(VatReturnsViewModel(returnYears, 2018, exampleReturns, hasNonMtdVat = false))
+    lazy val view = views.html.returns.submittedReturns(VatReturnsViewModel(returnYears, 2018, exampleReturns, hasNonMtdVat = false))
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct return heading" in {
@@ -192,7 +192,7 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
       )
 
     "the first tab is selected and the user has an old VAT enrolment" should {
-      lazy val view = views.html.returns.completedReturns(VatReturnsViewModel(Seq[Int](2018), 2018, exampleReturns, hasNonMtdVat = true))
+      lazy val view = views.html.returns.submittedReturns(VatReturnsViewModel(Seq[Int](2018), 2018, exampleReturns, hasNonMtdVat = true))
       lazy implicit val document: Document = Jsoup.parse(view.body)
 
       "have a tab for the returned year " should {
@@ -212,8 +212,8 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
           elementText(Selectors.tabTwo) should include("Previous returns")
         }
 
-        s"contain a link to ${controllers.routes.ReturnObligationsController.completedReturns(2017).url}" in {
-          element(Selectors.tabTwo).select("a").attr("href") shouldBe controllers.routes.ReturnObligationsController.completedReturns(2017).url
+        s"contain a link to ${controllers.routes.ReturnObligationsController.submittedReturns(2017).url}" in {
+          element(Selectors.tabTwo).select("a").attr("href") shouldBe controllers.routes.ReturnObligationsController.submittedReturns(2017).url
         }
 
         "contain visually hidden text" in {
@@ -254,7 +254,7 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
 
     "the second tab is selected and the user has an old VAT enrolment" should {
 
-      lazy val view = views.html.returns.completedReturns(VatReturnsViewModel(Seq[Int](2018), 2017, exampleReturns, hasNonMtdVat = true))
+      lazy val view = views.html.returns.submittedReturns(VatReturnsViewModel(Seq[Int](2018), 2017, exampleReturns, hasNonMtdVat = true))
       lazy implicit val document: Document = Jsoup.parse(view.body)
 
       "have a tab for the returned year " should {
@@ -263,8 +263,8 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
           elementText(Selectors.tabOne) should include("2018")
         }
 
-        s"contain a link to ${controllers.routes.ReturnObligationsController.completedReturns(2018).url}" in {
-          element(Selectors.tabOne).select("a").attr("href") shouldBe controllers.routes.ReturnObligationsController.completedReturns(2018).url
+        s"contain a link to ${controllers.routes.ReturnObligationsController.submittedReturns(2018).url}" in {
+          element(Selectors.tabOne).select("a").attr("href") shouldBe controllers.routes.ReturnObligationsController.submittedReturns(2018).url
         }
 
         "contain visually hidden text" in {
@@ -299,7 +299,7 @@ class CompletedReturnsViewSpec extends ViewBaseSpec {
 
     "the user has no old VAT enrolment" should {
 
-      lazy val view = views.html.returns.completedReturns(VatReturnsViewModel(Seq[Int](2018), 2018, exampleReturns, hasNonMtdVat = false))
+      lazy val view = views.html.returns.submittedReturns(VatReturnsViewModel(Seq[Int](2018), 2018, exampleReturns, hasNonMtdVat = false))
       lazy val document: Document = Jsoup.parse(view.body)
 
       "not show the Previous Returns tab" in {

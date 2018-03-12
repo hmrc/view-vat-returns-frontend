@@ -35,11 +35,11 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
                                             implicit val appConfig: AppConfig)
   extends AuthorisedController {
 
-  def completedReturns(year: Int): Action[AnyContent] = authorisedAction { implicit request =>
+  def submittedReturns(year: Int): Action[AnyContent] = authorisedAction { implicit request =>
     implicit user =>
       if(isValidSearchYear(year)) {
         getReturnObligations(user, year, Obligation.Status.Fulfilled).map { model =>
-          Ok(views.html.returns.completedReturns(model))
+          Ok(views.html.returns.submittedReturns(model))
         }
       } else {
         Future.successful(NotFound(views.html.errors.notFound()))

@@ -20,12 +20,12 @@
 
 @for(yearToDisplay <- years) {
   @if(yearToDisplay == selectedYear) {
-    @activeTab(yearToDisplay.toString, messages("completedReturns.activeTab", yearToDisplay.toString))
+    @activeTab(yearToDisplay.toString, messages("submittedReturns.activeTab", yearToDisplay.toString))
   } else {
     @inactiveTab(
       yearToDisplay.toString,
-      messages("completedReturns.inactiveTab", yearToDisplay.toString),
-      controllers.routes.ReturnObligationsController.completedReturns(yearToDisplay).url
+      messages("submittedReturns.inactiveTab", yearToDisplay.toString),
+      controllers.routes.ReturnObligationsController.submittedReturns(yearToDisplay).url
     )
   }
 }

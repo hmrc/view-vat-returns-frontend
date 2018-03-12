@@ -29,7 +29,7 @@
     links = Map(
       appConfig.btaHomeUrl -> messages("breadcrumbs.bta"),
       appConfig.vatDetailsUrl -> messages("breadcrumbs.vat"),
-      if(vatReturnViewModel.showReturnsBreadcrumb) controllers.routes.ReturnObligationsController.completedReturns(LocalDate.now().getYear).url -> messages("completedReturns.title")
+      if(vatReturnViewModel.showReturnsBreadcrumb) controllers.routes.ReturnObligationsController.submittedReturns(LocalDate.now().getYear).url -> messages("submittedReturns.title")
       else appConfig.vatPaymentsUrl -> messages("breadcrumbs.vatPayments")
     ),
     currentPage = messages("breadcrumbs.vatReturn", displayDateRange(vatReturnViewModel.periodFrom, vatReturnViewModel.periodTo))
