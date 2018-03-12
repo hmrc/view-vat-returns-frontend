@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,11 +12,20 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package models.viewModels
+@import views.html.templates.formatters.tabs._
 
-case class VatReturnsViewModel(returnYears: Seq[Int],
-                               selectedYear: Int,
-                               obligations: Seq[ReturnObligationsViewModel],
-                               hasNonMtdVat: Boolean)
+@(years: Seq[Int], selectedYear: Int)(implicit messages: Messages)
+
+@for(yearToDisplay <- years) {
+  @if(yearToDisplay == selectedYear) {
+    @activeTab(yearToDisplay.toString, messages("submittedReturns.activeTab", yearToDisplay.toString))
+  } else {
+    @inactiveTab(
+      yearToDisplay.toString,
+      messages("submittedReturns.inactiveTab", yearToDisplay.toString),
+      controllers.routes.ReturnObligationsController.submittedReturns(yearToDisplay).url
+    )
+  }
+}

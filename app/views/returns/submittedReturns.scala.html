@@ -1,0 +1,88 @@
+@*
+ * Copyright 2018 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import views.html.templates.formatters.breadcrumbs._
+@import views.html.templates.formatters.dates._
+@import views.html.templates.formatters.tabs._
+@import views.html.templates.returns._
+@import models.viewModels._
+
+@(model: VatReturnsViewModel)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
+
+@views.html.main_template(title = messages("submittedReturns.title"), bodyClasses = None, appConfig = appConfig) {
+
+  @navigationBreadcrumb(
+    links = Map(
+      appConfig.btaHomeUrl -> messages("breadcrumbs.bta"),
+      appConfig.vatDetailsUrl -> messages("breadcrumbs.vat")),
+    currentPage = messages("submittedReturns.title")
+  )
+
+  <div class="grid-row">
+    <div class="column-two-thirds">
+      <h1 class="heading-xlarge">@messages("submittedReturns.title")</h1>
+      @if(model.returnYears.length > 1) {
+        <ul class="tabs-nav">
+          @submittedReturnsTabs(model.returnYears, model.selectedYear)
+        </ul>
+      }
+      @if(model.returnYears.length == 1 && model.hasNonMtdVat) {
+        <ul class="tabs-nav">
+          @submittedReturnsTabs(model.returnYears, model.selectedYear)
+          @if(model.returnYears.head != model.selectedYear) {
+            @activeTab(messages("submittedReturns.previousReturns"), messages("submittedReturns.activePrevious"))
+          } else {
+            @inactiveTab(
+              messages("submittedReturns.previousReturns"),
+              messages("submittedReturns.inactivePrevious"),
+              controllers.routes.ReturnObligationsController.submittedReturns(model.returnYears.head - 1).url
+            )
+          }
+        </ul>
+      }
+
+      @if(model.returnYears.length == 1 && model.returnYears.head != model.selectedYear) {
+
+        <h2>@messages("submittedReturns.previousReturns")</h2>
+        <p>
+          @messages("submittedReturns.previousReturnsOne")
+          <a href="@appConfig.portalUrl" data-journey-click="return:view-portal-returns:submitted-returns">
+            @messages("submittedReturns.previousReturnsTwo")
+          </a>
+        </p>
+      } else {
+
+        <h2>@messages("submittedReturns.yearReturns", model.selectedYear.toString)</h2>
+        @if(model.obligations.isEmpty) {
+          <p>@messages("submittedReturns.noSubmitted", model.selectedYear.toString)</p>
+        } else {
+          <p>@messages("submittedReturns.period")</p>
+
+          <ul class="list list-bullet">
+            @for(obligation <- model.obligations) {
+              <li>
+                <a href="@controllers.routes.ReturnsController.vatReturn(model.selectedYear, obligation.periodKey)"
+                   data-journey-click="returns:view-return @{obligation.start}-to-@{obligation.end}:submitted-returns">
+                    @displayDateRange(obligation.start, obligation.end)
+                </a>
+              </li>
+            }
+          </ul>
+        }
+      }
+    </div>
+  </div>
+}
