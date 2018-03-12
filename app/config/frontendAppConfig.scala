@@ -77,9 +77,7 @@ class FrontendAppConfig @Inject()(val runModeConfiguration: Configuration, val e
   override lazy val shutterPage: String = getString(Keys.whitelistShutterPage)
 
   private lazy val signInBaseUrl: String = getString(Keys.signInBaseUrl)
-  private lazy val signInContinueBaseUrl: String = runModeConfiguration.getString(Keys.signInContinueBaseUrl).getOrElse("")
-  private lazy val signInContinueUrl: String = ContinueUrl(signInContinueBaseUrl +
-    controllers.routes.ReturnObligationsController.submittedReturns(LocalDate.now().getYear).url).encodedUrl
+  private lazy val signInContinueUrl: String = ContinueUrl(vatDetailsUrl).encodedUrl
   private lazy val signInOrigin = getString("appName")
   override lazy val signInUrl: String = s"$signInBaseUrl?continue=$signInContinueUrl&origin=$signInOrigin"
 

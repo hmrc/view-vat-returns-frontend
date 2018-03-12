@@ -35,4 +35,5 @@ case class VatReturnViewModel(entityName: Option[String],
                               boxNine: BigDecimal,
                               moneyOwed: Boolean,
                               isRepayment: Boolean,
-                              showReturnsBreadcrumb: Boolean)
+                              showReturnsBreadcrumb: Boolean,
+                              currentYear: Int)

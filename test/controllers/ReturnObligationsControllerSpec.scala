@@ -58,6 +58,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
     val mockVatReturnService: ReturnsService = mock[ReturnsService]
     val mockDateService: DateService = mock[DateService]
+    val previousYear: Int = 2017
 
     def setup(): Any = {
       (mockDateService.now: () => LocalDate).stubs().returns(LocalDate.parse("2018-05-01"))
@@ -112,19 +113,19 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
       "return 200" in new Test {
         override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
-        private val result = target.submittedReturns(LocalDate.now().getYear -1)(fakeRequest)
+        private val result = target.submittedReturns(previousYear)(fakeRequest)
         status(result) shouldBe Status.OK
       }
 
       "return HTML" in new Test {
         override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
-        private val result = target.submittedReturns(LocalDate.now().getYear -1)(fakeRequest)
+        private val result = target.submittedReturns(previousYear)(fakeRequest)
         contentType(result) shouldBe Some("text/html")
       }
 
       "return charset of utf-8" in new Test {
         override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
-        private val result = target.submittedReturns(LocalDate.now().getYear -1)(fakeRequest)
+        private val result = target.submittedReturns(previousYear)(fakeRequest)
         charset(result) shouldBe Some("utf-8")
       }
     }
@@ -134,7 +135,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
       "return 403 (Forbidden)" in new Test {
         override val serviceCall = false
         override val authResult: Future[Nothing] = Future.failed(InsufficientEnrolments())
-        private val result = target.submittedReturns(LocalDate.now().getYear -1)(fakeRequest)
+        private val result = target.submittedReturns(previousYear)(fakeRequest)
         status(result) shouldBe Status.FORBIDDEN
       }
     }
@@ -144,7 +145,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
       "return 401 (Unauthorised)" in new Test {
         override val serviceCall = false
         override val authResult: Future[Nothing] = Future.failed(MissingBearerToken())
-        private val result = target.submittedReturns(LocalDate.now().getYear -1)(fakeRequest)
+        private val result = target.submittedReturns(previousYear)(fakeRequest)
         status(result) shouldBe Status.UNAUTHORIZED
       }
     }
@@ -154,7 +155,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
       "return 404 (Not Found)" in new Test {
         override val serviceCall = false
         override val authResult: Future[_] = Future.successful(goodEnrolments)
-        private val result = target.submittedReturns(LocalDate.now().getYear +3)(fakeRequest)
+        private val result = target.submittedReturns(year = 2021)(fakeRequest)
         status(result) shouldBe Status.NOT_FOUND
       }
     }
@@ -236,9 +237,8 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
           )
         }
 
-        val currentYear: Int = LocalDate.now().getYear
         val expectedResult = VatReturnsViewModel(
-          Seq(currentYear),
+          Seq(2018),
           2017,
           Seq(
             ReturnObligationsViewModel(
@@ -262,9 +262,8 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
           Left(BadRequestError("", ""))
         }
 
-        val currentYear: Int = LocalDate.now().getYear
         val expectedResult = VatReturnsViewModel(
-          Seq(currentYear),
+          Seq(2018),
           2017,
           Seq(),
           hasNonMtdVat = false

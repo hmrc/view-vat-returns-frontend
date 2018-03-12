@@ -31,7 +31,6 @@ object ConfigKeys {
   val whitelistShutterPage: String = "whitelist.shutter-page-url"
 
   val signInBaseUrl: String = "signIn.url"
-  val signInContinueBaseUrl: String = "signIn.continueBaseUrl"
 
   val simpleAuthFeature: String = "features.simpleAuth.enabled"
   val userResearchBannerFeature: String = "features.userResearchBanner.enabled"
