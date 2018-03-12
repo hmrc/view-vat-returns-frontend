@@ -1,5 +1,7 @@
 common.dateRangeSeparator = to
 common.overdue = overdue
+base.back = Back
+base.signOut = Sign out
 
 sessionTimeout.title = Your session has timed out
 sessionTimeout.helpOne = To view your VAT returns, you''ll have to
@@ -100,6 +102,5 @@ banner.newService = This is a new service – your
 banner.feedback = feedback
 banner.feedbackImprove = will help us to improve it.
 banner.phaseName = BETA
-base.back = Back
 feedback.title = Feedback
 feedbackThanks.title = Thank you
