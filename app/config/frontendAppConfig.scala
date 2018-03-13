@@ -50,6 +50,9 @@ trait AppConfig extends ServicesConfig {
   val feedbackFormPartialUrl: String
   val contactFormServiceIdentifier: String
   val staticDateValue: String
+  val surveyUrl: String
+  val signOutUrl: String
+
 }
 
 @Singleton
@@ -101,4 +104,12 @@ class FrontendAppConfig @Inject()(val runModeConfiguration: Configuration, val e
   override lazy val paymentsReturnUrl: String = paymentsReturnBase + getString(Keys.paymentsReturnUrl)
 
   override lazy val staticDateValue: String = getString(Keys.staticDateValue)
+
+  private lazy val surveyBaseUrl: String = getString(Keys.surveyHost) + getString(Keys.surveyUrl)
+  override lazy val surveyUrl: String = s"$surveyBaseUrl/?origin=$contactFormServiceIdentifier"
+
+  private lazy val governmentGatewayHost: String = getString(Keys.governmentGatewayHost)
+
+  override lazy val signOutUrl: String = s"$governmentGatewayHost/gg/sign-out?continue=$surveyUrl"
+
 }
