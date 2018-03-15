@@ -24,6 +24,8 @@ import org.jsoup.nodes.Document
 
 class ReturnDeadlinesViewSpec extends ViewBaseSpec {
 
+  val userVrn = "555555555"
+
   object Selectors {
     val pageHeading = "#content h1"
     val submitThroughSoftware = "#content > article > div > div > p"
@@ -45,8 +47,8 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
     val returnDeadlinesBreadCrumb = "div.breadcrumbs li:nth-of-type(3)"
 
     val overdueLabel = ".task-overdue"
-    val noReturnsDue = "#content > article > div > div > p:nth-of-type(1)"
-    val useSoftware = "#content > article > div > div > p:nth-of-type(2)"
+    val noReturnsNextDeadline = "#content > article > div > div > p:nth-of-type(1)"
+    val noReturnsDue = "#content > article > div > div > p:nth-of-type(2)"
   }
 
   "Rendering the Return deadlines page with a single deadline" should {
@@ -58,7 +60,7 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
         LocalDate.parse("2018-01-01"))
     )
 
-    lazy val view = views.html.returns.returnDeadlines(singleDeadline)
+    lazy val view = views.html.returns.returnDeadlines(singleDeadline, userVrn)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "render the breadcrumbs which" should {
@@ -105,7 +107,7 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
     }
 
     "have the correct hint box title" in {
-      elementText(Selectors.howToDoThis) shouldBe "How to do this"
+      elementText(Selectors.howToDoThis) shouldBe "How to submit a return"
     }
 
     "have the correct message regarding downloading software in the hint box" in {
@@ -113,7 +115,7 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
     }
 
     "have the correct external link for software" in {
-      element(Selectors.downloadSoftwareLink).attr("href") shouldBe "#"
+      element(Selectors.downloadSoftwareLink).attr("href") shouldBe "/vat-file/trader/555555555/periods"
     }
 
     "have the correct message regarding VAT records in the hint box" in {
@@ -139,7 +141,7 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
         overdue = true)
     )
 
-    lazy val view = views.html.returns.returnDeadlines(multipleDeadlines)
+    lazy val view = views.html.returns.returnDeadlines(multipleDeadlines, userVrn)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct obligation due date for the first deadline" in {
@@ -166,16 +168,16 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
   "Rendering the Return deadlines page with no deadlines" should {
 
     val noDeadlines = Seq()
-    lazy val view = views.html.returns.returnDeadlines(noDeadlines)
+    lazy val view = views.html.returns.returnDeadlines(noDeadlines, userVrn)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct text for no deadlines" in {
-      elementText(Selectors.noReturnsDue) shouldBe
-        "You don't have any returns due right now. Your next return deadline will show here once it's been generated."
+      elementText(Selectors.noReturnsNextDeadline) shouldBe
+        "Your next deadline will show here on the first day of your next accounting period."
     }
 
     "have the correct software guidance" in {
-      elementText(Selectors.useSoftware) shouldBe "Use your accounting software to submit any returns"
+      elementText(Selectors.noReturnsDue) shouldBe "You don't have any returns due right now."
     }
   }
 }
