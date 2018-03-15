@@ -16,3 +16,8 @@
   margin-left: 5px;
   padding-top: 3px;
 }
+
+a.in-selected-tab {
+  color: #0B0C0C;
+  text-decoration: none;
+}
