@@ -52,7 +52,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
         case Right(obligations) =>
           val deadlines = obligations.obligations.map(ob =>
             ReturnDeadlineViewModel(ob.due, ob.start, ob.end, ob.due.isBefore(dateService.now())))
-            Ok(views.html.returns.returnDeadlines(deadlines))
+            Ok(views.html.returns.returnDeadlines(deadlines, user.vrn))
         case Left(_) => throw new Exception //non-graceful error handling for MVP
       }
   }

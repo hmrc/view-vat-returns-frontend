@@ -82,13 +82,13 @@ submittedReturns.previousReturns = Previous returns
 returnDeadlines.title = Return deadlines
 returnDeadlines.submitBy = You must use accounting software to submit a return by:
 returnDeadlines.periodEnding = for the period {0}
-returnDeadlines.howToSubmit = How to do this
+returnDeadlines.howToSubmit = How to submit a return
 returnDeadlines.softwareOne = Choose accounting software that supports this service (opens in a new tab)
 returnDeadlines.softwareTwo = if you haven''t already.
 returnDeadlines.vatRecords = Keep your VAT records in your accounting software.
 returnDeadlines.sendReturns = Submit any VAT Returns before your deadlines.
-returnDeadlines.noReturns = You don''t have any returns due right now. Your next return deadline will show here once it''s been generated.
-returnDeadlines.useSoftware = Use your accounting software to submit any returns
+returnDeadlines.nextDeadline = Your next deadline will show here on the first day of your next accounting period.
+returnDeadlines.noReturns = You don''t have any returns due right now.
 
 featureSwitch.title = Feature switches
 featureSwitch.heading = Features

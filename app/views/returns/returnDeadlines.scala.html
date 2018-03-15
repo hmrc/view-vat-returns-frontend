@@ -18,7 +18,7 @@
 @import views.html.templates.formatters.breadcrumbs._
 @import views.html.templates.formatters.dates._
 
-@(deadlines: Seq[ReturnDeadlineViewModel])(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
+@(deadlines: Seq[ReturnDeadlineViewModel], vrn: String)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
 @views.html.main_template(title = messages("returnDeadlines.title"), bodyClasses = None, appConfig = appConfig) {
 
@@ -34,8 +34,8 @@
       <h1 class="heading-xlarge">@messages("returnDeadlines.title")</h1>
 
       @if(deadlines.isEmpty) {
+        <p>@messages("returnDeadlines.nextDeadline")</p>
         <p>@messages("returnDeadlines.noReturns")</p>
-        <p>@messages("returnDeadlines.useSoftware")</p>
       } else {
         <p>@messages("returnDeadlines.submitBy")</p>
 
@@ -64,7 +64,7 @@
           <div class="panel panel-border-narrow">
             <ul class="list list-number">
               <li>
-                <a href="#">@messages("returnDeadlines.softwareOne")</a>
+                <a href="/vat-file/trader/@vrn/periods">@messages("returnDeadlines.softwareOne")</a>
                 @messages("returnDeadlines.softwareTwo")
               </li>
               <li>@messages("returnDeadlines.vatRecords")</li>
