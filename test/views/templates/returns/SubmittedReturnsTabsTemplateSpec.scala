@@ -44,7 +44,7 @@ class SubmittedReturnsTabsTemplateSpec extends TemplateBaseSpec {
           |  </a>
           |</li>
           |<li class="tabs-nav__tab tabs-nav__tab--active font-medium">
-          |  $tab2Year
+          |  <a href="#" class="in-selected-tab">$tab2Year</a>
           |  <span class="visuallyhidden">$hiddenText2</span>
           |</li>
           |<li class="tabs-nav__tab font-medium">
