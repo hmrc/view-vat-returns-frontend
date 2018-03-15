@@ -83,7 +83,7 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
       "contain the first return which" should {
 
         "contains the correct obligation period text" in {
-          elementText(Selectors.obligation(1)) shouldBe "1 January to 31 December 2018"
+          elementText(Selectors.obligation(1)) shouldBe "View return for the period 1 January to 31 December 2018"
         }
 
         "contains the correct link to view a specific return" in {
@@ -94,7 +94,7 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
       "contain the second return which" should {
 
         "contains the correct obligation period text" in {
-          elementText(Selectors.obligation(2)) shouldBe "1 January to 30 September 2018"
+          elementText(Selectors.obligation(2)) shouldBe "View return for the period 1 January to 30 September 2018"
         }
 
         "contains the correct link to view a specific return" in {
@@ -237,7 +237,7 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
       "contain the first return which" should {
 
         "contains the correct obligation period text" in {
-          elementText(Selectors.obligation(1)) shouldBe "1 January to 31 December 2018"
+          elementText(Selectors.obligation(1)) shouldBe "View return for the period 1 January to 31 December 2018"
         }
 
         "contains the correct link to view a specific return" in {
@@ -248,7 +248,7 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
       "contain the second return which" should {
 
         "contains the correct obligation period text" in {
-          elementText(Selectors.obligation(2)) shouldBe "1 January to 30 September 2018"
+          elementText(Selectors.obligation(2)) shouldBe "View return for the period 1 January to 30 September 2018"
         }
 
         "contains the correct link to view a specific return" in {
