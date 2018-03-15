@@ -70,6 +70,7 @@ boxFiveDescription.hmrcPaid = Total amount HMRC owed you
 submittedReturns.title = Submitted returns
 submittedReturns.yearReturns = {0} returns
 submittedReturns.period = For the period:
+submittedReturns.periodPrefix = View return for the period
 submittedReturns.previousReturnsOne = If you''ve submitted returns without using the software for this new service, you can
 submittedReturns.previousReturnsTwo = view your previous returns (opens in new tab).
 submittedReturns.activeTab = Currently viewing returns from {0}
@@ -81,6 +82,7 @@ submittedReturns.previousReturns = Previous returns
 
 returnDeadlines.title = Return deadlines
 returnDeadlines.submitBy = You must use accounting software to submit a return by:
+returnDeadlines.submitByPrefix = You must use accounting software to submit a return by
 returnDeadlines.periodEnding = for the period {0}
 returnDeadlines.howToSubmit = How to do this
 returnDeadlines.softwareOne = Choose accounting software that supports this service (opens in a new tab)
