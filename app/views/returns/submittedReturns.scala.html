@@ -69,11 +69,12 @@
         @if(model.obligations.isEmpty) {
           <p>@messages("submittedReturns.noSubmitted", model.selectedYear.toString)</p>
         } else {
-          <p>@messages("submittedReturns.period")</p>
+          <p aria-hidden="true">@messages("submittedReturns.period")</p>
 
           <ul class="list list-bullet">
             @for(obligation <- model.obligations) {
               <li>
+                <span class="visually-hidden">@messages("submittedReturns.periodPrefix")</span>
                 <a href="@controllers.routes.ReturnsController.vatReturn(model.selectedYear, obligation.periodKey)"
                    data-journey-click="returns:view-return @{obligation.start}-to-@{obligation.end}:submitted-returns">
                     @displayDateRange(obligation.start, obligation.end)

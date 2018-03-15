@@ -37,12 +37,13 @@
         <p>@messages("returnDeadlines.noReturns")</p>
         <p>@messages("returnDeadlines.useSoftware")</p>
       } else {
-        <p>@messages("returnDeadlines.submitBy")</p>
+        <p aria-hidden="true">@messages("returnDeadlines.submitBy")</p>
 
         <div class="form-group">
           <ul class="list list-bullet">
             @for(deadline <- deadlines){
               <li class="bold-small">
+                <span class="visually-hidden">@messages("returnDeadlines.submitByPrefix")</span>
                 @displayDate(deadline.due)
                 @if(deadline.overdue) {
                   <span>
