@@ -33,7 +33,7 @@ class MockAppConfig(val runModeConfiguration: Configuration, val mode: Mode = Mo
   override val shutterPage: String = "https://www.tax.service.gov.uk/shutter/vat-through-software"
   override val signInUrl: String = ""
   override val features: Features = new Features(runModeConfiguration)
-  override val portalUrl: String = ""
+  override val portalUrl: String => String = (vrn: String) => s"/portal-url/$vrn"
   override val vatApiBaseUrl: String = ""
   override val financialDataBaseUrl: String = ""
   override val btaHomeUrl = "bta-url"

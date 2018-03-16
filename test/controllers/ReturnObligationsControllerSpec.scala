@@ -247,7 +247,8 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
               "#001"
             )
           ),
-          hasNonMtdVat = false
+          hasNonMtdVat = false,
+          "999999999"
         )
 
         private val result = await(target.getReturnObligations(testUser, 2017, Obligation.Status.All))
@@ -266,7 +267,8 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
           Seq(2018),
           2017,
           Seq(),
-          hasNonMtdVat = false
+          hasNonMtdVat = false,
+          "999999999"
         )
 
         private val result = await(target.getReturnObligations(testUser, 2017, Obligation.Status.All))
