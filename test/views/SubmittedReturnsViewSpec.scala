@@ -69,7 +69,9 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
           )
         )
 
-      lazy val view = views.html.returns.submittedReturns(VatReturnsViewModel(returnYears, 2018, exampleReturns, hasNonMtdVat = false))
+      lazy val view = views.html.returns.submittedReturns(
+        VatReturnsViewModel(returnYears, 2018, exampleReturns, hasNonMtdVat = false, "999999999")
+      )
       lazy implicit val document: Document = Jsoup.parse(view.body)
 
       "have the correct return heading" in {
@@ -105,7 +107,9 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
 
     "there are no returns for the selected year of 2018" should {
 
-      lazy val view = views.html.returns.submittedReturns(VatReturnsViewModel(returnYears, 2018, Seq(), hasNonMtdVat = false))
+      lazy val view = views.html.returns.submittedReturns(
+        VatReturnsViewModel(returnYears, 2018, Seq(), hasNonMtdVat = false, "999999999")
+      )
       lazy implicit val document: Document = Jsoup.parse(view.body)
 
       "have the correct document title" in {
@@ -197,7 +201,9 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
       )
 
     "the first tab is selected and the user has an old VAT enrolment" should {
-      lazy val view = views.html.returns.submittedReturns(VatReturnsViewModel(Seq[Int](2018), 2018, exampleReturns, hasNonMtdVat = true))
+      lazy val view = views.html.returns.submittedReturns(
+        VatReturnsViewModel(Seq[Int](2018), 2018, exampleReturns, hasNonMtdVat = true, "999999999")
+      )
       lazy implicit val document: Document = Jsoup.parse(view.body)
 
       "have a tab for the returned year " should {
@@ -259,7 +265,9 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
 
     "the second tab is selected and the user has an old VAT enrolment" should {
 
-      lazy val view = views.html.returns.submittedReturns(VatReturnsViewModel(Seq[Int](2018), 2017, exampleReturns, hasNonMtdVat = true))
+      lazy val view = views.html.returns.submittedReturns(
+        VatReturnsViewModel(Seq[Int](2018), 2017, exampleReturns, hasNonMtdVat = true, "999999999")
+      )
       lazy implicit val document: Document = Jsoup.parse(view.body)
 
       "have a tab for the returned year " should {
@@ -298,13 +306,15 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
       }
 
       "contains the link" in {
-        element(Selectors.previousReturnsLink).attr("href") shouldBe ""
+        element(Selectors.previousReturnsLink).attr("href") shouldBe "/portal-url/999999999"
       }
     }
 
     "the user has no old VAT enrolment" should {
 
-      lazy val view = views.html.returns.submittedReturns(VatReturnsViewModel(Seq[Int](2018), 2018, exampleReturns, hasNonMtdVat = false))
+      lazy val view = views.html.returns.submittedReturns(
+        VatReturnsViewModel(Seq[Int](2018), 2018, exampleReturns, hasNonMtdVat = false, "999999999")
+      )
       lazy val document: Document = Jsoup.parse(view.body)
 
       "not show the Previous Returns tab" in {

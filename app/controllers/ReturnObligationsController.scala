@@ -77,9 +77,10 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
             obligation.periodKey
           )
         ),
-        user.hasNonMtdVat
+        user.hasNonMtdVat,
+        user.vrn
       )
-      case Left(_) => VatReturnsViewModel(returnYears, selectedYear, Seq(), user.hasNonMtdVat)
+      case Left(_) => VatReturnsViewModel(returnYears, selectedYear, Seq(), user.hasNonMtdVat, user.vrn)
     }
   }
 }

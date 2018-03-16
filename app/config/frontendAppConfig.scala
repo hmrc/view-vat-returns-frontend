@@ -16,7 +16,6 @@
 
 package config
 
-import java.time.LocalDate
 import java.util.Base64
 import javax.inject.{Inject, Singleton}
 
@@ -39,7 +38,7 @@ trait AppConfig extends ServicesConfig {
   val shutterPage: String
   val signInUrl: String
   val features: Features
-  val portalUrl: String
+  val portalUrl: String => String
   val vatApiBaseUrl: String
   val financialDataBaseUrl: String
   val btaHomeUrl: String
@@ -52,7 +51,6 @@ trait AppConfig extends ServicesConfig {
   val staticDateValue: String
   val surveyUrl: String
   val signOutUrl: String
-
 }
 
 @Singleton
@@ -86,7 +84,7 @@ class FrontendAppConfig @Inject()(val runModeConfiguration: Configuration, val e
 
   override val features = new Features(runModeConfiguration)
 
-  override val portalUrl: String = ""
+  override val portalUrl: String => String = (vrn: String) => s"/vat-file/trader/$vrn/periods"
   override val vatApiBaseUrl: String = baseUrl("vat-api")
   override val financialDataBaseUrl: String = baseUrl("financial-transactions")
 

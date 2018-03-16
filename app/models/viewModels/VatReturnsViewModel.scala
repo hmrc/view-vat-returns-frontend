@@ -19,4 +19,5 @@ package models.viewModels
 case class VatReturnsViewModel(returnYears: Seq[Int],
                                selectedYear: Int,
                                obligations: Seq[ReturnObligationsViewModel],
-                               hasNonMtdVat: Boolean)
+                               hasNonMtdVat: Boolean,
+                               vrn: String)
