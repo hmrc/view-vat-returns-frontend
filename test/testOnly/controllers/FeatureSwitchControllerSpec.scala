@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package controllers
+package testOnly.controllers
 
+import controllers.{ControllerBaseSpec, routes}
 import play.api.http.Status
 import play.api.test.Helpers._
 

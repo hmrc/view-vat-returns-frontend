@@ -1,7 +1,5 @@
 # microservice specific routes
 
-GET        /feature-switch              controllers.FeatureSwitchController.featureSwitch
-POST       /feature-switch              controllers.FeatureSwitchController.submitFeatureSwitch
 
 # Get return deadlines
 GET        /return-deadlines            controllers.ReturnObligationsController.returnDeadlines
