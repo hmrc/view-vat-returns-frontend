@@ -6,7 +6,7 @@
 
 ## Summary
 
-This service provides end users with a mechanism to manage view their VAT returns.
+The service provides end users with a mechanism to manage view their VAT returns.
 
 ### Running the application
 
