@@ -16,4 +16,9 @@
 
 @()(implicit appConfig: config.AppConfig, request: Request[_], messages: Messages)
 
-@views.html.errors.standardError(appConfig, messages("notFound.title"), messages("notFound.heading"), messages("notFound.message"))
+@views.html.errors.standardError(
+  appConfig,
+  messages("notFound.title"),
+  messages("notFound.heading"),
+  messages("notFound.message")
+)

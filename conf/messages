@@ -15,8 +15,9 @@ notFound.title = Page not found
 notFound.heading = This page can''t be found
 notFound.message = Please check that you have entered the correct web address.
 
-serverError.title = Internal server error
-serverError.message = Something went wrong. Please try again later.
+technicalProblem.title = There is a problem with the service - VAT reporting through software - GOV.UK
+technicalProblem.heading = Sorry, there is a problem with the service
+technicalProblem.message = Try again later.
 
 userResearch.heading = Please help us improve our service
 userResearch.enterSurvey = Enter our survey
