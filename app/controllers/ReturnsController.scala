@@ -87,7 +87,11 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
       case (Right(vatReturn), Some(ob), Some(pay)) =>
         val returnDetails = returnsService.constructReturnDetailsModel(vatReturn, pay)
         val viewModel = constructViewModel(pageData.customerInfo, ob, returnDetails, isReturnsPageRequest)
-        Ok(views.html.returns.vatReturnDetails(viewModel))
+        if (appConfig.features.allowNineBox()) {
+          Ok(views.html.returns.vatReturnDetails(viewModel))
+        } else {
+          NotFound(views.html.errors.notFound())
+        }
       case (Right(_), None, _) => NotFound(views.html.errors.notFound())
       case (Right(_), _, None) => NotFound(views.html.errors.notFound())
       case (Left(UnexpectedStatusError(404)), _, _) => NotFound(views.html.errors.notFound())

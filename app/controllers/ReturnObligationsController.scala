@@ -37,7 +37,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
 
   def submittedReturns(year: Int): Action[AnyContent] = authorisedAction { implicit request =>
     implicit user =>
-      if(isValidSearchYear(year) && appConfig.features.nineBox()) {
+      if(isValidSearchYear(year)) {
         getReturnObligations(user, year, Obligation.Status.Fulfilled).map { model =>
           Ok(views.html.returns.submittedReturns(model))
         }
