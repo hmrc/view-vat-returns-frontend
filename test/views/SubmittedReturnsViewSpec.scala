@@ -31,7 +31,7 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    features.nineBox(true)
+    features.allowNineBox(true)
   }
 
   object Selectors {
