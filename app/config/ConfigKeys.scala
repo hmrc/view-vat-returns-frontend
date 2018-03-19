@@ -56,4 +56,7 @@ object ConfigKeys {
 
   val surveyHost: String = "feedback-survey-frontend.host"
   val surveyUrl: String = "feedback-survey-frontend.url"
+
+  val mtdVatSignUpBaseUrl: String = "vat-subscription-frontend.host"
+  val mtdVatSignUpUrl: String = "vat-subscription-frontend.signUpUrl"
 }

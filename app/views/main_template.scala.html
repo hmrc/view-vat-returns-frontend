@@ -19,7 +19,9 @@
   contentHeader: Option[Html] = None,
   bodyClasses: Option[String] = None,
   mainClass: Option[String] = Some("full-width"),
-  appConfig: config.AppConfig)(mainContent: Html)(implicit request : Request[_], messages: Messages)
+  appConfig: config.AppConfig,
+  showLogout: Boolean = true,
+  feedbackOnSignOut: Boolean = true)(mainContent: Html)(implicit request : Request[_], messages: Messages)
 
 @import uk.gov.hmrc.play.views.html.layouts
 
@@ -38,5 +40,7 @@
                sidebar = sidebar,
                contentHeader = contentHeader,
                mainContent = layouts.article(mainContent),
-               serviceInfoContent = serviceInfoContent
+               serviceInfoContent = serviceInfoContent,
+               showLogout = showLogout,
+               feedbackOnSignOut = feedbackOnSignOut
 )
