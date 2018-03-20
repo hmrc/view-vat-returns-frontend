@@ -169,7 +169,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       "return 404 (Not Found)" in new Test {
         override val successReturn = false
         override val vatReturnResult: Future[HttpGetResult[VatReturn]] =
-          Future.successful(Left(UnexpectedStatusError(404)))
+          Future.successful(Left(UnexpectedStatusError(404, "test")))
         private val result = target.vatReturn(2018, "#001")(fakeRequest)
         status(result) shouldBe Status.NOT_FOUND
       }
@@ -232,7 +232,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       "return 404 (Not Found)" in new Test {
         override val successReturn = false
         override val vatReturnResult: Future[HttpGetResult[VatReturn]] =
-          Future.successful(Left(UnexpectedStatusError(404)))
+          Future.successful(Left(UnexpectedStatusError(404, "test")))
         private val result = target.vatReturnViaPayments("#001")(fakeRequest)
         status(result) shouldBe Status.NOT_FOUND
       }
@@ -323,7 +323,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     "it returns Left(UnexpectedStatusError(404)), _ and _" should {
 
       "return a Not Found status" in {
-        val data = ReturnsControllerData(Left(UnexpectedStatusError(404)), None, None, None)
+        val data = ReturnsControllerData(Left(UnexpectedStatusError(404, "test")), None, None, None)
         val result = target.renderResult(data, isReturnsPageRequest = true)(fakeRequest)
         result.header.status shouldBe Status.NOT_FOUND
       }
@@ -332,7 +332,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     "it returns something else" should {
 
       "return an Internal Server Error status" in {
-        val data = ReturnsControllerData(Left(ServerSideError), None, None, None)
+        val data = ReturnsControllerData(Left(ServerSideError(500, "test")), None, None, None)
         val result = target.renderResult(data, isReturnsPageRequest = true)(fakeRequest)
         result.header.status shouldBe Status.INTERNAL_SERVER_ERROR
       }
