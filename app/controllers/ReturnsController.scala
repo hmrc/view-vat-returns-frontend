@@ -90,7 +90,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
         Ok(views.html.returns.vatReturnDetails(viewModel))
       case (Right(_), None, _) => NotFound(views.html.errors.notFound())
       case (Right(_), _, None) => NotFound(views.html.errors.notFound())
-      case (Left(UnexpectedStatusError(404)), _, _) => NotFound(views.html.errors.notFound())
+      case (Left(UnexpectedStatusError(404, _)), _, _) => NotFound(views.html.errors.notFound())
       case _ => InternalServerError(views.html.errors.serverError())
     }
   }

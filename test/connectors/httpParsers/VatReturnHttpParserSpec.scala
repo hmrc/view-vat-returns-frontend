@@ -20,7 +20,7 @@ import connectors.httpParsers.VatReturnHttpParser.VatReturnReads
 import models.VatReturn
 import models.errors.{BadRequestError, MultipleErrors, ServerSideError, UnexpectedStatusError, UnknownError}
 import play.api.http.Status
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.play.test.UnitSpec
 
@@ -132,8 +132,13 @@ class VatReturnHttpParserSpec extends UnitSpec {
 
     "the HTTP response status is 5xx" should {
 
-      val httpResponse = HttpResponse(Status.INTERNAL_SERVER_ERROR)
-      val expected = Left(ServerSideError)
+      val body: JsObject = Json.obj(
+        "code" -> "GATEWAY_TIMEOUT",
+        "message" -> "GATEWAY_TIMEOUT"
+      )
+
+      val httpResponse = HttpResponse(Status.GATEWAY_TIMEOUT, Some(body))
+      val expected = Left(ServerSideError(Status.GATEWAY_TIMEOUT, httpResponse.body))
       val result = VatReturnReads.read("", "", httpResponse)
 
       "return a ServerSideError" in {
@@ -143,8 +148,13 @@ class VatReturnHttpParserSpec extends UnitSpec {
 
     "the HTTP response status isn't handled" should {
 
-      val httpResponse = HttpResponse(Status.CREATED)
-      val expected = Left(UnexpectedStatusError(Status.CREATED))
+      val body: JsObject = Json.obj(
+        "code" -> "Conflict",
+        "message" -> "CONFLCIT"
+      )
+
+      val httpResponse = HttpResponse(Status.CONFLICT, Some(body))
+      val expected = Left(UnexpectedStatusError(Status.CONFLICT, httpResponse.body))
       val result = VatReturnReads.read("", "", httpResponse)
 
       "return an UnexpectedStatusError" in {
