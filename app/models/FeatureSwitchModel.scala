@@ -20,4 +20,4 @@ case class FeatureSwitchModel(simpleAuthEnabled: Boolean,
                               userResearchBannerEnabled: Boolean,
                               allowPaymentsEnabled: Boolean,
                               staticDateEnabled: Boolean,
-                              nineBoxEnabled: Boolean)
+                              allowNineBoxEnabled: Boolean)
