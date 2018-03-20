@@ -18,11 +18,21 @@ package views
 
 import java.time.LocalDate
 
+import config.features.Features
 import models.viewModels.{ReturnObligationsViewModel, VatReturnsViewModel}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.scalatest.BeforeAndAfterEach
+import play.api.Configuration
 
-class SubmittedReturnsViewSpec extends ViewBaseSpec {
+class SubmittedReturnsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
+
+  private val features = new Features(app.injector.instanceOf[Configuration])
+
+  override def beforeEach(): Unit = {
+    super.beforeEach()
+    features.allowNineBox(true)
+  }
 
   object Selectors {
     val pageHeading = "h1"

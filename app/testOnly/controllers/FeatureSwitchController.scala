@@ -36,7 +36,7 @@ class FeatureSwitchController @Inject()(val messagesApi: MessagesApi,
         userResearchBannerEnabled = appConfig.features.userResearchBanner(),
         allowPaymentsEnabled = appConfig.features.allowPayments(),
         staticDateEnabled = appConfig.features.staticDateEnabled(),
-        nineBoxEnabled = appConfig.features.nineBox()
+        allowNineBoxEnabled = appConfig.features.allowNineBox()
       )
     )))
   }
@@ -53,7 +53,7 @@ class FeatureSwitchController @Inject()(val messagesApi: MessagesApi,
     appConfig.features.userResearchBanner(model.userResearchBannerEnabled)
     appConfig.features.allowPayments(model.allowPaymentsEnabled)
     appConfig.features.staticDateEnabled(model.staticDateEnabled)
-    appConfig.features.nineBox(model.nineBoxEnabled)
+    appConfig.features.allowNineBox(model.allowNineBoxEnabled)
     Redirect(routes.FeatureSwitchController.featureSwitch())
   }
 }
