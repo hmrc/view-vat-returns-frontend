@@ -77,7 +77,7 @@ class PaymentsHttpParserSpec extends UnitSpec {
 
       val expected = Left(BadRequestError(
         code = "INVALID DATE FROM",
-        message = "Bad date from"
+        errorResponse = "Bad date from"
       ))
 
       val result = PaymentsReads.read("", "", httpResponse)

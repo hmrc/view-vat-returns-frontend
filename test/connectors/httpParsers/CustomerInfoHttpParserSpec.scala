@@ -69,7 +69,7 @@ class CustomerInfoHttpParserSpec extends UnitSpec {
 
       val expected = Left(BadRequestError(
         code = "INVALID",
-        message = "Fail!"
+        errorResponse = "Fail!"
       ))
 
       val result = CustomerInfoReads.read("", "", httpResponse)

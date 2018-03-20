@@ -74,7 +74,7 @@ class VatReturnHttpParserSpec extends UnitSpec {
 
       val expected = Left(BadRequestError(
         code = "INVALID",
-        message = "Fail!"
+        errorResponse = "Fail!"
       ))
 
       val result = VatReturnReads.read("", "", httpResponse)
