@@ -312,7 +312,7 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
 
       "have the correct information text under the heading" in {
         elementText(Selectors.previousReturnsText) shouldBe
-          "If you've submitted returns without using the software for this new service, you can view your previous returns (opens in new tab)."
+          "If you've submitted returns without using the software for this new service, you can view your previous returns (opens in new window)."
       }
 
       "contains the link" in {

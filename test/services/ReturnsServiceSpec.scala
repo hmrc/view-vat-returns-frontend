@@ -24,6 +24,7 @@ import controllers.ControllerBaseSpec
 import models.Obligation.Status
 import models.payments.{Payment, Payments}
 import models._
+import models.errors.HttpError
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits._
@@ -76,7 +77,7 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
 
   "Calling .getReturnObligationsForYear" should {
 
-    val exampleObligations: VatReturnObligations = VatReturnObligations(
+    val exampleObligations = VatReturnObligations(
       Seq(
         VatReturnObligation(
           LocalDate.parse("2017-01-01"),
@@ -94,10 +95,9 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
         .expects(*, *, *, *, *, *)
         .returns(Future.successful(Right(exampleObligations)))
 
-      lazy val result: Option[VatReturnObligations] =
-        await(service.getReturnObligationsForYear(User("999999999"), 2018, Status.All))
+      lazy val result: HttpGetResult[VatReturnObligations] = await(service.getReturnObligationsForYear(User("999999999"), 2018, Status.All))
 
-      result shouldBe Some(exampleObligations)
+      result shouldBe Right(exampleObligations)
     }
   }
 

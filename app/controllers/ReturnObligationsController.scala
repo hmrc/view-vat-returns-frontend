@@ -17,8 +17,8 @@
 package controllers
 
 import javax.inject.Inject
-
 import config.AppConfig
+import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
 import models.viewModels.{ReturnDeadlineViewModel, ReturnObligationsViewModel, VatReturnsViewModel}
 import models.{Obligation, User, VatReturnObligations}
 import play.api.i18n.MessagesApi
@@ -39,11 +39,8 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
     implicit user =>
       if(isValidSearchYear(year)) {
         getReturnObligations(user, year, Obligation.Status.Fulfilled).map {
-          case Some(model) => Ok(views.html.returns.submittedReturns(model))
-          case None => InternalServerError(views.html.errors.standardError(
-            appConfig, messagesApi("paymentHandOffErrorHeading"),
-            messagesApi("paymentHandOffErrorHeading"),
-            messagesApi("paymentHandOffErrorMessage")))
+          case Right(model) => Ok(views.html.returns.submittedReturns(model))
+          case Left(_) => InternalServerError(views.html.errors.submittedReturnsError(user))
         }
       } else {
         Future.successful(NotFound(views.html.errors.notFound()))
@@ -53,12 +50,11 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
   def returnDeadlines(): Action[AnyContent] = authorisedAction { implicit request =>
     implicit user =>
       returnsService.getReturnObligationsForYear(user, dateService.now().getYear, Obligation.Status.Outstanding).map {
-        case Some(VatReturnObligations(obligations)) =>
+        case Right(VatReturnObligations(obligations)) =>
           val deadlines = obligations.map(ob =>
             ReturnDeadlineViewModel(ob.due, ob.start, ob.end, ob.due.isBefore(dateService.now())))
           Ok(views.html.returns.returnDeadlines(deadlines, user.vrn))
-        case Some(_) => Ok(views.html.returns.returnDeadlines(Seq(), user.vrn))
-        case None => throw new Exception //non-graceful error handling for MVP
+        case Left(_)=> throw new Exception //non-graceful error handling for MVP
       }
   }
 
@@ -67,12 +63,12 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
   }
 
   private[controllers] def getReturnObligations(user: User, selectedYear: Int, status: Obligation.Status.Value)
-                                               (implicit hc: HeaderCarrier): Future[Option[VatReturnsViewModel]] = {
+                                               (implicit hc: HeaderCarrier): Future[HttpGetResult[VatReturnsViewModel]] = {
 
     val returnYears: Seq[Int] = Seq[Int](2018)
 
     returnsService.getReturnObligationsForYear(user, selectedYear, status).map {
-      case Some(VatReturnObligations(obligations)) if obligations.nonEmpty => Some(VatReturnsViewModel(
+      case Right(VatReturnObligations(obligations)) => Right(VatReturnsViewModel(
         returnYears,
         selectedYear,
         obligations.map( obligation =>
@@ -85,8 +81,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
         user.hasNonMtdVat,
         user.vrn
       ))
-      case Some(_) => Some(VatReturnsViewModel(returnYears, selectedYear, Seq(), user.hasNonMtdVat, user.vrn))
-      case None => None
+      case Left(error)=> Left(error)
     }
   }
 }
