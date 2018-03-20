@@ -26,7 +26,6 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
 
   private trait ReturnRouteTest {
     def setupStubs(): StubMapping
-
     def request(): WSRequest = {
       setupStubs()
       buildRequest("/submitted/2018/%23001")
@@ -35,7 +34,6 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
 
   private trait PaymentReturnRouteTest {
     def setupStubs(): StubMapping
-
     def request(): WSRequest = {
       setupStubs()
       buildRequest("/%23001")
@@ -59,35 +57,11 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
         response.status shouldBe Status.OK
       }
     }
-
-    "the user is not authenticated" should {
-
-      def setupStubsForScenario(): StubMapping = AuthStub.unauthorisedNotLoggedIn()
-
-      "return 401 (Unauthorised)" in new ReturnRouteTest {
-        override def setupStubs(): StubMapping = setupStubsForScenario()
-
-        val response: WSResponse = await(request().get())
-        response.status shouldBe Status.UNAUTHORIZED
-      }
-    }
-
-    "the user is not authorised" should {
-
-      def setupStubsForScenario(): StubMapping = AuthStub.unauthorisedOtherEnrolment()
-
-      "return 401 (Forbidden)" in new ReturnRouteTest {
-        override def setupStubs(): StubMapping = setupStubsForScenario()
-
-        val response: WSResponse = await(request().get())
-        response.status shouldBe Status.FORBIDDEN
-      }
-    }
   }
 
   "Calling the /:periodKey route" when {
 
-    "the user is authenticated and the Customer Information API returns a valid response" should {
+    "the user is authenticated and all dependent APIs return a valid response" should {
 
       "return 200" in new PaymentReturnRouteTest {
         override def setupStubs(): StubMapping = {
@@ -100,30 +74,6 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
 
         val response: WSResponse = await(request().get())
         response.status shouldBe Status.OK
-      }
-    }
-
-    "the user is not authenticated" should {
-
-      def setupStubsForScenario(): StubMapping = AuthStub.unauthorisedNotLoggedIn()
-
-      "return 401 (Unauthorised)" in new PaymentReturnRouteTest {
-        override def setupStubs(): StubMapping = setupStubsForScenario()
-
-        val response: WSResponse = await(request().get())
-        response.status shouldBe Status.UNAUTHORIZED
-      }
-    }
-
-    "the user is not authorised" should {
-
-      def setupStubsForScenario(): StubMapping = AuthStub.unauthorisedOtherEnrolment()
-
-      "return 401 (Forbidden)" in new PaymentReturnRouteTest {
-        override def setupStubs(): StubMapping = setupStubsForScenario()
-
-        val response: WSResponse = await(request().get())
-        response.status shouldBe Status.FORBIDDEN
       }
     }
   }

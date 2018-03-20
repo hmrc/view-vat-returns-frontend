@@ -27,4 +27,5 @@ class Features @Inject()(config: Configuration) {
   val userResearchBanner = new Feature(ConfigKeys.userResearchBannerFeature, config)
   val allowPayments = new Feature(ConfigKeys.allowPaymentsFeature, config)
   val staticDateEnabled = new Feature(ConfigKeys.staticDateEnabledFeature, config)
+  val nineBox = new Feature(ConfigKeys.nineBoxFeature, config)
 }

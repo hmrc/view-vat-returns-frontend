@@ -320,24 +320,6 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       }
     }
 
-    "it returns Right(_), None and _" should {
-
-      "return a Not Found status" in {
-        val data = ReturnsControllerData(Right(exampleVatReturn), None, Some(examplePayment), None)
-        val result = target.renderResult(data, isReturnsPageRequest = true)(fakeRequest)
-        result.header.status shouldBe Status.NOT_FOUND
-      }
-    }
-
-    "it returns Right(_), _ and None" should {
-
-      "return a Not Found status" in {
-        val data = ReturnsControllerData(Right(exampleVatReturn), None, None, Some(exampleObligation))
-        val result = target.renderResult(data, isReturnsPageRequest = true)(fakeRequest)
-        result.header.status shouldBe Status.NOT_FOUND
-      }
-    }
-
     "it returns Left(UnexpectedStatusError(404)), _ and _" should {
 
       "return a Not Found status" in {
@@ -347,7 +329,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       }
     }
 
-    "it returns anything else" should {
+    "it returns something else" should {
 
       "return an Internal Server Error status" in {
         val data = ReturnsControllerData(Left(ServerSideError(500, "test")), None, None, None)

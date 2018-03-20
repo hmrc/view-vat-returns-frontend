@@ -16,4 +16,9 @@
 
 @()(implicit appConfig: config.AppConfig, request: Request[_], messages: Messages)
 
-@views.html.errors.standardError(appConfig, messages("serverError.title"), messages("serverError.title"), messages("serverError.message"))
+@views.html.errors.standardError(
+  appConfig,
+  messages("technicalProblem.title"),
+  messages("technicalProblem.heading"),
+  messages("technicalProblem.message")
+)

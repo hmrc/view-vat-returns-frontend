@@ -20,7 +20,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import views.ViewBaseSpec
 
-class ServerErrorViewSpec extends ViewBaseSpec {
+class TechnicalProblemViewSpec extends ViewBaseSpec {
 
   "Rendering the server error page" should {
 
@@ -29,19 +29,19 @@ class ServerErrorViewSpec extends ViewBaseSpec {
       val instructions = "#content p"
     }
 
-    lazy val view = views.html.errors.serverError()
+    lazy val view = views.html.errors.technicalProblem()
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct document title" in {
-      document.title shouldBe "Internal server error"
+      document.title shouldBe "There is a problem with the service - VAT reporting through software - GOV.UK"
     }
 
     "have a the correct page heading" in {
-      elementText(Selectors.pageHeading) shouldBe "Internal server error"
+      elementText(Selectors.pageHeading) shouldBe "Sorry, there is a problem with the service"
     }
 
     "have the correct message on the page" in {
-      elementText(Selectors.instructions) shouldBe "Something went wrong. Please try again later."
+      elementText(Selectors.instructions) shouldBe "Try again later."
     }
   }
 }
