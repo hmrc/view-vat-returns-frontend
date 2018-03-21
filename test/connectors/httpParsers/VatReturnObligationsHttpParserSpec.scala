@@ -84,27 +84,28 @@ class VatReturnObligationsHttpParserSpec extends UnitSpec {
         result shouldBe expected
       }
     }
-
     "the HTTP response status is BAD_REQUEST (400) (multiple errors)" should {
 
-      val httpResponse = HttpResponse(Status.BAD_REQUEST, responseJson = Some(
+      val httpResponse: AnyRef with HttpResponse = HttpResponse(Status.BAD_REQUEST, responseJson = Some(
         Json.obj(
           "code" -> "BAD_REQUEST",
           "message" -> "Fail!",
           "errors" -> Json.arr(
             Json.obj(
-              "code" -> "INVALID_DATE_FROM",
-              "message" -> "Bad 'from' date"
+              "code" -> "INVALID",
+              "message" -> "Fail!"
             ),
             Json.obj(
-              "code" -> "INVALID_DATE_TO",
-              "message" -> "Bad 'to' date"
+              "code" -> "INVALID_2",
+              "message" -> "Fail!"
             )
           )
         )
       ))
 
-      val expected = Left(MultipleErrors)
+      val errors = Seq(ApiSingleError("INVALID", "Fail!"), ApiSingleError("INVALID_2", "Fail!"))
+
+      val expected = Left(MultipleErrors(Status.BAD_REQUEST.toString, Json.toJson(errors).toString()))
 
       val result = VatReturnObligationsReads.read("", "", httpResponse)
 

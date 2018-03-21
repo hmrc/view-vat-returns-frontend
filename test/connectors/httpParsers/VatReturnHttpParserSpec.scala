@@ -18,8 +18,9 @@ package connectors.httpParsers
 
 import connectors.httpParsers.VatReturnHttpParser.VatReturnReads
 import models.VatReturn
-import models.errors.{BadRequestError, MultipleErrors, ServerSideError, UnexpectedStatusError, UnknownError}
+import models.errors._
 import play.api.http.Status
+import play.api.libs.json
 import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.play.test.UnitSpec
@@ -103,7 +104,9 @@ class VatReturnHttpParserSpec extends UnitSpec {
         )
       ))
 
-      val expected = Left(MultipleErrors)
+      val errors = Seq(ApiSingleError("INVALID", "Fail!"), ApiSingleError("INVALID_2", "Fail!"))
+
+      val expected = Left(MultipleErrors(Status.BAD_REQUEST.toString, Json.toJson(errors).toString()))
 
       val result = VatReturnReads.read("", "", httpResponse)
 

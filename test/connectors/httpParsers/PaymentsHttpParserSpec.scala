@@ -87,29 +87,33 @@ class PaymentsHttpParserSpec extends UnitSpec {
       }
     }
 
-    "a http response of 400 BAD_REQUEST (multiple errors)" should {
+    "the HTTP response status is BAD_REQUEST (400) (multiple errors)" should {
 
-      val httpResponse = HttpResponse(Status.BAD_REQUEST,
-        responseJson = Some(Json.obj(
-          "failures" -> Json.arr(
+      val httpResponse: AnyRef with HttpResponse = HttpResponse(Status.BAD_REQUEST, responseJson = Some(
+        Json.obj(
+          "code" -> "BAD_REQUEST",
+          "message" -> "Fail!",
+          "errors" -> Json.arr(
             Json.obj(
-              "code" -> "INVALID DATE FROM",
-              "reason" -> "Bad date from"
+              "code" -> "INVALID",
+              "message" -> "Fail!"
             ),
             Json.obj(
-              "code" -> "INVALID DATE TO",
-              "reason" -> "Bad date to"
+              "code" -> "INVALID_2",
+              "message" -> "Fail!"
             )
           )
-        ))
-      )
+        )
+      ))
 
-      val expected = Left(MultipleErrors)
+      val errors = Seq(ApiSingleError("INVALID", "Fail!"), ApiSingleError("INVALID_2", "Fail!"))
+
+      val expected = Left(MultipleErrors(Status.BAD_REQUEST.toString, Json.toJson(errors).toString()))
 
       val result = PaymentsReads.read("", "", httpResponse)
 
       "return a MultipleErrors" in {
-        result shouldEqual expected
+        result shouldBe expected
       }
     }
 
