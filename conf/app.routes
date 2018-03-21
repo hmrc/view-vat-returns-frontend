@@ -19,7 +19,7 @@ POST        /feedback                   controllers.feedback.FeedbackController.
 GET         /thankyou                   controllers.feedback.FeedbackController.thankyou
 
 #Sign Out Routes
-GET         /sign-out                   controllers.SignOutController.signOut
+GET         /sign-out                   controllers.SignOutController.signOut(authorised: Boolean)
 
 # Get a return via the payments page - NOTE THIS ROUTE MUST APPEAR AT THE END OF THE LIST
 GET        /:periodKey                  controllers.ReturnsController.vatReturnViaPayments(periodKey: String)
