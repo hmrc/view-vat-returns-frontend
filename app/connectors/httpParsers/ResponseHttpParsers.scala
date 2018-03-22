@@ -35,8 +35,8 @@ trait ResponseHttpParsers {
   private def generateClientError(error: ApiError): Left[HttpError, Nothing] = {
     error match {
       case ApiSingleError(code, message) => Left(BadRequestError(code, message))
-      case ApiMultiError(code, message, errorResponse) =>
-        Left(MultipleErrors(Status.BAD_REQUEST.toString, Json.toJson(errorResponse).toString()))
+      case ApiMultiError(code, _, errorResponse) =>
+        Left(MultipleErrors(code, Json.toJson(errorResponse).toString()))
       case ApiMultiErrorFinancial(errorResponse) =>
         Left(MultipleErrors(Status.BAD_REQUEST.toString, Json.toJson(errorResponse).toString()))
     }

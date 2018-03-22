@@ -61,7 +61,7 @@ class VatSubscriptionConnectorISpec extends IntegrationBaseSpec {
       "return an error" in new Test {
         override def setupStubs(): StubMapping = CustomerInfoStub.stubErrorFromApi
         setupStubs()
-        val expected = Left(ServerSideError(500, message))
+        val expected = Left(ServerSideError("500", message))
         private val result = await(connector.getCustomerInfo("999999999"))
 
         result shouldBe expected

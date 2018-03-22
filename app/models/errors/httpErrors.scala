@@ -16,8 +16,6 @@
 
 package models.errors
 
-import uk.gov.hmrc.http.HttpResponse
-
 sealed trait HttpError {
   def message: String
 }
@@ -27,12 +25,12 @@ case class BadRequestError(code: String, errorResponse: String) extends HttpErro
     s"[BadRequest]- RESPONSE status: $code, message: $errorResponse"
 }
 
-case class ServerSideError(code: Int, errorResponse: String) extends HttpError {
+case class ServerSideError(code: String, errorResponse: String) extends HttpError {
   override val message: String = s"The server you connecting to returned an error. " +
     s"[ServerSideError]- RESPONSE status: $code, body: $errorResponse"
 }
 
-case class UnexpectedStatusError(code: Int, errorResponse: String) extends HttpError {
+case class UnexpectedStatusError(code: String, errorResponse: String) extends HttpError {
   override val message: String = s"The server you connecting to returned an unexpected error." +
     s"[UnexpectedStatusError]- RESPONSE status: $code, body: $errorResponse"
 }
