@@ -47,7 +47,7 @@ class VatSubscriptionConnector @Inject()(http: HttpClient,
         customerInfo
       case httpError@Left(error) =>
         metrics.getCustomerInfoCallFailureCounter.inc()
-        Logger.info("VatSubscriptionConnector received error: " + error.message)
+        Logger.warn("VatSubscriptionConnector received error: " + error.message)
         httpError
     }
   }
