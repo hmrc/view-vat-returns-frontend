@@ -84,6 +84,7 @@ class VatReturnObligationsHttpParserSpec extends UnitSpec {
         result shouldBe expected
       }
     }
+
     "the HTTP response status is BAD_REQUEST (400) (multiple errors)" should {
 
       val httpResponse: AnyRef with HttpResponse = HttpResponse(Status.BAD_REQUEST, responseJson = Some(
