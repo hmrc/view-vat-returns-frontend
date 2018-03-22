@@ -72,7 +72,7 @@ class VatApiConnector @Inject()(http: HttpClient,
         vatReturns
       case httpError@Left(error) =>
         metrics.getObligationsCallFailureCounter.inc()
-        Logger.info("VatApiConnector received error: " + error.message)
+        Logger.warn("VatApiConnector received error: " + error.message)
         httpError
     }
   }
