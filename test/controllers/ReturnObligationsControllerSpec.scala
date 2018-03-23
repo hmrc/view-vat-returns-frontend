@@ -176,7 +176,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
             | """.stripMargin
 
         override val exampleObligations: Future[Left[HttpError, VatReturnObligations]]
-          = Left(ServerSideError(Status.GATEWAY_TIMEOUT, errorResponse))
+          = Left(ServerSideError("504", errorResponse))
 
         override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
 
@@ -256,7 +256,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
             | """.stripMargin
 
         override val exampleObligations: Future[Left[HttpError, VatReturnObligations]]
-          = Left(ServerSideError(Status.GATEWAY_TIMEOUT, errorResponse))
+          = Left(ServerSideError("504", errorResponse))
 
         override val serviceCall = false
         override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
@@ -337,9 +337,9 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
             | """.stripMargin
 
         override val vatServiceResult: Future[Left[HttpError, VatReturnObligations]]
-          = Left(ServerSideError(Status.GATEWAY_TIMEOUT, errorResponse))
+          = Left(ServerSideError("504", errorResponse))
 
-        val expectedResult = Left(ServerSideError(GATEWAY_TIMEOUT, errorResponse))
+        val expectedResult = Left(ServerSideError("504", errorResponse))
 
         private val result = await(target.getReturnObligations(testUser, 2017, Obligation.Status.All))
         result shouldBe expectedResult
