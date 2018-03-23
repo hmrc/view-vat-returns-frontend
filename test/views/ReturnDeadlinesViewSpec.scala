@@ -31,9 +31,8 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
     val submitThroughSoftware = "#content > article > div > div > p"
     val howToDoThis = "details > summary > span"
     val downloadSoftware = ".list-number li:nth-child(1)"
-    val downloadSoftwareLink = ".list-number li:nth-child(1) a"
     val vatRecords = ".list-number li:nth-child(2)"
-    val sendReturns= ".list-number li:nth-child(3)"
+    val sendReturns = ".list-number li:nth-child(3)"
 
     val firstDeadlineDueDate = ".list-bullet li:nth-of-type(1)"
     val firstDeadlinePeriod = ".list-bullet li:nth-of-type(1) .form-hint"
@@ -111,11 +110,7 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
     }
 
     "have the correct message regarding downloading software in the hint box" in {
-      elementText(Selectors.downloadSoftware) shouldBe "Choose accounting software that supports this service (opens in a new tab) if you haven't already."
-    }
-
-    "have the correct external link for software" in {
-      element(Selectors.downloadSoftwareLink).attr("href") shouldBe "/vat-file/trader/555555555/periods"
+      elementText(Selectors.downloadSoftware) shouldBe "Choose accounting software that supports this service if you haven't already."
     }
 
     "have the correct message regarding VAT records in the hint box" in {
