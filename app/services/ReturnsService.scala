@@ -42,7 +42,8 @@ class ReturnsService @Inject()(vatApiConnector: VatApiConnector, financialDataCo
     val to: LocalDate = LocalDate.parse(s"$searchYear-12-31")
 
     vatApiConnector.getVatReturnObligations(user.vrn, from, to, status).map {
-      case Right(obligations) => Right(filterObligationsByDueDate(obligations, searchYear))
+      case Right(VatReturnObligations(obligations)) =>
+        Right(filterObligationsByDueDate(VatReturnObligations(obligations), searchYear))
       case error@Left(_) => error
     }
   }
@@ -50,7 +51,7 @@ class ReturnsService @Inject()(vatApiConnector: VatApiConnector, financialDataCo
   def getObligationWithMatchingPeriodKey(user: User, year: Int, periodKey: String)
                                         (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[VatReturnObligation]] = {
     getReturnObligationsForYear(user, year, Status.Fulfilled).map {
-      case Right(obs) => obs.obligations.find(_.periodKey == periodKey)
+      case Right(VatReturnObligations(obs)) => obs.find(_.periodKey == periodKey)
       case Left(_) => None
     }
   }

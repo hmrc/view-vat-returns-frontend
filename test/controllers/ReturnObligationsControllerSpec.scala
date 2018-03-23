@@ -18,10 +18,14 @@ package controllers
 
 import java.time.LocalDate
 
-import models.errors.{BadRequestError, HttpError}
+import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
+import models.errors.{HttpError, ServerSideError}
 import models.viewModels.{ReturnObligationsViewModel, VatReturnsViewModel}
 import models.{Obligation, User, VatReturnObligation, VatReturnObligations}
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import play.api.http.Status
+import play.api.mvc.Result
 import play.api.test.Helpers._
 import services.{DateService, EnrolmentsAuthService, ReturnsService}
 import uk.gov.hmrc.auth.core._
@@ -40,15 +44,17 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
       )
     )
 
-    val exampleObligations: VatReturnObligations = VatReturnObligations(
-      Seq(
-        VatReturnObligation(
-          LocalDate.parse("2017-01-01"),
-          LocalDate.parse("2017-12-31"),
-          LocalDate.parse("2018-01-31"),
-          "O",
-          None,
-          "#001"
+    val exampleObligations: Future[HttpGetResult[VatReturnObligations]] = Right(
+      VatReturnObligations(
+        Seq(
+          VatReturnObligation(
+            LocalDate.parse("2017-01-01"),
+            LocalDate.parse("2017-12-31"),
+            LocalDate.parse("2018-01-31"),
+            "O",
+            None,
+            "#001"
+          )
         )
       )
     )
@@ -71,7 +77,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         (mockVatReturnService.getReturnObligationsForYear(_: User, _: Int, _: Obligation.Status.Value)
         (_: HeaderCarrier, _: ExecutionContext))
           .expects(*, *, *, *, *)
-          .returns(Future.successful(Right(exampleObligations)))
+          .returns(exampleObligations)
       }
     }
 
@@ -159,6 +165,27 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         status(result) shouldBe Status.NOT_FOUND
       }
     }
+
+    "An error occurs upstream" should {
+
+      "return the submitted returns error view" in new Test {
+        val errorResponse: String =
+          """
+            | "code" -> "GATEWAY_TIMEOUT",
+            | "message" -> "Gateway Timeout"
+            | """.stripMargin
+
+        override val exampleObligations: Future[Left[HttpError, VatReturnObligations]]
+          = Left(ServerSideError("504", errorResponse))
+
+        override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
+
+        val result: Result = await(target.submittedReturns(previousYear)(fakeRequest))
+        val document: Document = Jsoup.parse(bodyOf(result))
+
+        document.select("h1").first().text() shouldBe "Sorry, there is a problem with the service"
+      }
+    }
   }
 
   "Calling the .returnDeadlines action" when {
@@ -181,6 +208,21 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
         private val result = target.returnDeadlines()(fakeRequest)
         charset(result) shouldBe Some("utf-8")
+      }
+    }
+
+    "A user with no returns" should {
+
+      "return the no returns view" in new Test {
+        override val exampleObligations: Future[Right[HttpError, VatReturnObligations]] =
+          Right(VatReturnObligations(Seq.empty))
+        override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
+
+        val result: Result = await(target.returnDeadlines()(fakeRequest))
+        val document: Document = Jsoup.parse(bodyOf(result))
+
+        document.select("p").eq(2).text() shouldBe
+          "Your next deadline will show here on the first day of your next accounting period."
       }
     }
 
@@ -207,10 +249,14 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     "the Obligations API call fails" should {
 
       "throw an exception" in new Test {
-        (mockVatReturnService.getReturnObligationsForYear(_: User, _: Int, _: Obligation.Status.Value)
-        (_: HeaderCarrier, _: ExecutionContext))
-        .expects(*, *, *, *, *)
-          .returns(Future.successful(Left(BadRequestError("", ""))))
+        val errorResponse: String =
+          """
+            | "code" -> "GATEWAY_TIMEOUT",
+            | "message" -> "Gateway Timeout"
+            | """.stripMargin
+
+        override val exampleObligations: Future[Left[HttpError, VatReturnObligations]]
+          = Left(ServerSideError("504", errorResponse))
 
         override val serviceCall = false
         override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
@@ -237,7 +283,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
           )
         }
 
-        val expectedResult = VatReturnsViewModel(
+        val expectedResult = Right(VatReturnsViewModel(
           Seq(2018),
           2017,
           Seq(
@@ -249,6 +295,30 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
           ),
           hasNonMtdVat = false,
           "999999999"
+        ))
+
+        private val result = await(target.getReturnObligations(testUser, 2017, Obligation.Status.All))
+        result shouldBe expectedResult
+      }
+    }
+
+    "the vatReturnsService retrieves an empty list of VatReturnObligations" should {
+
+      "return a VatReturnsViewModel with empty obligations" in new HandleReturnObligationsTest {
+        override val vatServiceResult: Future[Right[HttpError, VatReturnObligations]] = Future.successful {
+          Right(
+            VatReturnObligations(Seq.empty)
+          )
+        }
+
+        val expectedResult = Right(
+          VatReturnsViewModel(
+            Seq(2018),
+            2017,
+            Seq(),
+           hasNonMtdVat = false,
+            "999999999"
+          )
         )
 
         private val result = await(target.getReturnObligations(testUser, 2017, Obligation.Status.All))
@@ -258,18 +328,18 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
     "the vatReturnsService retrieves an error" should {
 
-      "return a VatReturnsViewModel with empty obligations" in new HandleReturnObligationsTest {
-        override val vatServiceResult: Future[Either[HttpError, VatReturnObligations]] = Future.successful {
-          Left(BadRequestError("", ""))
-        }
+      "return a HttpGetResult error" in new HandleReturnObligationsTest {
 
-        val expectedResult = VatReturnsViewModel(
-          Seq(2018),
-          2017,
-          Seq(),
-          hasNonMtdVat = false,
-          "999999999"
-        )
+        val errorResponse: String =
+          """
+            | "code" -> "GATEWAY_TIMEOUT",
+            | "message" -> "Gateway Timeout"
+            | """.stripMargin
+
+        override val vatServiceResult: Future[Left[HttpError, VatReturnObligations]]
+          = Left(ServerSideError("504", errorResponse))
+
+        val expectedResult = Left(ServerSideError("504", errorResponse))
 
         private val result = await(target.getReturnObligations(testUser, 2017, Obligation.Status.All))
         result shouldBe expectedResult

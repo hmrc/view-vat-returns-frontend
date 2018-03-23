@@ -16,6 +16,8 @@
 
 package controllers
 
+import akka.actor.ActorSystem
+import akka.stream.{ActorMaterializer, Materializer}
 import config.AppConfig
 import mocks.MockAppConfig
 import org.scalamock.scalatest.MockFactory
@@ -35,7 +37,10 @@ class ControllerBaseSpec extends UnitSpec with MockFactory with GuiceOneAppPerSu
   lazy val messages: MessagesApi = injector.instanceOf[MessagesApi]
   lazy val mockConfig: AppConfig = new MockAppConfig(app.configuration)
 
-  lazy val fakeRequestWithSession = fakeRequest.withSession(
+  implicit val system: ActorSystem = ActorSystem()
+  implicit val materializer: Materializer = ActorMaterializer()
+
+  lazy val fakeRequestWithSession: FakeRequest[AnyContentAsEmpty.type] = fakeRequest.withSession(
     SessionKeys.lastRequestTimestamp -> "1498236506662", SessionKeys.authToken -> "Bearer Token")
 
   def fakeRequestToPOSTWithSession(input: (String, String)*): FakeRequest[AnyContentAsFormUrlEncoded] =
