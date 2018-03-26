@@ -43,20 +43,14 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach{
     val mainInformationText = "#content > article > div.grid-row.column-two-thirds > p:nth-child(2)"
     val extraInformationText = "#content > article > div.grid-row.column-two-thirds > p:nth-child(3)"
     val tableHeadingOne = "#content h3"
-    val tableHeadingTwo = "#content > article > div.grid-row.column-two-thirds > div:nth-child(12) > div"
-    val boxes = Array(
-      nineBoxElemSelector("1", "1", inFormGroup = true), nineBoxElemSelector("2", "1", inFormGroup = true),
-      nineBoxElemSelector("8", "1"), nineBoxElemSelector("9", "1"), nineBoxElemSelector("10", "1"),
-      nineBoxElemSelector("13", "1"), nineBoxElemSelector("14", "1"), nineBoxElemSelector("15", "1"),
-      nineBoxElemSelector("16", "1")
+    val tableHeadingTwo = "#content > article > div.grid-row.column-two-thirds > div:nth-child(11) > div"
+
+    val boxes = List(
+      "#box-one", "#box-two", "#box-three",
+      "#box-four", "#box-five", "#box-six",
+      "#box-seven", "#box-eight", "#box-nine"
     )
-    val rowDescriptions = Array(
-      nineBoxElemSelector("1", "2", inFormGroup = true), nineBoxElemSelector("2", "2", inFormGroup = true),
-      nineBoxElemSelector("8", "2"), nineBoxElemSelector("9", "2"), nineBoxElemSelector("13", "2"),
-      nineBoxElemSelector("14", "2"), nineBoxElemSelector("15", "2"), nineBoxElemSelector("16", "2")
-    )
-    val boxFiveDescription: String = nineBoxElemSelector("10", "2")
-    val boxFiveDescriptionYouOweMoney: String = nineBoxElemSelector("11", "2")
+
     val adjustments = "#adjustments"
     val paymentButton = ".button"
     val btaBreadcrumb = "div.breadcrumbs li:nth-of-type(1)"
@@ -72,9 +66,9 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach{
     val paymentServiceDetailYear = "#payment-detail input:nth-of-type(3)"
   }
 
-  def nineBoxElemSelector(divNumber: String, columnNumber: String, inFormGroup: Boolean = false): String = {
-    val formDiv = if(inFormGroup) "div.form-group >" else ""
-    s"#content > article > div.grid-row.column-two-thirds > $formDiv div:nth-child($divNumber) > div:nth-child($columnNumber)"
+  def boxElement(box: String, column: Int): String = {
+    val nameSelector = if (box.equals("#box-five")) "strong" else "div"
+    s"$box > $nameSelector:nth-child($column)"
   }
 
   val currentYear: Int = 2018
@@ -169,7 +163,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach{
 
     "have the correct box numbers in the table" in {
       val expectedBoxes = Array("Box 1", "Box 2", "Box 3", "Box 4", "Box 5", "Box 6", "Box 7", "Box 8", "Box 9")
-      expectedBoxes.indices.foreach(i => elementText(Selectors.boxes(i)) shouldBe expectedBoxes(i))
+      expectedBoxes.indices.foreach(i => elementText(boxElement(Selectors.boxes(i), 1)) shouldBe expectedBoxes(i))
     }
 
     "have the correct row descriptions in the table" in {
@@ -178,16 +172,13 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach{
         "VAT on European Community sales and related costs",
         "VAT sales subtotal",
         "Total VAT reclaimed from anywhere",
+        "Total you owed",
         "Total sales and other outputs from anywhere, minus VAT",
         "Total purchases from anywhere, minus VAT",
         "Total supplies, goods and related costs to European Community, minus VAT",
         "Total value of acquisitions of goods from European Community, minus VAT"
       )
-      expectedDescriptions.indices.foreach(i => elementText(Selectors.rowDescriptions(i)) shouldBe expectedDescriptions(i))
-    }
-
-    "have the correct box 5 description in the table" in {
-      elementText(Selectors.boxFiveDescription) shouldBe "Total you owed"
+      expectedDescriptions.indices.foreach(i => elementText(boxElement(Selectors.boxes(i), 2)) shouldBe expectedDescriptions(i))
     }
 
     "have the correct info regarding making adjustments" in {
@@ -272,7 +263,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach{
     }
 
     "have the correct box 5 description in the table" in {
-      elementText(Selectors.boxFiveDescriptionYouOweMoney) shouldBe "Total you owe"
+      elementText(boxElement(Selectors.boxes(4), 2)) shouldBe "Total you owe"
     }
 
     "have the pay button" in {
@@ -327,7 +318,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach{
     }
 
     "have the correct box 5 description in the table" in {
-      elementText(Selectors.boxFiveDescription) shouldBe "HMRC will pay you"
+      elementText(boxElement(Selectors.boxes(4), 2)) shouldBe "HMRC will pay you"
     }
   }
 
@@ -367,7 +358,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach{
     }
 
     "have the correct box 5 description in the table" in {
-      elementText(Selectors.boxFiveDescription) shouldBe "Total amount HMRC owed you"
+      elementText(boxElement(Selectors.boxes(4), 2)) shouldBe "Total amount HMRC owed you"
     }
   }
 }
