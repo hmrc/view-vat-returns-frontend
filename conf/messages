@@ -45,6 +45,7 @@ yourVatReturn.boxThreeDescription = VAT sales subtotal
 yourVatReturn.boxFour = Box 4
 yourVatReturn.boxFourDescription = Total VAT reclaimed from anywhere
 yourVatReturn.boxFive = Box 5
+yourVatReturn.boxFiveContext = This is box 3 {0} take away box 4 {1}
 yourVatReturn.boxSix = Box 6
 yourVatReturn.boxSixDescription = Total sales and other outputs from anywhere, minus VAT
 yourVatReturn.boxSeven = Box 7

@@ -60,57 +60,65 @@
       <h3 class="column-two-thirds bold-small section">@messages("yourVatReturn.vatDetails")</h3>
     </div>
     <div class="form-group">
-      <div class="grid-row">
+      <div class="grid-row" id="box-one">
         <div class="column-one-quarter form-hint">@messages("yourVatReturn.boxOne")</div>
         <div class="column-one-half form-hint">@messages("yourVatReturn.boxOneDescription")</div>
         <div class="column-one-quarter form-hint text--right">@displayMoney(vatReturnViewModel.boxOne)</div>
       </div>
-      <div class="grid-row">
+      <div class="grid-row" id="box-two">
         <div class="column-one-quarter form-hint">@messages("yourVatReturn.boxTwo")</div>
         <div class="column-one-half form-hint">@messages("yourVatReturn.boxTwoDescription")</div>
         <div class="column-one-quarter form-hint text--right">@displayMoney(vatReturnViewModel.boxTwo)</div>
       </div>
     </div>
-    <div class="grid-row">
-      <div class="column-one-quarter form-hint">@messages("yourVatReturn.boxThree")</div>
-      <div class="column-one-half form-hint">@messages("yourVatReturn.boxThreeDescription")</div>
-      <div class="column-one-quarter form-hint text--right">@displayMoney(vatReturnViewModel.boxThree)</div>
+    <div class="form-group">
+      <div class="grid-row" id="box-three">
+        <div class="column-one-quarter form-hint">@messages("yourVatReturn.boxThree")</div>
+        <div class="column-one-half form-hint">@messages("yourVatReturn.boxThreeDescription")</div>
+        <div class="column-one-quarter form-hint text--right">@displayMoney(vatReturnViewModel.boxThree)</div>
+      </div>
+      <div class="grid-row" id="box-four">
+        <div class="column-one-quarter form-hint">@messages("yourVatReturn.boxFour")</div>
+        <div class="column-one-half form-hint">@messages("yourVatReturn.boxFourDescription")</div>
+        <div class="column-one-quarter form-hint text--right">
+          <span aria-hidden="true">&minus;</span>
+          @displayMoney(vatReturnViewModel.boxFour)
+        </div>
+      </div>
     </div>
-    <div class="grid-row">
-      <div class="column-one-quarter form-hint">@messages("yourVatReturn.boxFour")</div>
-      <div class="column-one-half form-hint">@messages("yourVatReturn.boxFourDescription")</div>
-      <div class="column-one-quarter form-hint text--right">-@displayMoney(vatReturnViewModel.boxFour)</div>
-    </div>
-    <div class="grid-row">
-      <div class="column-one-quarter heading-small">@messages("yourVatReturn.boxFive")</div>
-      <div class="column-one-half heading-small">
+    <div class="grid-row" id="box-five">
+      <strong class="column-one-quarter bold-small">@messages("yourVatReturn.boxFive")</strong>
+      <strong class="column-one-half bold-small">
         @views.html.templates.returns.boxFiveDescription(
           vatReturnViewModel.moneyOwed,
           vatReturnViewModel.isRepayment
         )
-      </div>
-      <div class="column-one-quarter heading-small text--right">@displayMoney(vatReturnViewModel.boxFive)</div>
+      </strong>
+      <strong class="column-one-quarter bold-small text--right">
+        <span class="visually-hidden">@messages("yourVatReturn.boxFiveContext", displayMoney(vatReturnViewModel.boxThree), displayMoney(vatReturnViewModel.boxFour))</span>
+        @displayMoney(vatReturnViewModel.boxFive)
+      </strong>
     </div>
     <hr>
-    <div class="grid-row">
+    <div class="grid-row" id="additional-info">
       <div class="column-two-thirds bold-small section">@messages("yourVatReturn.additionalInfo")</div>
     </div>
-    <div class="grid-row">
+    <div class="grid-row" id="box-six">
       <div class="column-one-quarter form-hint">@messages("yourVatReturn.boxSix")</div>
       <div class="column-one-half form-hint">@messages("yourVatReturn.boxSixDescription")</div>
       <div class="column-one-quarter form-hint text--right">@displayMoney(vatReturnViewModel.boxSix)</div>
     </div>
-    <div class="grid-row">
+    <div class="grid-row" id="box-seven">
       <div class="column-one-quarter form-hint">@messages("yourVatReturn.boxSeven")</div>
       <div class="column-one-half form-hint">@messages("yourVatReturn.boxSevenDescription")</div>
       <div class="column-one-quarter form-hint text--right">@displayMoney(vatReturnViewModel.boxSeven)</div>
     </div>
-    <div class="grid-row">
+    <div class="grid-row" id="box-eight">
       <div class="column-one-quarter form-hint">@messages("yourVatReturn.boxEight")</div>
       <div class="column-one-half form-hint">@messages("yourVatReturn.boxEightDescription")</div>
       <div class="column-one-quarter form-hint text--right">@displayMoney(vatReturnViewModel.boxEight)</div>
     </div>
-    <div class="grid-row">
+    <div class="grid-row" id="box-nine">
       <div class="column-one-quarter form-hint">@messages("yourVatReturn.boxNine")</div>
       <div class="column-one-half form-hint">@messages("yourVatReturn.boxNineDescription")</div>
       <div class="column-one-quarter form-hint text--right">@displayMoney(vatReturnViewModel.boxNine)</div>
