@@ -18,23 +18,13 @@ package views
 
 import java.time.LocalDate
 
-import com.fasterxml.jackson.annotation.JsonFormat.Feature
-import config.ConfigKeys
-import config.features.{Feature, Features}
 import models.viewModels.VatReturnViewModel
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.scalatest.BeforeAndAfterEach
-import play.api.Configuration
 
-class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach{
+class VatReturnDetailsViewSpec extends ViewBaseSpec {
 
-  private val features = new Features(app.injector.instanceOf[Configuration])
-
-  override def beforeEach(): Unit = {
-    super.beforeEach()
-    features.allowPayments(true)
-  }
+  mockConfig.features.allowPayments(true)
 
   object Selectors {
     val pageHeading = "#content h1"
