@@ -47,6 +47,8 @@ object ConfigKeys {
   val vatPaymentsUrl: String = "vat-summary-frontend.paymentsUrl"
   val vatMakePaymentUrl: String = "vat-summary-frontend.makePaymentUrl"
 
+  val reportVatErrorUrl: String = "reportVatErrorUrl"
+
   val paymentsServiceBase: String = "payments-frontend.host"
   val paymentsServiceUrl: String = "payments-frontend.paymentUrl"
   val paymentsReturnBase: String = "payments-frontend.returnHost"

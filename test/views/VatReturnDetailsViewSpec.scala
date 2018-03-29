@@ -40,10 +40,10 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach{
     val pageHeading = "#content h1"
     val subHeading = "#content h2.heading-large"
     val entityNameHeading = "#content h2.heading-medium"
-    val mainInformationText = "#content > article > div.grid-row.column-two-thirds > p:nth-child(2)"
-    val extraInformationText = "#content > article > div.grid-row.column-two-thirds > p:nth-child(3)"
-    val tableHeadingOne = "#content h3"
-    val tableHeadingTwo = "#content > article > div.grid-row.column-two-thirds > div:nth-child(11) > div"
+    val mainInformationText = "#content > article > section > p:nth-of-type(1)"
+    val extraInformationText = "#content > article > section > p:nth-of-type(2)"
+    val tableHeadingOne = "#content section:nth-of-type(1) h3"
+    val tableHeadingTwo = "#content section:nth-of-type(2) h3"
 
     val boxes = List(
       "#box-one", "#box-two", "#box-three",
@@ -51,7 +51,13 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach{
       "#box-seven", "#box-eight", "#box-nine"
     )
 
-    val adjustments = "#adjustments"
+    val helpTitle = "details span"
+    val helpLink = "details a"
+    val helpLine1 = "details p:nth-of-type(1)"
+    val helpLine2 = "details p:nth-of-type(2)"
+    val helpBullet1 = "details li:nth-of-type(1)"
+    val helpBullet2 = "details li:nth-of-type(2)"
+
     val paymentButton = ".button"
     val btaBreadcrumb = "div.breadcrumbs li:nth-of-type(1)"
     val btaBreadcrumbLink = "div.breadcrumbs li:nth-of-type(1) a"
@@ -67,8 +73,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach{
   }
 
   def boxElement(box: String, column: Int): String = {
-    val nameSelector = if (box.equals("#box-five")) "strong" else "div"
-    s"$box > $nameSelector:nth-child($column)"
+    s"$box > div:nth-child($column)"
   }
 
   val currentYear: Int = 2018
@@ -181,8 +186,33 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach{
       expectedDescriptions.indices.foreach(i => elementText(boxElement(Selectors.boxes(i), 2)) shouldBe expectedDescriptions(i))
     }
 
-    "have the correct info regarding making adjustments" in {
-      elementText(Selectors.adjustments) shouldBe "If there are any errors, add or subtract them in your next return."
+    "render the correct help revealing link text" in {
+      elementText(Selectors.helpTitle) shouldBe "There’s an error in my return"
+    }
+
+    "render the correct text for the help section first paragraph" in {
+      elementText(Selectors.helpLine1) shouldBe
+        "If the error happened in an accounting period that ended in the last 4 years, you can correct it in your next return. The error must be either:"
+    }
+
+    "render the correct help section report any other errors text" in {
+      elementText(Selectors.helpLine2) shouldBe "You must report any other errors to HMRC."
+    }
+
+    "render the correct report vat error link text" in {
+      elementText(Selectors.helpLink) shouldBe "report any other"
+    }
+
+    "render the correct report vat error link href" in {
+      element(Selectors.helpLink).attr("href") shouldBe "report-vat-error-url"
+    }
+
+    "render the correct help section first bullet point text" in {
+      elementText(Selectors.helpBullet1) shouldBe "£10,000 or less"
+    }
+
+    "render the correct help section second bullet point text" in {
+      elementText(Selectors.helpBullet2) shouldBe "1% or less of your box 6 figure and below £50,000"
     }
   }
 
