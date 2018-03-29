@@ -46,6 +46,7 @@ trait AppConfig extends ServicesConfig {
   val vatPaymentsUrl: String
   val paymentsServiceUrl: String
   val paymentsReturnUrl: String
+  val reportVatErrorUrl: String
   val feedbackFormPartialUrl: String
   val contactFormServiceIdentifier: String
   val staticDateValue: String
@@ -102,6 +103,8 @@ class FrontendAppConfig @Inject()(val runModeConfiguration: Configuration, val e
   override lazy val paymentsServiceUrl: String = paymentsBaseUrl + paymentsUrl
   private lazy val paymentsReturnBase: String = getString(Keys.paymentsReturnBase)
   override lazy val paymentsReturnUrl: String = paymentsReturnBase + getString(Keys.paymentsReturnUrl)
+
+  override lazy val reportVatErrorUrl: String = getString(Keys.reportVatErrorUrl)
 
   override lazy val staticDateValue: String = getString(Keys.staticDateValue)
 

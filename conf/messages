@@ -54,8 +54,14 @@ yourVatReturn.boxEight = Box 8
 yourVatReturn.boxEightDescription = Total supplies, goods and related costs to European Community, minus VAT
 yourVatReturn.boxNine = Box 9
 yourVatReturn.boxNineDescription = Total value of acquisitions of goods from European Community, minus VAT
-yourVatReturn.adjustments = If there are any errors, add or subtract them in your next return.
 yourVatReturn.paymentNow = Pay this now
+yourVatReturn.helpTitle = There’s an error in my return
+yourVatReturn.helpLine = If the error happened in an accounting period that ended in the last 4 years, you can correct it in your next return. The error must be either:
+yourVatReturn.reportLink1 = You must
+yourVatReturn.reportLink2 = report any other
+yourVatReturn.reportLink3 = errors to HMRC.
+yourVatReturn.bullet1 = £10,000 or less
+yourVatReturn.bullet2 = 1% or less of your box 6 figure and below £50,000
 
 paymentStatus.youPaid = You paid:
 paymentStatus.returnTotal = Return total:
