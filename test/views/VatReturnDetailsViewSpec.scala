@@ -60,6 +60,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     val paymentServiceDetailAmount = "#payment-detail input:nth-of-type(1)"
     val paymentServiceDetailMonth = "#payment-detail input:nth-of-type(2)"
     val paymentServiceDetailYear = "#payment-detail input:nth-of-type(3)"
+
+    val gaTagElement = "#content ul"
   }
 
   def boxElement(box: String, column: Int): String = {
@@ -379,6 +381,41 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
 
     "have the correct box 5 description in the table" in {
       elementText(boxElement(Selectors.boxes(4), 2)) shouldBe "Total amount HMRC owed you"
+    }
+  }
+
+  "Rendering the VAT return details page when an entity name is not retrieved" should {
+
+    val vatReturnViewModel = VatReturnViewModel(
+      None,
+      LocalDate.parse("2017-01-01"),
+      LocalDate.parse("2017-03-31"),
+      LocalDate.parse("2017-04-06"),
+      1000.00,
+      LocalDate.parse("2017-04-08"),
+      1297,
+      5755,
+      7052,
+      5732,
+      1000,
+      77656,
+      765765,
+      55454,
+      545645,
+      moneyOwed = false,
+      isRepayment = false,
+      showReturnsBreadcrumb = true,
+      currentYear = currentYear
+    )
+    lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
+    lazy implicit val document: Document = Jsoup.parse(view.body)
+
+    "not show the entity name heading" in {
+      document.select(Selectors.entityNameHeading) shouldBe empty
+    }
+
+    "append a GA tag to the ul element regarding the graceful error handling" in {
+      element(Selectors.gaTagElement).attr("data-metrics") shouldBe "error:hidden-text:entity-name"
     }
   }
 }
