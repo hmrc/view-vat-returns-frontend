@@ -39,12 +39,14 @@ lazy val coverageSettings: Seq[Setting[_]] = {
     "app.*",
     "prod.*",
     "config.*",
-    "testOnlyDoNotUseInAppConf.*")
+    "testOnly.*",
+    "testOnlyDoNotUseInAppConf.*",
+    ".*feedback*.*")
 
   Seq(
     ScoverageKeys.coverageExcludedPackages := excludedPackages.mkString(";"),
-    ScoverageKeys.coverageMinimum := 90,
-    ScoverageKeys.coverageFailOnMinimum := false,
+    ScoverageKeys.coverageMinimum := 95,
+    ScoverageKeys.coverageFailOnMinimum := true,
     ScoverageKeys.coverageHighlighting := true
   )
 }
