@@ -59,7 +59,7 @@
       vatReturnViewModel.isRepayment
     )
 
-    <ul>
+    <ul @if(!vatReturnViewModel.entityName.isDefined){data-metrics="error:hidden-text:entity-name"}>
       <li>@messages("yourVatReturn.returnDueDate") @displayDate(vatReturnViewModel.dueDate)</li>
       <li>@messages("yourVatReturn.dateSubmitted") @displayDate(vatReturnViewModel.dateSubmitted)</li>
     </ul>
