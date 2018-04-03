@@ -102,7 +102,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
                                               isReturnsPageRequest: Boolean): VatReturnViewModel = {
 
     // TODO: update this value to reflect partial payments
-    val amountToShow: BigDecimal = returnDetails.vatReturn.netVatDue
+    val amountToShow: BigDecimal = returnDetails.vatReturn.boxFive
 
     VatReturnViewModel(
       entityName = entityName,
@@ -111,17 +111,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
       dueDate = obligation.due,
       outstandingAmount = amountToShow,
       dateSubmitted = obligation.received.get,
-      boxOne = returnDetails.vatReturn.vatDueSales,
-      boxTwo = returnDetails.vatReturn.vatDueAcquisitions,
-      boxThree = returnDetails.vatReturn.totalVatDue,
-      boxFour = returnDetails.vatReturn.vatReclaimedCurrentPeriod,
-      boxFive = returnDetails.vatReturn.netVatDue,
-      boxSix = returnDetails.vatReturn.totalSalesExcludingVAT,
-      boxSeven = returnDetails.vatReturn.totalPurchasesExcludingVAT,
-      boxEight = returnDetails.vatReturn.totalGoodsSuppliedExcludingVAT,
-      boxNine = returnDetails.vatReturn.totalAcquisitionsExcludingVAT,
-      moneyOwed = returnDetails.moneyOwed,
-      isRepayment = returnDetails.isRepayment,
+      vatReturnDetails = returnDetails,
       showReturnsBreadcrumb = isReturnsPageRequest,
       currentYear = dateService.now().getYear
     )

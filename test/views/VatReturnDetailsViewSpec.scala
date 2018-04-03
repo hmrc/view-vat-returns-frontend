@@ -18,6 +18,7 @@ package views
 
 import java.time.LocalDate
 
+import models.{VatReturn, VatReturnDetails}
 import models.viewModels.VatReturnViewModel
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -79,20 +80,27 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       LocalDate.parse("2017-04-06"),
       1000.00,
       LocalDate.parse("2017-04-08"),
-      1297,
-      5755,
-      7052,
-      5732,
-      1000,
-      77656,
-      765765,
-      55454,
-      545645,
-      moneyOwed = false,
-      isRepayment = false,
+      VatReturnDetails(
+        VatReturn(
+          "#001",
+          1297,
+          5755,
+          7052,
+          5732,
+          1000,
+          77656,
+          765765,
+          55454,
+          545645
+        ),
+        moneyOwed = false,
+        isRepayment = false,
+        None
+      ),
       showReturnsBreadcrumb = true,
-      currentYear = currentYear
+      currentYear
     )
+
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
@@ -217,20 +225,27 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       LocalDate.parse("2017-04-06"),
       1000.00,
       LocalDate.parse("2017-04-08"),
-      1297,
-      5755,
-      7052,
-      5732,
-      1320,
-      77656,
-      765765,
-      55454,
-      545645,
-      moneyOwed = false,
-      isRepayment = false,
+      VatReturnDetails(
+        VatReturn(
+          "#001",
+          1297,
+          5755,
+          7052,
+          5732,
+          1000,
+          77656,
+          765765,
+          55454,
+          545645
+        ),
+        moneyOwed = false,
+        isRepayment = false,
+        None
+      ),
       showReturnsBreadcrumb = false,
-      currentYear = currentYear
+      currentYear
     )
+
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
@@ -255,20 +270,27 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       LocalDate.parse("2017-04-06"),
       1000.00,
       LocalDate.parse("2017-04-08"),
-      1297,
-      5755,
-      7052,
-      5732,
-      1000.25,
-      77656,
-      765765,
-      55454,
-      545645,
-      moneyOwed = true,
-      isRepayment = false,
+      VatReturnDetails(
+        VatReturn(
+          "#001",
+          1297,
+          5755,
+          7052,
+          5732,
+          1000.25,
+          77656,
+          765765,
+          55454,
+          545645
+        ),
+        moneyOwed = true,
+        isRepayment = false,
+        None
+      ),
       showReturnsBreadcrumb = false,
-      currentYear = currentYear
+      currentYear
     )
+
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
@@ -314,20 +336,27 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       LocalDate.parse("2017-04-06"),
       1000.00,
       LocalDate.parse("2017-04-08"),
-      1297,
-      5755,
-      7052,
-      5732,
-      1000,
-      77656,
-      765765,
-      55454,
-      545645,
-      moneyOwed = true,
-      isRepayment = true,
+      VatReturnDetails(
+        VatReturn(
+          "#001",
+          1297,
+          5755,
+          7052,
+          5732,
+          1000,
+          77656,
+          765765,
+          55454,
+          545645
+        ),
+        moneyOwed = true,
+        isRepayment = true,
+        None
+      ),
       showReturnsBreadcrumb = false,
-      currentYear = currentYear
+      currentYear
     )
+
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
@@ -353,20 +382,27 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       LocalDate.parse("2017-04-06"),
       1000.00,
       LocalDate.parse("2017-04-08"),
-      1297,
-      5755,
-      7052,
-      5732,
-      1000,
-      77656,
-      765765,
-      55454,
-      545645,
-      moneyOwed = false,
-      isRepayment = true,
+      VatReturnDetails(
+        VatReturn(
+          "#001",
+          1297,
+          5755,
+          7052,
+          5732,
+          1000,
+          77656,
+          765765,
+          55454,
+          545645
+        ),
+        moneyOwed = false,
+        isRepayment = true,
+        None
+      ),
       showReturnsBreadcrumb = false,
-      currentYear = currentYear
+      currentYear
     )
+
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 

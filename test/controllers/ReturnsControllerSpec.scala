@@ -269,17 +269,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         dueDate = exampleObligation.due,
         outstandingAmount = examplePayment.outstandingAmount,
         dateSubmitted = exampleObligation.received.get,
-        boxOne = exampleVatReturn.vatDueSales,
-        boxTwo = exampleVatReturn.vatDueAcquisitions,
-        boxThree = exampleVatReturn.totalVatDue,
-        boxFour = exampleVatReturn.vatReclaimedCurrentPeriod,
-        boxFive = exampleVatReturn.netVatDue,
-        boxSix = exampleVatReturn.totalSalesExcludingVAT,
-        boxSeven = exampleVatReturn.totalPurchasesExcludingVAT,
-        boxEight = exampleVatReturn.totalGoodsSuppliedExcludingVAT,
-        boxNine = exampleVatReturn.totalAcquisitionsExcludingVAT,
-        moneyOwed = true,
-        isRepayment = false,
+        vatReturnDetails = exampleVatReturnDetails,
         showReturnsBreadcrumb = true,
         currentYear = 2018
       )
