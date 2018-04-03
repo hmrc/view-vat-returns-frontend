@@ -21,4 +21,4 @@ import models.payments.Payment
 case class VatReturnDetails(vatReturn: VatReturn,
                             moneyOwed: Boolean,
                             isRepayment: Boolean,
-                            payment: Payment)
+                            payment: Option[Payment])

@@ -55,7 +55,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
   val exampleEntityName: Option[String] = Some("Cheapo Clothing")
 
   val examplePayment: Payment = Payment(
-    "",
+    "VAT",
     LocalDate.parse("2017-01-01"),
     LocalDate.parse("2017-02-01"),
     LocalDate.parse("2017-02-02"),
@@ -72,7 +72,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     "#001"
   )
 
-  val exampleVatReturnDetails = VatReturnDetails(exampleVatReturn, moneyOwed = true, isRepayment = false, examplePayment)
+  val exampleVatReturnDetails = VatReturnDetails(exampleVatReturn, moneyOwed = true, isRepayment = false, Some(examplePayment))
 
   private trait Test {
     val serviceCall: Boolean = true
@@ -108,7 +108,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
           .returns(Future.successful(exampleEntityName))
 
         if(successReturn) {
-          (mockVatReturnService.constructReturnDetailsModel(_: VatReturn, _: Payment))
+          (mockVatReturnService.constructReturnDetailsModel(_: VatReturn, _: Option[Payment]))
             .expects(*, *)
             .returns(exampleVatReturnDetails)
         }
@@ -309,7 +309,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
       "return an OK status" in {
 
-        (mockVatReturnService.constructReturnDetailsModel(_: VatReturn, _: Payment))
+        (mockVatReturnService.constructReturnDetailsModel(_: VatReturn, _: Option[Payment]))
           .expects(*, *)
           .returns(exampleVatReturnDetails)
 

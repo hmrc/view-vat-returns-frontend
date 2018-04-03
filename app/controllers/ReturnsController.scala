@@ -83,8 +83,8 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
 
   private[controllers] def renderResult(pageData: ReturnsControllerData, isReturnsPageRequest: Boolean)(implicit req: Request[_]) = {
     (pageData.vatReturnResult, pageData.obligation, pageData.payment) match {
-      case (Right(vatReturn), Some(ob), Some(pay)) =>
-        val returnDetails = returnsService.constructReturnDetailsModel(vatReturn, pay)
+      case (Right(vatReturn), Some(ob), maybePayment) =>
+        val returnDetails = returnsService.constructReturnDetailsModel(vatReturn, maybePayment)
         val viewModel = constructViewModel(pageData.customerInfo, ob, returnDetails, isReturnsPageRequest)
         if (appConfig.features.allowNineBox()) {
           Ok(views.html.returns.vatReturnDetails(viewModel))

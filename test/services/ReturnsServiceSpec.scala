@@ -214,10 +214,10 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
 
     "create a VatReturnDetails object" in new Test {
       val expected: VatReturnDetails = VatReturnDetails(
-        exampleVatReturn, moneyOwed = true, isRepayment = false, examplePayment
+        exampleVatReturn, moneyOwed = true, isRepayment = false, Some(examplePayment)
       )
 
-      val result: VatReturnDetails = service.constructReturnDetailsModel(exampleVatReturn, examplePayment)
+      val result: VatReturnDetails = service.constructReturnDetailsModel(exampleVatReturn, Some(examplePayment))
 
       result shouldBe expected
     }
