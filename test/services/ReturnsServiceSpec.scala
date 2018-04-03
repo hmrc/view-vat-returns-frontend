@@ -52,6 +52,7 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
     )
 
     val examplePayment: Payment = Payment(
+      "VAT",
       LocalDate.parse("2017-01-01"),
       LocalDate.parse("2017-02-01"),
       LocalDate.parse("2017-02-02"),

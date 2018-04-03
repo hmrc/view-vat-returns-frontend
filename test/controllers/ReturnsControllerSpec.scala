@@ -55,6 +55,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
   val exampleEntityName: Option[String] = Some("Cheapo Clothing")
 
   val examplePayment: Payment = Payment(
+    "",
     LocalDate.parse("2017-01-01"),
     LocalDate.parse("2017-02-01"),
     LocalDate.parse("2017-02-02"),

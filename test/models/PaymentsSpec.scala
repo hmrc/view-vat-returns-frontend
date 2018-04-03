@@ -27,6 +27,7 @@ class PaymentsSpec extends UnitSpec {
   "A payment" should {
 
     val examplePayment = Payment(
+      "VAT",
       LocalDate.parse("2017-06-01"),
       LocalDate.parse("2017-07-01"),
       LocalDate.parse("2017-07-21"),
@@ -36,6 +37,7 @@ class PaymentsSpec extends UnitSpec {
 
     val exampleInputString =
       """{
+        |"chargeType":"VAT",
         |"taxPeriodFrom":"2017-06-01",
         |"taxPeriodTo":"2017-07-01",
         |"items":[{"dueDate":"2017-07-21"}, {"dueDate":"2017-07-22"}],
@@ -55,6 +57,7 @@ class PaymentsSpec extends UnitSpec {
     val examplePayments = Payments(
       Seq(
         Payment(
+          "VAT",
           LocalDate.parse("2017-06-01"),
           LocalDate.parse("2017-07-01"),
           LocalDate.parse("2017-07-21"),
@@ -62,6 +65,7 @@ class PaymentsSpec extends UnitSpec {
           "#004"
         ),
         Payment(
+          "VAT",
           LocalDate.parse("2017-07-01"),
           LocalDate.parse("2017-08-01"),
           LocalDate.parse("2017-08-21"),
@@ -74,12 +78,14 @@ class PaymentsSpec extends UnitSpec {
     val exampleInputString =
       """{
         |"financialTransactions": [{
+        |"chargeType":"VAT",
         |"taxPeriodFrom":"2017-06-01",
         |"taxPeriodTo":"2017-07-01",
         |"items":[{"dueDate":"2017-07-21"}, {"dueDate":"2017-07-22"}],
         |"outstandingAmount":10000,
         |"periodKey":"#004"
         |},{
+        |"chargeType":"VAT",
         |"taxPeriodFrom":"2017-07-01",
         |"taxPeriodTo":"2017-08-01",
         |"items":[{"dueDate":"2017-08-21"}, {"dueDate":"2017-08-22"}],
