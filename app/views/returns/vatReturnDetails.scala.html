@@ -144,7 +144,7 @@
 
     @expandingHelpSection(Messages("yourVatReturn.helpTitle"), "vatReturn", "vatReturn", hiddenHelpTextContent)
 
-    @if(appConfig.features.allowPayments() && vatReturnViewModel.vatReturnDetails.moneyOwed && !vatReturnViewModel.vatReturnDetails.isRepayment) {
+    @if(appConfig.features.allowPayments() && vatReturnViewModel.vatReturnDetails.payment.isDefined && vatReturnViewModel.vatReturnDetails.moneyOwed && !vatReturnViewModel.vatReturnDetails.isRepayment) {
       <div id="payment-detail">
         @form(action = controllers.routes.MakePaymentController.makePayment()) {
           <input type="hidden" name="amountInPence" value="@((vatReturnViewModel.vatReturnDetails.vatReturn.boxFive * 100).toInt)">

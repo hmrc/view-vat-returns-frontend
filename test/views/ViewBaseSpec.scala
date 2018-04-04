@@ -46,6 +46,17 @@ class ViewBaseSpec extends UnitSpec with GuiceOneAppPerSuite {
     document.select(cssSelector).first()
   }
 
+  // Useful if you want to check that an element doesn't exist
+  def elementAsOpt(cssSelector: String)(implicit document: Document): Option[Element] = {
+    val elements = document.select(cssSelector)
+
+    if(elements.isEmpty) {
+      None
+    } else {
+      Some(document.select(cssSelector).first())
+    }
+  }
+
   def elementText(selector: String)(implicit document: Document): String = {
     element(selector).text()
   }

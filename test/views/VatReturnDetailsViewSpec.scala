@@ -18,6 +18,7 @@ package views
 
 import java.time.LocalDate
 
+import models.payments.Payment
 import models.{VatReturn, VatReturnDetails}
 import models.viewModels.VatReturnViewModel
 import org.jsoup.Jsoup
@@ -285,7 +286,14 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
         ),
         moneyOwed = true,
         isRepayment = false,
-        None
+        Some(Payment(
+          chargeType = "VAT",
+          start = LocalDate.parse("2017-01-01"),
+          end = LocalDate.parse("2017-03-31"),
+          due = LocalDate.parse("2017-04-06"),
+          outstandingAmount = 1000.00,
+          periodKey = "#001"
+        ))
       ),
       showReturnsBreadcrumb = false,
       currentYear
@@ -314,11 +322,11 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       element(Selectors.paymentButton).attr("value") shouldBe "Pay this now"
     }
 
-    "render the correct value for the amount hidden input for the  payment service amount" in {
+    "render the correct value for the amount hidden input for the payment service amount" in {
       element(Selectors.paymentServiceDetailAmount).attr("value") shouldBe "100025"
     }
 
-    "render the correct value for the tax period month hidden input for the  payment service month" in {
+    "render the correct value for the tax period month hidden input for the payment service month" in {
       element(Selectors.paymentServiceDetailMonth).attr("value") shouldBe "03"
     }
 
@@ -351,7 +359,14 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
         ),
         moneyOwed = true,
         isRepayment = true,
-        None
+        Some(Payment(
+          chargeType = "VAT",
+          start = LocalDate.parse("2017-01-01"),
+          end = LocalDate.parse("2017-03-31"),
+          due = LocalDate.parse("2017-04-06"),
+          outstandingAmount = 1000.00,
+          periodKey = "#001"
+        ))
       ),
       showReturnsBreadcrumb = false,
       currentYear
@@ -370,6 +385,10 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
 
     "have the correct box 5 description in the table" in {
       elementText(boxElement(Selectors.boxes(4), 2)) shouldBe "HMRC will pay you"
+    }
+
+    "not have the pay now button" in {
+      elementAsOpt(Selectors.paymentButton) shouldBe None
     }
   }
 
@@ -397,7 +416,14 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
         ),
         moneyOwed = false,
         isRepayment = true,
-        None
+        Some(Payment(
+          chargeType = "VAT",
+          start = LocalDate.parse("2017-01-01"),
+          end = LocalDate.parse("2017-03-31"),
+          due = LocalDate.parse("2017-04-06"),
+          outstandingAmount = 1000.00,
+          periodKey = "#001"
+        ))
       ),
       showReturnsBreadcrumb = false,
       currentYear
@@ -418,6 +444,53 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     "have the correct box 5 description in the table" in {
       elementText(boxElement(Selectors.boxes(4), 2)) shouldBe "Total amount HMRC owed you"
     }
+
+    "not have the pay now button" in {
+      elementAsOpt(Selectors.paymentButton) shouldBe None
+    }
+  }
+
+  "Rendering the vat return details page when a charge hasn't been generated yet" should {
+
+    val vatReturnViewModel = VatReturnViewModel(
+      Some("Cheapo Clothing"),
+      LocalDate.parse("2017-01-01"),
+      LocalDate.parse("2017-03-31"),
+      LocalDate.parse("2017-04-06"),
+      1000.00,
+      LocalDate.parse("2017-04-08"),
+      VatReturnDetails(
+        VatReturn(
+          "#001",
+          1297,
+          5755,
+          7052,
+          5732,
+          1000,
+          77656,
+          765765,
+          55454,
+          545645
+        ),
+        moneyOwed = true,
+        isRepayment = false,
+        None
+      ),
+      showReturnsBreadcrumb = true,
+      currentYear
+    )
+
+    lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
+    lazy implicit val document: Document = Jsoup.parse(view.body)
+
+    "have the correct subheading" in {
+      elementText(Selectors.subHeading) shouldBe "Return total: £1,000"
+    }
+
+    "not have the pay now button" in {
+      elementAsOpt(Selectors.paymentButton) shouldBe None
+    }
+
   }
 
   "Rendering the VAT return details page when an entity name is not retrieved" should {
@@ -429,20 +502,27 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       LocalDate.parse("2017-04-06"),
       1000.00,
       LocalDate.parse("2017-04-08"),
-      1297,
-      5755,
-      7052,
-      5732,
-      1000,
-      77656,
-      765765,
-      55454,
-      545645,
-      moneyOwed = false,
-      isRepayment = false,
+      VatReturnDetails(
+        VatReturn(
+          "#001",
+          1297,
+          5755,
+          7052,
+          5732,
+          1000,
+          77656,
+          765765,
+          55454,
+          545645
+        ),
+        moneyOwed = true,
+        isRepayment = false,
+        None
+      ),
       showReturnsBreadcrumb = true,
-      currentYear = currentYear
+      currentYear
     )
+
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
