@@ -415,7 +415,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     }
 
     "append a GA tag to the ul element regarding the graceful error handling" in {
-      element(Selectors.gaTagElement).attr("data-metrics") shouldBe "error:hidden-text:entity-name"
+      element(Selectors.gaTagElement).attr("data-metrics") shouldBe "error:hidden-text:vat-return-entity-name"
     }
   }
 }
