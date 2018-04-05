@@ -83,8 +83,8 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
 
   private[controllers] def renderResult(pageData: ReturnsControllerData, isReturnsPageRequest: Boolean)(implicit req: Request[_]) = {
     (pageData.vatReturnResult, pageData.obligation, pageData.payment) match {
-      case (Right(vatReturn), Some(ob), maybePayment) =>
-        val returnDetails = returnsService.constructReturnDetailsModel(vatReturn, maybePayment)
+      case (Right(vatReturn), Some(ob), payment) =>
+        val returnDetails = returnsService.constructReturnDetailsModel(vatReturn, payment)
         val viewModel = constructViewModel(pageData.customerInfo, ob, returnDetails, isReturnsPageRequest)
         if (appConfig.features.allowNineBox()) {
           Ok(views.html.returns.vatReturnDetails(viewModel))
@@ -102,7 +102,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
                                               isReturnsPageRequest: Boolean): VatReturnViewModel = {
 
     // TODO: update this value to reflect partial payments
-    val amountToShow: BigDecimal = returnDetails.vatReturn.boxFive
+    val amountToShow: BigDecimal = returnDetails.vatReturn.netVatDue
 
     VatReturnViewModel(
       entityName = entityName,

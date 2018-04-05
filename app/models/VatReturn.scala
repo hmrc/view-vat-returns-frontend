@@ -20,29 +20,29 @@ import play.api.libs.json._
 import play.api.libs.functional.syntax._
 
 case class VatReturn(periodKey: String,
-                     boxOne: BigDecimal,
-                     boxTwo: BigDecimal,
-                     boxThree: BigDecimal,
-                     boxFour: BigDecimal,
-                     boxFive: BigDecimal,
-                     boxSix: BigDecimal,
-                     boxSeven: BigDecimal,
-                     boxEight: BigDecimal,
-                     boxNine: BigDecimal)
+                     vatDueSales: BigDecimal, // Box 1
+                     vatDueAcquisitions: BigDecimal, // Box 2
+                     totalVatDue: BigDecimal, // Box 3
+                     vatReclaimedCurrentPeriod: BigDecimal, // Box 4
+                     netVatDue: BigDecimal, // Box 5
+                     totalValueSalesExVAT: BigDecimal, // Box 6
+                     totalValuePurchasesExVAT: BigDecimal, // Box 7
+                     totalValueGoodsSuppliedExVAT: BigDecimal, // Box 8
+                     totalAcquisitionsExVAT: BigDecimal)   // Box 9
 
 object VatReturn {
 
   implicit val vatReturnWrites: Writes[VatReturn] = (
     (JsPath \ "periodKey").write[String] and
-      (JsPath \ "vatDueSales").write[BigDecimal] and // Box 1
-      (JsPath \ "vatDueAcquisitions").write[BigDecimal] and // Box 2
-      (JsPath \ "totalVatDue").write[BigDecimal] and // Box 3
-      (JsPath \ "vatReclaimedCurrPeriod").write[BigDecimal] and // Box 4
-      (JsPath \ "netVatDue").write[BigDecimal] and // Box 5
-      (JsPath \ "totalValueSalesExVAT").write[BigDecimal] and // Box 6
-      (JsPath \ "totalValuePurchasesExVAT").write[BigDecimal] and // Box 7
-      (JsPath \ "totalValueGoodsSuppliedExVAT").write[BigDecimal] and // Box 8
-      (JsPath \ "totalAcquisitionsExVAT").write[BigDecimal] // Box 9
+      (JsPath \ "vatDueSales").write[BigDecimal] and
+      (JsPath \ "vatDueAcquisitions").write[BigDecimal] and
+      (JsPath \ "totalVatDue").write[BigDecimal] and
+      (JsPath \ "vatReclaimedCurrPeriod").write[BigDecimal] and
+      (JsPath \ "netVatDue").write[BigDecimal] and
+      (JsPath \ "totalValueSalesExVAT").write[BigDecimal] and
+      (JsPath \ "totalValuePurchasesExVAT").write[BigDecimal] and
+      (JsPath \ "totalValueGoodsSuppliedExVAT").write[BigDecimal] and
+      (JsPath \ "totalAcquisitionsExVAT").write[BigDecimal]
     ) (unlift(VatReturn.unapply))
 
   implicit val vatReturnReads: Reads[VatReturn] = (
