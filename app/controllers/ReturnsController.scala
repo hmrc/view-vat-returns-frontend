@@ -83,8 +83,8 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
 
   private[controllers] def renderResult(pageData: ReturnsControllerData, isReturnsPageRequest: Boolean)(implicit req: Request[_]) = {
     (pageData.vatReturnResult, pageData.obligation, pageData.payment) match {
-      case (Right(vatReturn), Some(ob), Some(pay)) =>
-        val returnDetails = returnsService.constructReturnDetailsModel(vatReturn, pay)
+      case (Right(vatReturn), Some(ob), payment) =>
+        val returnDetails = returnsService.constructReturnDetailsModel(vatReturn, payment)
         val viewModel = constructViewModel(pageData.customerInfo, ob, returnDetails, isReturnsPageRequest)
         if (appConfig.features.allowNineBox()) {
           Ok(views.html.returns.vatReturnDetails(viewModel))
@@ -111,17 +111,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
       dueDate = obligation.due,
       outstandingAmount = amountToShow,
       dateSubmitted = obligation.received.get,
-      boxOne = returnDetails.vatReturn.vatDueSales,
-      boxTwo = returnDetails.vatReturn.vatDueAcquisitions,
-      boxThree = returnDetails.vatReturn.totalVatDue,
-      boxFour = returnDetails.vatReturn.vatReclaimedCurrentPeriod,
-      boxFive = returnDetails.vatReturn.netVatDue,
-      boxSix = returnDetails.vatReturn.totalSalesExcludingVAT,
-      boxSeven = returnDetails.vatReturn.totalPurchasesExcludingVAT,
-      boxEight = returnDetails.vatReturn.totalGoodsSuppliedExcludingVAT,
-      boxNine = returnDetails.vatReturn.totalAcquisitionsExcludingVAT,
-      moneyOwed = returnDetails.moneyOwed,
-      isRepayment = returnDetails.isRepayment,
+      vatReturnDetails = returnDetails,
       showReturnsBreadcrumb = isReturnsPageRequest,
       currentYear = dateService.now().getYear
     )

@@ -18,22 +18,14 @@ package models.viewModels
 
 import java.time.LocalDate
 
+import models.VatReturnDetails
+
 case class VatReturnViewModel(entityName: Option[String],
                               periodFrom: LocalDate,
                               periodTo: LocalDate,
                               dueDate: LocalDate,
                               outstandingAmount: BigDecimal,
                               dateSubmitted: LocalDate,
-                              boxOne: BigDecimal,
-                              boxTwo: BigDecimal,
-                              boxThree: BigDecimal,
-                              boxFour: BigDecimal,
-                              boxFive: BigDecimal,
-                              boxSix: BigDecimal,
-                              boxSeven: BigDecimal,
-                              boxEight: BigDecimal,
-                              boxNine: BigDecimal,
-                              moneyOwed: Boolean,
-                              isRepayment: Boolean,
+                              vatReturnDetails: VatReturnDetails,
                               showReturnsBreadcrumb: Boolean,
                               currentYear: Int)

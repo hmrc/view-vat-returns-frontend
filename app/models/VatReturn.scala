@@ -20,15 +20,15 @@ import play.api.libs.json._
 import play.api.libs.functional.syntax._
 
 case class VatReturn(periodKey: String,
-                     vatDueSales: BigDecimal,
-                     vatDueAcquisitions: BigDecimal,
-                     totalVatDue: BigDecimal,
-                     vatReclaimedCurrentPeriod: BigDecimal,
-                     netVatDue: BigDecimal,
-                     totalSalesExcludingVAT: BigDecimal,
-                     totalPurchasesExcludingVAT: BigDecimal,
-                     totalGoodsSuppliedExcludingVAT: BigDecimal,
-                     totalAcquisitionsExcludingVAT: BigDecimal)
+                     vatDueSales: BigDecimal, // Box 1
+                     vatDueAcquisitions: BigDecimal, // Box 2
+                     totalVatDue: BigDecimal, // Box 3
+                     vatReclaimedCurrentPeriod: BigDecimal, // Box 4
+                     netVatDue: BigDecimal, // Box 5
+                     totalValueSalesExVAT: BigDecimal, // Box 6
+                     totalValuePurchasesExVAT: BigDecimal, // Box 7
+                     totalValueGoodsSuppliedExVAT: BigDecimal, // Box 8
+                     totalAcquisitionsExVAT: BigDecimal)   // Box 9
 
 object VatReturn {
 

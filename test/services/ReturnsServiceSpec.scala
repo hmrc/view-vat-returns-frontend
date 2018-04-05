@@ -52,6 +52,7 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
     )
 
     val examplePayment: Payment = Payment(
+      "VAT",
       LocalDate.parse("2017-01-01"),
       LocalDate.parse("2017-02-01"),
       LocalDate.parse("2017-02-02"),
@@ -213,10 +214,10 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
 
     "create a VatReturnDetails object" in new Test {
       val expected: VatReturnDetails = VatReturnDetails(
-        exampleVatReturn, moneyOwed = true, isRepayment = false, examplePayment
+        exampleVatReturn, moneyOwed = true, isRepayment = false, Some(examplePayment)
       )
 
-      val result: VatReturnDetails = service.constructReturnDetailsModel(exampleVatReturn, examplePayment)
+      val result: VatReturnDetails = service.constructReturnDetailsModel(exampleVatReturn, Some(examplePayment))
 
       result shouldBe expected
     }

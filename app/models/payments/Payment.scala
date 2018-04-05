@@ -22,7 +22,8 @@ import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 
-case class Payment(start: LocalDate,
+case class Payment(chargeType: String,
+                   start: LocalDate,
                    end: LocalDate,
                    due: LocalDate,
                    outstandingAmount: BigDecimal,
@@ -30,6 +31,7 @@ case class Payment(start: LocalDate,
 
 object Payment {
   implicit val paymentReads: Reads[Payment] = (
+    (JsPath \ "chargeType").read[String] and
     (JsPath \ "taxPeriodFrom").read[LocalDate] and
     (JsPath \ "taxPeriodTo").read[LocalDate] and
     (JsPath \ "items")(0).\("dueDate").read[LocalDate] and
