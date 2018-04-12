@@ -18,9 +18,9 @@ package models.payments
 
 import java.time.LocalDate
 
-import play.api.libs.json._
-import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
+import play.api.libs.json.Reads._
+import play.api.libs.json._
 
 case class Payment(chargeType: String,
                    start: LocalDate,
@@ -30,12 +30,23 @@ case class Payment(chargeType: String,
                    periodKey: String)
 
 object Payment {
+
+  private def createPayment(chargeType: String,
+                            start: LocalDate,
+                            end: LocalDate,
+                            due: LocalDate,
+                            outstandingAmount: BigDecimal,
+                            periodKey: Option[String]): Payment = {
+    Payment(chargeType, start, end, due, outstandingAmount, periodKey.getOrElse("0000"))
+  }
+
   implicit val paymentReads: Reads[Payment] = (
     (JsPath \ "chargeType").read[String] and
-    (JsPath \ "taxPeriodFrom").read[LocalDate] and
-    (JsPath \ "taxPeriodTo").read[LocalDate] and
-    (JsPath \ "items")(0).\("dueDate").read[LocalDate] and
-    (JsPath \ "outstandingAmount").read[BigDecimal] and
-    (JsPath \ "periodKey").read[String]
-  )(Payment.apply _)
+      (JsPath \ "taxPeriodFrom").read[LocalDate] and
+      (JsPath \ "taxPeriodTo").read[LocalDate] and
+      (JsPath \ "items") (0).\("dueDate").read[LocalDate] and
+      (JsPath \ "outstandingAmount").read[BigDecimal] and
+      (JsPath \ "periodKey").readNullable[String]
+    ) (Payment.createPayment _)
+
 }
