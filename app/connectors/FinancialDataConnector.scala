@@ -16,10 +16,9 @@
 
 package connectors
 
-import javax.inject.{Inject, Singleton}
-
 import config.AppConfig
 import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
+import javax.inject.{Inject, Singleton}
 import models.payments.Payments
 import play.api.Logger
 import services.MetricsService
@@ -33,13 +32,23 @@ class FinancialDataConnector @Inject()(http: HttpClient,
                                        appConfig: AppConfig,
                                        metrics: MetricsService) {
 
-  import connectors.httpParsers.PaymentsHttpParser.PaymentsReads
-
   private[connectors] def paymentsUrl(vrn: String): String = s"${appConfig.financialDataBaseUrl}/financial-transactions/vat/$vrn"
 
   def getPayments(vrn: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[Payments]] = {
+
+    import connectors.httpParsers.PaymentsHttpParser.PaymentsReads
+
     val timer = metrics.getPaymentsTimer.time()
-    http.GET(paymentsUrl(vrn)).map {
+
+    val httpRequest = http.GET(
+      paymentsUrl(vrn),
+      Seq(
+        "from" -> "2018-01-01",
+        "to" -> "2018-12-31"
+      )
+    )
+
+    httpRequest.map {
       case payments@Right(_) =>
         timer.stop()
         payments
