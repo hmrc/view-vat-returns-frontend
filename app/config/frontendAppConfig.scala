@@ -40,6 +40,7 @@ trait AppConfig extends ServicesConfig {
   val features: Features
   val portalUrl: String => String
   val vatApiBaseUrl: String
+  val vatSubscriptionBaseUrl: String
   val financialDataBaseUrl: String
   val btaHomeUrl: String
   val vatDetailsUrl: String
@@ -89,6 +90,7 @@ class FrontendAppConfig @Inject()(val runModeConfiguration: Configuration, val e
 
   override val portalUrl: String => String = (vrn: String) => s"/vat-file/trader/$vrn/periods"
   override val vatApiBaseUrl: String = baseUrl("vat-api")
+  override val vatSubscriptionBaseUrl: String = baseUrl("vat-subscription")
   override val financialDataBaseUrl: String = baseUrl("financial-transactions")
 
   private lazy val btaBaseUrl: String = getString(Keys.businessTaxAccountBase)

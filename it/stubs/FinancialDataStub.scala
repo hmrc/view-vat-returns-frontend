@@ -50,7 +50,7 @@ object FinancialDataStub extends WireMockMethods{
       |    "financialTransactions" : [
       |      {
       |        "chargeType" : "VAT 0A Debit Charge",
-      |        "mainType" : "VAT Officer's Assessment",
+      |        "mainType" : "VAT Return Charge",
       |        "periodKey" : "#001",
       |        "periodKeyDescription" : "March 2015",
       |        "taxPeriodFrom" : "2018-05-01",
@@ -78,7 +78,7 @@ object FinancialDataStub extends WireMockMethods{
       |      },
       |      {
       |        "chargeType" : "VAT 0A Debit Charge",
-      |        "mainType" : "VAT Officer's Assessment",
+      |        "mainType" : "VAT Return Charge",
       |        "periodKey" : "#002",
       |        "periodKeyDescription" : "March 2015",
       |        "taxPeriodFrom" : "2018-05-01",
