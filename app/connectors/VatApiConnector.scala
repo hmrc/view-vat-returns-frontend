@@ -19,15 +19,16 @@ package connectors
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets.UTF_8
 import java.time.LocalDate
-import javax.inject.{Inject, Singleton}
 
 import config.AppConfig
 import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
+import javax.inject.{Inject, Singleton}
 import models.Obligation.Status
 import models.{VatReturn, VatReturnObligations}
 import play.api.Logger
+import play.api.http.HeaderNames
 import services.MetricsService
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{HeaderCarrier, HttpReads}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -41,6 +42,11 @@ class VatApiConnector @Inject()(http: HttpClient,
 
   private[connectors] def returnUrl(vrn: String, periodKey: String) = s"${appConfig.vatApiBaseUrl}/$vrn/returns/${URLEncoder.encode(periodKey, UTF_8.name())}"
 
+  private def headerCarrier(hc: HeaderCarrier) = hc.withExtraHeaders(
+    HeaderNames.ACCEPT -> "application/vnd.hmrc.1.0+json",
+    HeaderNames.CONTENT_TYPE -> "application/json"
+  )
+
   def getVatReturnDetails(vrn: String, periodKey: String)
                          (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[VatReturn]] = {
 
@@ -48,7 +54,15 @@ class VatApiConnector @Inject()(http: HttpClient,
 
     val timer = metrics.getVatReturnTimer.time()
 
-    http.GET(returnUrl(vrn, periodKey)).map {
+    val httpRequest = http.GET(
+      returnUrl(vrn, periodKey)
+    )(
+      implicitly[HttpReads[HttpGetResult[VatReturn]]],
+      headerCarrier(hc),
+      implicitly[ExecutionContext]
+    )
+
+    httpRequest.map {
       case nineBox@Right(_) =>
         timer.stop()
         nineBox
@@ -66,7 +80,16 @@ class VatApiConnector @Inject()(http: HttpClient,
 
     val timer = metrics.getObligationsTimer.time()
 
-    http.GET(obligationsUrl(vrn), Seq("from" -> from.toString, "to" -> to.toString, "status" -> status.toString)).map {
+    val httpRequest = http.GET(
+      obligationsUrl(vrn),
+      Seq("from" -> from.toString, "to" -> to.toString, "status" -> status.toString)
+    )(
+      implicitly[HttpReads[HttpGetResult[VatReturnObligations]]],
+      headerCarrier(hc),
+      implicitly[ExecutionContext]
+    )
+
+    httpRequest.map {
       case vatReturns@Right(_) =>
         timer.stop()
         vatReturns
