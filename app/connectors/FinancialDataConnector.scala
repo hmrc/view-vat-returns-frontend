@@ -43,8 +43,8 @@ class FinancialDataConnector @Inject()(http: HttpClient,
     val httpRequest = http.GET(
       paymentsUrl(vrn),
       Seq(
-        "from" -> "2018-01-01",
-        "to" -> "2018-12-31"
+        "dateFrom" -> "2018-01-01",
+        "dateTo" -> "2018-12-31"
       )
     )
 
