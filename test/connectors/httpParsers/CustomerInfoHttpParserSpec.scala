@@ -30,20 +30,17 @@ class CustomerInfoHttpParserSpec extends UnitSpec {
 
     "the HTTP response status is OK (200)" should {
 
-      val httpResponse = HttpResponse(Status.OK, responseJson = Some(
-        Json.obj(
-          "approvedInformation" -> Json.obj(
-            "customerDetails" -> Json.obj(
-              "organisationName" -> "Cheapo Clothing Ltd",
-              "individual" -> Json.obj(
-                "firstName" -> "John",
-                "lastName" -> "Smith"
-              ),
-              "tradingName" -> "Cheapo Clothing"
-            )
+      val httpResponse = HttpResponse(
+        Status.OK,
+        responseJson = Some(
+          Json.obj(
+            "organisationName" -> "Cheapo Clothing Ltd",
+            "firstName" -> "John",
+            "lastName" -> "Smith",
+            "tradingName" -> "Cheapo Clothing"
           )
         )
-      ))
+      )
 
       val expected = Right(CustomerInformation(
         Some("Cheapo Clothing Ltd"),

@@ -32,17 +32,11 @@ class CustomerInformationSpec extends UnitSpec {
 
     val exampleInputString =
       """{
-        |"approvedInformation":{
-        |  "customerDetails":{
-        |    "organisationName":"Cheapo Clothing Ltd",
-        |    "individual":{
-        |      "firstName":"John",
-        |      "lastName":"Smith"
-        |    },
-        |    "tradingName":"Cheapo Clothing"
-        |  }
-        |}
-      }"""
+        |"organisationName":"Cheapo Clothing Ltd",
+        |"firstName":"John",
+        |"lastName":"Smith",
+        |"tradingName":"Cheapo Clothing"
+        |}"""
         .stripMargin.replace("\n", "")
 
     val exampleOutputString =

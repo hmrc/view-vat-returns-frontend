@@ -16,8 +16,8 @@
 
 package models
 
-import play.api.libs.json._
 import play.api.libs.functional.syntax._
+import play.api.libs.json._
 
 case class CustomerInformation(organisationName: Option[String],
                                firstName: Option[String],
@@ -29,9 +29,9 @@ object CustomerInformation {
   implicit val customerInformationWrites: Writes[CustomerInformation] = Json.writes[CustomerInformation]
 
   implicit val customerInformationReads: Reads[CustomerInformation] = (
-    (JsPath \ "approvedInformation" \ "customerDetails" \ "organisationName").readNullable[String] and
-    (JsPath \ "approvedInformation" \ "customerDetails" \\ "firstName").readNullable[String] and
-    (JsPath \ "approvedInformation" \ "customerDetails" \\ "lastName").readNullable[String] and
-    (JsPath \ "approvedInformation" \ "customerDetails" \ "tradingName").readNullable[String]
-  ) (CustomerInformation.apply _)
+    (JsPath \ "organisationName").readNullable[String] and
+      (JsPath \ "firstName").readNullable[String] and
+      (JsPath \ "lastName").readNullable[String] and
+      (JsPath \ "tradingName").readNullable[String]
+    ) (CustomerInformation.apply _)
 }
