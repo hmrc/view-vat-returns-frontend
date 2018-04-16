@@ -37,22 +37,16 @@ object CustomerInfoStub extends WireMockMethods {
 
   private val customerInfo = Json.parse(
     """{
-      |  "approvedInformation" : {
-      |    "customerDetails" : {
-      |      "organisationName" : "Cheapo Clothing Ltd",
-      |      "individual" : {
-      |        "title" : "0001",
-      |        "firstName" : "Vincent",
-      |        "middleName" : "Victor",
-      |        "lastName" : "Vatreturn"
-      |      },
-      |      "tradingName" : "Cheapo Clothing",
-      |      "mandationStatus" : "1",
-      |      "registrationReason" : "0001",
-      |      "effectiveRegistrationDate" : "2017-08-21",
-      |      "businessStartDate" : "2017-01-01"
-      |    }
-      |  }
+      |   "organisationName" : "Cheapo Clothing Ltd",
+      |   "title" : "0001",
+      |   "firstName" : "Vincent",
+      |   "middleName" : "Victor",
+      |   "lastName" : "Vatreturn",
+      |   "tradingName" : "Cheapo Clothing",
+      |   "mandationStatus" : "1",
+      |   "registrationReason" : "0001",
+      |   "effectiveRegistrationDate" : "2017-08-21",
+      |   "businessStartDate" : "2017-01-01"
       |}""".stripMargin
   )
 
