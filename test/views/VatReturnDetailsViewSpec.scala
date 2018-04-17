@@ -327,11 +327,11 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     }
 
     "render the correct value for the tax period month hidden input for the payment service month" in {
-      element(Selectors.paymentServiceDetailMonth).attr("value") shouldBe "03"
+      element(Selectors.paymentServiceDetailMonth).attr("value") shouldBe "3"
     }
 
     "render the correct value for the tax period year hidden input payment service year" in {
-      element(Selectors.paymentServiceDetailYear).attr("value") shouldBe "17"
+      element(Selectors.paymentServiceDetailYear).attr("value") shouldBe "2017"
     }
   }
 

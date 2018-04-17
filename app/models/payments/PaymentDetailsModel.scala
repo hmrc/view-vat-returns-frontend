@@ -29,7 +29,7 @@ case class PaymentDetailsModel(taxType: String,
 
 object PaymentDetailsModel {
 
-  implicit val writes = new Writes[PaymentDetailsModel] {
+  implicit val writes: Writes[PaymentDetailsModel] = new Writes[PaymentDetailsModel] {
     def writes(paymentDetail: PaymentDetailsModel): JsObject = Json.obj(
       "taxType" -> paymentDetail.taxType,
       "reference" -> paymentDetail.taxReference,
