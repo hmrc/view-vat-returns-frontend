@@ -49,8 +49,9 @@ object ConfigKeys {
 
   val reportVatErrorUrl: String = "reportVatErrorUrl"
 
-  val paymentsServiceBase: String = "payments-frontend.host"
-  val paymentsServiceUrl: String = "payments-frontend.paymentUrl"
+  val paymentsServiceBase: String = "pay-api"
+  val setupPaymentsJourneyPath: String = "microservice.services.pay-api.endpoints.setupJourney"
+
   val paymentsReturnBase: String = "payments-frontend.returnHost"
   val paymentsReturnUrl: String = "payments-frontend.returnUrl"
 

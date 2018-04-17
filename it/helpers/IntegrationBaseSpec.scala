@@ -37,6 +37,8 @@ trait IntegrationBaseSpec extends UnitSpec with WireMockHelper with GuiceOneServ
   def servicesConfig: Map[String, String] = Map(
     "microservice.services.auth.host" -> mockHost,
     "microservice.services.auth.port" -> mockPort,
+    "microservice.services.pay-api.host" -> mockHost,
+    "microservice.services.pay-api.port" -> mockPort,
     "microservice.services.vat-api.host" -> mockHost,
     "microservice.services.vat-api.port" -> mockPort,
     "microservice.services.vat-subscription.host" -> mockHost,

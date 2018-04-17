@@ -16,47 +16,50 @@
 
 package controllers
 
-import javax.inject.{Inject, Singleton}
-
 import config.AppConfig
 import forms.MakePaymentForm
+import javax.inject.{Inject, Singleton}
 import models.payments.PaymentDetailsModel
 import play.api.Logger
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent}
-import services.EnrolmentsAuthService
+import services.{EnrolmentsAuthService, PaymentsService}
 
 import scala.concurrent.Future
 
 @Singleton
 class MakePaymentController @Inject()(val messagesApi: MessagesApi,
                                       val enrolmentsAuthService: EnrolmentsAuthService,
+                                      paymentsService: PaymentsService,
                                       implicit val appConfig: AppConfig)
   extends AuthorisedController with I18nSupport {
+
+  private[controllers] def payment(paymentData: PaymentDetailsModel, vrn: String) = paymentData.copy(
+    taxType = "vat",
+    taxReference = vrn,
+    returnUrl = appConfig.paymentsReturnUrl,
+    taxPeriodYear = paymentData.taxPeriodYear
+  )
 
   def makePayment(): Action[AnyContent] = authorisedAction { implicit request =>
     user =>
 
-      def payment(paymentData: PaymentDetailsModel, vrn: String) = Json.toJson[PaymentDetailsModel](
-        paymentData.copy(
-          taxType = "mtdfb-vat",
-          taxReference = vrn,
-          returnUrl = appConfig.paymentsReturnUrl,
-          taxPeriodYear = paymentData.taxPeriodYear.takeRight(2)))
-
       MakePaymentForm.form.bindFromRequest().fold(
-        errors => {
+        _ => { // failed to bind model
           Logger.warn("[MakePaymentsController].[makePayment] invalid payment data")
-          Future.successful(InternalServerError(views.html.errors.standardError(
-            appConfig, Messages("paymentHandOffErrorHeading"),
-            Messages("paymentHandOffErrorHeading"),
-            Messages("paymentHandOffErrorMessage"))))
+          Future.successful(
+            InternalServerError(
+              views.html.errors.standardError(
+                appConfig, Messages("paymentHandOffErrorHeading"),
+                Messages("paymentHandOffErrorHeading"),
+                Messages("paymentHandOffErrorMessage")
+              )
+            )
+          )
         },
         paymentDetail => {
-          Future.successful(Redirect(appConfig.paymentsServiceUrl).addingToSession(
-            "payment-data" -> payment(paymentDetail, user.vrn).toString())
-          )
+          val details = payment(paymentDetail, user.vrn)
+          paymentsService.setupPaymentsJourney(details).map(url => Redirect(url))
         }
       )
   }

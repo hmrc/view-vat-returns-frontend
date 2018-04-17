@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-package forms
-import models.payments.PaymentDetailsModel
-import play.api.data.Form
-import play.api.data.Forms._
+package connectors
 
-object MakePaymentForm {
-  val form: Form[PaymentDetailsModel] = Form(
-    mapping(
-      "taxType" -> default(text, "mtdfb-vat"),
-      "taxReference" -> default(nonEmptyText, "/"),
-      "amountInPence" -> number,
-      "taxPeriodMonth" -> number,
-      "taxPeriodYear" -> number,
-      "returnUrl" -> default(nonEmptyText, "/")
-    )(PaymentDetailsModel.apply)(PaymentDetailsModel.unapply)
-  )
+import controllers.ControllerBaseSpec
+import mocks.MockMetricsService
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
+
+class PaymentsConnectorSpec extends ControllerBaseSpec {
+
+  "PaymentsConnector" should {
+    "generate the correct setup URL" in {
+      val connector = new PaymentsConnector(mock[HttpClient], mockConfig, MockMetricsService)
+      connector.setupUrl shouldEqual "payments-url/payment/start"
+    }
+  }
+
 }
