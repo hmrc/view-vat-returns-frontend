@@ -37,7 +37,9 @@ class MakePaymentControllerSpec extends ControllerBaseSpec {
     amountInPence = 10000,
     taxPeriodMonth = 2,
     taxPeriodYear = 2018,
-    returnUrl = "payments-return-url"
+    returnUrl = "payments-return-url",
+    backUrl = controllers.routes.ReturnsController.vatReturn(2018, "#001").url,
+    periodKey = "#001"
   )
 
   private trait MakePaymentDetailsTest {
@@ -82,7 +84,8 @@ class MakePaymentControllerSpec extends ControllerBaseSpec {
         private lazy val request = fakeRequestToPOSTWithSession(
           ("amountInPence", "10000"),
           ("taxPeriodMonth", "02"),
-          ("taxPeriodYear", "18")
+          ("taxPeriodYear", "18"),
+          ("periodKey", "#001")
         )
 
         lazy val result: Future[Result] = target.makePayment()(request)
@@ -97,7 +100,9 @@ class MakePaymentControllerSpec extends ControllerBaseSpec {
         private lazy val request = fakeRequestToPOSTWithSession(
           ("amountInPence", "10000"),
           ("taxPeriodMonth", "02"),
-          ("taxPeriodYear", "2018"))
+          ("taxPeriodYear", "2018"),
+          ("periodKey", "#001")
+        )
         lazy val result: Future[Result] = target.makePayment()(request)
 
         override val authResult: Future[Nothing] = Future.failed(MissingBearerToken())
@@ -111,7 +116,9 @@ class MakePaymentControllerSpec extends ControllerBaseSpec {
         private lazy val request = fakeRequestToPOSTWithSession(
           ("amountInPence", "10000"),
           ("taxPeriodMonth", "02"),
-          ("taxPeriodYear", "2018"))
+          ("taxPeriodYear", "2018"),
+          ("periodKey", "#001")
+        )
         lazy val result: Future[Result] = target.makePayment()(request)
 
         override val authResult: Future[Nothing] = Future.failed(InsufficientEnrolments())

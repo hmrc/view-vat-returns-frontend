@@ -22,12 +22,14 @@ import play.api.data.Forms._
 object MakePaymentForm {
   val form: Form[PaymentDetailsModel] = Form(
     mapping(
-      "taxType" -> default(text, "mtdfb-vat"),
+      "taxType" -> default(text, "vat"),
       "taxReference" -> default(nonEmptyText, "/"),
       "amountInPence" -> number,
       "taxPeriodMonth" -> number,
       "taxPeriodYear" -> number,
-      "returnUrl" -> default(nonEmptyText, "/")
+      "returnUrl" -> default(nonEmptyText, "/"),
+      "backUrl" -> default(nonEmptyText, "/"),
+      "periodKey" -> nonEmptyText
     )(PaymentDetailsModel.apply)(PaymentDetailsModel.unapply)
   )
 }
