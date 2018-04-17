@@ -29,7 +29,9 @@ class PaymentDetailsModelSpec extends UnitSpec {
         123456,
         3,
         2018,
-        "https://www.tax.service.gov.uk/mtdfb-page"
+        "https://www.tax.service.gov.uk/mtdfb-page",
+        "https://www.tax.service.gov.uk/mtdfb-page2/#001",
+        "#001"
       )
 
       val expectedJson = Json.parse(
@@ -44,7 +46,8 @@ class PaymentDetailsModelSpec extends UnitSpec {
           |      "year" : 2018
           |    }
           |  },
-          |  "returnUrl": "https://www.tax.service.gov.uk/mtdfb-page"
+          |  "returnUrl": "https://www.tax.service.gov.uk/mtdfb-page",
+          |  "backUrl": "https://www.tax.service.gov.uk/mtdfb-page2/#001"
           |}
         """.stripMargin
       ).toString()
