@@ -20,7 +20,6 @@ import connectors.httpParsers.VatReturnHttpParser.VatReturnReads
 import models.VatReturn
 import models.errors._
 import play.api.http.Status
-import play.api.libs.json
 import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.play.test.UnitSpec
@@ -43,44 +42,6 @@ class VatReturnHttpParserSpec extends UnitSpec {
         "totalValueGoodsSuppliedExVAT" -> 55454,
         "totalAcquisitionsExVAT" -> 545645
       )))
-
-
-      val payload = """{
-                      |  "idType": "VRN",
-                      |  "idNumber": "999973804",
-                      |  "regimeType": "VATC",
-                      |  "processingDate": "2018-04-17T08:55:22Z",
-                      |  "financialTransactions": [
-                      |    {
-                      |      "chargeType": "VAT Return Debit Charge",
-                      |      "mainType": "VAT Return Charge",
-                      |      "periodKey": "18AC",
-                      |      "periodKeyDescription": "March 2018",
-                      |      "taxPeriodFrom": "2018-03-01",
-                      |      "taxPeriodTo": "2018-03-31",
-                      |      "businessPartner": "0100113120",
-                      |      "contractAccountCategory": "33",
-                      |      "contractAccount": "091700000405",
-                      |      "contractObjectType": "ZVAT",
-                      |      "contractObject": "00000180000000000165",
-                      |      "sapDocumentNumber": "003030001189",
-                      |      "sapDocumentNumberItem": "0001",
-                      |      "chargeReference": "XJ002610110056",
-                      |      "mainTransaction": "4700",
-                      |      "subTransaction": "1174",
-                      |      "originalAmount": 10169.45,
-                      |      "outstandingAmount": 10169.45,
-                      |      "items": [
-                      |        {
-                      |          "subItem": "000",
-                      |          "dueDate": "2018-05-07",
-                      |          "amount": 10169.45
-                      |        }
-                      |      ]
-                      |    }
-                      |  ]
-                      |}""".stripMargin
-
 
       val expected = Right(VatReturn(
         "#001",
@@ -191,7 +152,7 @@ class VatReturnHttpParserSpec extends UnitSpec {
 
       val body: JsObject = Json.obj(
         "code" -> "Conflict",
-        "message" -> "CONFLCIT"
+        "message" -> "CONFLICT"
       )
 
       val httpResponse = HttpResponse(Status.CONFLICT, Some(body))
