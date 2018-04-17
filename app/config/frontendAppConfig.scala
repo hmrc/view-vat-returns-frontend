@@ -55,6 +55,8 @@ trait AppConfig extends ServicesConfig {
   val signOutUrl: String
   val mtdVatSignUpUrl: String
   val unauthorisedSignOutUrl: String
+  val setupPaymentsJourneyPath: String
+
 }
 
 @Singleton
@@ -100,9 +102,9 @@ class FrontendAppConfig @Inject()(val runModeConfiguration: Configuration, val e
   override lazy val vatDetailsUrl: String = vatSummaryBase + getString(Keys.vatDetailsUrl)
   override lazy val vatPaymentsUrl: String = vatSummaryBase + getString(Keys.vatPaymentsUrl)
 
-  private lazy val paymentsBaseUrl: String = getString(Keys.paymentsServiceBase)
-  private lazy val paymentsUrl: String = getString(Keys.paymentsServiceUrl)
-  override lazy val paymentsServiceUrl: String = paymentsBaseUrl + paymentsUrl
+  override lazy val paymentsServiceUrl: String = baseUrl(Keys.paymentsServiceBase)
+  override lazy val setupPaymentsJourneyPath: String = getString(Keys.setupPaymentsJourneyPath)
+
   private lazy val paymentsReturnBase: String = getString(Keys.paymentsReturnBase)
   override lazy val paymentsReturnUrl: String = paymentsReturnBase + getString(Keys.paymentsReturnUrl)
 
@@ -120,4 +122,5 @@ class FrontendAppConfig @Inject()(val runModeConfiguration: Configuration, val e
 
   private val mtdVatSignUpBaseUrl: String = getString(Keys.mtdVatSignUpBaseUrl)
   override lazy val mtdVatSignUpUrl: String = mtdVatSignUpBaseUrl + getString(Keys.mtdVatSignUpUrl)
+
 }
