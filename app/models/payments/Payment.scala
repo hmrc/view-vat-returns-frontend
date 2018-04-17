@@ -27,6 +27,7 @@ case class Payment(chargeType: String,
                    end: LocalDate,
                    due: LocalDate,
                    outstandingAmount: BigDecimal,
+                   clearedAmount: BigDecimal,
                    periodKey: String)
 
 object Payment {
@@ -35,9 +36,10 @@ object Payment {
                             start: LocalDate,
                             end: LocalDate,
                             due: LocalDate,
-                            outstandingAmount: BigDecimal,
-                            periodKey: Option[String]): Payment = {
-    Payment(chargeType, start, end, due, outstandingAmount, periodKey.getOrElse("0000"))
+                            outstandingAmount: Option[BigDecimal],
+                            clearedAmount: Option[BigDecimal],
+                            periodKey: String): Payment = {
+    Payment(chargeType, start, end, due, outstandingAmount.getOrElse(0), clearedAmount.getOrElse(0), periodKey)
   }
 
   implicit val paymentReads: Reads[Payment] = (
@@ -45,8 +47,9 @@ object Payment {
       (JsPath \ "taxPeriodFrom").read[LocalDate] and
       (JsPath \ "taxPeriodTo").read[LocalDate] and
       (JsPath \ "items") (0).\("dueDate").read[LocalDate] and
-      (JsPath \ "outstandingAmount").read[BigDecimal] and
-      (JsPath \ "periodKey").readNullable[String]
+      (JsPath \ "outstandingAmount").readNullable[BigDecimal] and
+      (JsPath \ "clearedAmount").readNullable[BigDecimal] and
+      (JsPath \ "periodKey").read[String]
     ) (Payment.createPayment _)
 
 }

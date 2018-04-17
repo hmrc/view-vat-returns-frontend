@@ -292,6 +292,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
           end = LocalDate.parse("2017-03-31"),
           due = LocalDate.parse("2017-04-06"),
           outstandingAmount = 1000.00,
+          clearedAmount = 0,
           periodKey = "#001"
         ))
       ),
@@ -365,6 +366,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
           end = LocalDate.parse("2017-03-31"),
           due = LocalDate.parse("2017-04-06"),
           outstandingAmount = 1000.00,
+          clearedAmount = 0,
           periodKey = "#001"
         ))
       ),
@@ -422,6 +424,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
           end = LocalDate.parse("2017-03-31"),
           due = LocalDate.parse("2017-04-06"),
           outstandingAmount = 1000.00,
+          clearedAmount = 0,
           periodKey = "#001"
         ))
       ),

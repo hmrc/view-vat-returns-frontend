@@ -32,6 +32,7 @@ class PaymentsSpec extends UnitSpec {
       LocalDate.parse("2017-07-01"),
       LocalDate.parse("2017-07-21"),
       10000,
+      0,
       "#004"
     )
 
@@ -62,6 +63,7 @@ class PaymentsSpec extends UnitSpec {
           LocalDate.parse("2017-07-01"),
           LocalDate.parse("2017-07-21"),
           10000,
+          0,
           "#004"
         ),
         Payment(
@@ -70,6 +72,7 @@ class PaymentsSpec extends UnitSpec {
           LocalDate.parse("2017-08-01"),
           LocalDate.parse("2017-08-21"),
           4000,
+          0,
           "#005"
         )
       )

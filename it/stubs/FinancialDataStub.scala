@@ -67,7 +67,7 @@ object FinancialDataStub extends WireMockMethods{
       |        "subTransaction" : "1174",
       |        "originalAmount" : 4000,
       |        "outstandingAmount" : 4000,
-      |        "clearedAmount" : 4000,
+      |        "clearedAmount" : 0,
       |        "items" : [
       |          {
       |            "subItem" : "000",

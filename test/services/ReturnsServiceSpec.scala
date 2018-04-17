@@ -24,7 +24,6 @@ import controllers.ControllerBaseSpec
 import models.Obligation.Status
 import models.payments.{Payment, Payments}
 import models._
-import models.errors.HttpError
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits._
@@ -57,6 +56,7 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
       LocalDate.parse("2017-02-01"),
       LocalDate.parse("2017-02-02"),
       5000,
+      0,
       "#003"
     )
   }
