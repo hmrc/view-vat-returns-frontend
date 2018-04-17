@@ -20,7 +20,6 @@ import connectors.httpParsers.VatReturnHttpParser.VatReturnReads
 import models.VatReturn
 import models.errors._
 import play.api.http.Status
-import play.api.libs.json
 import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.play.test.UnitSpec
@@ -153,7 +152,7 @@ class VatReturnHttpParserSpec extends UnitSpec {
 
       val body: JsObject = Json.obj(
         "code" -> "Conflict",
-        "message" -> "CONFLCIT"
+        "message" -> "CONFLICT"
       )
 
       val httpResponse = HttpResponse(Status.CONFLICT, Some(body))

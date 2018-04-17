@@ -18,7 +18,6 @@ package stubs
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import helpers.WireMockMethods
-import models.errors.ApiSingleError
 import play.api.http.Status.{OK, BAD_REQUEST}
 import play.api.libs.json.{JsValue, Json}
 
@@ -67,7 +66,7 @@ object FinancialDataStub extends WireMockMethods{
       |        "subTransaction" : "1174",
       |        "originalAmount" : 4000,
       |        "outstandingAmount" : 4000,
-      |        "clearedAmount" : 4000,
+      |        "clearedAmount" : 0,
       |        "items" : [
       |          {
       |            "subItem" : "000",

@@ -30,34 +30,55 @@ class PaymentsHttpParserSpec extends UnitSpec {
 
   "PaymentsReads" when {
 
+
     "a http response of 200 (OK) is received" should {
 
       val httpResponse = HttpResponse(Status.OK, responseJson = Some(
         Json.obj(
+          "idType" -> "VRN",
+          "idNumber" -> "999973804",
+          "regimeType" -> "VATC",
+          "processingDate" -> "2018-04-17T08:55:22Z",
           "financialTransactions" -> Json.arr(
             Json.obj(
-              "mainType" -> "VAT Return Charge",
-              "chargeType" -> "VAT",
-              "taxPeriodFrom" -> "2017-06-01",
+              "chargeType"-> "VAT Return Debit Charge",
+              "mainType"-> "VAT Return Charge",
+              "periodKey"-> "18AC",
+              "periodKeyDescription" -> "March 2018",
+              "taxPeriodFrom"-> "2017-06-01",
               "taxPeriodTo" -> "2017-10-01",
+              "businessPartner" -> "0100113120",
+              "contractAccountCategory" -> "33",
+              "contractAccount" -> "091700000405",
+              "contractObjectType" -> "ZVAT",
+              "contractObject" -> "00000180000000000165",
+              "sapDocumentNumber" -> "003030001189",
+              "sapDocumentNumberItem" -> "0001",
+              "chargeReference" -> "XJ002610110056",
+              "mainTransaction" -> "4700",
+              "subTransaction" -> "1174",
+              "originalAmount" -> 10169.45,
+              "outstandingAmount" -> 5000.00,
               "items" -> Json.arr(
-                Json.obj("dueDate" -> "2017-11-01")
-              ),
-              "outstandingAmount" -> 5000,
-              "periodKey" -> "#004"
+                Json.obj(
+                  "subItem" -> "000",
+                  "dueDate" -> "2017-11-01",
+                  "amount" -> 10169.45
+                )
+              )
             )
           )
-        )
-      ))
-
+        )))
+      
       val expectedResult = Right(Payments(Seq(
         Payment(
-          chargeType = "VAT",
+          chargeType = "VAT Return Debit Charge",
           start = LocalDate.parse("2017-06-01"),
           end = LocalDate.parse("2017-10-01"),
           due = LocalDate.parse("2017-11-01"),
           outstandingAmount = BigDecimal(5000.00),
-          periodKey = "#004"
+          clearedAmount = BigDecimal(0),
+          periodKey = "18AC"
         )))
       )
 
