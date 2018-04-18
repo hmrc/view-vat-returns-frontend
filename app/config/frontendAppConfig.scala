@@ -28,6 +28,7 @@ import uk.gov.hmrc.play.config.ServicesConfig
 import config.{ConfigKeys => Keys}
 
 trait AppConfig extends ServicesConfig {
+  val appName:String
   val analyticsToken: String
   val analyticsHost: String
   val reportAProblemPartialUrl: String
@@ -56,7 +57,6 @@ trait AppConfig extends ServicesConfig {
   val mtdVatSignUpUrl: String
   val unauthorisedSignOutUrl: String
   val setupPaymentsJourneyPath: String
-
 }
 
 @Singleton
@@ -64,6 +64,7 @@ class FrontendAppConfig @Inject()(val runModeConfiguration: Configuration, val e
 
   override val mode: Mode = environment.mode
 
+  override val appName: String = getString("appName")
   private lazy val contactHost: String = getString(Keys.contactFrontendHost)
   override lazy val contactFormServiceIdentifier: String = "VATVC"
   private lazy val contactFrontendService = baseUrl(Keys.contactFrontendService)
@@ -122,5 +123,4 @@ class FrontendAppConfig @Inject()(val runModeConfiguration: Configuration, val e
 
   private val mtdVatSignUpBaseUrl: String = getString(Keys.mtdVatSignUpBaseUrl)
   override lazy val mtdVatSignUpUrl: String = mtdVatSignUpBaseUrl + getString(Keys.mtdVatSignUpUrl)
-
 }
