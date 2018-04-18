@@ -22,7 +22,7 @@ import javax.inject.{Inject, Singleton}
 import models.payments.PaymentDetailsModel
 import play.api.Logger
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{Action, AnyContent, RequestHeader}
 import services.{EnrolmentsAuthService, PaymentsService}
 
 import scala.concurrent.Future
@@ -34,12 +34,13 @@ class MakePaymentController @Inject()(val messagesApi: MessagesApi,
                                       implicit val appConfig: AppConfig)
   extends AuthorisedController with I18nSupport {
 
-  private[controllers] def payment(data: PaymentDetailsModel, vrn: String) = data.copy(
+  private[controllers] def payment(data: PaymentDetailsModel, vrn: String)(implicit request: RequestHeader): PaymentDetailsModel =
+    data.copy(
     taxType = "vat",
     taxReference = vrn,
     returnUrl = appConfig.paymentsReturnUrl,
     taxPeriodYear = data.taxPeriodYear,
-    backUrl = controllers.routes.ReturnsController.vatReturn(data.taxPeriodYear, data.periodKey).url
+    backUrl = controllers.routes.ReturnsController.vatReturn(data.taxPeriodYear, data.periodKey).absoluteURL()
   )
 
   def makePayment(): Action[AnyContent] = authorisedAction { implicit request =>
@@ -59,7 +60,7 @@ class MakePaymentController @Inject()(val messagesApi: MessagesApi,
           )
         },
         paymentDetail => {
-          val details = payment(paymentDetail, user.vrn)
+          val details = payment(paymentDetail, user.vrn)(request)
           paymentsService.setupPaymentsJourney(details).map(url => Redirect(url))
         }
       )
