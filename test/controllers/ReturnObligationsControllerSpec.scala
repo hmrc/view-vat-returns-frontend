@@ -18,6 +18,8 @@ package controllers
 
 import java.time.LocalDate
 
+import audit.AuditingService
+import audit.models.ExtendedAuditModel
 import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
 import models.errors.{HttpError, ServerSideError}
 import models.viewModels.{ReturnObligationsViewModel, VatReturnsViewModel}
@@ -64,7 +66,9 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
     val mockVatReturnService: ReturnsService = mock[ReturnsService]
     val mockDateService: DateService = mock[DateService]
+    val mockAuditService: AuditingService = mock[AuditingService]
     val previousYear: Int = 2017
+    val auditingExpected: Boolean = false
 
     def setup(): Any = {
       (mockDateService.now: () => LocalDate).stubs().returns(LocalDate.parse("2018-05-01"))
@@ -78,6 +82,10 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         (_: HeaderCarrier, _: ExecutionContext))
           .expects(*, *, *, *, *)
           .returns(exampleObligations)
+
+        (mockAuditService.extendedAudit(_: ExtendedAuditModel, _: String)(_: HeaderCarrier, _: ExecutionContext))
+          .stubs(*, *, *, *)
+          .returns({})
       }
     }
 
@@ -85,31 +93,13 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
     def target: ReturnObligationsController = {
       setup()
-      new ReturnObligationsController(messages, mockEnrolmentsAuthService, mockVatReturnService, mockDateService, mockConfig)
-    }
-  }
-
-  private trait HandleReturnObligationsTest {
-    val vatServiceResult: Future[Either[HttpError, VatReturnObligations]]
-    val mockAuthConnector: AuthConnector = mock[AuthConnector]
-    val mockVatReturnService: ReturnsService = mock[ReturnsService]
-    val mockDateService: DateService = mock[DateService]
-    val mockEnrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
-    val testUser: User = User("999999999")
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-
-    def setup(): Any = {
-      (mockDateService.now: () => LocalDate).stubs().returns(LocalDate.parse("2018-05-01"))
-
-      (mockVatReturnService.getReturnObligationsForYear(_: User, _: Int, _: Obligation.Status.Value)
-      (_: HeaderCarrier, _: ExecutionContext))
-        .expects(*, *, *, *, *)
-        .returns(vatServiceResult)
-    }
-
-    def target: ReturnObligationsController = {
-      setup()
-      new ReturnObligationsController(messages, mockEnrolmentsAuthService, mockVatReturnService, mockDateService, mockConfig)
+      new ReturnObligationsController(
+        messages,
+        mockEnrolmentsAuthService,
+        mockVatReturnService,
+        mockDateService,
+        mockConfig,
+        mockAuditService)
     }
   }
 
@@ -176,7 +166,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
             | """.stripMargin
 
         override val exampleObligations: Future[Left[HttpError, VatReturnObligations]]
-          = Left(ServerSideError("504", errorResponse))
+        = Left(ServerSideError("504", errorResponse))
 
         override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
 
@@ -256,12 +246,46 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
             | """.stripMargin
 
         override val exampleObligations: Future[Left[HttpError, VatReturnObligations]]
-          = Left(ServerSideError("504", errorResponse))
+        = Left(ServerSideError("504", errorResponse))
 
         override val serviceCall = false
         override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
         intercept[Exception](await(target.returnDeadlines()(fakeRequest)))
       }
+    }
+  }
+
+  private trait HandleReturnObligationsTest {
+    val vatServiceResult: Future[Either[HttpError, VatReturnObligations]]
+    val mockAuthConnector: AuthConnector = mock[AuthConnector]
+    val mockVatReturnService: ReturnsService = mock[ReturnsService]
+    val mockDateService: DateService = mock[DateService]
+    val mockEnrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
+    val mockAuditService: AuditingService = mock[AuditingService]
+    val testUser: User = User("999999999")
+    implicit val hc: HeaderCarrier = HeaderCarrier()
+
+    def setup(): Any = {
+      (mockDateService.now: () => LocalDate).stubs().returns(LocalDate.parse("2018-05-01"))
+
+      (mockVatReturnService.getReturnObligationsForYear(_: User, _: Int, _: Obligation.Status.Value)
+      (_: HeaderCarrier, _: ExecutionContext))
+        .expects(*, *, *, *, *)
+        .returns(vatServiceResult)
+
+      (mockAuditService.extendedAudit(_: ExtendedAuditModel, _: String)(_: HeaderCarrier, _: ExecutionContext))
+        .stubs(*, *, *, *)
+        .returns({})
+    }
+
+    def target: ReturnObligationsController = {
+      setup()
+      new ReturnObligationsController(messages,
+        mockEnrolmentsAuthService,
+        mockVatReturnService,
+        mockDateService,
+        mockConfig,
+        mockAuditService)
     }
   }
 
@@ -316,7 +340,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
             Seq(2018),
             2017,
             Seq(),
-           hasNonMtdVat = false,
+            hasNonMtdVat = false,
             "999999999"
           )
         )
@@ -337,7 +361,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
             | """.stripMargin
 
         override val vatServiceResult: Future[Left[HttpError, VatReturnObligations]]
-          = Left(ServerSideError("504", errorResponse))
+        = Left(ServerSideError("504", errorResponse))
 
         val expectedResult = Left(ServerSideError("504", errorResponse))
 
