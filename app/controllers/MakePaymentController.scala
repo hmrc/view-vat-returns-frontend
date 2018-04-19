@@ -34,14 +34,22 @@ class MakePaymentController @Inject()(val messagesApi: MessagesApi,
                                       implicit val appConfig: AppConfig)
   extends AuthorisedController with I18nSupport {
 
-  private[controllers] def payment(data: PaymentDetailsModel, vrn: String): PaymentDetailsModel =
+  private[controllers] def payment(data: PaymentDetailsModel, vrn: String): PaymentDetailsModel = {
+
+    val viewReturnUrl = if (data.backUrl == "/") {
+      controllers.routes.ReturnsController.vatReturn(data.taxPeriodYear, data.periodKey).url
+    } else {
+      controllers.routes.ReturnsController.vatReturnViaPayments(data.periodKey).url
+    }
+
     data.copy(
-    taxType = "vat",
-    taxReference = vrn,
-    returnUrl = appConfig.paymentsReturnUrl,
-    taxPeriodYear = data.taxPeriodYear,
-    backUrl = appConfig.selfHost + controllers.routes.ReturnsController.vatReturn(data.taxPeriodYear, data.periodKey).url
-  )
+      taxType = "vat",
+      taxReference = vrn,
+      returnUrl = appConfig.paymentsReturnUrl,
+      taxPeriodYear = data.taxPeriodYear,
+      backUrl = appConfig.selfHost + viewReturnUrl
+    )
+  }
 
   def makePayment(): Action[AnyContent] = authorisedAction { implicit request =>
     user =>

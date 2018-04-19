@@ -151,6 +151,7 @@
           <input type="hidden" name="taxPeriodMonth" value='@(vatReturnViewModel.periodTo.getMonthValue.toString)'>
           <input type="hidden" name="taxPeriodYear" value="@vatReturnViewModel.periodTo.getYear.toString">
           <input type="hidden" name="periodKey" value="@vatReturnViewModel.vatReturnDetails.vatReturn.periodKey">
+          <input type="hidden" name="backUrl" value="@{if( vatReturnViewModel.showReturnsBreadcrumb) "" else "payments" }">
           <input class="button" type="submit" value='@messages("yourVatReturn.paymentNow")' data-journey-click="return:make-payment:vat-return-details"/>
         }
       </div>
