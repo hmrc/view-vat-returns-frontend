@@ -51,5 +51,6 @@ class MockAppConfig(val runModeConfiguration: Configuration, val mode: Mode = Mo
   override val mtdVatSignUpUrl: String = "mtd-sign-up"
   override val unauthorisedSignOutUrl: String = ""
   override val vatSubscriptionBaseUrl: String = ""
+  override val selfHost: String = "www.app.com"
 }
 
