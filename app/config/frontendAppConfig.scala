@@ -56,6 +56,7 @@ trait AppConfig extends ServicesConfig {
   val mtdVatSignUpUrl: String
   val unauthorisedSignOutUrl: String
   val setupPaymentsJourneyPath: String
+  val selfHost: String
 
 }
 
@@ -122,5 +123,7 @@ class FrontendAppConfig @Inject()(val runModeConfiguration: Configuration, val e
 
   private val mtdVatSignUpBaseUrl: String = getString(Keys.mtdVatSignUpBaseUrl)
   override lazy val mtdVatSignUpUrl: String = mtdVatSignUpBaseUrl + getString(Keys.mtdVatSignUpUrl)
+
+  override lazy val selfHost: String = getString(Keys.selfHost)
 
 }
