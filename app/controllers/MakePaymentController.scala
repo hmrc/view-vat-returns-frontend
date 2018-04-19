@@ -65,7 +65,10 @@ class MakePaymentController @Inject()(val messagesApi: MessagesApi,
         paymentDetail => {
           val details = payment(paymentDetail, user.vrn)
           paymentsService.setupPaymentsJourney(details).map { url =>
-            auditService.audit(PaymentAuditModel(user, details, url))
+            auditService.audit(
+              PaymentAuditModel(user, details, url),
+              routes.MakePaymentController.makePayment().url
+            )
             Redirect(url)
           }
         }

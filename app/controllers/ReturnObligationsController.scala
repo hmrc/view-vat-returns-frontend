@@ -58,7 +58,11 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
             ReturnDeadlineViewModel(ob.due, ob.start, ob.end, ob.due.isBefore(dateService.now()))
           )
 
-          auditService.extendedAudit(OpenObligationsAuditModel(user, obligations))
+          auditService.extendedAudit(
+            OpenObligationsAuditModel(user, obligations),
+            routes.ReturnObligationsController.returnDeadlines().url
+          )
+
           Ok(views.html.returns.returnDeadlines(deadlines, user.vrn))
 
         case Left(_) => InternalServerError(views.html.errors.technicalProblem())
@@ -76,7 +80,11 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
 
     returnsService.getReturnObligationsForYear(user, selectedYear, status).map {
       case Right(VatReturnObligations(obligations)) =>
-        auditService.extendedAudit(FulfilledObligationsAuditModel(user, obligations))
+        auditService.extendedAudit(
+          FulfilledObligationsAuditModel(user, obligations),
+          routes.ReturnObligationsController.submittedReturns(selectedYear).url
+        )
+
         Right(VatReturnsViewModel(
           returnYears,
           selectedYear,
