@@ -16,13 +16,15 @@
 
 package controllers
 
+import audit.AuditingService
+import audit.models.PaymentAuditModel
 import config.AppConfig
 import forms.MakePaymentForm
 import javax.inject.{Inject, Singleton}
 import models.payments.PaymentDetailsModel
 import play.api.Logger
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.mvc.{Action, AnyContent, RequestHeader}
+import play.api.mvc.{Action, AnyContent}
 import services.{EnrolmentsAuthService, PaymentsService}
 
 import scala.concurrent.Future
@@ -31,7 +33,8 @@ import scala.concurrent.Future
 class MakePaymentController @Inject()(val messagesApi: MessagesApi,
                                       val enrolmentsAuthService: EnrolmentsAuthService,
                                       paymentsService: PaymentsService,
-                                      implicit val appConfig: AppConfig)
+                                      implicit val appConfig: AppConfig,
+                                      auditService: AuditingService)
   extends AuthorisedController with I18nSupport {
 
   private[controllers] def payment(data: PaymentDetailsModel, vrn: String): PaymentDetailsModel = {
@@ -69,7 +72,13 @@ class MakePaymentController @Inject()(val messagesApi: MessagesApi,
         },
         paymentDetail => {
           val details = payment(paymentDetail, user.vrn)
-          paymentsService.setupPaymentsJourney(details).map(url => Redirect(url))
+          paymentsService.setupPaymentsJourney(details).map { url =>
+            auditService.audit(
+              PaymentAuditModel(user, details, url),
+              routes.MakePaymentController.makePayment().url
+            )
+            Redirect(url)
+          }
         }
       )
   }

@@ -16,16 +16,19 @@
 
 package controllers
 
-import javax.inject.{Inject, Singleton}
-
+import audit.AuditingService
+import audit.models.VatReturnAuditModel
 import config.AppConfig
+import javax.inject.{Inject, Singleton}
 import models.errors.UnexpectedStatusError
 import models.payments.Payment
 import models.viewModels.VatReturnViewModel
-import models.{ReturnsControllerData, VatReturnDetails, VatReturnObligation}
+import models.{ReturnsControllerData, User, VatReturnDetails, VatReturnObligation}
 import play.api.i18n.MessagesApi
 import play.api.mvc._
 import services.{DateService, EnrolmentsAuthService, ReturnsService, SubscriptionService}
+import uk.gov.hmrc.http.HeaderCarrier
+
 import scala.concurrent.Future
 
 @Singleton
@@ -34,7 +37,8 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
                                   returnsService: ReturnsService,
                                   subscriptionService: SubscriptionService,
                                   dateService: DateService,
-                                  implicit val appConfig: AppConfig)
+                                  implicit val appConfig: AppConfig,
+                                  auditService: AuditingService)
   extends AuthorisedController {
 
   def vatReturn(year: Int, periodKey: String): Action[AnyContent] = authorisedAction {
@@ -64,6 +68,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
         val vatReturnCall = returnsService.getVatReturn(user, periodKey)
         val entityNameCall = subscriptionService.getEntityName(user)
         val financialDataCall = returnsService.getPayment(user, periodKey)
+
         def obligationCall(payment: Option[Payment]) = {
           payment.fold(Future.successful(Option.empty[VatReturnObligation])) { p =>
             returnsService.getObligationWithMatchingPeriodKey(user, p.end.getYear, periodKey)
@@ -81,12 +86,13 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
         }
   }
 
-  private[controllers] def renderResult(pageData: ReturnsControllerData, isReturnsPageRequest: Boolean)(implicit req: Request[_]) = {
+  private[controllers] def renderResult(pageData: ReturnsControllerData, isReturnsPageRequest: Boolean)(implicit req: Request[_], user: User) = {
     (pageData.vatReturnResult, pageData.obligation, pageData.payment) match {
       case (Right(vatReturn), Some(ob), payment) =>
         val returnDetails = returnsService.constructReturnDetailsModel(vatReturn, payment)
         val viewModel = constructViewModel(pageData.customerInfo, ob, returnDetails, isReturnsPageRequest)
         if (appConfig.features.allowNineBox()) {
+          auditEvent(isReturnsPageRequest, viewModel)
           Ok(views.html.returns.vatReturnDetails(viewModel))
         } else {
           NotFound(views.html.errors.notFound())
@@ -94,6 +100,20 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
       case (Left(UnexpectedStatusError("404", _)), _, _) => NotFound(views.html.errors.notFound())
       case _ => InternalServerError(views.html.errors.technicalProblem())
     }
+  }
+
+  private def auditEvent(isReturnsPageRequest: Boolean, data: VatReturnViewModel)(implicit user: User, hc: HeaderCarrier): Unit = {
+
+    val periodKey = data.vatReturnDetails.vatReturn.periodKey
+
+    val auditPath = if (isReturnsPageRequest) {
+      routes.ReturnsController.vatReturn(data.periodFrom.getYear, periodKey).url
+    }
+    else {
+      routes.ReturnsController.vatReturnViaPayments(periodKey).url
+    }
+
+    auditService.audit(VatReturnAuditModel(user, data), auditPath)
   }
 
   private[controllers] def constructViewModel(entityName: Option[String],

@@ -23,6 +23,7 @@ import play.api.{Configuration, Mode}
 import play.api.mvc.Call
 
 class MockAppConfig(val runModeConfiguration: Configuration, val mode: Mode = Mode.Test) extends AppConfig {
+  override val appName: String = "view-vat-returns-frontend"
   override val analyticsToken: String = ""
   override val analyticsHost: String = ""
   override val reportAProblemPartialUrl: String = ""

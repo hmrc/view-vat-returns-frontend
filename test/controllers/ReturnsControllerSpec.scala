@@ -18,6 +18,8 @@ package controllers
 
 import java.time.LocalDate
 
+import audit.AuditingService
+import audit.models.AuditModel
 import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
 import models._
 import models.errors.{ServerSideError, UnexpectedStatusError, UnknownError}
@@ -85,6 +87,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     val mockVatReturnService: ReturnsService = mock[ReturnsService]
     val mockSubscriptionService: SubscriptionService = mock[SubscriptionService]
     val mockDateService: DateService = mock[DateService]
+    val mockAuditService: AuditingService = mock[AuditingService]
 
     def setup(): Any = {
       (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
@@ -108,11 +111,15 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
           .expects(*, *, *)
           .returns(Future.successful(exampleEntityName))
 
-        if(successReturn) {
+        if (successReturn) {
           (mockVatReturnService.constructReturnDetailsModel(_: VatReturn, _: Option[Payment]))
             .expects(*, *)
             .returns(exampleVatReturnDetails)
         }
+
+        (mockAuditService.audit(_: AuditModel, _: String)(_: HeaderCarrier, _: ExecutionContext))
+          .stubs(*, *, *, *)
+          .returns({})
 
         (mockDateService.now: () => LocalDate).stubs().returns(LocalDate.parse("2018-05-01"))
       }
@@ -122,7 +129,14 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
     def target: ReturnsController = {
       setup()
-      new ReturnsController(messages, mockEnrolmentsAuthService, mockVatReturnService, mockSubscriptionService, mockDateService, mockConfig)
+      new ReturnsController(
+        messages,
+        mockEnrolmentsAuthService,
+        mockVatReturnService,
+        mockSubscriptionService,
+        mockDateService,
+        mockConfig,
+        mockAuditService)
     }
   }
 
@@ -258,8 +272,16 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     val mockVatApiService: SubscriptionService = mock[SubscriptionService]
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
     val mockDateService: DateService = mock[DateService]
+    val mockAuditService: AuditingService = mock[AuditingService]
     val mockEnrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
-    val target = new ReturnsController(messages, mockEnrolmentsAuthService, mockVatReturnService, mockVatApiService, mockDateService, mockConfig)
+    val target = new ReturnsController(
+      messages,
+      mockEnrolmentsAuthService,
+      mockVatReturnService,
+      mockVatApiService,
+      mockDateService,
+      mockConfig,
+      mockAuditService)
 
     "populate a VatReturnViewModel" in {
 
@@ -293,8 +315,18 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     val mockVatApiService: SubscriptionService = mock[SubscriptionService]
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
     val mockDateService: DateService = mock[DateService]
+    val mockAuditService: AuditingService = mock[AuditingService]
     val mockEnrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
-    val target = new ReturnsController(messages, mockEnrolmentsAuthService, mockVatReturnService, mockVatApiService, mockDateService, mockConfig)
+    val user = models.User("123456789", true, true)
+
+    val target = new ReturnsController(
+      messages,
+      mockEnrolmentsAuthService,
+      mockVatReturnService,
+      mockVatApiService,
+      mockDateService,
+      mockConfig,
+      mockAuditService)
 
     "it returns Right(vatReturn), Some(ob) and Some(pay)" should {
 
@@ -306,8 +338,12 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
         (mockDateService.now: () => LocalDate).stubs().returns(LocalDate.parse("2018-05-01"))
 
+        (mockAuditService.audit(_: AuditModel, _: String)(_: HeaderCarrier, _: ExecutionContext))
+          .stubs(*, *, *, *)
+          .returns({})
+
         val data = ReturnsControllerData(Right(exampleVatReturn), None, Some(examplePayment), Some(exampleObligation))
-        val result = target.renderResult(data, isReturnsPageRequest = true)(fakeRequest)
+        val result = target.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
         result.header.status shouldBe Status.OK
       }
     }
@@ -316,7 +352,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
       "return a Not Found status" in {
         val data = ReturnsControllerData(Left(UnexpectedStatusError("404", "test")), None, None, None)
-        val result = target.renderResult(data, isReturnsPageRequest = true)(fakeRequest)
+        val result = target.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
         result.header.status shouldBe Status.NOT_FOUND
       }
     }
@@ -325,7 +361,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
       "return an Internal Server Error status" in {
         val data = ReturnsControllerData(Left(ServerSideError("500", "test")), None, None, None)
-        val result = target.renderResult(data, isReturnsPageRequest = true)(fakeRequest)
+        val result = target.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
         result.header.status shouldBe Status.INTERNAL_SERVER_ERROR
       }
     }

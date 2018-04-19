@@ -16,9 +16,11 @@
 
 package controllers
 
-import javax.inject.Inject
+import audit.AuditingService
+import audit.models.{FulfilledObligationsAuditModel, OpenObligationsAuditModel}
 import config.AppConfig
 import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
+import javax.inject.Inject
 import models.viewModels.{ReturnDeadlineViewModel, ReturnObligationsViewModel, VatReturnsViewModel}
 import models.{Obligation, User, VatReturnObligations}
 import play.api.i18n.MessagesApi
@@ -32,12 +34,13 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
                                             val enrolmentsAuthService: EnrolmentsAuthService,
                                             returnsService: ReturnsService,
                                             dateService: DateService,
-                                            implicit val appConfig: AppConfig)
+                                            implicit val appConfig: AppConfig,
+                                            auditService: AuditingService)
   extends AuthorisedController {
 
   def submittedReturns(year: Int): Action[AnyContent] = authorisedAction { implicit request =>
     implicit user =>
-      if(isValidSearchYear(year)) {
+      if (isValidSearchYear(year)) {
         getReturnObligations(user, year, Obligation.Status.Fulfilled).map {
           case Right(model) => Ok(views.html.returns.submittedReturns(model))
           case Left(_) => InternalServerError(views.html.errors.submittedReturnsError(user))
@@ -52,8 +55,16 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
       returnsService.getReturnObligationsForYear(user, dateService.now().getYear, Obligation.Status.Outstanding).map {
         case Right(VatReturnObligations(obligations)) =>
           val deadlines = obligations.map(ob =>
-            ReturnDeadlineViewModel(ob.due, ob.start, ob.end, ob.due.isBefore(dateService.now())))
+            ReturnDeadlineViewModel(ob.due, ob.start, ob.end, ob.due.isBefore(dateService.now()))
+          )
+
+          auditService.extendedAudit(
+            OpenObligationsAuditModel(user, obligations),
+            routes.ReturnObligationsController.returnDeadlines().url
+          )
+
           Ok(views.html.returns.returnDeadlines(deadlines, user.vrn))
+
         case Left(_) => InternalServerError(views.html.errors.technicalProblem())
       }
   }
@@ -68,20 +79,26 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
     val returnYears: Seq[Int] = Seq[Int](2018)
 
     returnsService.getReturnObligationsForYear(user, selectedYear, status).map {
-      case Right(VatReturnObligations(obligations)) => Right(VatReturnsViewModel(
-        returnYears,
-        selectedYear,
-        obligations.map( obligation =>
-          ReturnObligationsViewModel(
-            obligation.start,
-            obligation.end,
-            obligation.periodKey
-          )
-        ),
-        user.hasNonMtdVat,
-        user.vrn
-      ))
-      case Left(error)=> Left(error)
+      case Right(VatReturnObligations(obligations)) =>
+        auditService.extendedAudit(
+          FulfilledObligationsAuditModel(user, obligations),
+          routes.ReturnObligationsController.submittedReturns(selectedYear).url
+        )
+
+        Right(VatReturnsViewModel(
+          returnYears,
+          selectedYear,
+          obligations.map(obligation =>
+            ReturnObligationsViewModel(
+              obligation.start,
+              obligation.end,
+              obligation.periodKey
+            )
+          ),
+          user.hasNonMtdVat,
+          user.vrn
+        ))
+      case Left(error) => Left(error)
     }
   }
 }
