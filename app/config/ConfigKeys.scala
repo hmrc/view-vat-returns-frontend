@@ -38,6 +38,7 @@ object ConfigKeys {
   val staticDateEnabledFeature: String = "features.date-service.staticDate.enabled"
   val staticDateValue: String = "date-service.staticDate.value"
   val allowNineBoxFeature: String = "features.allowNineBox.enabled"
+  val enableAuditingFeature: String = "features.auditing.enabled"
 
   val businessTaxAccountBase: String = "business-tax-account.host"
   val businessTaxAccountUrl: String = "business-tax-account.homeUrl"
