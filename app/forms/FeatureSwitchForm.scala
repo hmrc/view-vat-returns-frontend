@@ -29,7 +29,8 @@ object FeatureSwitchForm {
       ConfigKeys.userResearchBannerFeature -> boolean,
       ConfigKeys.allowPaymentsFeature -> boolean,
       ConfigKeys.staticDateEnabledFeature -> boolean,
-      ConfigKeys.allowNineBoxFeature -> boolean
+      ConfigKeys.allowNineBoxFeature -> boolean,
+      ConfigKeys.enableAuditingFeature -> boolean
   )(FeatureSwitchModel.apply)(FeatureSwitchModel.unapply)
   )
 }
