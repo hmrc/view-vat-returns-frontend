@@ -273,7 +273,7 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
         .expects(*, *, *, *, *, *)
         .returns(Future.successful(Right(exampleObligations)))
 
-      lazy val result: HttpGetResult[VatReturnObligations] = service.getPreviousFulfilledObligations(LocalDate.parse("2018-01-01"))
+      lazy val result: HttpGetResult[VatReturnObligations] = service.getFulfilledObligations(LocalDate.parse("2018-01-01"))
 
       await(result) shouldBe Right(exampleObligations)
     }

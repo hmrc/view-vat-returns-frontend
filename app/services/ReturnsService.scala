@@ -48,7 +48,7 @@ class ReturnsService @Inject()(vatApiConnector: VatApiConnector, financialDataCo
     }
   }
 
-  def getPreviousFulfilledObligations(currentDate: LocalDate)
+  def getFulfilledObligations(currentDate: LocalDate)
                                      (implicit user: User, hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[VatReturnObligations]] = {
     val from: LocalDate = currentDate.minusYears(1)
     vatApiConnector.getVatReturnObligations(user.vrn, from, currentDate, Status.Fulfilled)
