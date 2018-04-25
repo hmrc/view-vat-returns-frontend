@@ -154,11 +154,6 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       elementText(Selectors.entityNameHeading) shouldBe vatReturnViewModel.entityName.get
     }
 
-    "have the correct information text under the heading" in {
-      elementText(Selectors.mainInformationText) shouldBe
-        "Your payment has been processed. There is nothing more you need to do with this return."
-    }
-
     "have the correct heading for the first section of the return" in {
       elementText(Selectors.tableHeadingOne) shouldBe "VAT details"
     }
@@ -197,11 +192,11 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     }
 
     "render the correct help section report any other errors text" in {
-      elementText(Selectors.helpLine2) shouldBe "You must report any other errors to HMRC."
+      elementText(Selectors.helpLine2) shouldBe "You must report any other errors (opens in a new tab) to HMRC."
     }
 
     "render the correct report vat error link text" in {
-      elementText(Selectors.helpLink) shouldBe "report any other"
+      elementText(Selectors.helpLink) shouldBe "report any other errors (opens in a new tab)"
     }
 
     "render the correct report vat error link href" in {
@@ -308,11 +303,11 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     }
 
     "have the correct information text under the heading" in {
-      elementText(Selectors.mainInformationText) shouldBe "This bill needs to be paid before 6 April 2017."
+      elementText(Selectors.mainInformationText) shouldBe "You need to pay this bill by 6 April 2017."
     }
 
     "have the correct extra information text under the heading" in {
-      elementText(Selectors.extraInformationText) shouldBe "Payments can take between 4 and 7 days to appear here."
+      elementText(Selectors.extraInformationText) shouldBe "It can take up to 7 days to show that you've made a payment."
     }
 
     "have the correct box 5 description in the table" in {
@@ -437,11 +432,6 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
 
     "have the correct subheading" in {
       elementText(Selectors.subHeading) shouldBe "HMRC paid you: £1,000"
-    }
-
-    "have the correct information text under the heading" in {
-      elementText(Selectors.mainInformationText) shouldBe
-        "Your payment has been processed. There is nothing more you need to do with this return."
     }
 
     "have the correct box 5 description in the table" in {

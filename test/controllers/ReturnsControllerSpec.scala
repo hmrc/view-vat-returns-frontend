@@ -37,6 +37,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ReturnsControllerSpec extends ControllerBaseSpec {
 
+  mockConfig.features.allowNineBox(true)
+
   val goodEnrolments: Enrolments = Enrolments(
     Set(
       Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("VRN", "999999999")), "Active")
@@ -75,7 +77,15 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     "#001"
   )
 
-  val exampleVatReturnDetails = VatReturnDetails(exampleVatReturn, moneyOwed = true, isRepayment = false, Some(examplePayment))
+  val exampleVatReturnDetails =
+    VatReturnDetails(exampleVatReturn, moneyOwed = true, isRepayment = false, Some(examplePayment))
+
+  val mockAuditService: AuditingService = mock[AuditingService]
+  val mockDateService: DateService = mock[DateService]
+  val mockAuthConnector: AuthConnector = mock[AuthConnector]
+  val mockVatReturnService: ReturnsService = mock[ReturnsService]
+  val mockEnrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
+  val mockVatApiService: SubscriptionService = mock[SubscriptionService]
 
   private trait Test {
     val serviceCall: Boolean = true
@@ -83,11 +93,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
     val vatReturnResult: Future[HttpGetResult[VatReturn]] = Future.successful(Right(exampleVatReturn))
     val paymentResult: Future[Option[Payment]] = Future.successful(Some(examplePayment))
-    val mockAuthConnector: AuthConnector = mock[AuthConnector]
-    val mockVatReturnService: ReturnsService = mock[ReturnsService]
     val mockSubscriptionService: SubscriptionService = mock[SubscriptionService]
-    val mockDateService: DateService = mock[DateService]
-    val mockAuditService: AuditingService = mock[AuditingService]
 
     def setup(): Any = {
       (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
@@ -125,8 +131,6 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       }
     }
 
-    val mockEnrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
-
     def target: ReturnsController = {
       setup()
       new ReturnsController(
@@ -136,7 +140,8 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         mockSubscriptionService,
         mockDateService,
         mockConfig,
-        mockAuditService)
+        mockAuditService
+      )
     }
   }
 
@@ -268,12 +273,6 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
   "Calling .constructViewModel" should {
 
-    val mockVatReturnService: ReturnsService = mock[ReturnsService]
-    val mockVatApiService: SubscriptionService = mock[SubscriptionService]
-    val mockAuthConnector: AuthConnector = mock[AuthConnector]
-    val mockDateService: DateService = mock[DateService]
-    val mockAuditService: AuditingService = mock[AuditingService]
-    val mockEnrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
     val target = new ReturnsController(
       messages,
       mockEnrolmentsAuthService,
@@ -281,7 +280,8 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       mockVatApiService,
       mockDateService,
       mockConfig,
-      mockAuditService)
+      mockAuditService
+    )
 
     "populate a VatReturnViewModel" in {
 
@@ -311,13 +311,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
   "Calling .renderResult" when {
 
-    val mockVatReturnService: ReturnsService = mock[ReturnsService]
-    val mockVatApiService: SubscriptionService = mock[SubscriptionService]
-    val mockAuthConnector: AuthConnector = mock[AuthConnector]
-    val mockDateService: DateService = mock[DateService]
-    val mockAuditService: AuditingService = mock[AuditingService]
-    val mockEnrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
-    val user = models.User("123456789", true, true)
+    val user = models.User("123456789", hasNonMtdVat = true)
 
     val target = new ReturnsController(
       messages,
@@ -326,7 +320,8 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       mockVatApiService,
       mockDateService,
       mockConfig,
-      mockAuditService)
+      mockAuditService
+    )
 
     "it returns Right(vatReturn), Some(ob) and Some(pay)" should {
 

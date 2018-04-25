@@ -26,7 +26,6 @@
     <h2 class="heading-large">@messages("paymentStatus.hmrcWillPay") @displayMoney(amount)</h2>
   }
   case (false, true) => {
-    <p>@messages("paymentStatus.paymentProcessed")</p>
     <h2 class="heading-large">@messages("paymentStatus.hmrcPaid") @displayMoney(amount)</h2>
   }
   case (true, false) => {
@@ -35,7 +34,6 @@
     <h2 class="heading-large">@messages("paymentStatus.returnTotal") @displayMoney(amount)</h2>
   }
   case (false, false) => {
-    <p>@messages("paymentStatus.paymentProcessed")</p>
     <h2 class="heading-large">@messages("paymentStatus.youPaid") @displayMoney(amount)</h2>
   }
 }
