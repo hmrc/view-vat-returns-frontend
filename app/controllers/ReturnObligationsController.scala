@@ -53,6 +53,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
   def returnDeadlines(): Action[AnyContent] = authorisedAction { implicit request =>
     implicit user =>
       returnsService.getReturnObligationsForYear(user, dateService.now().getYear, Obligation.Status.Outstanding).map {
+        case Right(VatReturnObligations(Seq())) => Ok(views.html.returns.noUpcomingReturnDeadlines(None))
         case Right(VatReturnObligations(obligations)) =>
           val deadlines = obligations.map(ob =>
             ReturnDeadlineViewModel(ob.due, ob.start, ob.end, ob.due.isBefore(dateService.now()))

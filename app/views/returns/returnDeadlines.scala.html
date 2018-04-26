@@ -30,13 +30,7 @@
 
   <div class="grid-row">
     <div class="column-two-thirds">
-
       <h1 class="heading-xlarge">@messages("returnDeadlines.title")</h1>
-
-      @if(deadlines.isEmpty) {
-        <p class="lede">@messages("returnDeadlines.nextDeadline")</p>
-        <p>@messages("returnDeadlines.noReturns")</p>
-      } else {
         <p aria-hidden="true">@messages("returnDeadlines.submitBy")</p>
 
         <div class="form-group">
@@ -70,7 +64,6 @@
             </ul>
           </div>
         </details>
-      }
     </div>
   </div>
 }

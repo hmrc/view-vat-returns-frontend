@@ -44,8 +44,6 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
     val returnDeadlinesBreadCrumb = "div.breadcrumbs li:nth-of-type(3)"
 
     val overdueLabel = ".task-overdue"
-    val noReturnsNextDeadline = "#content > article > div > div > p:nth-of-type(1)"
-    val noReturnsDue = "#content > article > div > div > p:nth-of-type(2)"
   }
 
   "Rendering the Return deadlines page with a single deadline" should {
@@ -158,19 +156,4 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
     }
   }
 
-  "Rendering the Return deadlines page with no deadlines" should {
-
-    val noDeadlines = Seq()
-    lazy val view = views.html.returns.returnDeadlines(noDeadlines)
-    lazy implicit val document: Document = Jsoup.parse(view.body)
-
-    "have the correct text for no deadlines" in {
-      elementText(Selectors.noReturnsNextDeadline) shouldBe
-        "Your next deadline will show here on the first day of your next accounting period."
-    }
-
-    "have the correct software guidance" in {
-      elementText(Selectors.noReturnsDue) shouldBe "You don't have any returns due right now."
-    }
-  }
 }
