@@ -25,7 +25,6 @@ import models.Obligation.Status
 import models.payments.{Payment, Payments}
 import models._
 import uk.gov.hmrc.http.HeaderCarrier
-
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -59,6 +58,19 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
       0,
       "#003"
     )
+
+    val exampleObligations = VatReturnObligations(
+      Seq(
+        VatReturnObligation(
+          LocalDate.parse("2017-01-01"),
+          LocalDate.parse("2018-12-31"),
+          LocalDate.parse("2018-01-31"),
+          "O",
+          None,
+          "#001"
+        )
+      )
+    )
   }
 
   "Calling .getVatReturn" should {
@@ -77,19 +89,6 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
   }
 
   "Calling .getReturnObligationsForYear" should {
-
-    val exampleObligations = VatReturnObligations(
-      Seq(
-        VatReturnObligation(
-          LocalDate.parse("2017-01-01"),
-          LocalDate.parse("2018-12-31"),
-          LocalDate.parse("2018-01-31"),
-          "O",
-          None,
-          "#001"
-        )
-      )
-    )
 
     "return all of a user's VAT return obligations" in new Test {
       (mockVatApiConnector.getVatReturnObligations(_: String, _: LocalDate, _: LocalDate, _: Status.Value)(_: HeaderCarrier, _: ExecutionContext))
@@ -151,7 +150,7 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
 
   "Calling .getObligationWithMatchingPeriodKey" should {
 
-    val exampleObligations: VatReturnObligations = VatReturnObligations(
+    val obligations: VatReturnObligations = VatReturnObligations(
       Seq(
         VatReturnObligation(
           LocalDate.parse("2017-01-01"),
@@ -193,7 +192,7 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
 
       (mockVatApiConnector.getVatReturnObligations(_: String, _: LocalDate, _: LocalDate, _: Status.Value)(_: HeaderCarrier, _: ExecutionContext))
         .expects(*, *, *, *, *, *)
-        .returns(Future.successful(Right(exampleObligations)))
+        .returns(Future.successful(Right(obligations)))
 
       val result: Option[VatReturnObligation] = await(service.getObligationWithMatchingPeriodKey(User("111111111"), 2018, "#001"))
       result shouldBe Some(expected)
@@ -203,7 +202,7 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
 
       (mockVatApiConnector.getVatReturnObligations(_: String, _: LocalDate, _: LocalDate, _: Status.Value)(_: HeaderCarrier, _: ExecutionContext))
         .expects(*, *, *, *, *, *)
-        .returns(Future.successful(Right(exampleObligations)))
+        .returns(Future.successful(Right(obligations)))
 
       val result: Option[VatReturnObligation] = await(service.getObligationWithMatchingPeriodKey(User("111111111"), 2018, "#004"))
       result shouldBe None
@@ -220,6 +219,63 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
       val result: VatReturnDetails = service.constructReturnDetailsModel(exampleVatReturn, Some(examplePayment))
 
       result shouldBe expected
+    }
+  }
+
+  "Calling .getLastObligation" when {
+
+    val olderObligation: VatReturnObligation = VatReturnObligation(
+      LocalDate.parse("2017-01-01"),
+      LocalDate.parse("2018-12-31"),
+      due = LocalDate.parse("2018-01-30"),
+      "F",
+      Some(LocalDate.parse("2018-01-31")),
+      "#001"
+    )
+    val newerObligation: VatReturnObligation = VatReturnObligation(
+      LocalDate.parse("2017-01-01"),
+      LocalDate.parse("2018-12-31"),
+      due = LocalDate.parse("2018-01-31"),
+      "F",
+      Some(LocalDate.parse("2018-01-31")),
+      "#001"
+    )
+
+    "supplying multiple obligations" should {
+
+      val obligations: VatReturnObligations = VatReturnObligations(Seq(olderObligation, olderObligation, newerObligation))
+
+      "return the most recent obligation by due date" in new Test {
+
+        val result: VatReturnObligation = service.getLastObligation(obligations)
+        result shouldEqual newerObligation
+      }
+    }
+
+    "supplying one obligation" should {
+
+      val obligations: VatReturnObligations = VatReturnObligations(Seq(olderObligation))
+
+      "return the most recent obligation by due date" in new Test {
+
+        val result: VatReturnObligation = service.getLastObligation(obligations)
+        result shouldEqual olderObligation
+      }
+    }
+  }
+
+  "Calling .getPreviousFulfilledObligations" should {
+
+    "return obligations" in new Test {
+      implicit val user: User = User("999999999")
+
+      (mockVatApiConnector.getVatReturnObligations(_: String, _: LocalDate, _: LocalDate, _: Status.Value)(_: HeaderCarrier, _: ExecutionContext))
+        .expects(*, *, *, *, *, *)
+        .returns(Future.successful(Right(exampleObligations)))
+
+      lazy val result: HttpGetResult[VatReturnObligations] = service.getFulfilledObligations(LocalDate.parse("2018-01-01"))
+
+      await(result) shouldBe Right(exampleObligations)
     }
   }
 }
