@@ -124,7 +124,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       }
 
       "have the text 'VAT'" in {
-        elementText(Selectors.vatBreadcrumb) shouldBe "VAT"
+        elementText(Selectors.vatBreadcrumb) shouldBe "Your VAT details"
       }
 
       s"link to 'vat-details-url'" in {

@@ -26,7 +26,7 @@ userResearch.enterSurvey = Enter our survey
 userResearch.close = No thanks
 
 breadcrumbs.bta = Business tax account
-breadcrumbs.vat = VAT
+breadcrumbs.vat = Your VAT details
 breadcrumbs.vatPayments = What you owe
 breadcrumbs.vatReturn = VAT return: {0}
 
