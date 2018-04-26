@@ -24,8 +24,6 @@ import org.jsoup.nodes.Document
 
 class ReturnDeadlinesViewSpec extends ViewBaseSpec {
 
-  val userVrn = "555555555"
-
   object Selectors {
     val pageHeading = "#content h1"
     val submitThroughSoftware = "#content > article > div > div > p"
@@ -59,7 +57,7 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
         LocalDate.parse("2018-01-01"))
     )
 
-    lazy val view = views.html.returns.returnDeadlines(singleDeadline, userVrn)
+    lazy val view = views.html.returns.returnDeadlines(singleDeadline)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "render the breadcrumbs which" should {
@@ -136,7 +134,7 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
         overdue = true)
     )
 
-    lazy val view = views.html.returns.returnDeadlines(multipleDeadlines, userVrn)
+    lazy val view = views.html.returns.returnDeadlines(multipleDeadlines)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct obligation due date for the first deadline" in {
@@ -163,7 +161,7 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
   "Rendering the Return deadlines page with no deadlines" should {
 
     val noDeadlines = Seq()
-    lazy val view = views.html.returns.returnDeadlines(noDeadlines, userVrn)
+    lazy val view = views.html.returns.returnDeadlines(noDeadlines)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct text for no deadlines" in {

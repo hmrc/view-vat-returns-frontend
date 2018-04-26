@@ -63,7 +63,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
             routes.ReturnObligationsController.returnDeadlines().url
           )
 
-          Ok(views.html.returns.returnDeadlines(deadlines, user.vrn))
+          Ok(views.html.returns.returnDeadlines(deadlines))
 
         case Left(_) => InternalServerError(views.html.errors.technicalProblem())
       }
