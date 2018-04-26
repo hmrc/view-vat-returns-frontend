@@ -47,8 +47,8 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
     val period = ".column-two-thirds p"
     def obligation(number: Int): String = s".list-bullet li:nth-of-type($number)"
     def obligationLink(number: Int): String = s".list-bullet li:nth-of-type($number) > a"
-    val previousReturnsText = ".column-two-thirds p"
-    val previousReturnsLink = "div > div > p > a"
+    val previousReturnsText = "#previous-one"
+    val previousReturnsLink = "#previous-one a:nth-of-type(1)"
   }
 
   "Rendering the Submitted Returns page with multiple return years displayed" when {

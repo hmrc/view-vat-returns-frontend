@@ -211,7 +211,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         val result: Result = await(target.returnDeadlines()(fakeRequest))
         val document: Document = Jsoup.parse(bodyOf(result))
 
-        document.select("p").eq(2).text() shouldBe
+        document.select(".lede").text() shouldBe
           "Your next deadline will show here on the first day of your next accounting period."
       }
     }

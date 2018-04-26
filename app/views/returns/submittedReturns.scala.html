@@ -57,7 +57,7 @@
       @if(model.returnYears.length == 1 && model.returnYears.head != model.selectedYear) {
 
         <h2>@messages("submittedReturns.previousReturns")</h2>
-        <p>
+        <p id="previous-one">
           @messages("submittedReturns.previousReturnsOne")
           <a href="@appConfig.portalUrl(model.vrn)" data-journey-click="return:view-portal-returns:submitted-returns">
             @messages("submittedReturns.previousReturnsTwo")</a>.
