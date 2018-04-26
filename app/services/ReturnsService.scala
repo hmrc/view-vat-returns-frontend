@@ -50,7 +50,7 @@ class ReturnsService @Inject()(vatApiConnector: VatApiConnector, financialDataCo
 
   def getFulfilledObligations(currentDate: LocalDate)
                              (implicit user: User, hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[VatReturnObligations]] = {
-    val from: LocalDate = currentDate.minusMonths(3) //TODO: check this logic is correct
+    val from: LocalDate = currentDate.minusMonths(3)
     vatApiConnector.getVatReturnObligations(user.vrn, from, currentDate, Status.Fulfilled)
   }
 
