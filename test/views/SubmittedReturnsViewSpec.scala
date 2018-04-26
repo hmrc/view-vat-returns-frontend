@@ -133,7 +133,7 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
         }
 
         "have the text 'VAT'" in {
-          elementText(Selectors.vatBreadcrumb) shouldBe "VAT"
+          elementText(Selectors.vatBreadcrumb) shouldBe "Your VAT details"
         }
 
         "link to the VAT Details page" in {
