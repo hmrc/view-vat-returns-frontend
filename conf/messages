@@ -58,8 +58,8 @@ yourVatReturn.paymentNow = Pay this now
 yourVatReturn.helpTitle = There’s an error in my return
 yourVatReturn.helpLine = If the error happened in an accounting period that ended in the last 4 years, you can correct it in your next return. The error must be either:
 yourVatReturn.reportLink1 = You must
-yourVatReturn.reportLink2 = report any other
-yourVatReturn.reportLink3 = errors to HMRC.
+yourVatReturn.reportLink2 = report any other errors (opens in a new tab)
+yourVatReturn.reportLink3 = to HMRC.
 yourVatReturn.bullet1 = £10,000 or less
 yourVatReturn.bullet2 = 1% or less of your box 6 figure and below £50,000
 
@@ -67,10 +67,9 @@ paymentStatus.youPaid = You paid:
 paymentStatus.returnTotal = Return total:
 paymentStatus.hmrcWillPay = HMRC will pay you:
 paymentStatus.hmrcPaid = HMRC paid you:
-paymentStatus.billToPay = This bill needs to be paid before {0}.
-paymentStatus.paymentProcessing = Payments can take between 4 and 7 days to appear here.
+paymentStatus.billToPay = You need to pay this bill by {0}.
+paymentStatus.paymentProcessing = It can take up to 7 days to show that you''ve made a payment.
 paymentStatus.repaymentProcessing = It can take up to 30 days for you to receive a repayment.
-paymentStatus.paymentProcessed = Your payment has been processed. There is nothing more you need to do with this return.
 
 boxFiveDescription.totalYouOwed = Total you owed
 boxFiveDescription.totalYouOwe = Total you owe
@@ -91,8 +90,7 @@ submittedReturns.inactivePrevious = View previous returns
 submittedReturns.previousReturns = Previous returns
 
 returnDeadlines.title = Return deadlines
-returnDeadlines.submitBy = You must use accounting software to submit a return by:
-returnDeadlines.submitByPrefix = You must use accounting software to submit a return by
+returnDeadlines.submitBy = Use your accounting software to submit a return by:
 returnDeadlines.periodEnding = for the period {0}
 returnDeadlines.howToSubmit = How to submit a return
 returnDeadlines.software = Choose accounting software that supports this service if you haven''t already.

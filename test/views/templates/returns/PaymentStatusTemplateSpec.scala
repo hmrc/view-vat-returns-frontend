@@ -28,8 +28,8 @@ class PaymentStatusTemplateSpec extends TemplateBaseSpec {
 
     "the user owes money on their VAT return" should {
 
-      val expectedText = "This bill needs to be paid before 11 November 2011. " +
-           "Payments can take between 4 and 7 days to appear here. Return total: £1,000"
+      val expectedText = "You need to pay this bill by 11 November 2011. " +
+           "It can take up to 7 days to show that you've made a payment. Return total: £1,000"
 
       val template = views.html.templates.returns.paymentStatus(
         1000,
@@ -46,8 +46,7 @@ class PaymentStatusTemplateSpec extends TemplateBaseSpec {
 
     "the user has paid off their VAT return" should {
 
-      val expectedText = "Your payment has been processed. " +
-        "There is nothing more you need to do with this return. You paid: £1,000"
+      val expectedText = "You paid: £1,000"
 
       val template = views.html.templates.returns.paymentStatus(
         1000,
@@ -81,8 +80,7 @@ class PaymentStatusTemplateSpec extends TemplateBaseSpec {
 
     "the user has been paid by HMRC for their VAT return" should {
 
-      val expectedText = "Your payment has been processed. " +
-        "There is nothing more you need to do with this return. HMRC paid you: £1,000"
+      val expectedText = "HMRC paid you: £1,000"
 
       val template = views.html.templates.returns.paymentStatus(
         1000,
