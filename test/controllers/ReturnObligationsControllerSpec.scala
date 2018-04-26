@@ -60,8 +60,8 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         )
       )
     )
-
     val serviceCall: Boolean = true
+    val openObligations: Boolean = true
     val authResult: Future[_]
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
     val mockVatReturnService: ReturnsService = mock[ReturnsService]
@@ -86,6 +86,13 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         (mockAuditService.extendedAudit(_: ExtendedAuditModel, _: String)(_: HeaderCarrier, _: ExecutionContext))
           .stubs(*, *, *, *)
           .returns({})
+      }
+
+      if(!openObligations) {
+        (mockVatReturnService.getFulfilledObligations(_: LocalDate)
+        (_: User, _: HeaderCarrier, _: ExecutionContext))
+          .expects(*, *, *, *)
+          .returns(Right(VatReturnObligations(Seq.empty)))
       }
     }
 
@@ -201,12 +208,13 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
       }
     }
 
-    "A user with no returns" should {
+    "A user with no open obligations" should {
 
       "return the no returns view" in new Test {
         override val exampleObligations: Future[Right[HttpError, VatReturnObligations]] =
           Right(VatReturnObligations(Seq.empty))
         override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
+        override val openObligations: Boolean = false
 
         val result: Result = await(target.returnDeadlines()(fakeRequest))
         val document: Document = Jsoup.parse(bodyOf(result))

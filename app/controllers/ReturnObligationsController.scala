@@ -21,10 +21,11 @@ import audit.models.{ViewSubmittedVatObligationsAuditModel, ViewOpenVatObligatio
 import config.AppConfig
 import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
 import javax.inject.Inject
+
 import models.viewModels.{ReturnDeadlineViewModel, ReturnObligationsViewModel, VatReturnsViewModel}
-import models.{Obligation, User, VatReturnObligations}
+import models.{Obligation, User, VatReturnObligation, VatReturnObligations}
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{Action, AnyContent, Request, Result}
 import services.{DateService, EnrolmentsAuthService, ReturnsService}
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -52,11 +53,15 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
 
   def returnDeadlines(): Action[AnyContent] = authorisedAction { implicit request =>
     implicit user =>
-      returnsService.getReturnObligationsForYear(user, dateService.now().getYear, Obligation.Status.Outstanding).map {
-        case Right(VatReturnObligations(Seq())) => Ok(views.html.returns.noUpcomingReturnDeadlines(None))
+      val currentDate = dateService.now()
+      val openObligationsCall = returnsService.getReturnObligationsForYear(user, currentDate.getYear, Obligation.Status.Outstanding)
+      lazy val closedObligationsCall = returnsService.getFulfilledObligations(currentDate)
+
+      openObligationsCall.flatMap {
+        case Right(VatReturnObligations(Seq())) => closedObligationsCall.map(fulfilledObligations => noOpenObligationsAction(fulfilledObligations))
         case Right(VatReturnObligations(obligations)) =>
           val deadlines = obligations.map(ob =>
-            ReturnDeadlineViewModel(ob.due, ob.start, ob.end, ob.due.isBefore(dateService.now()))
+            ReturnDeadlineViewModel(ob.due, ob.start, ob.end, ob.due.isBefore(currentDate))
           )
 
           auditService.extendedAudit(
@@ -64,10 +69,23 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
             routes.ReturnObligationsController.returnDeadlines().url
           )
 
-          Ok(views.html.returns.returnDeadlines(deadlines))
-
-        case Left(_) => InternalServerError(views.html.errors.technicalProblem())
+          Future.successful(Ok(views.html.returns.returnDeadlines(deadlines)))
+        case Left(_) => Future.successful(InternalServerError(views.html.errors.technicalProblem()))
       }
+  }
+
+  private def noOpenObligationsAction(obligationsResult: HttpGetResult[VatReturnObligations])(implicit request: Request[AnyContent]): Result = {
+    obligationsResult match {
+      case Right(VatReturnObligations(Seq())) => Ok(views.html.returns.noUpcomingReturnDeadlines(None))
+      case Right(obligations) =>
+        val lastFulfilledObligation: VatReturnObligation = returnsService.getLastObligation(obligations)
+        Ok(views.html.returns.noUpcomingReturnDeadlines(Some(ReturnDeadlineViewModel(
+          lastFulfilledObligation.due,
+          lastFulfilledObligation.start,
+          lastFulfilledObligation.end
+        ))))
+      case Left(_) => InternalServerError(views.html.errors.technicalProblem())
+    }
   }
 
   private[controllers] def isValidSearchYear(year: Int, upperBound: Int = dateService.now().getYear) = {
