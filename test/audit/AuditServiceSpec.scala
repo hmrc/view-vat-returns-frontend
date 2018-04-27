@@ -17,7 +17,7 @@
 package auditSpec
 
 import audit.AuditingService
-import audit.models.PaymentAuditModel
+import audit.models.PayVatReturnChargeAuditModel
 import config.FrontendAuditConnector
 import controllers.ControllerBaseSpec
 import models.User
@@ -49,7 +49,7 @@ class AuditServiceSpec extends ControllerBaseSpec with BeforeAndAfterEach {
       "payment details have been supplied" should {
         "extract the data and pass it into the AuditConnector" in new Test {
 
-          val testModel = PaymentAuditModel(
+          val testModel = PayVatReturnChargeAuditModel(
             User("111111111", true, true),
             PaymentDetailsModel(
               taxType = "vat",

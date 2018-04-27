@@ -17,7 +17,7 @@
 package controllers
 
 import audit.AuditingService
-import audit.models.PaymentAuditModel
+import audit.models.PayVatReturnChargeAuditModel
 import config.AppConfig
 import forms.MakePaymentForm
 import javax.inject.{Inject, Singleton}
@@ -74,7 +74,7 @@ class MakePaymentController @Inject()(val messagesApi: MessagesApi,
           val details = payment(paymentDetail, user.vrn)
           paymentsService.setupPaymentsJourney(details).map { url =>
             auditService.audit(
-              PaymentAuditModel(user, details, url),
+              PayVatReturnChargeAuditModel(user, details, url),
               routes.MakePaymentController.makePayment().url
             )
             Redirect(url)
