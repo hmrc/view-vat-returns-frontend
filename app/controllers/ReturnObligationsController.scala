@@ -55,10 +55,10 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
     implicit user =>
       val currentDate = dateService.now()
       val openObligationsCall = returnsService.getReturnObligationsForYear(user, currentDate.getYear, Obligation.Status.Outstanding)
-      lazy val closedObligationsCall = returnsService.getFulfilledObligations(currentDate)
 
       openObligationsCall.flatMap {
-        case Right(VatReturnObligations(Seq())) => closedObligationsCall.map(fulfilledObligations => noOpenObligationsAction(fulfilledObligations))
+        case Right(VatReturnObligations(Seq())) =>
+          returnsService.getFulfilledObligations(currentDate).map(fulfilledObligations => fulfilledObligationsAction(fulfilledObligations))
         case Right(VatReturnObligations(obligations)) =>
           val deadlines = obligations.map(ob =>
             ReturnDeadlineViewModel(ob.due, ob.start, ob.end, ob.due.isBefore(currentDate))
@@ -74,7 +74,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
       }
   }
 
-  private def noOpenObligationsAction(obligationsResult: HttpGetResult[VatReturnObligations])(implicit request: Request[AnyContent]): Result = {
+  private def fulfilledObligationsAction(obligationsResult: HttpGetResult[VatReturnObligations])(implicit request: Request[AnyContent]): Result = {
     obligationsResult match {
       case Right(VatReturnObligations(Seq())) => Ok(views.html.returns.noUpcomingReturnDeadlines(None))
       case Right(obligations) =>

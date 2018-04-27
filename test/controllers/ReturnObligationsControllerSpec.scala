@@ -446,4 +446,32 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
       }
     }
   }
+
+  "Calling .fulfilledObligationsAction" when {
+
+    "user has no obligations" should {
+
+      "return noUpcomingReturnDeadlines view with no obligation" in {
+
+      }
+    }
+
+    "user has obligations" should {
+
+      "return noUpcomingReturnDeadlines view with the obligation dates" in {
+
+      }
+    }
+
+    "the service returns an error" should {
+
+      "return an internal server error" in {
+
+      }
+
+      "return the technical problem view" in {
+
+      }
+    }
+  }
 }
