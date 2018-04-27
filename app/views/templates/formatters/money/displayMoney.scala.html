@@ -18,8 +18,9 @@
 
 @(value: BigDecimal)(implicit messages: Messages)
 
-@if(value.isWhole){
-  @Money.pounds(value)
-}else{
-  @Money.pounds(value, 2)
+@(value.isWhole, value > 0) match {
+  case (true, true) => { @Money.pounds(value) }
+  case (true, false) => { <span aria-hidden="true">&minus;</span>@Money.pounds(value.abs) }
+  case (false, true) => { @Money.pounds(value, 2) }
+  case (false, false) => { <span aria-hidden="true">&minus;</span>@Money.pounds(value.abs, 2) }
 }

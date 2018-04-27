@@ -64,6 +64,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     val paymentServiceDetailYear = "#payment-detail input:nth-of-type(3)"
 
     val gaTagElement = "#content ul"
+    val minusSymbol = "#box-four > div.column-one-quarter.form-hint.text--right > span"
   }
 
   def boxElement(box: String, column: Int): String = {
@@ -180,6 +181,10 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
         "Total value of acquisitions of goods from European Community, minus VAT"
       )
       expectedDescriptions.indices.foreach(i => elementText(boxElement(Selectors.boxes(i), 2)) shouldBe expectedDescriptions(i))
+    }
+
+    "have the minus symbol before the box four amount" in {
+      elementText(Selectors.minusSymbol) shouldBe "−"
     }
 
     "render the correct help revealing link text" in {

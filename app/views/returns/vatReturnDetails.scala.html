@@ -93,7 +93,7 @@
           <div class="column-one-half form-hint">@messages("yourVatReturn.boxFourDescription")</div>
           <div class="column-one-quarter form-hint text--right">
             <span aria-hidden="true">&minus;</span>
-            @displayMoney(vatReturnViewModel.vatReturnDetails.vatReturn.vatReclaimedCurrentPeriod)
+            @displayMoney(vatReturnViewModel.vatReturnDetails.vatReturn.vatReclaimedCurrentPeriod.abs)
           </div>
         </div>
       </div>
