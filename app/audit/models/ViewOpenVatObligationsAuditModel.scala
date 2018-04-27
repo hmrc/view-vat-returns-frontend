@@ -21,12 +21,12 @@ import java.time.LocalDate
 import models.{User, VatReturnObligation}
 import play.api.libs.json.{JsValue, Json, Writes}
 
-case class OpenObligationsAuditModel(user: User,
-                                     obligations: Seq[VatReturnObligation]) extends ExtendedAuditModel {
+case class ViewOpenVatObligationsAuditModel(user: User,
+                                            obligations: Seq[VatReturnObligation]) extends ExtendedAuditModel {
 
   override val auditType: String = "ReturnDeadlinesPageView"
 
-  override val transactionName: String = "ViewOpenVatObligations"
+  override val transactionName: String = "view-open-vat-obligations"
 
   private case class OpenObligationDetails(start: LocalDate,
                                            end: LocalDate,

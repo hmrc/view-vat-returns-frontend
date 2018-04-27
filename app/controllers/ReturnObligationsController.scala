@@ -17,7 +17,7 @@
 package controllers
 
 import audit.AuditingService
-import audit.models.{FulfilledObligationsAuditModel, OpenObligationsAuditModel}
+import audit.models.{ViewSubmittedVatObligationsAuditModel, ViewOpenVatObligationsAuditModel}
 import config.AppConfig
 import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
 import javax.inject.Inject
@@ -59,7 +59,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
           )
 
           auditService.extendedAudit(
-            OpenObligationsAuditModel(user, obligations),
+            ViewOpenVatObligationsAuditModel(user, obligations),
             routes.ReturnObligationsController.returnDeadlines().url
           )
 
@@ -81,7 +81,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
     returnsService.getReturnObligationsForYear(user, selectedYear, status).map {
       case Right(VatReturnObligations(obligations)) =>
         auditService.extendedAudit(
-          FulfilledObligationsAuditModel(user, obligations),
+          ViewSubmittedVatObligationsAuditModel(user, obligations),
           routes.ReturnObligationsController.submittedReturns(selectedYear).url
         )
 

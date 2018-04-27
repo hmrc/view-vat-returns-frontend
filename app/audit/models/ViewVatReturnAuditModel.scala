@@ -19,12 +19,12 @@ package audit.models
 import models.{User, VatReturn}
 import models.viewModels.VatReturnViewModel
 
-case class VatReturnAuditModel(user: User,
-                               vatReturnViewInfo: VatReturnViewModel) extends AuditModel {
+case class ViewVatReturnAuditModel(user: User,
+                                   vatReturnViewInfo: VatReturnViewModel) extends AuditModel {
 
   override val auditType: String = "VatReturnPageView"
 
-  override val transactionName: String = "ViewVatReturn"
+  override val transactionName: String = "view-vat-return"
 
   private val vatReturn: VatReturn = vatReturnViewInfo.vatReturnDetails.vatReturn
 

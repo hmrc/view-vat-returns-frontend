@@ -17,7 +17,7 @@
 package controllers
 
 import audit.AuditingService
-import audit.models.VatReturnAuditModel
+import audit.models.ViewVatReturnAuditModel
 import config.AppConfig
 import javax.inject.{Inject, Singleton}
 import models.errors.UnexpectedStatusError
@@ -113,7 +113,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
       routes.ReturnsController.vatReturnViaPayments(periodKey).url
     }
 
-    auditService.audit(VatReturnAuditModel(user, data), auditPath)
+    auditService.audit(ViewVatReturnAuditModel(user, data), auditPath)
   }
 
   private[controllers] def constructViewModel(entityName: Option[String],
