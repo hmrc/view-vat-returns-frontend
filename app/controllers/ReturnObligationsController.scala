@@ -74,7 +74,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
       }
   }
 
-  private def fulfilledObligationsAction(obligationsResult: HttpGetResult[VatReturnObligations])(implicit request: Request[AnyContent]): Result = {
+  private[controllers] def fulfilledObligationsAction(obligationsResult: HttpGetResult[VatReturnObligations])(implicit request: Request[AnyContent]): Result = {
     obligationsResult match {
       case Right(VatReturnObligations(Seq())) => Ok(views.html.returns.noUpcomingReturnDeadlines(None))
       case Right(obligations) =>

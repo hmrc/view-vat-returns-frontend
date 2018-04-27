@@ -447,30 +447,72 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     }
   }
 
+  private trait FulfilledObligationsTest {
+    val mockAuthConnector: AuthConnector = mock[AuthConnector]
+    val mockEnrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
+    val mockVatReturnService: ReturnsService = mock[ReturnsService]
+    val mockDateService: DateService = mock[DateService]
+    val mockAuditService: AuditingService = mock[AuditingService]
+    def target: ReturnObligationsController = {
+      new ReturnObligationsController(
+        messages,
+        mockEnrolmentsAuthService,
+        mockVatReturnService,
+        mockDateService,
+        mockConfig,
+        mockAuditService)
+    }
+  }
+
   "Calling .fulfilledObligationsAction" when {
 
     "user has no obligations" should {
 
-      "return noUpcomingReturnDeadlines view with no obligation" in {
+      val obligationsResult: HttpGetResult[VatReturnObligations] = Right(VatReturnObligations(Seq()))
 
+      "return noUpcomingReturnDeadlines view with no obligation" in new FulfilledObligationsTest {
+        val result = target.fulfilledObligationsAction(obligationsResult)
+        val document: Document = Jsoup.parse(bodyOf(result))
+
+        document.select("p").eq(2).text() shouldBe
+          "Your next deadline will show here on the first day of your next accounting period."
       }
     }
 
     "user has obligations" should {
 
-      "return noUpcomingReturnDeadlines view with the obligation dates" in {
+      val obligation = VatReturnObligation(
+        LocalDate.parse("2017-01-01"),
+        LocalDate.parse("2017-04-01"),
+        LocalDate.parse("2017-05-11"),
+        "F",
+        None,
+        "#001"
+      )
+      val obligationsResult: HttpGetResult[VatReturnObligations] = Right(VatReturnObligations(Seq(obligation)))
 
+      "return noUpcomingReturnDeadlines view with the obligation dates"  in new FulfilledObligationsTest {
+        val mockReturnsService: ReturnsService = mock[ReturnsService]
+        (mockReturnsService.getLastObligation(_: VatReturnObligations))
+          .expects(*)
+          .returns(obligation)
+        override val mockVatReturnService: ReturnsService = mockReturnsService
+        val result = target.fulfilledObligationsAction(obligationsResult)
+        val document: Document = Jsoup.parse(bodyOf(result))
+
+        document.select("p").eq(3).text() shouldBe
+          "We received your return for the period 1 January to 1 April 2017. You don't have any returns due right now."
       }
     }
 
     "the service returns an error" should {
 
-      "return an internal server error" in {
+      val obligationsResult: HttpGetResult[VatReturnObligations] = Left(ServerSideError("", ""))
 
-      }
-
-      "return the technical problem view" in {
-
+      "return the technical problem view" in new FulfilledObligationsTest {
+        val result = target.fulfilledObligationsAction(obligationsResult)
+        val document: Document = Jsoup.parse(bodyOf(result))
+        document.title shouldBe "There is a problem with the service - VAT reporting through software - GOV.UK"
       }
     }
   }
