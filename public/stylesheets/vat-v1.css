@@ -21,10 +21,3 @@ a.in-selected-tab {
   color: #0B0C0C;
   text-decoration: none;
 }
-
-@media (min-width: 641px) {
-  .centered-content {
-    font-size: 16px;
-    line-height: 1.31579;
-  }
-}
