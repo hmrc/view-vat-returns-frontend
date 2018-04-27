@@ -54,7 +54,7 @@ class ReturnsService @Inject()(vatApiConnector: VatApiConnector, financialDataCo
     vatApiConnector.getVatReturnObligations(user.vrn, from, currentDate, Status.Fulfilled)
   }
 
-  def getLastObligation(obligations: VatReturnObligations): VatReturnObligation = obligations.obligations.sortWith(_.due isAfter _.due).head
+  def getLastObligation(obligations: Seq[VatReturnObligation]): VatReturnObligation = obligations.sortWith(_.due isAfter _.due).head
 
   def getObligationWithMatchingPeriodKey(user: User, year: Int, periodKey: String)
                                         (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[VatReturnObligation]] = {

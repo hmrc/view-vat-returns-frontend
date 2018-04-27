@@ -243,7 +243,7 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
 
     "supplying multiple obligations" should {
 
-      val obligations: VatReturnObligations = VatReturnObligations(Seq(olderObligation, olderObligation, newerObligation))
+      val obligations: Seq[VatReturnObligation] = Seq(olderObligation, olderObligation, newerObligation)
 
       "return the most recent obligation by due date" in new Test {
 
@@ -254,7 +254,7 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
 
     "supplying one obligation" should {
 
-      val obligations: VatReturnObligations = VatReturnObligations(Seq(olderObligation))
+      val obligations: Seq[VatReturnObligation] = Seq(olderObligation)
 
       "return the most recent obligation by due date" in new Test {
 

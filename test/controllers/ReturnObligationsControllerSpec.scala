@@ -493,7 +493,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
       "return noUpcomingReturnDeadlines view with the obligation dates"  in new FulfilledObligationsTest {
         val mockReturnsService: ReturnsService = mock[ReturnsService]
-        (mockReturnsService.getLastObligation(_: VatReturnObligations))
+        (mockReturnsService.getLastObligation(_: Seq[VatReturnObligation]))
           .expects(*)
           .returns(obligation)
         override val mockVatReturnService: ReturnsService = mockReturnsService
