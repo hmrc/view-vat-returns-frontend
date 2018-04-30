@@ -474,7 +474,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         val result = target.fulfilledObligationsAction(obligationsResult)
         val document: Document = Jsoup.parse(bodyOf(result))
 
-        document.select("p").eq(2).text() shouldBe
+        document.select("p").eq(3).text() shouldBe
           "Your next deadline will show here on the first day of your next accounting period."
       }
     }
@@ -500,7 +500,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         val result = target.fulfilledObligationsAction(obligationsResult)
         val document: Document = Jsoup.parse(bodyOf(result))
 
-        document.select("p").eq(3).text() shouldBe
+        document.select("p").eq(4).text() shouldBe
           "We received your return for the period 1 January to 1 April 2017. You don't have any returns due right now."
       }
     }

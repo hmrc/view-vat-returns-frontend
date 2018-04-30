@@ -75,24 +75,16 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
   }
 
   private[controllers] def fulfilledObligationsAction(obligationsResult: HttpGetResult[VatReturnObligations])
-                                                     (implicit request: Request[AnyContent], user: User): Result = {
+                                                     (implicit request: Request[AnyContent]): Result = {
     obligationsResult match {
+      case Right(VatReturnObligations(Seq())) => Ok(views.html.returns.noUpcomingReturnDeadlines(None))
       case Right(VatReturnObligations(obligations)) =>
-        auditService.extendedAudit(
-          FulfilledObligationsAuditModel(user, obligations),
-          routes.ReturnObligationsController.returnDeadlines().url
-        )
-        if(obligations.isEmpty) {
-          Ok(views.html.returns.noUpcomingReturnDeadlines(None))
-        }
-        else {
-          val lastFulfilledObligation: VatReturnObligation = returnsService.getLastObligation(obligations)
-          Ok(views.html.returns.noUpcomingReturnDeadlines(Some(ReturnDeadlineViewModel(
-            lastFulfilledObligation.due,
-            lastFulfilledObligation.start,
-            lastFulfilledObligation.end
-          ))))
-        }
+        val lastFulfilledObligation: VatReturnObligation = returnsService.getLastObligation(obligations)
+        Ok(views.html.returns.noUpcomingReturnDeadlines(Some(ReturnDeadlineViewModel(
+          lastFulfilledObligation.due,
+          lastFulfilledObligation.start,
+          lastFulfilledObligation.end
+        ))))
       case Left(_) => InternalServerError(views.html.errors.technicalProblem())
     }
   }
