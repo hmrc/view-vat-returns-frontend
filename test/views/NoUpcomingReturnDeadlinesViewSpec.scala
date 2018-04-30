@@ -71,7 +71,7 @@ class NoUpcomingReturnDeadlinesViewSpec extends ViewBaseSpec {
         "Your next deadline will show here on the first day of your next accounting period."
     }
 
-    "have the correct software guidance" in {
+    "have the correct returns due guidance" in {
       elementText(Selectors.noReturnsDue) shouldBe "You don't have any returns due right now."
     }
   }
@@ -91,7 +91,7 @@ class NoUpcomingReturnDeadlinesViewSpec extends ViewBaseSpec {
         "Your next deadline will show here on the first day of your next accounting period."
     }
 
-    "have the correct software guidance" in {
+    "have the correct received return guidance" in {
       elementText(Selectors.noReturnsDue) shouldBe
         "We received your return for the period 1 January to 1 April 2018. You don't have any returns due right now."
     }
