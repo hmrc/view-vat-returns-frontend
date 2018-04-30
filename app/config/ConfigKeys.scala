@@ -65,4 +65,7 @@ object ConfigKeys {
   val mtdVatSignUpUrl: String = "vat-subscription-frontend.signUpUrl"
 
   val selfHost: String = "self.host"
+
+  val timeoutPeriod: String = "timeout.period"
+  val timeoutCountDown: String = "timeout.countDown"
 }

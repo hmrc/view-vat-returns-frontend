@@ -53,5 +53,7 @@ class MockAppConfig(val runModeConfiguration: Configuration, val mode: Mode = Mo
   override val unauthorisedSignOutUrl: String = ""
   override val vatSubscriptionBaseUrl: String = ""
   override val selfHost: String = "www.app.com"
+  override val timeoutPeriod: Int = 1800
+  override val timeoutCountdown: Int = 20
 }
 
