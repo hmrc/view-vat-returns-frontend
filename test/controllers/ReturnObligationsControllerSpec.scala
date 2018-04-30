@@ -246,20 +246,19 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
     "the Obligations API call fails" should {
 
-      "throw an exception" in new Test {
+      "return the technical problem view" in new Test {
         val errorResponse: String =
           """
             | "code" -> "GATEWAY_TIMEOUT",
             | "message" -> "Gateway Timeout"
             | """.stripMargin
 
-        override val exampleObligations: Future[Left[HttpError, VatReturnObligations]]
-        = Left(ServerSideError("504", errorResponse))
-
-        override val serviceCall = false
+        override val exampleObligations: Future[Left[HttpError, VatReturnObligations]] = Left(ServerSideError("504", errorResponse))
+        override val serviceCall = true
         override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
-        intercept[Exception](await(target.returnDeadlines()(fakeRequest)))
-      }
+        val result = await(target.returnDeadlines()(fakeRequest))
+        val document: Document = Jsoup.parse(bodyOf(result))
+        document.title shouldBe "There is a problem with the service - VAT reporting through software - GOV.UK"      }
     }
   }
 
@@ -473,7 +472,6 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
       "return noUpcomingReturnDeadlines view with no obligation" in new FulfilledObligationsTest {
         val result = target.fulfilledObligationsAction(obligationsResult)
         val document: Document = Jsoup.parse(bodyOf(result))
-
         document.select("p").eq(3).text() shouldBe
           "Your next deadline will show here on the first day of your next accounting period."
       }
