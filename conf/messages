@@ -99,6 +99,7 @@ returnDeadlines.vatRecords = Keep your VAT records in your accounting software.
 returnDeadlines.sendReturns = Submit any VAT Returns before your deadlines.
 returnDeadlines.nextDeadline = Your next deadline will show here on the first day of your next accounting period.
 returnDeadlines.noReturns = You don''t have any returns due right now.
+returnDeadlines.receivedReturn = We received your return for the period {0}.
 
 featureSwitch.title = Feature switches
 featureSwitch.heading = Features

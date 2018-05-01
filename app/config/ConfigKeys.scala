@@ -35,7 +35,7 @@ object ConfigKeys {
   val simpleAuthFeature: String = "features.simpleAuth.enabled"
   val userResearchBannerFeature: String = "features.userResearchBanner.enabled"
   val allowPaymentsFeature: String = "features.allowPayments.enabled"
-  val staticDateEnabledFeature: String = "features.date-service.staticDate.enabled"
+  val staticDateEnabledFeature: String = "features.staticDate.enabled"
   val staticDateValue: String = "date-service.staticDate.value"
   val allowNineBoxFeature: String = "features.allowNineBox.enabled"
   val enableAuditingFeature: String = "features.auditing.enabled"
