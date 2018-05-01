@@ -24,7 +24,7 @@ object MakePaymentForm {
     mapping(
       "taxType" -> default(text, "vat"),
       "taxReference" -> default(nonEmptyText, "/"),
-      "amountInPence" -> number,
+      "amountInPence" -> longNumber,
       "taxPeriodMonth" -> number,
       "taxPeriodYear" -> number,
       "returnUrl" -> default(nonEmptyText, "/"),
