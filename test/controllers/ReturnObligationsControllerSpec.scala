@@ -256,7 +256,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         override val exampleObligations: Future[Left[HttpError, VatReturnObligations]] = Left(ServerSideError("504", errorResponse))
         override val serviceCall = true
         override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
-        val result = await(target.returnDeadlines()(fakeRequest))
+        val result: Result = await(target.returnDeadlines()(fakeRequest))
         val document: Document = Jsoup.parse(bodyOf(result))
         document.title shouldBe "There is a problem with the service - VAT reporting through software - GOV.UK"      }
     }
@@ -470,9 +470,9 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
       val obligationsResult: HttpGetResult[VatReturnObligations] = Right(VatReturnObligations(Seq()))
 
       "return noUpcomingReturnDeadlines view with no obligation" in new FulfilledObligationsTest {
-        val result = target.fulfilledObligationsAction(obligationsResult)
+        val result: Result = target.fulfilledObligationsAction(obligationsResult)
         val document: Document = Jsoup.parse(bodyOf(result))
-        document.select("p").eq(3).text() shouldBe
+        document.select("p.lede").text() shouldBe
           "Your next deadline will show here on the first day of your next accounting period."
       }
     }
@@ -495,10 +495,10 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
           .expects(*)
           .returns(obligation)
         override val mockVatReturnService: ReturnsService = mockReturnsService
-        val result = target.fulfilledObligationsAction(obligationsResult)
+        val result: Result = target.fulfilledObligationsAction(obligationsResult)
         val document: Document = Jsoup.parse(bodyOf(result))
 
-        document.select("p").eq(4).text() shouldBe
+        document.select("#content > article > p:nth-child(4)").text() shouldBe
           "We received your return for the period 1 January to 1 April 2017. You don't have any returns due right now."
       }
     }
@@ -508,7 +508,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
       val obligationsResult: HttpGetResult[VatReturnObligations] = Left(ServerSideError("", ""))
 
       "return the technical problem view" in new FulfilledObligationsTest {
-        val result = target.fulfilledObligationsAction(obligationsResult)
+        val result: Result = target.fulfilledObligationsAction(obligationsResult)
         val document: Document = Jsoup.parse(bodyOf(result))
         document.title shouldBe "There is a problem with the service - VAT reporting through software - GOV.UK"
       }
