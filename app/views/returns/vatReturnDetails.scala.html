@@ -30,7 +30,7 @@
     <li>@Messages("yourVatReturn.bullet1")</li>
     <li>@Messages("yourVatReturn.bullet2")</li>
   </ul>
-  <p>@Messages("yourVatReturn.reportLink1") <a href="@appConfig.reportVatErrorUrl" id="reportVatErrorLink">@Messages("yourVatReturn.reportLink2")</a> @Messages("yourVatReturn.reportLink3")</p>
+  <p>@Messages("yourVatReturn.reportLink1") <a target="_blank" href="@appConfig.reportVatErrorUrl" id="reportVatErrorLink">@Messages("yourVatReturn.reportLink2")</a> @Messages("yourVatReturn.reportLink3")</p>
 }
 
 @views.html.main_template(title = messages("yourVatReturn.title"), bodyClasses = None, appConfig = appConfig) {
