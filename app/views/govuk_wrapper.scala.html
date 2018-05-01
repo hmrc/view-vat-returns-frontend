@@ -35,7 +35,21 @@
 }
 
 @scriptElement = {
-  <script type="text/javascript" src='@routes.Assets.at("javascript/vat-v1.js")'></script>
+<script type="text/javascript" src='@routes.Assets.at("javascript/vat-v1.js")'></script>
+
+<script>
+    @if(showLogout) {
+        $.timeoutDialog({
+          timeout: @appConfig.timeoutPeriod,
+          countdown: @appConfig.timeoutCountdown,
+          keep_alive_url: '/vat-through-software/vat-returns/return-deadlines',
+          logout_url: '/vat-through-software/vat-returns/time-out',
+          sign_out_button_text: '@messages("base.signOut")'
+        });
+
+        var dialogOpen;
+    }
+  </script>
 }
 
 @head = {

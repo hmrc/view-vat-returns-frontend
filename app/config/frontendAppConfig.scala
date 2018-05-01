@@ -58,6 +58,8 @@ trait AppConfig extends ServicesConfig {
   val unauthorisedSignOutUrl: String
   val setupPaymentsJourneyPath: String
   val selfHost: String
+  val timeoutPeriod: Int
+  val timeoutCountdown: Int
 }
 
 @Singleton
@@ -126,4 +128,7 @@ class FrontendAppConfig @Inject()(val runModeConfiguration: Configuration, val e
   override lazy val mtdVatSignUpUrl: String = mtdVatSignUpBaseUrl + getString(Keys.mtdVatSignUpUrl)
 
   override lazy val selfHost: String = getString(Keys.selfHost)
+
+  override lazy val timeoutPeriod: Int = getString(Keys.timeoutPeriod).toInt
+  override lazy val timeoutCountdown: Int = getString(Keys.timeoutCountDown).toInt
 }
