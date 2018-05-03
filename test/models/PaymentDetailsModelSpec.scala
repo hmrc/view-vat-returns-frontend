@@ -56,5 +56,22 @@ class PaymentDetailsModelSpec extends UnitSpec {
 
       actualJson shouldBe expectedJson
     }
+
+    "render amounts greater than the max Int correctly" in {
+      val payment = PaymentDetailsModel(
+        "vat",
+        "123456789",
+        2147483648L,
+        3,
+        2018,
+        "https://www.tax.service.gov.uk/mtdfb-page",
+        "https://www.tax.service.gov.uk/mtdfb-page2/#001",
+        "#001"
+      )
+
+      val renderedPayment = (Json.toJson(payment) \ "amountInPence").get.toString()
+
+      renderedPayment shouldBe "2147483648"
+    }
   }
 }
