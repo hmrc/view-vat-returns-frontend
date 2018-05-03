@@ -336,6 +336,57 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     }
   }
 
+  "Rendering the vat return details page when amount (in pence) owed is more than the maximum Integer value (2147483647)" should {
+
+    val vatReturnViewModel = VatReturnViewModel(
+      Some("Cheapo Clothing"),
+      LocalDate.parse("2017-01-01"),
+      LocalDate.parse("2017-03-31"),
+      LocalDate.parse("2017-04-06"),
+      1000.00,
+      LocalDate.parse("2017-04-08"),
+      VatReturnDetails(
+        VatReturn(
+          "#001",
+          1297,
+          5755,
+          7052,
+          5732,
+          BigDecimal("21474836.48"),
+          77656,
+          765765,
+          55454,
+          545645
+        ),
+        moneyOwed = true,
+        isRepayment = false,
+        Some(Payment(
+          chargeType = "VAT",
+          start = LocalDate.parse("2017-01-01"),
+          end = LocalDate.parse("2017-03-31"),
+          due = LocalDate.parse("2017-04-06"),
+          outstandingAmount = 1000.00,
+          clearedAmount = 0,
+          periodKey = "#001"
+        ))
+      ),
+      showReturnsBreadcrumb = false,
+      currentYear
+    )
+
+    lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
+    lazy implicit val document: Document = Jsoup.parse(view.body)
+
+    "have the pay button" in {
+      element(Selectors.paymentButton).attr("value") shouldBe "Pay this now"
+    }
+
+    "render the correct value for the amount hidden input for the payment service amount" in {
+      element(Selectors.paymentServiceDetailAmount).attr("value") shouldBe "2147483648"
+    }
+
+  }
+
   "Rendering the vat return details page when HMRC owe money on the return" should {
 
     val vatReturnViewModel = VatReturnViewModel(

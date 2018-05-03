@@ -77,7 +77,6 @@ class MakePaymentController @Inject()(val messagesApi: MessagesApi,
               PayVatReturnChargeAuditModel(user, details, url),
               routes.MakePaymentController.makePayment().url
             )
-            println(details)
             Redirect(url)
           }
         }
