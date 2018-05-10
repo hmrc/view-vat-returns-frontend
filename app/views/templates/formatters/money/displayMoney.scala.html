@@ -18,7 +18,7 @@
 
 @(value: BigDecimal)(implicit messages: Messages)
 
-@(value.isWhole, value > 0) match {
+@(value.isWhole, value >= 0) match {
   case (true, true) => { @Money.pounds(value) }
   case (true, false) => { <span aria-hidden="true">&minus;</span>@Money.pounds(value.abs) }
   case (false, true) => { @Money.pounds(value, 2) }
