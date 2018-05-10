@@ -219,8 +219,9 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         val result: Result = await(target.returnDeadlines()(fakeRequest))
         val document: Document = Jsoup.parse(bodyOf(result))
 
-        document.select(".lede").text() shouldBe
-          "Your next deadline will show here on the first day of your next accounting period."
+        document.select("article > p:nth-child(3)").text() shouldBe
+          "You don't have any returns due right now. Your next deadline will show here on the first day of your next" +
+            " accounting period."
       }
     }
 
@@ -472,8 +473,9 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
       "return noUpcomingReturnDeadlines view with no obligation" in new FulfilledObligationsTest {
         val result: Result = target.fulfilledObligationsAction(obligationsResult)
         val document: Document = Jsoup.parse(bodyOf(result))
-        document.select("p.lede").text() shouldBe
-          "Your next deadline will show here on the first day of your next accounting period."
+        document.select("article > p:nth-child(3)").text() shouldBe
+          "You don't have any returns due right now. Your next deadline will show here on the first day of your next" +
+            " accounting period."
       }
     }
 
@@ -498,8 +500,8 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         val result: Result = target.fulfilledObligationsAction(obligationsResult)
         val document: Document = Jsoup.parse(bodyOf(result))
 
-        document.select("#content > article > p:nth-child(4)").text() shouldBe
-          "We received your return for the period 1 January to 1 April 2017. You don't have any returns due right now."
+        document.select("p.lede").text() shouldBe
+          "We received your return for the period 1 January to 1 April 2017."
       }
     }
 

@@ -34,6 +34,7 @@ class NoUpcomingReturnDeadlinesViewSpec extends ViewBaseSpec {
     val returnDeadlinesBreadCrumb = "div.breadcrumbs li:nth-of-type(3)"
 
     val noReturnsNextDeadline = "p.lede"
+    val noReturnsDueNoObligations = "article > p:nth-child(3)"
     val noReturnsDue = "article > p:nth-child(4)"
   }
 
@@ -66,13 +67,10 @@ class NoUpcomingReturnDeadlinesViewSpec extends ViewBaseSpec {
       }
     }
 
-    "have the correct text for no deadlines" in {
-      elementText(Selectors.noReturnsNextDeadline) shouldBe
-        "Your next deadline will show here on the first day of your next accounting period."
-    }
-
-    "have the correct returns due guidance" in {
-      elementText(Selectors.noReturnsDue) shouldBe "You don't have any returns due right now."
+    "have the correct text for no deadlines with guidance" in {
+      elementText(Selectors.noReturnsDueNoObligations) shouldBe
+        "You don't have any returns due right now. Your next deadline will show here on the first day of your next" +
+          " accounting period."
     }
   }
 
@@ -88,12 +86,12 @@ class NoUpcomingReturnDeadlinesViewSpec extends ViewBaseSpec {
 
     "have the correct text for no deadlines" in {
       elementText(Selectors.noReturnsNextDeadline) shouldBe
-        "Your next deadline will show here on the first day of your next accounting period."
+        "We received your return for the period 1 January to 1 April 2018."
     }
 
     "have the correct received return guidance" in {
       elementText(Selectors.noReturnsDue) shouldBe
-        "We received your return for the period 1 January to 1 April 2018. You don't have any returns due right now."
+        "You don't have any returns due right now. Your next deadline will show here on the first day of your next accounting period."
     }
   }
 }
