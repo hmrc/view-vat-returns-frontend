@@ -34,11 +34,12 @@
         <p aria-hidden="true">@messages("returnDeadlines.submitBy")</p>
 
         <div class="form-group">
-          <ul class="list list-bullet">
+          <ul class="list">
             @for(deadline <- deadlines){
-              <li class="bold-small">
+            <li class="section divider--bottom">
+              <p>
                 <span class="visually-hidden">@messages("returnDeadlines.submitByPrefix")</span>
-                @displayDate(deadline.due)
+                <span class="bold-medium">@displayDate(deadline.due)</span>
                 @if(deadline.overdue) {
                   <span>
                     <strong class="task-overdue">@messages("common.overdue")</strong>
@@ -47,7 +48,8 @@
                 <span class="form-hint">
                   @messages("returnDeadlines.periodEnding", displayDateRange(deadline.start, deadline.end))
                 </span>
-              </li>
+              </p>
+            </li>
             }
           </ul>
         </div>
@@ -58,7 +60,7 @@
 
           <div class="panel panel-border-narrow">
             <ul class="list list-number">
-              <li>@messages("returnDeadlines.software")</li>
+              <li><a href="#">@messages("returnDeadlines.software")</a> @messages("returnDeadlines.ifYouHavent")</li>
               <li>@messages("returnDeadlines.vatRecords")</li>
               <li>@messages("returnDeadlines.sendReturns")</li>
             </ul>

@@ -32,10 +32,10 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
     val vatRecords = ".list-number li:nth-child(2)"
     val sendReturns = ".list-number li:nth-child(3)"
 
-    val firstDeadlineDueDate = ".list-bullet li:nth-of-type(1)"
-    val firstDeadlinePeriod = ".list-bullet li:nth-of-type(1) .form-hint"
-    val secondDeadlineDueDate = ".list-bullet li:nth-of-type(2)"
-    val secondDeadlinePeriod = ".list-bullet li:nth-of-type(2) .form-hint"
+    val firstDeadlineDueDate = ".list li:nth-of-type(1)"
+    val firstDeadlinePeriod = ".list li:nth-of-type(1) .form-hint"
+    val secondDeadlineDueDate = ".list li:nth-of-type(2)"
+    val secondDeadlinePeriod = ".list li:nth-of-type(2) .form-hint"
 
     val btaBreadcrumb = "div.breadcrumbs li:nth-of-type(1)"
     val btaBreadCrumbLink = "div.breadcrumbs li:nth-of-type(1) a"
@@ -106,7 +106,7 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
     }
 
     "have the correct message regarding downloading software in the hint box" in {
-      elementText(Selectors.downloadSoftware) shouldBe "Choose accounting software that supports this service if you haven't already."
+      elementText(Selectors.downloadSoftware) shouldBe "Choose accounting software that supports this service (opens in a new tab) if you haven't already."
     }
 
     "have the correct message regarding VAT records in the hint box" in {

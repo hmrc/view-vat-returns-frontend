@@ -55,7 +55,7 @@ class ReturnDeadlinesPageSpec extends IntegrationBaseSpec {
 
       val response: WSResponse = await(request().get())
       lazy implicit val document: Document = Jsoup.parse(response.body)
-      val deadlineSelector = ".list-bullet li"
+      val deadlineSelector = ".list li.divider--bottom"
       document.select(deadlineSelector).size() shouldBe 1
     }
   }
