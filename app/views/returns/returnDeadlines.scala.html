@@ -36,20 +36,20 @@
         <div class="form-group">
           <ul class="list">
             @for(deadline <- deadlines){
-              <li class="divider--bottom">
-                <p>
-                  <span class="visually-hidden">@messages("returnDeadlines.submitByPrefix")</span>
-                  <span class="bold-medium">@displayDate(deadline.due)</span>
-                  @if(deadline.overdue) {
-                    <span>
-                      <strong class="task-overdue">@messages("common.overdue")</strong>
-                    </span>
-                  }
-                  <span class="form-hint">
-                    @messages("returnDeadlines.periodEnding", displayDateRange(deadline.start, deadline.end))
+            <li class="section divider--bottom">
+              <p>
+                <span class="visually-hidden">@messages("returnDeadlines.submitByPrefix")</span>
+                <span class="bold-medium">@displayDate(deadline.due)</span>
+                @if(deadline.overdue) {
+                  <span>
+                    <strong class="task-overdue">@messages("common.overdue")</strong>
                   </span>
-                </p>
-              </li>
+                }
+                <span class="form-hint">
+                  @messages("returnDeadlines.periodEnding", displayDateRange(deadline.start, deadline.end))
+                </span>
+              </p>
+            </li>
             }
           </ul>
         </div>
