@@ -27,8 +27,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class VatSubscriptionConnectorISpec extends IntegrationBaseSpec {
 
-  val hasFlatRateScheme: Boolean = true
-
   private trait Test {
     def setupStubs(): StubMapping
 
@@ -42,6 +40,8 @@ class VatSubscriptionConnectorISpec extends IntegrationBaseSpec {
 
       "provide a user's information" in new Test {
         override def setupStubs(): StubMapping = CustomerInfoStub.stubCustomerInfo
+
+        val hasFlatRateScheme: Boolean = true
 
         setupStubs()
         val expected = Right(CustomerInformation(

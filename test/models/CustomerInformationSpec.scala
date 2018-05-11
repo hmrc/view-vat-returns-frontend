@@ -21,9 +21,9 @@ import uk.gov.hmrc.play.test.UnitSpec
 
 class CustomerInformationSpec extends UnitSpec {
 
-  val hasFlatRateSchemeYes = true
-
   "A CustomerInformation object" should {
+
+    val hasFlatRateSchemeYes = true
 
     val exampleCustomerInfo: CustomerInformation = CustomerInformation(
       Some("Cheapo Clothing Ltd"),
