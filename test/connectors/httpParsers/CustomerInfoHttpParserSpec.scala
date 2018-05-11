@@ -26,6 +26,8 @@ import uk.gov.hmrc.play.test.UnitSpec
 
 class CustomerInfoHttpParserSpec extends UnitSpec {
 
+  val hasFlatRateSchemeYes: Boolean = true
+
   "CustomerInfoReads" when {
 
     "the HTTP response status is OK (200)" should {
@@ -37,7 +39,8 @@ class CustomerInfoHttpParserSpec extends UnitSpec {
             "organisationName" -> "Cheapo Clothing Ltd",
             "firstName" -> "John",
             "lastName" -> "Smith",
-            "tradingName" -> "Cheapo Clothing"
+            "tradingName" -> "Cheapo Clothing",
+            "hasFlatRateScheme" -> hasFlatRateSchemeYes
           )
         )
       )
@@ -46,7 +49,8 @@ class CustomerInfoHttpParserSpec extends UnitSpec {
         Some("Cheapo Clothing Ltd"),
         Some("John"),
         Some("Smith"),
-        Some("Cheapo Clothing")
+        Some("Cheapo Clothing"),
+        hasFlatRateSchemeYes
       ))
       val result = CustomerInfoReads.read("", "", httpResponse)
 

@@ -27,6 +27,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class SubscriptionServiceSpec extends ControllerBaseSpec {
 
+  val hasFlatRateScheme: Boolean = true
   private trait Test {
     val mockConnector: VatSubscriptionConnector = mock[VatSubscriptionConnector]
     val service: SubscriptionService = new SubscriptionService(mockConnector)
@@ -42,7 +43,8 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           Some("My organisation name"),
           Some("John"),
           Some("Smith"),
-          Some("My trading name")
+          Some("My trading name"),
+          hasFlatRateScheme
         )
 
         (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
@@ -62,7 +64,8 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           None,
           Some("John"),
           Some("Smith"),
-          None
+          None,
+          hasFlatRateScheme
         )
 
         (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
@@ -82,7 +85,8 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           Some("My organisation name"),
           None,
           None,
-          None
+          None,
+          hasFlatRateScheme
         )
 
         (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
@@ -102,7 +106,8 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           None,
           None,
           None,
-          None
+          None,
+          hasFlatRateScheme
         )
 
         (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))

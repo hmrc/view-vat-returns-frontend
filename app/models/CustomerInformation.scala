@@ -22,7 +22,8 @@ import play.api.libs.json._
 case class CustomerInformation(organisationName: Option[String],
                                firstName: Option[String],
                                lastName: Option[String],
-                               tradingName: Option[String])
+                               tradingName: Option[String],
+                               hasFlatRateScheme: Boolean)
 
 
 object CustomerInformation {
@@ -32,6 +33,7 @@ object CustomerInformation {
     (JsPath \ "organisationName").readNullable[String] and
       (JsPath \ "firstName").readNullable[String] and
       (JsPath \ "lastName").readNullable[String] and
-      (JsPath \ "tradingName").readNullable[String]
+      (JsPath \ "tradingName").readNullable[String] and
+      (JsPath \ "hasFlatRateScheme").read[Boolean]
     ) (CustomerInformation.apply _)
 }
