@@ -45,5 +45,38 @@ class DisplayMoneyTemplateSpec extends TemplateBaseSpec {
         document.body().text() shouldEqual "£9,999.99"
       }
     }
+
+    "the amount is negative" should {
+
+      lazy val money = BigDecimal("-1")
+      lazy val template = views.html.templates.formatters.money.displayMoney(money)
+      lazy val document: Document = Jsoup.parse(template.body)
+
+      "render the amount with a negative prefix" in {
+        document.body().text() shouldEqual "− £1"
+      }
+    }
+
+    "the amount is zero" should {
+
+      lazy val money = BigDecimal("0")
+      lazy val template = views.html.templates.formatters.money.displayMoney(money)
+      lazy val document: Document = Jsoup.parse(template.body)
+
+      "render the amount without a negative prefix" in {
+        document.body().text() shouldEqual "£0"
+      }
+    }
+
+    "the amount is positive" should {
+
+      lazy val money = BigDecimal("1")
+      lazy val template = views.html.templates.formatters.money.displayMoney(money)
+      lazy val document: Document = Jsoup.parse(template.body)
+
+      "render the amount without a negative prefix" in {
+        document.body().text() shouldEqual "£1"
+      }
+    }
   }
 }
