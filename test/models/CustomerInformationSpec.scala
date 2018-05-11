@@ -21,13 +21,16 @@ import uk.gov.hmrc.play.test.UnitSpec
 
 class CustomerInformationSpec extends UnitSpec {
 
+  val hasFlatRateSchemeYes = true
+
   "A CustomerInformation object" should {
 
     val exampleCustomerInfo: CustomerInformation = CustomerInformation(
       Some("Cheapo Clothing Ltd"),
       Some("John"),
       Some("Smith"),
-      Some("Cheapo Clothing")
+      Some("Cheapo Clothing"),
+      hasFlatRateSchemeYes
     )
 
     val exampleInputString =
@@ -35,7 +38,8 @@ class CustomerInformationSpec extends UnitSpec {
         |"organisationName":"Cheapo Clothing Ltd",
         |"firstName":"John",
         |"lastName":"Smith",
-        |"tradingName":"Cheapo Clothing"
+        |"tradingName":"Cheapo Clothing",
+        |"hasFlatRateScheme":true
         |}"""
         .stripMargin.replace("\n", "")
 
@@ -44,7 +48,8 @@ class CustomerInformationSpec extends UnitSpec {
         |"organisationName":"Cheapo Clothing Ltd",
         |"firstName":"John",
         |"lastName":"Smith",
-        |"tradingName":"Cheapo Clothing"
+        |"tradingName":"Cheapo Clothing",
+        |"hasFlatRateScheme":true
         |}"""
         .stripMargin.replace("\n", "")
 

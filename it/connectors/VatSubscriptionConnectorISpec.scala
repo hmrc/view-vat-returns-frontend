@@ -27,6 +27,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class VatSubscriptionConnectorISpec extends IntegrationBaseSpec {
 
+  val hasFlatRateScheme: Boolean = true
+
   private trait Test {
     def setupStubs(): StubMapping
 
@@ -46,7 +48,8 @@ class VatSubscriptionConnectorISpec extends IntegrationBaseSpec {
           Some("Cheapo Clothing Ltd"),
           Some("Vincent"),
           Some("Vatreturn"),
-          Some("Cheapo Clothing")
+          Some("Cheapo Clothing"),
+          hasFlatRateScheme
         ))
         private val result = await(connector.getCustomerInfo("999999999"))
 

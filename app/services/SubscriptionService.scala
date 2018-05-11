@@ -29,10 +29,10 @@ class SubscriptionService @Inject()(connector: VatSubscriptionConnector) {
 
   def getEntityName(user: User)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[String]] = {
     connector.getCustomerInfo(user.vrn).map {
-      case Right(CustomerInformation(None, None, None, None)) => None
-      case Right(CustomerInformation(None, Some(firstName), Some(lastName), None)) => Some(s"$firstName $lastName")
-      case Right(CustomerInformation(organisationName, None, None, None)) => organisationName
-      case Right(CustomerInformation(_, _, _, tradingName)) => tradingName
+      case Right(CustomerInformation(None, None, None, None, _)) => None
+      case Right(CustomerInformation(None, Some(firstName), Some(lastName), None, _)) => Some(s"$firstName $lastName")
+      case Right(CustomerInformation(organisationName, None, None, None, _)) => organisationName
+      case Right(CustomerInformation(_, _, _, tradingName, _)) => tradingName
       case Left(_) => None
     }
   }
