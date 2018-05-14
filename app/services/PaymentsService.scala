@@ -16,19 +16,22 @@
 
 package services
 
-import connectors.{FinancialDataConnector, PaymentsConnector}
+import connectors.PaymentsConnector
 import javax.inject.{Inject, Singleton}
-import models.payments.{PaymentDetailsModel, Payments}
+
+import models.ServiceResponse
+import models.errors.PaymentSetupError
+import models.payments.PaymentDetailsModel
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class PaymentsService @Inject()(paymentsConnector: PaymentsConnector) {
-  def setupPaymentsJourney(journeyDetails: PaymentDetailsModel)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[String] =
+  def setupPaymentsJourney(journeyDetails: PaymentDetailsModel)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ServiceResponse[String]] =
     paymentsConnector.setupJourney(journeyDetails).map {
-      case Right(redirectUrl) => redirectUrl
-      case Left(error) => throw new Exception(error.message)
+      case Right(redirectUrl) => Right(redirectUrl)
+      case Left(_) => Left(PaymentSetupError)
     }
 
 }

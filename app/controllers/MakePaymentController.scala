@@ -23,7 +23,7 @@ import forms.MakePaymentForm
 import javax.inject.{Inject, Singleton}
 import models.payments.PaymentDetailsModel
 import play.api.Logger
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent}
 import services.{EnrolmentsAuthService, PaymentsService}
 
@@ -60,24 +60,18 @@ class MakePaymentController @Inject()(val messagesApi: MessagesApi,
       MakePaymentForm.form.bindFromRequest().fold(
         _ => { // failed to bind model
           Logger.warn("[MakePaymentsController].[makePayment] invalid payment data")
-          Future.successful(
-            InternalServerError(
-              views.html.errors.standardError(
-                appConfig, Messages("paymentHandOffErrorHeading"),
-                Messages("paymentHandOffErrorHeading"),
-                Messages("paymentHandOffErrorMessage")
-              )
-            )
-          )
+          Future.successful(InternalServerError(views.html.errors.paymentsError()))
         },
         paymentDetail => {
           val details = payment(paymentDetail, user.vrn)
-          paymentsService.setupPaymentsJourney(details).map { url =>
-            auditService.audit(
-              PayVatReturnChargeAuditModel(user, details, url),
-              routes.MakePaymentController.makePayment().url
-            )
-            Redirect(url)
+          paymentsService.setupPaymentsJourney(details).map {
+            case Right(url) =>
+              auditService.audit(
+                PayVatReturnChargeAuditModel(user, details, url),
+                routes.MakePaymentController.makePayment().url
+              )
+              Redirect(url)
+            case Left(_) => InternalServerError(views.html.errors.paymentsError())
           }
         }
       )
