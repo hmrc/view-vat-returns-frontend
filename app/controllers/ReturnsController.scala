@@ -20,6 +20,7 @@ import audit.AuditingService
 import audit.models.ViewVatReturnAuditModel
 import config.AppConfig
 import javax.inject.{Inject, Singleton}
+import models.customer.CustomerDetail
 import models.errors.UnexpectedStatusError
 import models.payments.Payment
 import models.viewModels.VatReturnViewModel
@@ -116,16 +117,15 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
     auditService.audit(ViewVatReturnAuditModel(user, data), auditPath)
   }
 
-  private[controllers] def constructViewModel(entityName: Option[String],
+  private[controllers] def constructViewModel(customerDetail: Option[CustomerDetail],
                                               obligation: VatReturnObligation,
                                               returnDetails: VatReturnDetails,
                                               isReturnsPageRequest: Boolean): VatReturnViewModel = {
 
-    // TODO: update this value to reflect partial payments
     val amountToShow: BigDecimal = returnDetails.vatReturn.netVatDue
 
     VatReturnViewModel(
-      entityName = entityName,
+      entityName = customerDetail.fold(Option.empty[String])(detail => Some(detail.entityName)),
       periodFrom = obligation.start,
       periodTo = obligation.end,
       dueDate = obligation.due,
@@ -133,7 +133,8 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
       dateSubmitted = obligation.received.get,
       vatReturnDetails = returnDetails,
       showReturnsBreadcrumb = isReturnsPageRequest,
-      currentYear = dateService.now().getYear
+      currentYear = dateService.now().getYear,
+      hasFlatRateScheme = customerDetail.fold(false)(_.hasFlatRateScheme)
     )
   }
 }

@@ -18,8 +18,9 @@ package services
 
 import connectors.VatSubscriptionConnector
 import controllers.ControllerBaseSpec
+import models.customer.CustomerDetail
 import models.errors.BadRequestError
-import models.{CustomerInformation, User}
+import models.{CustomerInformation, User, customer}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits._
@@ -27,7 +28,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class SubscriptionServiceSpec extends ControllerBaseSpec {
 
-  val hasFlatRateScheme: Boolean = true
+  val hasFlatRateSchemeNo: Boolean = false
+  val hasFlatRateSchemeYes: Boolean = true
+
   private trait Test {
     val mockConnector: VatSubscriptionConnector = mock[VatSubscriptionConnector]
     val service: SubscriptionService = new SubscriptionService(mockConnector)
@@ -37,23 +40,22 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
   "Calling .getEntityName" when {
 
     "the connector retrieves a trading name" should {
-
       "return the trading name" in new Test {
         val exampleCustomerInfo: CustomerInformation = CustomerInformation(
           Some("My organisation name"),
           Some("John"),
           Some("Smith"),
           Some("My trading name"),
-          hasFlatRateScheme
+          hasFlatRateSchemeYes
         )
 
         (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
           .expects(*, *, *)
           .returns(Future.successful(Right(exampleCustomerInfo)))
 
-        lazy val result: Option[String] = await(service.getEntityName(User("999999999")))
+        lazy val result: Option[CustomerDetail] = await(service.getEntityName(User("999999999")))
 
-        result shouldBe Some("My trading name")
+        result shouldBe Some(CustomerDetail("My trading name", hasFlatRateSchemeYes))
       }
     }
 
@@ -65,16 +67,16 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           Some("John"),
           Some("Smith"),
           None,
-          hasFlatRateScheme
+          hasFlatRateSchemeNo
         )
 
         (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
           .expects(*, *, *)
           .returns(Future.successful(Right(exampleCustomerInfo)))
 
-        val result: Option[String] = await(service.getEntityName(User("999999999")))
+        val result: Option[CustomerDetail] = await(service.getEntityName(User("999999999")))
 
-        result shouldBe Some("John Smith")
+        result shouldBe Some(CustomerDetail("John Smith", hasFlatRateSchemeNo))
       }
     }
 
@@ -86,16 +88,16 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           None,
           None,
           None,
-          hasFlatRateScheme
+          hasFlatRateSchemeNo
         )
 
         (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
           .expects(*, *, *)
           .returns(Future.successful(Right(exampleCustomerInfo)))
 
-        val result: Option[String] = await(service.getEntityName(User("999999999")))
+        val result: Option[CustomerDetail] = await(service.getEntityName(User("999999999")))
 
-        result shouldBe Some("My organisation name")
+        result shouldBe Some(CustomerDetail("My organisation name", hasFlatRateSchemeNo))
       }
     }
 
@@ -107,14 +109,14 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           None,
           None,
           None,
-          hasFlatRateScheme
+          hasFlatRateSchemeYes
         )
 
         (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
           .expects(*, *, *)
           .returns(Future.successful(Right(exampleCustomerInfo)))
 
-        val result: Option[String] = await(service.getEntityName(User("999999999")))
+        val result: Option[CustomerDetail] = await(service.getEntityName(User("999999999")))
 
         result shouldBe None
       }
@@ -127,7 +129,7 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           .expects(*, *, *)
           .returns(Future.successful(Left(BadRequestError("", ""))))
 
-        val result: Option[String] = await(service.getEntityName(User("999999999")))
+        val result: Option[CustomerDetail] = await(service.getEntityName(User("999999999")))
 
         result shouldBe None
       }

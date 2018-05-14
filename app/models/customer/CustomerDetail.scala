@@ -14,13 +14,6 @@
  * limitations under the License.
  */
 
-package models
+package models.customer
 
-import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
-import models.customer.CustomerDetail
-import models.payments.Payment
-
-case class ReturnsControllerData(vatReturnResult: HttpGetResult[VatReturn],
-                                 customerInfo: Option[CustomerDetail],
-                                 payment: Option[Payment],
-                                 obligation: Option[VatReturnObligation])
+case class CustomerDetail(entityName: String, hasFlatRateScheme: Boolean)

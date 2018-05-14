@@ -122,7 +122,12 @@
 
       <div class="grid-row" id="box-six">
         <div class="column-one-quarter form-hint">@messages("yourVatReturn.boxSix")</div>
-        <div class="column-one-half form-hint">@messages("yourVatReturn.boxSixDescription")</div>
+        @if(vatReturnViewModel.hasFlatRateScheme) {
+          <div class="column-one-half form-hint">@messages("yourVatReturn.boxSixFlatRate")</div>
+        }else{
+          <div class="column-one-half form-hint">@messages("yourVatReturn.boxSixNoFlatRate")</div>
+        }
+
         <div class="column-one-quarter form-hint text--right">@displayMoney(vatReturnViewModel.vatReturnDetails.vatReturn.totalValueSalesExVAT)</div>
       </div>
       <div class="grid-row" id="box-seven">
