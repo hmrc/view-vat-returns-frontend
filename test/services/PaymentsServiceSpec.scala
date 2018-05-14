@@ -18,7 +18,8 @@ package services
 
 import connectors.PaymentsConnector
 import connectors.httpParsers.ResponseHttpParsers.HttpPostResult
-import models.errors.UnknownError
+import models.ServiceResponse
+import models.errors.{PaymentSetupError, UnknownError}
 import models.payments.PaymentDetailsModel
 import org.scalamock.matchers.Matchers
 import org.scalamock.scalatest.MockFactory
@@ -33,7 +34,6 @@ class PaymentsServiceSpec extends UnitSpec with MockFactory with Matchers {
   "Calling the .setupJourney method" when {
 
     trait Test {
-
       implicit val hc: HeaderCarrier = HeaderCarrier()
       val mockPaymentsConnector: PaymentsConnector = mock[PaymentsConnector]
 
@@ -63,25 +63,23 @@ class PaymentsServiceSpec extends UnitSpec with MockFactory with Matchers {
 
       "return a redirect url" in new Test {
 
-        val expectedRedirectUrl = "http://www.google.com"
-        val expectedResult: HttpPostResult[String] = Right(expectedRedirectUrl)
+        val expectedResult = Right("http://www.google.com")
 
         override def setup(): Any = {
           (mockPaymentsConnector.setupJourney(_: PaymentDetailsModel)(_: HeaderCarrier, _: ExecutionContext))
             .expects(*, *, *)
-            .returns(Right(expectedRedirectUrl))
+            .returns(expectedResult)
         }
 
+        val result: ServiceResponse[String] = await(target.setupPaymentsJourney(paymentDetails))
 
-        val result: String = await(target.setupPaymentsJourney(paymentDetails))
-
-        result shouldBe expectedRedirectUrl
+        result shouldBe expectedResult
       }
     }
 
     "the connector is unsuccessful" should {
 
-      "throw an exception" in new Test {
+      "return a PaymentsSetupError" in new Test {
 
         val expectedResult: HttpPostResult[String] = Left(UnknownError)
 
@@ -91,9 +89,9 @@ class PaymentsServiceSpec extends UnitSpec with MockFactory with Matchers {
             .returns(expectedResult)
         }
 
-        the[Exception] thrownBy {
-          await(target.setupPaymentsJourney(paymentDetails))
-        } should have message "Received an unknown error."
+        val result: ServiceResponse[String] = await(target.setupPaymentsJourney(paymentDetails))
+
+        result shouldBe Left(PaymentSetupError)
       }
     }
   }

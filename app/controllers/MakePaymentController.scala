@@ -64,14 +64,14 @@ class MakePaymentController @Inject()(val messagesApi: MessagesApi,
         },
         paymentDetail => {
           val details = payment(paymentDetail, user.vrn)
-          paymentsService.setupPaymentsJourney(details).map { url =>
-            auditService.audit(
-              PayVatReturnChargeAuditModel(user, details, url),
-              routes.MakePaymentController.makePayment().url
-            )
-            Redirect(url)
-          }.recover {
-            case _ => InternalServerError(views.html.errors.paymentsError())
+          paymentsService.setupPaymentsJourney(details).map {
+            case Right(url) =>
+              auditService.audit(
+                PayVatReturnChargeAuditModel(user, details, url),
+                routes.MakePaymentController.makePayment().url
+              )
+              Redirect(url)
+            case Left(_) => InternalServerError(views.html.errors.paymentsError())
           }
         }
       )

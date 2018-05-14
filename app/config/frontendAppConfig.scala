@@ -100,8 +100,7 @@ class FrontendAppConfig @Inject()(val runModeConfiguration: Configuration, val e
   override val vatSubscriptionBaseUrl: String = baseUrl("vat-subscription")
   override val financialDataBaseUrl: String = baseUrl("financial-transactions")
 
-  private lazy val btaBaseUrl: String = getString(Keys.businessTaxAccountBase)
-  override lazy val btaHomeUrl: String = btaBaseUrl + getString(Keys.businessTaxAccountUrl)
+  override lazy val btaHomeUrl: String = getString(Keys.businessTaxAccountBase) + getString(Keys.businessTaxAccountUrl)
 
   private lazy val vatSummaryBase: String = getString(Keys.vatSummaryBase)
   override lazy val vatDetailsUrl: String = vatSummaryBase + getString(Keys.vatDetailsUrl)
@@ -110,11 +109,10 @@ class FrontendAppConfig @Inject()(val runModeConfiguration: Configuration, val e
   override lazy val paymentsServiceUrl: String = baseUrl(Keys.paymentsServiceBase)
   override lazy val setupPaymentsJourneyPath: String = getString(Keys.setupPaymentsJourneyPath)
 
-  private lazy val paymentsReturnBase: String = getString(Keys.paymentsReturnBase)
-  override lazy val paymentsReturnUrl: String = paymentsReturnBase + getString(Keys.paymentsReturnUrl)
+  override lazy val paymentsReturnUrl: String = getString(Keys.paymentsReturnBase) + getString(Keys.paymentsReturnUrl)
 
-  private lazy val unauthenticatedPaymentsBase: String = getString(Keys.unauthenticatedPaymentsBase)
-  override lazy val unauthenticatedPaymentsUrl: String = unauthenticatedPaymentsBase + getString(Keys.unauthenticatedPaymentsUrl)
+  override lazy val unauthenticatedPaymentsUrl: String =
+    getString(Keys.unauthenticatedPaymentsBase) + getString(Keys.unauthenticatedPaymentsUrl)
 
   override lazy val reportVatErrorUrl: String = getString(Keys.reportVatErrorUrl)
 

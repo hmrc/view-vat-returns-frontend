@@ -78,15 +78,15 @@ class MakePaymentControllerSpec extends ControllerBaseSpec {
     "the user is logged in" should {
       "have redirect to url returned from service" in new MakePaymentDetailsTest {
 
+        val redirectUrl = "http://www.google.com"
+
         override def setup(): Any = {
           super.setup()
 
           (mockPaymentsService.setupPaymentsJourney(_: PaymentDetailsModel)(_: HeaderCarrier, _: ExecutionContext))
             .expects(*, *, *)
-            .returns(Future.successful(expectedRedirectUrl))
+            .returns(Future.successful(Right(redirectUrl)))
         }
-
-        val expectedRedirectUrl = "http://www.google.com"
 
         private lazy val request = fakeRequestToPOSTWithSession(
           ("amountInPence", "10000"),
@@ -98,7 +98,7 @@ class MakePaymentControllerSpec extends ControllerBaseSpec {
         lazy val result: Future[Result] = target.makePayment()(request)
 
         status(result) shouldBe Status.SEE_OTHER
-        redirectLocation(result) shouldBe Some(expectedRedirectUrl)
+        redirectLocation(result) shouldBe Some(redirectUrl)
       }
     }
 
