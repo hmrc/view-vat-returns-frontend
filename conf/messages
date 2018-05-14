@@ -21,6 +21,10 @@ technicalProblem.title = There is a problem with the service - VAT reporting thr
 technicalProblem.heading = Sorry, there is a problem with the service
 technicalProblem.message = Try again later.
 
+paymentsError.payNowOne = If you know how much you owe,
+paymentsError.payNowTwo = use the payments service
+paymentsError.payNowThree = to pay now.
+
 userResearch.heading = Please help us improve our service
 userResearch.enterSurvey = Enter our survey
 userResearch.close = No thanks

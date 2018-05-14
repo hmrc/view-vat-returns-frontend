@@ -56,6 +56,9 @@ object ConfigKeys {
   val paymentsReturnBase: String = "payments-frontend.returnHost"
   val paymentsReturnUrl: String = "payments-frontend.returnUrl"
 
+  val unauthenticatedPaymentsBase: String = "unauthenticatedPayments.host"
+  val unauthenticatedPaymentsUrl: String = "unauthenticatedPayments.url"
+
   val governmentGatewayHost: String = "government-gateway.host"
 
   val surveyHost: String = "feedback-survey-frontend.host"

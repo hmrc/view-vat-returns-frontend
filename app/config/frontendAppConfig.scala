@@ -48,6 +48,7 @@ trait AppConfig extends ServicesConfig {
   val vatPaymentsUrl: String
   val paymentsServiceUrl: String
   val paymentsReturnUrl: String
+  val unauthenticatedPaymentsUrl: String
   val reportVatErrorUrl: String
   val feedbackFormPartialUrl: String
   val contactFormServiceIdentifier: String
@@ -111,6 +112,9 @@ class FrontendAppConfig @Inject()(val runModeConfiguration: Configuration, val e
 
   private lazy val paymentsReturnBase: String = getString(Keys.paymentsReturnBase)
   override lazy val paymentsReturnUrl: String = paymentsReturnBase + getString(Keys.paymentsReturnUrl)
+
+  private lazy val unauthenticatedPaymentsBase: String = getString(Keys.unauthenticatedPaymentsBase)
+  override lazy val unauthenticatedPaymentsUrl: String = unauthenticatedPaymentsBase + getString(Keys.unauthenticatedPaymentsUrl)
 
   override lazy val reportVatErrorUrl: String = getString(Keys.reportVatErrorUrl)
 

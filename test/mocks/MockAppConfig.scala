@@ -43,6 +43,7 @@ class MockAppConfig(val runModeConfiguration: Configuration, val mode: Mode = Mo
   override val paymentsServiceUrl: String = "payments-url"
   override val setupPaymentsJourneyPath: String = "/payment/start"
   override val paymentsReturnUrl: String = "payments-return-url"
+  override val unauthenticatedPaymentsUrl: String = "unauthenticated-payments-url"
   override val reportVatErrorUrl: String = "report-vat-error-url"
   override val feedbackFormPartialUrl: String = "BasefeedbackUrl"
   override val contactFormServiceIdentifier: String = "VATVC"
