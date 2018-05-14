@@ -16,9 +16,9 @@
 
 package services
 
-import connectors.{FinancialDataConnector, PaymentsConnector}
+import connectors.PaymentsConnector
 import javax.inject.{Inject, Singleton}
-import models.payments.{PaymentDetailsModel, Payments}
+import models.payments.PaymentDetailsModel
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
