@@ -31,7 +31,7 @@ breadcrumbs.vat = Your VAT details
 breadcrumbs.vatPayments = What you owe
 breadcrumbs.vatReturn = VAT return: {0}
 
-yourVatReturn.title = VAT return
+yourVatReturn.title = Submitted returns
 yourVatReturn.vrn = VAT registration number (VRN):
 yourVatReturn.dateSubmitted = Date submitted:
 yourVatReturn.returnDueDate = Return due date:
@@ -59,7 +59,7 @@ yourVatReturn.boxNine = Box 9
 yourVatReturn.boxNineDescription = Total value of acquisitions of goods from European Community, minus VAT
 yourVatReturn.paymentNow = Pay this now
 yourVatReturn.helpTitle = There’s an error in my return
-yourVatReturn.helpLine = If the error happened in an accounting period that ended in the last 4 years, you can correct it in your next return. The error must be either:
+yourVatReturn.helpLine = You can correct certain errors in your next return, using your accounting software. To do this, the error must have happened in an accounting period that ended in the last 4 years and be either:
 yourVatReturn.reportLink1 = You must
 yourVatReturn.reportLink2 = report any other errors (opens in a new tab)
 yourVatReturn.reportLink3 = to HMRC.

@@ -46,10 +46,10 @@
   )
 
   <section class="grid-row column-two-thirds">
-    <h1 class="heading-xlarge">@messages("yourVatReturn.title")
-      <span class="heading-secondary">
-        @displayDateRange(vatReturnViewModel.periodFrom, vatReturnViewModel.periodTo)
-      </span>
+
+    <h1 class="heading-xlarge">
+      <span class="heading-secondary">@messages("yourVatReturn.title")</span>
+      @displayDateRange(vatReturnViewModel.periodFrom, vatReturnViewModel.periodTo)
     </h1>
 
     @views.html.templates.returns.paymentStatus(
