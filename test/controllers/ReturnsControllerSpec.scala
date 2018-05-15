@@ -116,7 +116,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
           .expects(*, *, *, *)
           .returns(paymentResult)
 
-        (mockSubscriptionService.getEntityName(_: User)(_: HeaderCarrier, _: ExecutionContext))
+        (mockSubscriptionService.getUserDetails(_: User)(_: HeaderCarrier, _: ExecutionContext))
           .expects(*, *, *)
           .returns(Future.successful(exampleCustomerDetail))
 

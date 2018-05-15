@@ -27,7 +27,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class SubscriptionService @Inject()(connector: VatSubscriptionConnector) {
 
-  def getEntityName(user: User)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[CustomerDetail]] = {
+  def getUserDetails(user: User)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[CustomerDetail]] = {
     connector.getCustomerInfo(user.vrn).map {
       case Right(CustomerInformation(None, None, None, None, _)) => None
       case Right(CustomerInformation(None, Some(firstName), Some(lastName), None, hasFlatRateScheme)) =>

@@ -53,7 +53,7 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           .expects(*, *, *)
           .returns(Future.successful(Right(exampleCustomerInfo)))
 
-        lazy val result: Option[CustomerDetail] = await(service.getEntityName(User("999999999")))
+        lazy val result: Option[CustomerDetail] = await(service.getUserDetails(User("999999999")))
 
         result shouldBe Some(CustomerDetail("My trading name", hasFlatRateSchemeYes))
       }
@@ -74,7 +74,7 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           .expects(*, *, *)
           .returns(Future.successful(Right(exampleCustomerInfo)))
 
-        val result: Option[CustomerDetail] = await(service.getEntityName(User("999999999")))
+        val result: Option[CustomerDetail] = await(service.getUserDetails(User("999999999")))
 
         result shouldBe Some(CustomerDetail("John Smith", hasFlatRateSchemeNo))
       }
@@ -95,7 +95,7 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           .expects(*, *, *)
           .returns(Future.successful(Right(exampleCustomerInfo)))
 
-        val result: Option[CustomerDetail] = await(service.getEntityName(User("999999999")))
+        val result: Option[CustomerDetail] = await(service.getUserDetails(User("999999999")))
 
         result shouldBe Some(CustomerDetail("My organisation name", hasFlatRateSchemeNo))
       }
@@ -116,7 +116,7 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           .expects(*, *, *)
           .returns(Future.successful(Right(exampleCustomerInfo)))
 
-        val result: Option[CustomerDetail] = await(service.getEntityName(User("999999999")))
+        val result: Option[CustomerDetail] = await(service.getUserDetails(User("999999999")))
 
         result shouldBe None
       }
@@ -129,7 +129,7 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           .expects(*, *, *)
           .returns(Future.successful(Left(BadRequestError("", ""))))
 
-        val result: Option[CustomerDetail] = await(service.getEntityName(User("999999999")))
+        val result: Option[CustomerDetail] = await(service.getUserDetails(User("999999999")))
 
         result shouldBe None
       }
