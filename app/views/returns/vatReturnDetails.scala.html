@@ -42,7 +42,7 @@
       if(vatReturnViewModel.showReturnsBreadcrumb) controllers.routes.ReturnObligationsController.submittedReturns(vatReturnViewModel.currentYear).url -> messages("submittedReturns.title")
       else appConfig.vatPaymentsUrl -> messages("breadcrumbs.vatPayments")
     ),
-    currentPage = messages("breadcrumbs.vatReturn", displayDateRange(vatReturnViewModel.periodFrom, vatReturnViewModel.periodTo))
+    currentPage = displayDateRange(vatReturnViewModel.periodFrom, vatReturnViewModel.periodTo).toString
   )
 
   <section class="grid-row column-two-thirds">

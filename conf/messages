@@ -29,7 +29,6 @@ userResearch.close.context = I do not want to enter the survey
 breadcrumbs.bta = Business tax account
 breadcrumbs.vat = Your VAT details
 breadcrumbs.vatPayments = What you owe
-breadcrumbs.vatReturn = VAT return: {0}
 
 yourVatReturn.title = Submitted returns
 yourVatReturn.vrn = VAT registration number (VRN):

@@ -143,7 +143,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       }
 
       "have the correct current page text containing the obligation dates" in {
-        elementText(Selectors.currentPage) shouldBe "VAT return: 1 January to 31 March 2017"
+        elementText(Selectors.currentPage) shouldBe "1 January to 31 March 2017"
       }
 
     }
@@ -290,7 +290,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       }
 
       "have the correct current page text containing the obligation dates" in {
-        elementText(Selectors.currentPage) shouldBe "VAT return: 1 January to 31 March 2017"
+        elementText(Selectors.currentPage) shouldBe "1 January to 31 March 2017"
       }
 
     }
