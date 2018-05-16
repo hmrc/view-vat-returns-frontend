@@ -73,7 +73,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
 
   val currentYear: Int = 2018
 
-  "Rendering the vat return details page from the returns route" should {
+  "Rendering the vat return details page from the returns route with flat rate scheme" should {
 
     val vatReturnViewModel = VatReturnViewModel(
       Some("Cheapo Clothing"),
@@ -100,18 +100,19 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
         None
       ),
       showReturnsBreadcrumb = true,
-      currentYear
+      currentYear,
+      hasFlatRateScheme = true
     )
 
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct document title" in {
-      document.title shouldBe "VAT return"
+      document.title shouldBe "Submitted returns"
     }
 
     "have the correct page heading" in {
-      elementText(Selectors.pageHeading) should include ("VAT return")
+      elementText(Selectors.pageHeading) should include ("Submitted returns")
     }
 
     "render breadcrumbs which" should {
@@ -142,7 +143,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       }
 
       "have the correct current page text containing the obligation dates" in {
-        elementText(Selectors.currentPage) shouldBe "VAT return: 1 January to 31 March 2017"
+        elementText(Selectors.currentPage) shouldBe "1 January to 31 March 2017"
       }
 
     }
@@ -170,15 +171,15 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
 
     "have the correct row descriptions in the table" in {
       val expectedDescriptions = Array(
-        "VAT on United Kingdom sales and other outputs",
-        "VAT on European Community sales and related costs",
-        "VAT sales subtotal",
-        "Total VAT reclaimed from anywhere",
-        "Total you owed",
-        "Total sales and other outputs from anywhere, minus VAT",
-        "Total purchases from anywhere, minus VAT",
-        "Total supplies, goods and related costs to European Community, minus VAT",
-        "Total value of acquisitions of goods from European Community, minus VAT"
+        "VAT you charged on sales and other supplies",
+        "VAT you owe on goods purchased from EC countries and brought into the UK",
+        "VAT you owe before deductions (this is the total of box 1 and 2)",
+        "VAT you've claimed back",
+        "Total VAT you owed",
+        "Total value of sales and other supplies, including VAT",
+        "Total value of purchases and other expenses, excluding VAT",
+        "Total value of supplied goods to EC countries and related costs (excluding VAT)",
+        "Total value of goods purchased from EC countries and brought into the UK, as well as any related costs (excluding VAT)"
       )
       expectedDescriptions.indices.foreach(i => elementText(boxElement(Selectors.boxes(i), 2)) shouldBe expectedDescriptions(i))
     }
@@ -193,7 +194,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
 
     "render the correct text for the help section first paragraph" in {
       elementText(Selectors.helpLine1) shouldBe
-        "If the error happened in an accounting period that ended in the last 4 years, you can correct it in your next return. The error must be either:"
+        "You can correct certain errors in your next return, using your accounting software. To do this, "  +
+          "the error must have happened in an accounting period that ended in the last 4 years and be either:"
     }
 
     "render the correct help section report any other errors text" in {
@@ -216,6 +218,154 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       elementText(Selectors.helpBullet2) shouldBe "1% or less of your box 6 figure and below £50,000"
     }
   }
+
+
+  "Rendering the vat return details page from the returns route without Flat rate scheme" should {
+
+    val vatReturnViewModel = VatReturnViewModel(
+      Some("Cheapo Clothing"),
+      LocalDate.parse("2017-01-01"),
+      LocalDate.parse("2017-03-31"),
+      LocalDate.parse("2017-04-06"),
+      1000.00,
+      LocalDate.parse("2017-04-08"),
+      VatReturnDetails(
+        VatReturn(
+          "#001",
+          1297,
+          5755,
+          7052,
+          5732,
+          1000,
+          77656,
+          765765,
+          55454,
+          545645
+        ),
+        moneyOwed = false,
+        isRepayment = false,
+        None
+      ),
+      showReturnsBreadcrumb = true,
+      currentYear,
+      hasFlatRateScheme = false
+    )
+
+    lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
+    lazy implicit val document: Document = Jsoup.parse(view.body)
+
+    "have the correct document title" in {
+      document.title shouldBe "Submitted returns"
+    }
+
+    "have the correct page heading" in {
+      elementText(Selectors.pageHeading) should include ("Submitted returns")
+    }
+
+    "render breadcrumbs which" should {
+
+      "have the text 'Business tax account'" in {
+        elementText(Selectors.btaBreadcrumb) shouldBe "Business tax account"
+      }
+
+      "link to bta" in {
+        element(Selectors.btaBreadcrumbLink).attr("href") shouldBe "bta-url"
+      }
+
+      "have the text 'VAT'" in {
+        elementText(Selectors.vatBreadcrumb) shouldBe "Your VAT details"
+      }
+
+      s"link to 'vat-details-url'" in {
+        element(Selectors.vatBreadcrumbLink).attr("href") shouldBe "vat-details-url"
+      }
+
+      "have the text 'Submitted returns'" in {
+        elementText(Selectors.previousPageBreadcrumb) shouldBe "Submitted returns"
+      }
+
+      s"link to ${controllers.routes.ReturnObligationsController.submittedReturns(currentYear).url}" in {
+        element(Selectors.previousPageBreadcrumbLink).attr("href") shouldBe
+          controllers.routes.ReturnObligationsController.submittedReturns(currentYear).url
+      }
+
+      "have the correct current page text containing the obligation dates" in {
+        elementText(Selectors.currentPage) shouldBe "1 January to 31 March 2017"
+      }
+
+    }
+
+    "have the correct subheading" in {
+      elementText(Selectors.subHeading) shouldBe "You paid: £1,000"
+    }
+
+    "have the correct trading name" in {
+      elementText(Selectors.entityNameHeading) shouldBe vatReturnViewModel.entityName.get
+    }
+
+    "have the correct heading for the first section of the return" in {
+      elementText(Selectors.tableHeadingOne) shouldBe "VAT details"
+    }
+
+    "have the correct heading for the second section of the return" in {
+      elementText(Selectors.tableHeadingTwo) shouldBe "Additional information"
+    }
+
+    "have the correct box numbers in the table" in {
+      val expectedBoxes = Array("Box 1", "Box 2", "Box 3", "Box 4", "Box 5", "Box 6", "Box 7", "Box 8", "Box 9")
+      expectedBoxes.indices.foreach(i => elementText(boxElement(Selectors.boxes(i), 1)) shouldBe expectedBoxes(i))
+    }
+
+    "have the correct row descriptions in the table" in {
+      val expectedDescriptions = Array(
+        "VAT you charged on sales and other supplies",
+        "VAT you owe on goods purchased from EC countries and brought into the UK",
+        "VAT you owe before deductions (this is the total of box 1 and 2)",
+        "VAT you've claimed back",
+        "Total VAT you owed",
+        "Total value of sales and other supplies, excluding VAT",
+        "Total value of purchases and other expenses, excluding VAT",
+        "Total value of supplied goods to EC countries and related costs (excluding VAT)",
+        "Total value of goods purchased from EC countries and brought into the UK, as well as any related costs (excluding VAT)"
+      )
+      expectedDescriptions.indices.foreach(i => elementText(boxElement(Selectors.boxes(i), 2)) shouldBe expectedDescriptions(i))
+    }
+
+    "have the minus symbol before the box four amount" in {
+      elementText(Selectors.minusSymbol) shouldBe "−"
+    }
+
+    "render the correct help revealing link text" in {
+      elementText(Selectors.helpTitle) shouldBe "There’s an error in my return"
+    }
+
+    "render the correct text for the help section first paragraph" in {
+      elementText(Selectors.helpLine1) shouldBe
+        "You can correct certain errors in your next return, using your accounting software. To do this, "  +
+          "the error must have happened in an accounting period that ended in the last 4 years and be either:"
+    }
+
+    "render the correct help section report any other errors text" in {
+      elementText(Selectors.helpLine2) shouldBe "You must report any other errors (opens in a new tab) to HMRC."
+    }
+
+    "render the correct report vat error link text" in {
+      elementText(Selectors.helpLink) shouldBe "report any other errors (opens in a new tab)"
+    }
+
+    "render the correct report vat error link href" in {
+      element(Selectors.helpLink).attr("href") shouldBe "report-vat-error-url"
+    }
+
+    "render the correct help section first bullet point text" in {
+      elementText(Selectors.helpBullet1) shouldBe "£10,000 or less"
+    }
+
+    "render the correct help section second bullet point text" in {
+      elementText(Selectors.helpBullet2) shouldBe "1% or less of your box 6 figure and below £50,000"
+    }
+  }
+
 
   "Rendering the vat return details page from the payments route" should {
 
@@ -244,7 +394,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
         None
       ),
       showReturnsBreadcrumb = false,
-      currentYear
+      currentYear,
+      hasFlatRateScheme = true
     )
 
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
@@ -297,7 +448,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
         ))
       ),
       showReturnsBreadcrumb = false,
-      currentYear
+      currentYear,
+      hasFlatRateScheme = true
     )
 
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
@@ -316,7 +468,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     }
 
     "have the correct box 5 description in the table" in {
-      elementText(boxElement(Selectors.boxes(4), 2)) shouldBe "Total you owe"
+      elementText(boxElement(Selectors.boxes(4), 2)) shouldBe "Total VAT you owe"
     }
 
     "have the pay button" in {
@@ -371,7 +523,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
         ))
       ),
       showReturnsBreadcrumb = false,
-      currentYear
+      currentYear,
+      hasFlatRateScheme = true
     )
 
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
@@ -422,7 +575,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
         ))
       ),
       showReturnsBreadcrumb = false,
-      currentYear
+      currentYear,
+      hasFlatRateScheme = true
     )
 
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
@@ -437,7 +591,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     }
 
     "have the correct box 5 description in the table" in {
-      elementText(boxElement(Selectors.boxes(4), 2)) shouldBe "HMRC will pay you"
+      elementText(boxElement(Selectors.boxes(4), 2)) shouldBe "Total VAT HMRC owes you"
     }
 
     "not have the pay now button" in {
@@ -480,7 +634,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
         ))
       ),
       showReturnsBreadcrumb = false,
-      currentYear
+      currentYear,
+      hasFlatRateScheme = true
     )
 
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
@@ -491,7 +646,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     }
 
     "have the correct box 5 description in the table" in {
-      elementText(boxElement(Selectors.boxes(4), 2)) shouldBe "Total amount HMRC owed you"
+      elementText(boxElement(Selectors.boxes(4), 2)) shouldBe "Total VAT HMRC owed you"
     }
 
     "not have the pay now button" in {
@@ -526,7 +681,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
         None
       ),
       showReturnsBreadcrumb = true,
-      currentYear
+      currentYear,
+      hasFlatRateScheme = true
     )
 
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
@@ -569,7 +725,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
         None
       ),
       showReturnsBreadcrumb = true,
-      currentYear
+      currentYear,
+      hasFlatRateScheme = true
     )
 
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)

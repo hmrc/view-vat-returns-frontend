@@ -17,8 +17,8 @@
 package services
 
 import javax.inject.{Inject, Singleton}
-
 import connectors.VatSubscriptionConnector
+import models.customer.CustomerDetail
 import models.{CustomerInformation, User}
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -27,12 +27,15 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class SubscriptionService @Inject()(connector: VatSubscriptionConnector) {
 
-  def getEntityName(user: User)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[String]] = {
+  def getUserDetails(user: User)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[CustomerDetail]] = {
     connector.getCustomerInfo(user.vrn).map {
       case Right(CustomerInformation(None, None, None, None, _)) => None
-      case Right(CustomerInformation(None, Some(firstName), Some(lastName), None, _)) => Some(s"$firstName $lastName")
-      case Right(CustomerInformation(organisationName, None, None, None, _)) => organisationName
-      case Right(CustomerInformation(_, _, _, tradingName, _)) => tradingName
+      case Right(CustomerInformation(None, Some(firstName), Some(lastName), None, hasFlatRateScheme)) =>
+        Some(CustomerDetail(s"$firstName $lastName", hasFlatRateScheme))
+      case Right(CustomerInformation(organisationName, None, None, None, hasFlatRateScheme)) =>
+        organisationName.fold(Option.empty[CustomerDetail])(orgName => Some(CustomerDetail(orgName, hasFlatRateScheme)))
+      case Right(CustomerInformation(_, _, _, tradingName, hasFlatRateScheme)) =>
+        tradingName.fold(Option.empty[CustomerDetail])(tradeName => Some(CustomerDetail(tradeName, hasFlatRateScheme)))
       case Left(_) => None
     }
   }

@@ -22,6 +22,7 @@ import audit.AuditingService
 import audit.models.AuditModel
 import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
 import models._
+import models.customer.CustomerDetail
 import models.errors.{ServerSideError, UnexpectedStatusError, UnknownError}
 import models.payments.Payment
 import models.viewModels.VatReturnViewModel
@@ -56,7 +57,9 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     55454,
     545645
   )
+
   val exampleEntityName: Option[String] = Some("Cheapo Clothing")
+  val exampleCustomerDetail: Option[CustomerDetail] = Some(CustomerDetail("Cheapo Clothing", hasFlatRateScheme = true))
 
   val examplePayment: Payment = Payment(
     "VAT",
@@ -113,9 +116,9 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
           .expects(*, *, *, *)
           .returns(paymentResult)
 
-        (mockSubscriptionService.getEntityName(_: User)(_: HeaderCarrier, _: ExecutionContext))
+        (mockSubscriptionService.getUserDetails(_: User)(_: HeaderCarrier, _: ExecutionContext))
           .expects(*, *, *)
-          .returns(Future.successful(exampleEntityName))
+          .returns(Future.successful(exampleCustomerDetail))
 
         if (successReturn) {
           (mockVatReturnService.constructReturnDetailsModel(_: VatReturn, _: Option[Payment]))
@@ -286,7 +289,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     "populate a VatReturnViewModel" in {
 
       val expectedViewModel = VatReturnViewModel(
-        entityName = exampleEntityName,
+        entityName = Some("Cheapo Clothing"),
         periodFrom = exampleObligation.start,
         periodTo = exampleObligation.end,
         dueDate = exampleObligation.due,
@@ -294,13 +297,14 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         dateSubmitted = exampleObligation.received.get,
         vatReturnDetails = exampleVatReturnDetails,
         showReturnsBreadcrumb = true,
-        currentYear = 2018
+        currentYear = 2018,
+        hasFlatRateScheme = true
       )
 
       (mockDateService.now: () => LocalDate).stubs().returns(LocalDate.parse("2018-05-01"))
 
       val result: VatReturnViewModel = target.constructViewModel(
-        exampleEntityName,
+        exampleCustomerDetail,
         exampleObligation,
         exampleVatReturnDetails,
         isReturnsPageRequest = true

@@ -17,9 +17,10 @@
 package models
 
 import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
+import models.customer.CustomerDetail
 import models.payments.Payment
 
 case class ReturnsControllerData(vatReturnResult: HttpGetResult[VatReturn],
-                                 customerInfo: Option[String],
+                                 customerInfo: Option[CustomerDetail],
                                  payment: Option[Payment],
                                  obligation: Option[VatReturnObligation])

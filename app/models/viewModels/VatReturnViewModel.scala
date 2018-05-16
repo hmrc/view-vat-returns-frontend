@@ -28,4 +28,5 @@ case class VatReturnViewModel(entityName: Option[String],
                               dateSubmitted: LocalDate,
                               vatReturnDetails: VatReturnDetails,
                               showReturnsBreadcrumb: Boolean,
-                              currentYear: Int)
+                              currentYear: Int,
+                              hasFlatRateScheme: Boolean)

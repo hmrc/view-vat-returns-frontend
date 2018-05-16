@@ -42,14 +42,14 @@
       if(vatReturnViewModel.showReturnsBreadcrumb) controllers.routes.ReturnObligationsController.submittedReturns(vatReturnViewModel.currentYear).url -> messages("submittedReturns.title")
       else appConfig.vatPaymentsUrl -> messages("breadcrumbs.vatPayments")
     ),
-    currentPage = messages("breadcrumbs.vatReturn", displayDateRange(vatReturnViewModel.periodFrom, vatReturnViewModel.periodTo))
+    currentPage = displayDateRange(vatReturnViewModel.periodFrom, vatReturnViewModel.periodTo).toString
   )
 
   <section class="grid-row column-two-thirds">
-    <h1 class="heading-xlarge">@messages("yourVatReturn.title")
-      <span class="heading-secondary">
-        @displayDateRange(vatReturnViewModel.periodFrom, vatReturnViewModel.periodTo)
-      </span>
+
+    <h1 class="heading-xlarge">
+      <span class="heading-secondary">@messages("yourVatReturn.title")</span>
+      @displayDateRange(vatReturnViewModel.periodFrom, vatReturnViewModel.periodTo, useShortDayFormat = true)
     </h1>
 
     @views.html.templates.returns.paymentStatus(
@@ -122,7 +122,12 @@
 
       <div class="grid-row" id="box-six">
         <div class="column-one-quarter form-hint">@messages("yourVatReturn.boxSix")</div>
-        <div class="column-one-half form-hint">@messages("yourVatReturn.boxSixDescription")</div>
+        @if(vatReturnViewModel.hasFlatRateScheme) {
+          <div class="column-one-half form-hint">@messages("yourVatReturn.boxSixFlatRate")</div>
+        }else{
+          <div class="column-one-half form-hint">@messages("yourVatReturn.boxSixNoFlatRate")</div>
+        }
+
         <div class="column-one-quarter form-hint text--right">@displayMoney(vatReturnViewModel.vatReturnDetails.vatReturn.totalValueSalesExVAT)</div>
       </div>
       <div class="grid-row" id="box-seven">
