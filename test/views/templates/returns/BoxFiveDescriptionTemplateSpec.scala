@@ -30,7 +30,7 @@ class BoxFiveDescriptionTemplateSpec extends TemplateBaseSpec {
       val document: Document = Jsoup.parse(template.body)
 
       "render the expected text" in {
-        document.body().text() shouldBe "Total you owe"
+        document.body().text() shouldBe "Total VAT you owe"
       }
     }
 
@@ -40,7 +40,7 @@ class BoxFiveDescriptionTemplateSpec extends TemplateBaseSpec {
       val document: Document = Jsoup.parse(template.body)
 
       "render the expected text" in {
-        document.body().text() shouldBe "Total you owed"
+        document.body().text() shouldBe "Total VAT you owed"
       }
     }
 
@@ -50,7 +50,7 @@ class BoxFiveDescriptionTemplateSpec extends TemplateBaseSpec {
       val document: Document = Jsoup.parse(template.body)
 
       "render the expected text" in {
-        document.body().text() shouldBe "HMRC will pay you"
+        document.body().text() shouldBe "Total VAT HMRC owes you"
       }
     }
 
@@ -60,7 +60,7 @@ class BoxFiveDescriptionTemplateSpec extends TemplateBaseSpec {
       val document: Document = Jsoup.parse(template.body)
 
       "render the expected text" in {
-        document.body().text() shouldBe "Total amount HMRC owed you"
+        document.body().text() shouldBe "Total VAT HMRC owed you"
       }
     }
   }

@@ -171,15 +171,15 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
 
     "have the correct row descriptions in the table" in {
       val expectedDescriptions = Array(
-        "VAT on United Kingdom sales and other outputs",
-        "VAT on European Community sales and related costs",
-        "VAT sales subtotal",
-        "Total VAT reclaimed from anywhere",
-        "Total you owed",
+        "VAT you charged on sales and other supplies",
+        "VAT you owe on goods purchased from EC countries and brought into the UK",
+        "VAT you owe before deductions (this is the total of box 1 and 2)",
+        "VAT you've claimed back",
+        "Total VAT you owed",
         "Total value of sales and other supplies, including VAT",
-        "Total purchases from anywhere, minus VAT",
-        "Total supplies, goods and related costs to European Community, minus VAT",
-        "Total value of acquisitions of goods from European Community, minus VAT"
+        "Total value of purchases and other expenses, excluding VAT",
+        "Total value of supplied goods to EC countries and related costs (excluding VAT)",
+        "Total value of goods purchased from EC countries and brought into the UK, as well as any related costs (excluding VAT)"
       )
       expectedDescriptions.indices.foreach(i => elementText(boxElement(Selectors.boxes(i), 2)) shouldBe expectedDescriptions(i))
     }
@@ -318,15 +318,15 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
 
     "have the correct row descriptions in the table" in {
       val expectedDescriptions = Array(
-        "VAT on United Kingdom sales and other outputs",
-        "VAT on European Community sales and related costs",
-        "VAT sales subtotal",
-        "Total VAT reclaimed from anywhere",
-        "Total you owed",
+        "VAT you charged on sales and other supplies",
+        "VAT you owe on goods purchased from EC countries and brought into the UK",
+        "VAT you owe before deductions (this is the total of box 1 and 2)",
+        "VAT you've claimed back",
+        "Total VAT you owed",
         "Total value of sales and other supplies, excluding VAT",
-        "Total purchases from anywhere, minus VAT",
-        "Total supplies, goods and related costs to European Community, minus VAT",
-        "Total value of acquisitions of goods from European Community, minus VAT"
+        "Total value of purchases and other expenses, excluding VAT",
+        "Total value of supplied goods to EC countries and related costs (excluding VAT)",
+        "Total value of goods purchased from EC countries and brought into the UK, as well as any related costs (excluding VAT)"
       )
       expectedDescriptions.indices.foreach(i => elementText(boxElement(Selectors.boxes(i), 2)) shouldBe expectedDescriptions(i))
     }
@@ -365,10 +365,6 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       elementText(Selectors.helpBullet2) shouldBe "1% or less of your box 6 figure and below £50,000"
     }
   }
-
-
-
-
 
 
   "Rendering the vat return details page from the payments route" should {
@@ -472,7 +468,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     }
 
     "have the correct box 5 description in the table" in {
-      elementText(boxElement(Selectors.boxes(4), 2)) shouldBe "Total you owe"
+      elementText(boxElement(Selectors.boxes(4), 2)) shouldBe "Total VAT you owe"
     }
 
     "have the pay button" in {
@@ -595,7 +591,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     }
 
     "have the correct box 5 description in the table" in {
-      elementText(boxElement(Selectors.boxes(4), 2)) shouldBe "HMRC will pay you"
+      elementText(boxElement(Selectors.boxes(4), 2)) shouldBe "Total VAT HMRC owes you"
     }
 
     "not have the pay now button" in {
@@ -650,7 +646,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     }
 
     "have the correct box 5 description in the table" in {
-      elementText(boxElement(Selectors.boxes(4), 2)) shouldBe "Total amount HMRC owed you"
+      elementText(boxElement(Selectors.boxes(4), 2)) shouldBe "Total VAT HMRC owed you"
     }
 
     "not have the pay now button" in {
