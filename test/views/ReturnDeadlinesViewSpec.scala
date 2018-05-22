@@ -106,7 +106,7 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
     }
 
     "have the correct message regarding downloading software in the hint box" in {
-      elementText(Selectors.downloadSoftware) shouldBe "Choose accounting software that supports this service (opens in a new tab) if you haven't already."
+      elementText(Selectors.downloadSoftware) shouldBe "Choose accounting software that supports this service if you haven't already."
     }
 
     "have the correct message regarding VAT records in the hint box" in {
