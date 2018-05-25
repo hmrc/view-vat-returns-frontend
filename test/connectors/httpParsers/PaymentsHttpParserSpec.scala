@@ -157,6 +157,19 @@ class PaymentsHttpParserSpec extends UnitSpec {
       }
     }
 
+    "a http response of 404 NOT_FOUND" should {
+
+      val httpResponse = HttpResponse(Status.NOT_FOUND, None)
+
+      val expected = Right(Payments(Seq.empty))
+
+      val result = PaymentsReads.read("", "", httpResponse)
+
+      "return a UnknownError" in {
+        result shouldEqual expected
+      }
+    }
+
     "the HTTP response status is 5xx" should {
 
       val body: JsObject = Json.obj(
