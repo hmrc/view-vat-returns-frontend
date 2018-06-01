@@ -19,7 +19,7 @@ package controllers
 import audit.AuditingService
 import audit.models.{ViewOpenVatObligationsAuditModel, ViewSubmittedVatObligationsAuditModel}
 import config.AppConfig
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
 import models.viewModels.{ReturnDeadlineViewModel, ReturnObligationsViewModel, VatReturnsViewModel}
 import models._
@@ -30,6 +30,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
 
+@Singleton
 class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
                                             val enrolmentsAuthService: EnrolmentsAuthService,
                                             returnsService: ReturnsService,
@@ -42,8 +43,8 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
     implicit user =>
       if (isValidSearchYear(year)) {
         getReturnObligations(user, year, Obligation.Status.Fulfilled).map {
-          case Some(model) => Ok(views.html.returns.submittedReturns(model))
-          case None => InternalServerError(views.html.errors.submittedReturnsError(user))
+          case Right(model) => Ok(views.html.returns.submittedReturns(model))
+          case Left(_) => InternalServerError(views.html.errors.submittedReturnsError(user))
         }
       } else {
         Future.successful(NotFound(views.html.errors.notFound()))
@@ -93,7 +94,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
   }
 
   private[controllers] def getReturnObligations(user: User, selectedYear: Int, status: Obligation.Status.Value)
-                                               (implicit hc: HeaderCarrier): Future[Option[VatReturnsViewModel]] = {
+                                               (implicit hc: HeaderCarrier): Future[ServiceResponse[VatReturnsViewModel]] = {
 
     val returnYears: Seq[Int] = Seq[Int](2018)
 
@@ -104,7 +105,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
           routes.ReturnObligationsController.submittedReturns(selectedYear).url
         )
 
-        Some(VatReturnsViewModel(
+        Right(VatReturnsViewModel(
           returnYears,
           selectedYear,
           obligations.map(obligation =>
@@ -117,7 +118,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
           user.hasNonMtdVat,
           user.vrn
         ))
-      case Left(_) => None
+      case Left(error) => Left(error)
     }
   }
 }

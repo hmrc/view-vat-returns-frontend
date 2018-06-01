@@ -302,7 +302,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
             )))
           )
 
-        val expectedResult = Some(VatReturnsViewModel(
+        val expectedResult = Right(VatReturnsViewModel(
           Seq(2018),
           2017,
           Seq(
@@ -326,7 +326,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
       "return a VatReturnsViewModel with empty obligations" in new HandleReturnObligationsTest {
         override val vatServiceResult: Future[ServiceResponse[VatReturnObligations]] = Right(VatReturnObligations(Seq.empty))
 
-        val expectedResult = Some(
+        val expectedResult = Right(
           VatReturnsViewModel(
             Seq(2018),
             2017,
@@ -345,7 +345,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
       "return None" in new HandleReturnObligationsTest {
         override val vatServiceResult: Future[ServiceResponse[Nothing]] = Left(ObligationError)
-        private val expectedResult = None
+        private val expectedResult = Left(ObligationError)
         private val result = await(target.getReturnObligations(testUser, 2017, Obligation.Status.All))
 
         result shouldBe expectedResult
