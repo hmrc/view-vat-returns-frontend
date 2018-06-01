@@ -20,8 +20,9 @@ import audit.AuditingService
 import audit.models.ViewVatReturnAuditModel
 import config.AppConfig
 import javax.inject.{Inject, Singleton}
+
 import models.customer.CustomerDetail
-import models.errors.UnexpectedStatusError
+import models.errors.NotFoundError
 import models.payments.Payment
 import models.viewModels.VatReturnViewModel
 import models.{ReturnsControllerData, User, VatReturnDetails, VatReturnObligation}
@@ -98,7 +99,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
         } else {
           NotFound(views.html.errors.notFound())
         }
-      case (Left(UnexpectedStatusError("404", _)), _, _) => NotFound(views.html.errors.notFound())
+      case (Left(NotFoundError), _, _) => NotFound(views.html.errors.notFound())
       case _ => InternalServerError(views.html.errors.technicalProblem())
     }
   }

@@ -20,10 +20,10 @@ import java.time.LocalDate
 
 import audit.AuditingService
 import audit.models.ExtendedAuditModel
-import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
-import models.errors.{HttpError, ServerSideError}
+import models._
+import models.errors.ObligationError
+import models.User
 import models.viewModels.{ReturnObligationsViewModel, VatReturnsViewModel}
-import models.{Obligation, User, VatReturnObligation, VatReturnObligations}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.http.Status
@@ -46,7 +46,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
       )
     )
 
-    val exampleObligations: Future[HttpGetResult[VatReturnObligations]] = Right(
+    val exampleObligations: Future[ServiceResponse[VatReturnObligations]] = Right(
       VatReturnObligations(
         Seq(
           VatReturnObligation(
@@ -166,15 +166,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     "An error occurs upstream" should {
 
       "return the submitted returns error view" in new Test {
-        val errorResponse: String =
-          """
-            | "code" -> "GATEWAY_TIMEOUT",
-            | "message" -> "Gateway Timeout"
-            | """.stripMargin
-
-        override val exampleObligations: Future[Left[HttpError, VatReturnObligations]]
-        = Left(ServerSideError("504", errorResponse))
-
+        override val exampleObligations: Future[ServiceResponse[Nothing]] = Left(ObligationError)
         override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
 
         val result: Result = await(target.submittedReturns(previousYear)(fakeRequest))
@@ -211,8 +203,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     "A user with no open obligations" should {
 
       "return the no returns view" in new Test {
-        override val exampleObligations: Future[Right[HttpError, VatReturnObligations]] =
-          Right(VatReturnObligations(Seq.empty))
+        override val exampleObligations: Future[ServiceResponse[VatReturnObligations]] = Right(VatReturnObligations(Seq.empty))
         override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
         override val openObligations: Boolean = false
 
@@ -248,23 +239,20 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     "the Obligations API call fails" should {
 
       "return the technical problem view" in new Test {
-        val errorResponse: String =
-          """
-            | "code" -> "GATEWAY_TIMEOUT",
-            | "message" -> "Gateway Timeout"
-            | """.stripMargin
-
-        override val exampleObligations: Future[Left[HttpError, VatReturnObligations]] = Left(ServerSideError("504", errorResponse))
+        override val exampleObligations: Future[ServiceResponse[Nothing]] = Left(ObligationError)
         override val serviceCall = true
         override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
+
         val result: Result = await(target.returnDeadlines()(fakeRequest))
         val document: Document = Jsoup.parse(bodyOf(result))
-        document.title shouldBe "There is a problem with the service - VAT reporting through software - GOV.UK"      }
+
+        document.title shouldBe "There is a problem with the service - VAT reporting through software - GOV.UK"
+      }
     }
   }
 
   private trait HandleReturnObligationsTest {
-    val vatServiceResult: Future[Either[HttpError, VatReturnObligations]]
+    val vatServiceResult: Future[ServiceResponse[VatReturnObligations]]
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
     val mockVatReturnService: ReturnsService = mock[ReturnsService]
     val mockDateService: DateService = mock[DateService]
@@ -302,7 +290,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     "the vatReturnsService retrieves a valid list of VatReturnObligations" should {
 
       "return a VatReturnsViewModel with valid obligations" in new HandleReturnObligationsTest {
-        override val vatServiceResult: Future[Right[HttpError, VatReturnObligations]] = Future.successful {
+        override val vatServiceResult: Future[ServiceResponse[VatReturnObligations]] =
           Right(
             VatReturnObligations(Seq(VatReturnObligation(
               LocalDate.parse("2017-01-01"),
@@ -313,7 +301,6 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
               "#001"
             )))
           )
-        }
 
         val expectedResult = Right(VatReturnsViewModel(
           Seq(2018),
@@ -328,8 +315,8 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
           hasNonMtdVat = false,
           "999999999"
         ))
-
         private val result = await(target.getReturnObligations(testUser, 2017, Obligation.Status.All))
+
         result shouldBe expectedResult
       }
     }
@@ -337,11 +324,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     "the vatReturnsService retrieves an empty list of VatReturnObligations" should {
 
       "return a VatReturnsViewModel with empty obligations" in new HandleReturnObligationsTest {
-        override val vatServiceResult: Future[Right[HttpError, VatReturnObligations]] = Future.successful {
-          Right(
-            VatReturnObligations(Seq.empty)
-          )
-        }
+        override val vatServiceResult: Future[ServiceResponse[VatReturnObligations]] = Right(VatReturnObligations(Seq.empty))
 
         val expectedResult = Right(
           VatReturnsViewModel(
@@ -352,28 +335,19 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
             "999999999"
           )
         )
-
         private val result = await(target.getReturnObligations(testUser, 2017, Obligation.Status.All))
+
         result shouldBe expectedResult
       }
     }
 
     "the vatReturnsService retrieves an error" should {
 
-      "return a HttpGetResult error" in new HandleReturnObligationsTest {
-
-        val errorResponse: String =
-          """
-            | "code" -> "GATEWAY_TIMEOUT",
-            | "message" -> "Gateway Timeout"
-            | """.stripMargin
-
-        override val vatServiceResult: Future[Left[HttpError, VatReturnObligations]]
-        = Left(ServerSideError("504", errorResponse))
-
-        val expectedResult = Left(ServerSideError("504", errorResponse))
-
+      "return None" in new HandleReturnObligationsTest {
+        override val vatServiceResult: Future[ServiceResponse[Nothing]] = Left(ObligationError)
+        private val expectedResult = Left(ObligationError)
         private val result = await(target.getReturnObligations(testUser, 2017, Obligation.Status.All))
+
         result shouldBe expectedResult
       }
     }
@@ -385,11 +359,8 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
       "return true" in new Test {
         override val authResult: Future[_] = Future.successful("")
-
         override def setup(): Any = "" // Prevent the unused mocks causing trouble
-
         val result: Boolean = target.isValidSearchYear(2018, 2018)
-
         result shouldBe true
       }
     }
@@ -398,11 +369,8 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
       "return false" in new Test {
         override val authResult: Future[_] = Future.successful("")
-
         override def setup(): Any = "" // Prevent the unused mocks causing trouble
-
         val result: Boolean = target.isValidSearchYear(2019, 2018)
-
         result shouldBe false
       }
     }
@@ -411,11 +379,8 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
       "return true" in new Test {
         override val authResult: Future[_] = Future.successful("")
-
         override def setup(): Any = "" // Prevent the unused mocks causing trouble
-
         val result: Boolean = target.isValidSearchYear(2017, 2018)
-
         result shouldBe true
       }
     }
@@ -424,11 +389,8 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
       "return false" in new Test {
         override val authResult: Future[_] = Future.successful("")
-
         override def setup(): Any = "" // Prevent the unused mocks causing trouble
-
         val result: Boolean = target.isValidSearchYear(2014, 2018)
-
         result shouldBe false
       }
     }
@@ -437,11 +399,8 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
       "return true" in new Test {
         override val authResult: Future[_] = Future.successful("")
-
         override def setup(): Any = "" // Prevent the unused mocks causing trouble
-
         val result: Boolean = target.isValidSearchYear(2017, 2018)
-
         result shouldBe true
       }
     }
@@ -468,7 +427,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
     "user has no obligations" should {
 
-      val obligationsResult: HttpGetResult[VatReturnObligations] = Right(VatReturnObligations(Seq()))
+      val obligationsResult: ServiceResponse[VatReturnObligations] = Right(VatReturnObligations(Seq()))
 
       "return noUpcomingReturnDeadlines view with no obligation" in new FulfilledObligationsTest {
         val result: Result = target.fulfilledObligationsAction(obligationsResult)
@@ -489,7 +448,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         None,
         "#001"
       )
-      val obligationsResult: HttpGetResult[VatReturnObligations] = Right(VatReturnObligations(Seq(obligation)))
+      val obligationsResult: ServiceResponse[VatReturnObligations] = Right(VatReturnObligations(Seq(obligation)))
 
       "return noUpcomingReturnDeadlines view with the obligation dates"  in new FulfilledObligationsTest {
         val mockReturnsService: ReturnsService = mock[ReturnsService]
@@ -507,7 +466,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
     "the service returns an error" should {
 
-      val obligationsResult: HttpGetResult[VatReturnObligations] = Left(ServerSideError("", ""))
+      val obligationsResult: ServiceResponse[Nothing] = Left(ObligationError)
 
       "return the technical problem view" in new FulfilledObligationsTest {
         val result: Result = target.fulfilledObligationsAction(obligationsResult)
