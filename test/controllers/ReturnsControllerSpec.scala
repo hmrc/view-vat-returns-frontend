@@ -20,10 +20,10 @@ import java.time.LocalDate
 
 import audit.AuditingService
 import audit.models.AuditModel
-import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
 import models._
+import models.User
 import models.customer.CustomerDetail
-import models.errors.{ServerSideError, UnexpectedStatusError, UnknownError}
+import models.errors.{NotFoundError, VatReturnError}
 import models.payments.Payment
 import models.viewModels.VatReturnViewModel
 import play.api.http.Status
@@ -94,7 +94,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     val serviceCall: Boolean = true
     val successReturn: Boolean = true
     val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
-    val vatReturnResult: Future[HttpGetResult[VatReturn]] = Future.successful(Right(exampleVatReturn))
+    val vatReturnResult: Future[ServiceResponse[VatReturn]] = Future.successful(Right(exampleVatReturn))
     val paymentResult: Future[Option[Payment]] = Future.successful(Some(examplePayment))
     val mockSubscriptionService: SubscriptionService = mock[SubscriptionService]
 
@@ -192,8 +192,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
       "return 404 (Not Found)" in new Test {
         override val successReturn = false
-        override val vatReturnResult: Future[HttpGetResult[VatReturn]] =
-          Future.successful(Left(UnexpectedStatusError("404", "test")))
+        override val vatReturnResult: Future[ServiceResponse[Nothing]] = Left(NotFoundError)
         private val result = target.vatReturn(2018, "#001")(fakeRequest)
         status(result) shouldBe Status.NOT_FOUND
       }
@@ -203,8 +202,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
       "return 500 (Internal Server Error)" in new Test {
         override val successReturn = false
-        override val vatReturnResult: Future[HttpGetResult[VatReturn]] =
-          Future.successful(Left(UnknownError))
+        override val vatReturnResult: Future[ServiceResponse[Nothing]] = Left(VatReturnError)
         private val result = target.vatReturn(2018, "#001")(fakeRequest)
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
       }
@@ -255,8 +253,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
       "return 404 (Not Found)" in new Test {
         override val successReturn = false
-        override val vatReturnResult: Future[HttpGetResult[VatReturn]] =
-          Future.successful(Left(UnexpectedStatusError("404", "test")))
+        override val vatReturnResult: Future[ServiceResponse[Nothing]] = Left(NotFoundError)
         private val result = target.vatReturnViaPayments("#001")(fakeRequest)
         status(result) shouldBe Status.NOT_FOUND
       }
@@ -266,8 +263,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
       "return 500 (Internal Server Error)" in new Test {
         override val successReturn = false
-        override val vatReturnResult: Future[HttpGetResult[VatReturn]] =
-          Future.successful(Left(UnknownError))
+        override val vatReturnResult: Future[ServiceResponse[Nothing]] = Left(VatReturnError)
         private val result = target.vatReturnViaPayments("#001")(fakeRequest)
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
       }
@@ -347,10 +343,10 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       }
     }
 
-    "it returns Left(UnexpectedStatusError(404)), _ and _" should {
+    "it returns Left(NotFoundError), _ and _" should {
 
       "return a Not Found status" in {
-        val data = ReturnsControllerData(Left(UnexpectedStatusError("404", "test")), None, None, None)
+        val data = ReturnsControllerData(Left(NotFoundError), None, None, None)
         val result = target.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
         result.header.status shouldBe Status.NOT_FOUND
       }
@@ -359,7 +355,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     "it returns something else" should {
 
       "return an Internal Server Error status" in {
-        val data = ReturnsControllerData(Left(ServerSideError("500", "test")), None, None, None)
+        val data = ReturnsControllerData(Left(VatReturnError), None, None, None)
         val result = target.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
         result.header.status shouldBe Status.INTERNAL_SERVER_ERROR
       }

@@ -28,10 +28,10 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class PaymentsService @Inject()(paymentsConnector: PaymentsConnector) {
-  def setupPaymentsJourney(journeyDetails: PaymentDetailsModel)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ServiceResponse[String]] =
+  def setupPaymentsJourney(journeyDetails: PaymentDetailsModel)
+                          (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ServiceResponse[String]] =
     paymentsConnector.setupJourney(journeyDetails).map {
       case Right(redirectUrl) => Right(redirectUrl)
       case Left(_) => Left(PaymentSetupError)
     }
-
 }

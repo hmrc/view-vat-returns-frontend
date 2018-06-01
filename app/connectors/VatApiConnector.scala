@@ -90,9 +90,9 @@ class VatApiConnector @Inject()(http: HttpClient,
     )
 
     httpRequest.map {
-      case vatReturns@Right(_) =>
+      case obligations@Right(_) =>
         timer.stop()
-        vatReturns
+        obligations
       case httpError@Left(error) =>
         metrics.getObligationsCallFailureCounter.inc()
         Logger.warn("VatApiConnector received error: " + error.message)

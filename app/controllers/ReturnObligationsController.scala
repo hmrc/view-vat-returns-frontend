@@ -17,13 +17,12 @@
 package controllers
 
 import audit.AuditingService
-import audit.models.{ViewSubmittedVatObligationsAuditModel, ViewOpenVatObligationsAuditModel}
+import audit.models.{ViewOpenVatObligationsAuditModel, ViewSubmittedVatObligationsAuditModel}
 import config.AppConfig
-import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
 import javax.inject.Inject
 
 import models.viewModels.{ReturnDeadlineViewModel, ReturnObligationsViewModel, VatReturnsViewModel}
-import models.{Obligation, User, VatReturnObligation, VatReturnObligations}
+import models._
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, Request, Result}
 import services.{DateService, EnrolmentsAuthService, ReturnsService}
@@ -43,8 +42,8 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
     implicit user =>
       if (isValidSearchYear(year)) {
         getReturnObligations(user, year, Obligation.Status.Fulfilled).map {
-          case Right(model) => Ok(views.html.returns.submittedReturns(model))
-          case Left(_) => InternalServerError(views.html.errors.submittedReturnsError(user))
+          case Some(model) => Ok(views.html.returns.submittedReturns(model))
+          case None => InternalServerError(views.html.errors.submittedReturnsError(user))
         }
       } else {
         Future.successful(NotFound(views.html.errors.notFound()))
@@ -65,8 +64,8 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
           if (obligations.isEmpty) {
             returnsService.getFulfilledObligations(currentDate).map(fulfilledObligations => fulfilledObligationsAction(fulfilledObligations))
           } else {
-            val deadlines = obligations.map(ob =>
-              ReturnDeadlineViewModel(ob.due, ob.start, ob.end, ob.due.isBefore(currentDate))
+            val deadlines = obligations.map(obligation =>
+              ReturnDeadlineViewModel(obligation.due, obligation.start, obligation.end, obligation.due.isBefore(currentDate))
             )
             Future.successful(Ok(views.html.returns.returnDeadlines(deadlines)))
           }
@@ -74,7 +73,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
       }
   }
 
-  private[controllers] def fulfilledObligationsAction(obligationsResult: HttpGetResult[VatReturnObligations])
+  private[controllers] def fulfilledObligationsAction(obligationsResult: ServiceResponse[VatReturnObligations])
                                                      (implicit request: Request[AnyContent]): Result = {
     obligationsResult match {
       case Right(VatReturnObligations(Seq())) => Ok(views.html.returns.noUpcomingReturnDeadlines(None))
@@ -94,7 +93,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
   }
 
   private[controllers] def getReturnObligations(user: User, selectedYear: Int, status: Obligation.Status.Value)
-                                               (implicit hc: HeaderCarrier): Future[HttpGetResult[VatReturnsViewModel]] = {
+                                               (implicit hc: HeaderCarrier): Future[Option[VatReturnsViewModel]] = {
 
     val returnYears: Seq[Int] = Seq[Int](2018)
 
@@ -105,7 +104,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
           routes.ReturnObligationsController.submittedReturns(selectedYear).url
         )
 
-        Right(VatReturnsViewModel(
+        Some(VatReturnsViewModel(
           returnYears,
           selectedYear,
           obligations.map(obligation =>
@@ -118,7 +117,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
           user.hasNonMtdVat,
           user.vrn
         ))
-      case Left(error) => Left(error)
+      case Left(_) => None
     }
   }
 }
