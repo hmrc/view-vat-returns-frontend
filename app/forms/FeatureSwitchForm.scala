@@ -30,7 +30,9 @@ object FeatureSwitchForm {
       ConfigKeys.allowPaymentsFeature -> boolean,
       ConfigKeys.staticDateEnabledFeature -> boolean,
       ConfigKeys.allowNineBoxFeature -> boolean,
-      ConfigKeys.enableAuditingFeature -> boolean
+      ConfigKeys.enableAuditingFeature -> boolean,
+      ConfigKeys.useVatReturnsService -> boolean,
+      ConfigKeys.useVatObligationsService -> boolean
   )(FeatureSwitchModel.apply)(FeatureSwitchModel.unapply)
   )
 }

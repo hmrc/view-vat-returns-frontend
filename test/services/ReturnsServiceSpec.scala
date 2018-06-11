@@ -18,22 +18,24 @@ package services
 
 import java.time.LocalDate
 
-import connectors.{FinancialDataConnector, VatApiConnector}
+import connectors.{FinancialDataConnector, VatObligationsConnector, VatReturnsConnector}
 import controllers.ControllerBaseSpec
 import models._
 import models.Obligation.Status
 import models.payments.{Payment, Payments}
 import models.User
 import uk.gov.hmrc.http.HeaderCarrier
+
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.{ExecutionContext, Future}
 
 class ReturnsServiceSpec extends ControllerBaseSpec {
 
   private trait Test {
-    val mockVatApiConnector: VatApiConnector = mock[VatApiConnector]
+    val mockVatApiConnector: VatObligationsConnector = mock[VatObligationsConnector]
+    val mockVatReturnsConnector: VatReturnsConnector = mock[VatReturnsConnector]
     val mockFinancialDataApiConnector: FinancialDataConnector = mock[FinancialDataConnector]
-    val service = new ReturnsService(mockVatApiConnector, mockFinancialDataApiConnector)
+    val service = new ReturnsService(mockVatApiConnector, mockFinancialDataApiConnector, mockVatReturnsConnector)
     implicit val hc: HeaderCarrier = HeaderCarrier()
 
     val exampleVatReturn: VatReturn = VatReturn(
@@ -76,7 +78,7 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
   "Calling .getVatReturn" should {
 
     "return a VAT Return" in new Test {
-      (mockVatApiConnector.getVatReturnDetails(_: String, _: String)(_: HeaderCarrier, _: ExecutionContext))
+      (mockVatReturnsConnector.getVatReturnDetails(_: String, _: String)(_: HeaderCarrier, _: ExecutionContext))
         .expects(*, *, *, *)
         .returns(Future.successful(Right(exampleVatReturn)))
 
