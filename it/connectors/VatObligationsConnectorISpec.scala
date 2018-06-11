@@ -22,7 +22,7 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import helpers.IntegrationBaseSpec
 import models.Obligation.Status
 import models.errors.{ApiSingleError, BadRequestError, MultipleErrors}
-import models.{VatReturn, VatReturnObligation, VatReturnObligations}
+import models.{VatReturnObligation, VatReturnObligations}
 import play.api.libs.json.Json
 import stubs.VatApiStub
 import uk.gov.hmrc.http.HeaderCarrier
