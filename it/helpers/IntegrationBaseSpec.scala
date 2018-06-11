@@ -44,7 +44,11 @@ trait IntegrationBaseSpec extends UnitSpec with WireMockHelper with GuiceOneServ
     "microservice.services.vat-subscription.host" -> mockHost,
     "microservice.services.vat-subscription.port" -> mockPort,
     "microservice.services.financial-transactions.host" -> mockHost,
-    "microservice.services.financial-transactions.port" -> mockPort
+    "microservice.services.financial-transactions.port" -> mockPort,
+    "microservice.services.vat-returns.host" -> mockHost,
+    "microservice.services.vat-returns.port" -> mockPort,
+    "microservice.services.vat-obligations.host" -> mockHost,
+    "microservice.services.vat-obligations.port" -> mockPort
   )
 
   override implicit lazy val app: Application = new GuiceApplicationBuilder()

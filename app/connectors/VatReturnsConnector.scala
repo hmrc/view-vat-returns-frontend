@@ -18,13 +18,10 @@ package connectors
 
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets.UTF_8
-import java.time.LocalDate
-
 import config.AppConfig
 import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
 import javax.inject.{Inject, Singleton}
-import models.Obligation.Status
-import models.{VatReturn, VatReturnObligations}
+import models.VatReturn
 import play.api.Logger
 import play.api.http.HeaderNames
 import services.MetricsService
@@ -34,13 +31,19 @@ import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class VatApiConnector @Inject()(http: HttpClient,
+class VatReturnsConnector @Inject()(http: HttpClient,
                                 appConfig: AppConfig,
                                 metrics: MetricsService) {
 
-  private[connectors] def obligationsUrl(vrn: String): String = s"${appConfig.vatApiBaseUrl}/$vrn/obligations"
+  private[connectors] def returnUrl(vrn: String, periodKey: String) = {
+    val baseUrl: String = if (appConfig.features.enableVatReturnsService()) {
+      appConfig.vatReturnsBaseUrl
+    } else {
+      appConfig.vatApiBaseUrl
+    }
 
-  private[connectors] def returnUrl(vrn: String, periodKey: String) = s"${appConfig.vatApiBaseUrl}/$vrn/returns/${URLEncoder.encode(periodKey, UTF_8.name())}"
+    s"$baseUrl/$vrn/returns/${URLEncoder.encode(periodKey, UTF_8.name())}"
+  }
 
   private def headerCarrier(hc: HeaderCarrier) = hc.withExtraHeaders(
     HeaderNames.ACCEPT -> "application/vnd.hmrc.1.0+json",
@@ -68,33 +71,6 @@ class VatApiConnector @Inject()(http: HttpClient,
         nineBox
       case httpError@Left(error) =>
         metrics.getVatReturnCallFailureCounter.inc()
-        Logger.warn("VatApiConnector received error: " + error.message)
-        httpError
-    }
-  }
-
-  def getVatReturnObligations(vrn: String, from: LocalDate, to: LocalDate, status: Status.Value)
-                             (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[VatReturnObligations]] = {
-
-    import connectors.httpParsers.VatReturnObligationsHttpParser.VatReturnObligationsReads
-
-    val timer = metrics.getObligationsTimer.time()
-
-    val httpRequest = http.GET(
-      obligationsUrl(vrn),
-      Seq("from" -> from.toString, "to" -> to.toString, "status" -> status.toString)
-    )(
-      implicitly[HttpReads[HttpGetResult[VatReturnObligations]]],
-      headerCarrier(hc),
-      implicitly[ExecutionContext]
-    )
-
-    httpRequest.map {
-      case obligations@Right(_) =>
-        timer.stop()
-        obligations
-      case httpError@Left(error) =>
-        metrics.getObligationsCallFailureCounter.inc()
         Logger.warn("VatApiConnector received error: " + error.message)
         httpError
     }

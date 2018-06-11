@@ -22,19 +22,19 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import helpers.IntegrationBaseSpec
 import models.Obligation.Status
 import models.errors.{ApiSingleError, BadRequestError, MultipleErrors}
-import models.{VatReturn, VatReturnObligation, VatReturnObligations}
+import models.{VatReturnObligation, VatReturnObligations}
 import play.api.libs.json.Json
 import stubs.VatApiStub
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class VatApiConnectorISpec extends IntegrationBaseSpec {
+class VatObligationsConnectorISpec extends IntegrationBaseSpec {
 
   private trait Test {
     def setupStubs(): StubMapping
 
-    val connector: VatApiConnector = app.injector.instanceOf[VatApiConnector]
+    val connector: VatObligationsConnector = app.injector.instanceOf[VatObligationsConnector]
     implicit val hc: HeaderCarrier = HeaderCarrier()
   }
 
@@ -248,66 +248,4 @@ class VatApiConnectorISpec extends IntegrationBaseSpec {
     }
   }
 
-  "Calling getReturnDetails" when {
-
-    "the supplied data is all correct" should {
-
-      "return a VatReturn" in new Test {
-        override def setupStubs(): StubMapping = VatApiStub.stubSuccessfulVatReturn
-
-        val expected = Right(VatReturn(
-          "#001",
-          100,
-          100,
-          200,
-          100,
-          100,
-          500,
-          500,
-          500,
-          500
-        ))
-
-        setupStubs()
-        private val result = await(connector.getVatReturnDetails("123456789", "%23001"))
-
-        result shouldBe expected
-      }
-    }
-
-    "the supplied VRN is invalid" should {
-
-      "return a BadRequestError" in new Test {
-        override def setupStubs(): StubMapping = VatApiStub.stubInvalidVrnForReturns
-
-        val expected = Left(BadRequestError(
-          code = "VRN_INVALID",
-          errorResponse = ""
-        ))
-
-        setupStubs()
-        private val result = await(connector.getVatReturnDetails("123456789", "%23001"))
-
-        result shouldBe expected
-      }
-    }
-
-    "the supplied period key is invalid" should {
-
-      "return a BadRequestError" in new Test {
-        override def setupStubs(): StubMapping = VatApiStub.stubInvalidPeriodKey
-
-        val expected = Left(BadRequestError(
-          code = "PERIOD_KEY_INVALID",
-          errorResponse = ""
-        ))
-
-        setupStubs()
-        private val result = await(connector.getVatReturnDetails("123456789", "%23001"))
-
-        result shouldBe expected
-      }
-    }
-
-  }
 }

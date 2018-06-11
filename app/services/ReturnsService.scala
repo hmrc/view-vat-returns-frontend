@@ -17,9 +17,9 @@
 package services
 
 import java.time.LocalDate
-import javax.inject.{Inject, Singleton}
 
-import connectors.{FinancialDataConnector, VatApiConnector}
+import javax.inject.{Inject, Singleton}
+import connectors.{FinancialDataConnector, VatObligationsConnector, VatReturnsConnector}
 import models.Obligation.Status
 import models.payments.{Payment, Payments}
 import models._
@@ -29,11 +29,12 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ReturnsService @Inject()(vatApiConnector: VatApiConnector, financialDataConnector: FinancialDataConnector) {
+class ReturnsService @Inject()(vatObligationsConnector: VatObligationsConnector, financialDataConnector: FinancialDataConnector,
+                               vatReturnConnector: VatReturnsConnector) {
 
   def getVatReturn(user: User, periodKey: String)
                   (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ServiceResponse[VatReturn]] =
-    vatApiConnector.getVatReturnDetails(user.vrn, periodKey).map {
+    vatReturnConnector.getVatReturnDetails(user.vrn, periodKey).map {
       case Right(vatReturn) => Right(vatReturn)
       case Left(UnexpectedStatusError("404", _)) => Left(NotFoundError)
       case Left(_) => Left(VatReturnError)
@@ -44,7 +45,7 @@ class ReturnsService @Inject()(vatApiConnector: VatApiConnector, financialDataCo
     val from: LocalDate = LocalDate.parse(s"$searchYear-01-01")
     val to: LocalDate = LocalDate.parse(s"$searchYear-12-31")
 
-    vatApiConnector.getVatReturnObligations(user.vrn, from, to, status).map {
+    vatObligationsConnector.getVatReturnObligations(user.vrn, from, to, status).map {
       case Right(obligations) =>
         Right(filterObligationsByDueDate(obligations, searchYear))
       case Left(_) => Left(ObligationError)
@@ -54,7 +55,7 @@ class ReturnsService @Inject()(vatApiConnector: VatApiConnector, financialDataCo
   def getFulfilledObligations(currentDate: LocalDate)
                              (implicit user: User, hc: HeaderCarrier, ec: ExecutionContext): Future[ServiceResponse[VatReturnObligations]] = {
     val from: LocalDate = currentDate.minusMonths(3)
-    vatApiConnector.getVatReturnObligations(user.vrn, from, currentDate, Status.Fulfilled).map {
+    vatObligationsConnector.getVatReturnObligations(user.vrn, from, currentDate, Status.Fulfilled).map {
       case Right(obligations) => Right(obligations)
       case Left(_) => Left(ObligationError)
     }
