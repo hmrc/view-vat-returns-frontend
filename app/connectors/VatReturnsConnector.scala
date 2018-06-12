@@ -71,7 +71,7 @@ class VatReturnsConnector @Inject()(http: HttpClient,
         nineBox
       case httpError@Left(error) =>
         metrics.getVatReturnCallFailureCounter.inc()
-        Logger.warn("VatApiConnector received error: " + error.message)
+        Logger.warn("VatReturnsConnector received error: " + error.message)
         httpError
     }
   }
