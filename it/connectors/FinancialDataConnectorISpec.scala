@@ -43,7 +43,7 @@ class FinancialDataConnectorISpec extends IntegrationBaseSpec {
 
       val expected = Right(Payments(Seq(
         Payment(
-          "VAT 0A Debit Charge",
+          "VAT Return Debit Charge",
           LocalDate.parse("2018-05-01"),
           LocalDate.parse("2018-06-20"),
           LocalDate.parse("2018-06-21"),
@@ -52,7 +52,7 @@ class FinancialDataConnectorISpec extends IntegrationBaseSpec {
           "#001"
         ),
         Payment(
-          "VAT 0A Debit Charge",
+          "VAT Return Debit Charge",
           LocalDate.parse("2018-05-01"),
           LocalDate.parse("2018-06-20"),
           LocalDate.parse("2018-06-21"),
