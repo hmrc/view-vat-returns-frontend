@@ -30,8 +30,7 @@ class PaymentsHttpParserSpec extends UnitSpec {
 
   "PaymentsReads" when {
 
-
-    "a http response of 200 (OK) is received" should {
+    "a http response of 200 (OK) is received with the charge type set to VAT Return Debit Charge" should {
 
       val httpResponse = HttpResponse(Status.OK, responseJson = Some(
         Json.obj(
@@ -69,7 +68,7 @@ class PaymentsHttpParserSpec extends UnitSpec {
             )
           )
         )))
-      
+
       val expectedResult = Right(Payments(Seq(
         Payment(
           chargeType = "VAT Return Debit Charge",
@@ -87,7 +86,54 @@ class PaymentsHttpParserSpec extends UnitSpec {
       "return a Payments instance" in {
         result shouldBe expectedResult
       }
+    }
 
+    "a http response of 200 (OK) is received with the charge type set to VAT Return Credit Charge" should {
+
+      val httpResponse = HttpResponse(Status.OK, responseJson = Some(
+        Json.obj(
+          "idType" -> "VRN",
+          "idNumber" -> "999973804",
+          "regimeType" -> "VATC",
+          "processingDate" -> "2018-04-17T08:55:22Z",
+          "financialTransactions" -> Json.arr(
+            Json.obj(
+              "chargeType"-> "VAT Return Credit Charge",
+              "mainType"-> "VAT Return Charge",
+              "periodKey"-> "18AC",
+              "periodKeyDescription" -> "March 2018",
+              "taxPeriodFrom"-> "2017-06-01",
+              "taxPeriodTo" -> "2017-10-01",
+              "businessPartner" -> "0100113120",
+              "contractAccountCategory" -> "33",
+              "contractAccount" -> "091700000405",
+              "contractObjectType" -> "ZVAT",
+              "contractObject" -> "00000180000000000165",
+              "sapDocumentNumber" -> "003030001189",
+              "sapDocumentNumberItem" -> "0001",
+              "chargeReference" -> "XJ002610110056",
+              "mainTransaction" -> "4700",
+              "subTransaction" -> "1174",
+              "originalAmount" -> 10169.45,
+              "outstandingAmount" -> 5000.00,
+              "items" -> Json.arr(
+                Json.obj(
+                  "subItem" -> "000",
+                  "dueDate" -> "2017-11-01",
+                  "amount" -> 10169.45
+                )
+              )
+            )
+          )
+        )))
+
+      val expectedResult = Right(Payments(Seq.empty))
+
+      val result = PaymentsReads.read("", "", httpResponse)
+
+      "return a Payments instance" in {
+        result shouldBe expectedResult
+      }
     }
 
     "a http response of 400 BAD_REQUEST (single error)" should {
