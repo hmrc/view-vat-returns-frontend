@@ -36,13 +36,11 @@ class VatReturnsConnector @Inject()(http: HttpClient,
                                 metrics: MetricsService) {
 
   private[connectors] def returnUrl(vrn: String, periodKey: String) = {
-    val baseUrl: String = if (appConfig.features.enableVatReturnsService()) {
-      appConfig.vatReturnsBaseUrl
+    if(appConfig.features.enableVatReturnsService()) {
+      appConfig.vatReturnsBaseUrl + s"/vat-returns/returns/vrn/$vrn?period-key=${URLEncoder.encode(periodKey, UTF_8.name())}"
     } else {
-      appConfig.vatApiBaseUrl
+      appConfig.vatApiBaseUrl + s"/$vrn/returns/${URLEncoder.encode(periodKey, UTF_8.name())}"
     }
-
-    s"$baseUrl/$vrn/returns/${URLEncoder.encode(periodKey, UTF_8.name())}"
   }
 
   private def headerCarrier(hc: HeaderCarrier) = hc.withExtraHeaders(

@@ -28,7 +28,7 @@ class VatReturnsConnectorSpec extends ControllerBaseSpec {
 
     "generate the correct returns url with a period key when using vat-returns" in {
       mockConfig.features.enableVatReturnsService(true)
-      connector.returnUrl("111", "123") shouldBe "/return-api/111/returns/123"
+      connector.returnUrl("111", "123") shouldBe "/return-api/vat-returns/returns/vrn/111?period-key=123"
     }
 
     "generate the correct returns url with a period key when not using vat-returns" in {
