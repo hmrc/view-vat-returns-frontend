@@ -27,7 +27,7 @@ import play.api.libs.json.Json
 
 object VatApiStub extends WireMockMethods {
 
-  private val obligationsUri = "/([0-9]+)/obligations"
+  private val obligationsUri = "/vat-obligations/([0-9]+)/obligations"
   private val returnsUri = "/([0-9]+)/returns/(.+)"
   private val dateRegex = "([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))"
 

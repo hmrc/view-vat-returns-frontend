@@ -43,7 +43,7 @@ class VatObligationsConnector @Inject()(http: HttpClient,
     } else {
       appConfig.vatApiBaseUrl
     }
-    s"$baseUrl/$vrn/obligations"
+    s"$baseUrl/vat-obligations/$vrn/obligations"
   }
 
   private def headerCarrier(hc: HeaderCarrier) = hc.withExtraHeaders(
