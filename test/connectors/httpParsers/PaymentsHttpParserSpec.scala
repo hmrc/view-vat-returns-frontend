@@ -30,109 +30,84 @@ class PaymentsHttpParserSpec extends UnitSpec {
 
   "PaymentsReads" when {
 
-    "a http response of 200 (OK) is received with the charge type set to VAT Return Debit Charge" should {
+    "the http response status is 200 OK and there are valid charge types" should {
 
       val httpResponse = HttpResponse(Status.OK, responseJson = Some(
         Json.obj(
-          "idType" -> "VRN",
-          "idNumber" -> "999973804",
-          "regimeType" -> "VATC",
-          "processingDate" -> "2018-04-17T08:55:22Z",
           "financialTransactions" -> Json.arr(
             Json.obj(
-              "chargeType"-> "VAT Return Debit Charge",
-              "mainType"-> "VAT Return Charge",
-              "periodKey"-> "18AC",
-              "periodKeyDescription" -> "March 2018",
-              "taxPeriodFrom"-> "2017-06-01",
-              "taxPeriodTo" -> "2017-10-01",
-              "businessPartner" -> "0100113120",
-              "contractAccountCategory" -> "33",
-              "contractAccount" -> "091700000405",
-              "contractObjectType" -> "ZVAT",
-              "contractObject" -> "00000180000000000165",
-              "sapDocumentNumber" -> "003030001189",
-              "sapDocumentNumberItem" -> "0001",
-              "chargeReference" -> "XJ002610110056",
-              "mainTransaction" -> "4700",
-              "subTransaction" -> "1174",
-              "originalAmount" -> 10169.45,
-              "outstandingAmount" -> 5000.00,
+              "mainType" -> "VAT Return Charge",
+              "chargeType" -> "VAT Return Debit Charge",
+              "taxPeriodFrom" -> "2016-12-01",
+              "taxPeriodTo" -> "2017-01-01",
               "items" -> Json.arr(
-                Json.obj(
-                  "subItem" -> "000",
-                  "dueDate" -> "2017-11-01",
-                  "amount" -> 10169.45
-                )
-              )
+                Json.obj("dueDate" -> "2017-10-25")
+              ),
+              "outstandingAmount" -> 1000,
+              "periodKey" -> "#003"
+            ),
+            Json.obj(
+              "mainType" -> "VAT Return Charge",
+              "chargeType" -> "VAT Return Credit Charge",
+              "taxPeriodFrom" -> "2017-12-01",
+              "taxPeriodTo" -> "2018-01-01",
+              "items" -> Json.arr(
+                Json.obj("dueDate" -> "2018-10-25")
+              ),
+              "outstandingAmount" -> 1000,
+              "periodKey" -> "#004"
             )
           )
-        )))
+        )
+      ))
 
-      val expectedResult = Right(Payments(Seq(
+      val expected = Right(Payments(Seq(
         Payment(
-          chargeType = "VAT Return Debit Charge",
-          start = LocalDate.parse("2017-06-01"),
-          end = LocalDate.parse("2017-10-01"),
-          due = LocalDate.parse("2017-11-01"),
-          outstandingAmount = BigDecimal(5000.00),
+          "VAT Return Debit Charge",
+          start = LocalDate.parse("2016-12-01"),
+          end = LocalDate.parse("2017-01-01"),
+          due = LocalDate.parse("2017-10-25"),
+          outstandingAmount = BigDecimal(1000.00),
           clearedAmount = BigDecimal(0),
-          periodKey = "18AC"
-        )))
-      )
+          periodKey = "#003"
+        ),
+        Payment(
+          "VAT Return Credit Charge",
+          start = LocalDate.parse("2017-12-01"),
+          end = LocalDate.parse("2018-01-01"),
+          due = LocalDate.parse("2018-10-25"),
+          outstandingAmount = BigDecimal(1000.00),
+          clearedAmount = BigDecimal(0),
+          periodKey = "#004"
+        )
+      )))
 
       val result = PaymentsReads.read("", "", httpResponse)
 
       "return a Payments instance" in {
-        result shouldBe expectedResult
+        result shouldBe expected
       }
     }
 
-    "a http response of 200 (OK) is received with the charge type set to VAT Return Credit Charge" should {
-
+    "the http response is 200 OK and there are no valid charge types" should {
       val httpResponse = HttpResponse(Status.OK, responseJson = Some(
         Json.obj(
-          "idType" -> "VRN",
-          "idNumber" -> "999973804",
-          "regimeType" -> "VATC",
-          "processingDate" -> "2018-04-17T08:55:22Z",
           "financialTransactions" -> Json.arr(
             Json.obj(
-              "chargeType"-> "VAT Return Credit Charge",
-              "mainType"-> "VAT Return Charge",
-              "periodKey"-> "18AC",
-              "periodKeyDescription" -> "March 2018",
-              "taxPeriodFrom"-> "2017-06-01",
-              "taxPeriodTo" -> "2017-10-01",
-              "businessPartner" -> "0100113120",
-              "contractAccountCategory" -> "33",
-              "contractAccount" -> "091700000405",
-              "contractObjectType" -> "ZVAT",
-              "contractObject" -> "00000180000000000165",
-              "sapDocumentNumber" -> "003030001189",
-              "sapDocumentNumberItem" -> "0001",
-              "chargeReference" -> "XJ002610110056",
-              "mainTransaction" -> "4700",
-              "subTransaction" -> "1174",
-              "originalAmount" -> 10169.45,
-              "outstandingAmount" -> 5000.00,
-              "items" -> Json.arr(
-                Json.obj(
-                  "subItem" -> "000",
-                  "dueDate" -> "2017-11-01",
-                  "amount" -> 10169.45
-                )
-              )
+              "mainType" -> "VAT Return Charge",
+              "chargeType" -> "Other Charge Type",
+              "outstandingAmount" -> 99
             )
           )
-        )))
+        )
+      ))
 
-      val expectedResult = Right(Payments(Seq.empty))
+      val expected = Right(Payments(Seq.empty))
 
       val result = PaymentsReads.read("", "", httpResponse)
 
-      "return a Payments instance" in {
-        result shouldBe expectedResult
+      "return an empty Payments instance" in {
+        result shouldBe expected
       }
     }
 
@@ -236,7 +211,7 @@ class PaymentsHttpParserSpec extends UnitSpec {
 
       val body: JsObject = Json.obj(
         "code" -> "Conflict",
-        "reason" -> "CONFLCIT"
+        "reason" -> "CONFLICT"
       )
 
       val httpResponse = HttpResponse(Status.CONFLICT, Some(body))
