@@ -101,7 +101,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       ),
       showReturnsBreadcrumb = true,
       currentYear,
-      hasFlatRateScheme = true
+      hasFlatRateScheme = true,
+      hasDirectDebit = false
     )
 
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
@@ -248,7 +249,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       ),
       showReturnsBreadcrumb = true,
       currentYear,
-      hasFlatRateScheme = false
+      hasFlatRateScheme = false,
+      hasDirectDebit = false
     )
 
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
@@ -395,7 +397,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       ),
       showReturnsBreadcrumb = false,
       currentYear,
-      hasFlatRateScheme = true
+      hasFlatRateScheme = true,
+      hasDirectDebit = false
     )
 
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
@@ -449,7 +452,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       ),
       showReturnsBreadcrumb = false,
       currentYear,
-      hasFlatRateScheme = true
+      hasFlatRateScheme = true,
+      hasDirectDebit = false
     )
 
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
@@ -524,7 +528,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       ),
       showReturnsBreadcrumb = false,
       currentYear,
-      hasFlatRateScheme = true
+      hasFlatRateScheme = true,
+      hasDirectDebit = false
     )
 
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
@@ -576,7 +581,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       ),
       showReturnsBreadcrumb = false,
       currentYear,
-      hasFlatRateScheme = true
+      hasFlatRateScheme = true,
+      hasDirectDebit = false
     )
 
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
@@ -635,7 +641,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       ),
       showReturnsBreadcrumb = false,
       currentYear,
-      hasFlatRateScheme = true
+      hasFlatRateScheme = true,
+      hasDirectDebit = false
     )
 
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
@@ -682,7 +689,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       ),
       showReturnsBreadcrumb = true,
       currentYear,
-      hasFlatRateScheme = true
+      hasFlatRateScheme = true,
+      hasDirectDebit = false
     )
 
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
@@ -696,6 +704,49 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       elementAsOpt(Selectors.paymentButton) shouldBe None
     }
 
+  }
+
+  "Rendering the vat return details page when the user has an active direct debit" should {
+    val vatReturnViewModel = VatReturnViewModel(
+      Some("Cheapo Clothing"),
+      LocalDate.parse("2017-01-01"),
+      LocalDate.parse("2017-03-31"),
+      LocalDate.parse("2017-04-06"),
+      1000.00,
+      LocalDate.parse("2017-04-08"),
+      VatReturnDetails(
+        VatReturn(
+          "#001",
+          1297,
+          5755,
+          7052,
+          5732,
+          1000,
+          77656,
+          765765,
+          55454,
+          545645
+        ),
+        moneyOwed = true,
+        isRepayment = false,
+        None
+      ),
+      showReturnsBreadcrumb = true,
+      currentYear,
+      hasFlatRateScheme = true,
+      hasDirectDebit = true
+    )
+
+    lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
+    lazy implicit val document: Document = Jsoup.parse(view.body)
+
+    "have the correct subheading" in {
+      elementText(Selectors.subHeading) shouldBe "Return total: £1,000"
+    }
+
+    "not have the pay now button" in {
+      elementAsOpt(Selectors.paymentButton) shouldBe None
+    }
   }
 
   "Rendering the VAT return details page when an entity name is not retrieved" should {
@@ -726,7 +777,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       ),
       showReturnsBreadcrumb = true,
       currentYear,
-      hasFlatRateScheme = true
+      hasFlatRateScheme = true,
+      hasDirectDebit = false
     )
 
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
