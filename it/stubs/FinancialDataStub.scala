@@ -18,12 +18,13 @@ package stubs
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import helpers.WireMockMethods
-import play.api.http.Status.{OK, BAD_REQUEST}
+import play.api.http.Status.{BAD_REQUEST, OK}
 import play.api.libs.json.{JsValue, Json}
 
 object FinancialDataStub extends WireMockMethods{
 
   private val financialDataUri = "/financial-transactions/vat/([0-9]+)"
+  private val financialDataDirectDebitUri = "/financial-transactions/has-direct-debit/([0-9]+)"
 
   def stubAllOutstandingPayments: StubMapping = {
     when(method = GET, uri = financialDataUri)
@@ -37,6 +38,16 @@ object FinancialDataStub extends WireMockMethods{
 
   def stubInvalidVrn: StubMapping = {
     when(method = GET, uri = financialDataUri)
+      .thenReturn(BAD_REQUEST, body = invalidVrn)
+  }
+
+  def stubSuccessfulDirectDebit: StubMapping = {
+    when(method = GET, uri = financialDataDirectDebitUri)
+      .thenReturn(status = OK, body = true)
+  }
+
+  def stubInvalidVrnDirectDebit: StubMapping = {
+    when(method = GET, uri = financialDataDirectDebitUri)
       .thenReturn(BAD_REQUEST, body = invalidVrn)
   }
 

@@ -17,13 +17,13 @@
 package services
 
 import java.time.LocalDate
-
 import javax.inject.{Inject, Singleton}
+
 import connectors.{FinancialDataConnector, VatObligationsConnector, VatReturnsConnector}
 import models.Obligation.Status
 import models.payments.{Payment, Payments}
 import models._
-import models.errors.{NotFoundError, ObligationError, UnexpectedStatusError, VatReturnError}
+import models.errors._
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -87,5 +87,12 @@ class ReturnsService @Inject()(vatObligationsConnector: VatObligationsConnector,
     val moneyOwed = payment.fold(true)(_.outstandingAmount != 0)
     val isRepayment = vatReturn.vatReclaimedCurrentPeriod > vatReturn.totalVatDue
     VatReturnDetails(vatReturn, moneyOwed, isRepayment, payment)
+  }
+
+  def getDirectDebitStatus(vrn: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ServiceResponse[Boolean]] = {
+    financialDataConnector.getDirectDebitStatus(vrn) map {
+      case Right(directDebitStatus) => Right(directDebitStatus)
+      case Left(_) => Left(DirectDebitStatusError)
+    }
   }
 }

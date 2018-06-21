@@ -24,7 +24,9 @@ import models._
 import models.Obligation.Status
 import models.payments.{Payment, Payments}
 import models.User
-import uk.gov.hmrc.http.HeaderCarrier
+import models.errors.{DirectDebitStatusError, ServerSideError}
+import org.scalatest.Matchers
+import uk.gov.hmrc.http.{HeaderCarrier, Upstream5xxResponse}
 
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.{ExecutionContext, Future}
@@ -270,6 +272,35 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
       lazy val result: ServiceResponse[VatReturnObligations] = service.getFulfilledObligations(LocalDate.parse("2018-01-01"))
 
       await(result) shouldBe Right(exampleObligations)
+    }
+  }
+
+  "Calling the .getDirectDebitStatus function" when {
+
+    "the user has a direct debit setup" should {
+
+      "return a DirectDebitStatus with true" in new Test {
+        (mockFinancialDataApiConnector.getDirectDebitStatus(_: String)
+        (_: HeaderCarrier, _: ExecutionContext))
+          .expects(*, *, *)
+          .returns(Future.successful(Right(true)))
+        val paymentsResponse: ServiceResponse[Boolean] = await(service.getDirectDebitStatus("123456789"))
+
+        paymentsResponse shouldBe Right(true)
+      }
+    }
+
+    "the connector call fails" should {
+
+      "return None" in new Test {
+        (mockFinancialDataApiConnector.getDirectDebitStatus(_: String)
+        (_: HeaderCarrier, _: ExecutionContext))
+          .expects(*, *, *)
+          .returns(Future.successful(Left(ServerSideError("", ""))))
+        val paymentsResponse: ServiceResponse[Boolean] = await(service.getDirectDebitStatus("123456789"))
+
+        paymentsResponse shouldBe Left(DirectDebitStatusError)
+      }
     }
   }
 }

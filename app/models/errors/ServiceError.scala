@@ -22,3 +22,5 @@ case object PaymentSetupError extends ServiceError
 case object NotFoundError extends ServiceError
 case object VatReturnError extends ServiceError
 case object ObligationError extends ServiceError
+case object DirectDebitStatusError extends ServiceError
+

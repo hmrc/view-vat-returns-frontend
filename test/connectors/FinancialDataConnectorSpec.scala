@@ -29,5 +29,10 @@ class FinancialDataConnectorSpec extends ControllerBaseSpec {
       connector.paymentsUrl("111111111") shouldEqual "/financial-transactions/vat/111111111"
     }
 
+    "generate the correct direct debit status check url" in {
+      val connector = new FinancialDataConnector(mock[HttpClient], mockConfig, MockMetricsService)
+      connector.directDebitUrl("111") shouldEqual "/financial-transactions/has-direct-debit/111"
+    }
+
   }
 }
