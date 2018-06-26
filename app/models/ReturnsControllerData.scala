@@ -22,4 +22,5 @@ import models.payments.Payment
 case class ReturnsControllerData(vatReturnResult: ServiceResponse[VatReturn],
                                  customerInfo: Option[CustomerDetail],
                                  payment: Option[Payment],
-                                 obligation: Option[VatReturnObligation])
+                                 obligation: Option[VatReturnObligation],
+                                 hasDirectDebit: ServiceResponse[Boolean])

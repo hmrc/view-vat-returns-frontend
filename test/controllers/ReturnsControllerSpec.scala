@@ -23,7 +23,7 @@ import audit.models.AuditModel
 import models._
 import models.User
 import models.customer.CustomerDetail
-import models.errors.{NotFoundError, VatReturnError}
+import models.errors.{DirectDebitStatusError, NotFoundError, VatReturnError}
 import models.payments.Payment
 import models.viewModels.VatReturnViewModel
 import play.api.http.Status
@@ -93,6 +93,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
   private trait Test {
     val serviceCall: Boolean = true
     val successReturn: Boolean = true
+    val directDebitStatus: ServiceResponse[Boolean] = Right(false)
     val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
     val vatReturnResult: Future[ServiceResponse[VatReturn]] = Future.successful(Right(exampleVatReturn))
     val paymentResult: Future[Option[Payment]] = Future.successful(Some(examplePayment))
@@ -115,6 +116,10 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         (mockVatReturnService.getPayment(_: User, _: String)(_: HeaderCarrier, _: ExecutionContext))
           .expects(*, *, *, *)
           .returns(paymentResult)
+
+        (mockVatReturnService.getDirectDebitStatus(_: String)(_: HeaderCarrier, _:ExecutionContext))
+          .expects(*, *, *)
+          .returns(directDebitStatus)
 
         (mockSubscriptionService.getUserDetails(_: User)(_: HeaderCarrier, _: ExecutionContext))
           .expects(*, *, *)
@@ -294,7 +299,8 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         vatReturnDetails = exampleVatReturnDetails,
         showReturnsBreadcrumb = true,
         currentYear = 2018,
-        hasFlatRateScheme = true
+        hasFlatRateScheme = true,
+        hasDirectDebit = false
       )
 
       (mockDateService.now: () => LocalDate).stubs().returns(LocalDate.parse("2018-05-01"))
@@ -303,7 +309,8 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         exampleCustomerDetail,
         exampleObligation,
         exampleVatReturnDetails,
-        isReturnsPageRequest = true
+        isReturnsPageRequest = true,
+        directDebitStatus = false
       )
       result shouldBe expectedViewModel
     }
@@ -337,7 +344,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
           .stubs(*, *, *, *)
           .returns({})
 
-        val data = ReturnsControllerData(Right(exampleVatReturn), None, Some(examplePayment), Some(exampleObligation))
+        val data = ReturnsControllerData(Right(exampleVatReturn), None, Some(examplePayment), Some(exampleObligation), Right(false))
         val result = target.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
         result.header.status shouldBe Status.OK
       }
@@ -346,7 +353,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     "it returns Left(NotFoundError), _ and _" should {
 
       "return a Not Found status" in {
-        val data = ReturnsControllerData(Left(NotFoundError), None, None, None)
+        val data = ReturnsControllerData(Left(NotFoundError), None, None, None, Left(NotFoundError))
         val result = target.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
         result.header.status shouldBe Status.NOT_FOUND
       }
@@ -355,7 +362,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     "it returns something else" should {
 
       "return an Internal Server Error status" in {
-        val data = ReturnsControllerData(Left(VatReturnError), None, None, None)
+        val data = ReturnsControllerData(Left(VatReturnError), None, None, None, Left(DirectDebitStatusError))
         val result = target.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
         result.header.status shouldBe Status.INTERNAL_SERVER_ERROR
       }
