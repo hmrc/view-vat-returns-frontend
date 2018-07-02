@@ -25,6 +25,7 @@ import models.errors.NotFoundError
 import models.payments.Payment
 import models.viewModels.VatReturnViewModel
 import models._
+import play.api.Logger
 import play.api.i18n.MessagesApi
 import play.api.mvc._
 import services.{DateService, EnrolmentsAuthService, ReturnsService, SubscriptionService}
@@ -103,15 +104,26 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
         } else {
           NotFound(views.html.errors.notFound())
         }
-      case (Left(NotFoundError), _, _) => NotFound(views.html.errors.notFound())
-      case _ => InternalServerError(views.html.errors.technicalProblem())
+      case (Left(NotFoundError), _, _) =>
+        NotFound(views.html.errors.notFound())
+      case (Left(vatReturnError), _, _) =>
+        Logger.warn(s"[ReturnsController][renderResult] error retrieving vatReturn: ${vatReturnError.toString}")
+        InternalServerError(views.html.errors.technicalProblem())
+      case (Right(_), None, _) =>
+        Logger.warn("[ReturnsController][renderResult] error: render required a valid obligation but none was returned")
+        InternalServerError(views.html.errors.technicalProblem())
+      case _ =>
+        Logger.warn("[ReturnsController][renderResult] error: Unknown error")
+        InternalServerError(views.html.errors.technicalProblem())
     }
   }
 
   private def getDirectDebitStatus(response: ServiceResponse[Boolean]): Boolean = {
     response match {
       case Right(directDebit) => directDebit
-      case Left(_) => false
+      case Left(error) =>
+        Logger.warn("[ReturnsController][getDirectDebitStatus] error: " + error.toString)
+        false
     }
   }
 

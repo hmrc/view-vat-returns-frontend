@@ -20,9 +20,9 @@ import audit.AuditingService
 import audit.models.{ViewOpenVatObligationsAuditModel, ViewSubmittedVatObligationsAuditModel}
 import config.AppConfig
 import javax.inject.{Inject, Singleton}
-
 import models.viewModels.{ReturnDeadlineViewModel, ReturnObligationsViewModel, VatReturnsViewModel}
 import models._
+import play.api.Logger
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, Request, Result}
 import services.{DateService, EnrolmentsAuthService, ReturnsService}
@@ -44,7 +44,9 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
       if (isValidSearchYear(year)) {
         getReturnObligations(user, year, Obligation.Status.Fulfilled).map {
           case Right(model) => Ok(views.html.returns.submittedReturns(model))
-          case Left(_) => InternalServerError(views.html.errors.submittedReturnsError(user))
+          case Left(error) =>
+            Logger.warn("[ReturnObligationsController][submittedReturns] error: " + error.toString)
+            InternalServerError(views.html.errors.submittedReturnsError(user))
         }
       } else {
         Future.successful(NotFound(views.html.errors.notFound()))
@@ -70,7 +72,9 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
             )
             Future.successful(Ok(views.html.returns.returnDeadlines(deadlines)))
           }
-        case Left(_) => Future.successful(InternalServerError(views.html.errors.technicalProblem()))
+        case Left(error) =>
+          Logger.warn("[ReturnObligationsController][returnDeadlines] error: " + error.toString)
+          Future.successful(InternalServerError(views.html.errors.technicalProblem()))
       }
   }
 
@@ -85,7 +89,9 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
           lastFulfilledObligation.start,
           lastFulfilledObligation.end
         ))))
-      case Left(_) => InternalServerError(views.html.errors.technicalProblem())
+      case Left(error) =>
+        Logger.warn("[ReturnObligationsController][fulfilledObligationsAction] error: " + error.toString)
+        InternalServerError(views.html.errors.technicalProblem())
     }
   }
 
@@ -118,7 +124,9 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
           user.hasNonMtdVat,
           user.vrn
         ))
-      case Left(error) => Left(error)
+      case Left(error) =>
+        Logger.warn("[ReturnObligationsController][getReturnObligations] error: " + error.toString)
+        Left(error)
     }
   }
 }

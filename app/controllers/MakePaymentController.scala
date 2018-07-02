@@ -71,7 +71,9 @@ class MakePaymentController @Inject()(val messagesApi: MessagesApi,
                 routes.MakePaymentController.makePayment().url
               )
               Redirect(url)
-            case Left(_) => InternalServerError(views.html.errors.paymentsError())
+            case Left(error) =>
+              Logger.warn("[MakePaymentController][makePayment] error: " + error.toString)
+              InternalServerError(views.html.errors.paymentsError())
           }
         }
       )
