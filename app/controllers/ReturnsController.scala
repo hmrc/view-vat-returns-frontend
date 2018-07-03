@@ -106,9 +106,6 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
         }
       case (Left(NotFoundError), _, _) =>
         NotFound(views.html.errors.notFound())
-      case (Left(vatReturnError), _, _) =>
-        Logger.warn(s"[ReturnsController][renderResult] error retrieving vatReturn: ${vatReturnError.toString}")
-        InternalServerError(views.html.errors.technicalProblem())
       case (Right(_), None, _) =>
         Logger.warn("[ReturnsController][renderResult] error: render required a valid obligation but none was returned")
         InternalServerError(views.html.errors.technicalProblem())
@@ -118,7 +115,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
     }
   }
 
-  private def getDirectDebitStatus(response: ServiceResponse[Boolean]): Boolean = {
+  private[controllers] def getDirectDebitStatus(response: ServiceResponse[Boolean]): Boolean = {
     response match {
       case Right(directDebit) => directDebit
       case Left(error) =>

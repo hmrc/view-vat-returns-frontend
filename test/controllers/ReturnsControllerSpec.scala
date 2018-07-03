@@ -27,6 +27,7 @@ import models.errors.{DirectDebitStatusError, NotFoundError, VatReturnError}
 import models.payments.Payment
 import models.viewModels.VatReturnViewModel
 import play.api.http.Status
+import play.api.mvc.Result
 import play.api.test.Helpers._
 import services.{DateService, EnrolmentsAuthService, ReturnsService, SubscriptionService}
 import uk.gov.hmrc.auth.core._
@@ -37,8 +38,6 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.{ExecutionContext, Future}
 
 class ReturnsControllerSpec extends ControllerBaseSpec {
-
-  mockConfig.features.allowNineBox(true)
 
   val goodEnrolments: Enrolments = Enrolments(
     Set(
@@ -89,6 +88,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
   val mockVatReturnService: ReturnsService = mock[ReturnsService]
   val mockEnrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
   val mockVatApiService: SubscriptionService = mock[SubscriptionService]
+  val mockSubscriptionService: SubscriptionService = mock[SubscriptionService]
 
   private trait Test {
     val serviceCall: Boolean = true
@@ -97,7 +97,6 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
     val vatReturnResult: Future[ServiceResponse[VatReturn]] = Future.successful(Right(exampleVatReturn))
     val paymentResult: Future[Option[Payment]] = Future.successful(Some(examplePayment))
-    val mockSubscriptionService: SubscriptionService = mock[SubscriptionService]
 
     def setup(): Any = {
       (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
@@ -330,10 +329,9 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       mockAuditService
     )
 
-    "it returns Right(vatReturn), Some(ob) and Some(pay)" should {
+    "there is a VAT return, obligation and payment" when {
 
-      "return an OK status" in {
-
+      def successSetup(): Any = {
         (mockVatReturnService.constructReturnDetailsModel(_: VatReturn, _: Option[Payment]))
           .expects(*, *)
           .returns(exampleVatReturnDetails)
@@ -343,28 +341,78 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         (mockAuditService.audit(_: AuditModel, _: String)(_: HeaderCarrier, _: ExecutionContext))
           .stubs(*, *, *, *)
           .returns({})
+      }
+      val data = ReturnsControllerData(Right(exampleVatReturn), None, Some(examplePayment), Some(exampleObligation), Right(false))
+      def result: Result = target.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
 
-        val data = ReturnsControllerData(Right(exampleVatReturn), None, Some(examplePayment), Some(exampleObligation), Right(false))
-        val result = target.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
-        result.header.status shouldBe Status.OK
+      "the nine box feature switch is enabled" should {
+
+        "return an OK status" in {
+          successSetup()
+          mockConfig.features.allowNineBox(true)
+
+          result.header.status shouldBe Status.OK
+        }
+      }
+
+      "the nine box feature switch is disabled" should {
+
+        "return a Not Found status" in {
+          successSetup()
+          mockConfig.features.allowNineBox(false)
+
+          result.header.status shouldBe Status.NOT_FOUND
+        }
       }
     }
 
-    "it returns Left(NotFoundError), _ and _" should {
+    "the VAT return is not found" should {
 
       "return a Not Found status" in {
-        val data = ReturnsControllerData(Left(NotFoundError), None, None, None, Left(NotFoundError))
+        val data = ReturnsControllerData(Left(NotFoundError), None, None, None, Left(DirectDebitStatusError))
         val result = target.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
         result.header.status shouldBe Status.NOT_FOUND
       }
     }
 
-    "it returns something else" should {
+    "there is a VAT return but no obligation" should {
+
+      "return an Internal Server Error status" in {
+        val data = ReturnsControllerData(Right(exampleVatReturn), None, None, None, Right(false))
+        val result = target.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
+        result.header.status shouldBe Status.INTERNAL_SERVER_ERROR
+      }
+    }
+
+    "there is any other combination" should {
 
       "return an Internal Server Error status" in {
         val data = ReturnsControllerData(Left(VatReturnError), None, None, None, Left(DirectDebitStatusError))
         val result = target.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
         result.header.status shouldBe Status.INTERNAL_SERVER_ERROR
+      }
+    }
+  }
+
+  "Calling .getDirectDebitStatus" when {
+
+    "the service response is successful" should {
+
+      "return the boolean in the service response" in new Test {
+        override def setup(): Any = ()
+        val serviceResponse = Right(true)
+        val result: Boolean = target.getDirectDebitStatus(serviceResponse)
+        result shouldBe true
+      }
+    }
+
+    "the service response fails" should {
+
+      "return false" in new Test {
+        override def setup(): Any = ()
+        val serviceResponse = Left(DirectDebitStatusError)
+        val result: Boolean = target.getDirectDebitStatus(serviceResponse)
+        result shouldBe false
       }
     }
   }
