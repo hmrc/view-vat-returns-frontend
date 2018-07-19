@@ -181,7 +181,7 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
 
       "have the correct alternate content when no returns are found" in {
         elementText(Selectors.noReturnsFound) shouldBe
-          "You haven't submitted any returns for 2018 yet. You must use accounting software to submit your returns."
+          "You have not submitted any returns for 2018 yet. You must use accounting software to submit your returns."
       }
     }
   }
@@ -304,7 +304,7 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
 
       "have the correct information text under the heading" in {
         elementText(Selectors.previousReturnsText) shouldBe
-          "If you've submitted returns without using the software for this new service, you can view your previous returns (opens in a new tab)."
+          "If you have submitted returns without using the software for this new service, you can view your previous returns (opens in a new tab)."
       }
 
       "contains the link" in {

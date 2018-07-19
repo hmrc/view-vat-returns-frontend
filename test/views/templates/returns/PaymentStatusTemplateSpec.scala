@@ -29,7 +29,7 @@ class PaymentStatusTemplateSpec extends TemplateBaseSpec {
     "the user owes money on their VAT return" should {
 
       val expectedText = "You need to pay this bill by 11 November 2011. " +
-           "It can take up to 7 days to show that you've made a payment. Return total: £1,000"
+           "It can take up to 7 days to show that you have made a payment. Return total: £1,000"
 
       val template = views.html.templates.returns.paymentStatus(
         1000,
