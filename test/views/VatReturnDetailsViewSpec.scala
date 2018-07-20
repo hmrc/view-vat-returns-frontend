@@ -175,7 +175,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
         "VAT you charged on sales and other supplies",
         "VAT you owe on goods purchased from EC countries and brought into the UK",
         "VAT you owe before deductions (this is the total of box 1 and 2)",
-        "VAT you've claimed back",
+        "VAT you have claimed back",
         "Total VAT you owed",
         "Total value of sales and other supplies, including VAT",
         "Total value of purchases and other expenses, excluding VAT",
@@ -190,7 +190,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     }
 
     "render the correct help revealing link text" in {
-      elementText(Selectors.helpTitle) shouldBe "There’s an error in my return"
+      elementText(Selectors.helpTitle) shouldBe "There is an error in my return"
     }
 
     "render the correct text for the help section first paragraph" in {
@@ -323,7 +323,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
         "VAT you charged on sales and other supplies",
         "VAT you owe on goods purchased from EC countries and brought into the UK",
         "VAT you owe before deductions (this is the total of box 1 and 2)",
-        "VAT you've claimed back",
+        "VAT you have claimed back",
         "Total VAT you owed",
         "Total value of sales and other supplies, excluding VAT",
         "Total value of purchases and other expenses, excluding VAT",
@@ -338,7 +338,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     }
 
     "render the correct help revealing link text" in {
-      elementText(Selectors.helpTitle) shouldBe "There’s an error in my return"
+      elementText(Selectors.helpTitle) shouldBe "There is an error in my return"
     }
 
     "render the correct text for the help section first paragraph" in {
@@ -468,7 +468,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     }
 
     "have the correct extra information text under the heading" in {
-      elementText(Selectors.extraInformationText) shouldBe "It can take up to 7 days to show that you've made a payment."
+      elementText(Selectors.extraInformationText) shouldBe "It can take up to 7 days to show that you have made a payment."
     }
 
     "have the correct box 5 description in the table" in {

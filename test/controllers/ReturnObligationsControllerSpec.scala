@@ -211,7 +211,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         val document: Document = Jsoup.parse(bodyOf(result))
 
         document.select("article > p:nth-child(3)").text() shouldBe
-          "You don't have any returns due right now. Your next deadline will show here on the first day of your next" +
+          "You do not have any returns due right now. Your next deadline will show here on the first day of your next" +
             " accounting period."
       }
     }
@@ -433,7 +433,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         val result: Result = target.fulfilledObligationsAction(obligationsResult)
         val document: Document = Jsoup.parse(bodyOf(result))
         document.select("article > p:nth-child(3)").text() shouldBe
-          "You don't have any returns due right now. Your next deadline will show here on the first day of your next" +
+          "You do not have any returns due right now. Your next deadline will show here on the first day of your next" +
             " accounting period."
       }
     }

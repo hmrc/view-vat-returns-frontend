@@ -70,7 +70,7 @@ class SubmittedReturnsErrorViewSpec extends ViewBaseSpec {
     }
 
     "have the correct previous returns message" in {
-      elementText(Selectors.previousReturn) shouldBe "If you've submitted returns without using the software for this new service," +
+      elementText(Selectors.previousReturn) shouldBe "If you have submitted returns without using the software for this new service," +
         " you can view your previous returns (opens in a new tab)."
     }
 
