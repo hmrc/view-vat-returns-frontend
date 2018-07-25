@@ -22,7 +22,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.http.Status
 import play.api.libs.ws.{WSRequest, WSResponse}
-import stubs.{AuthStub, VatApiStub}
+import stubs.{AuthStub, VatObligationsStub}
 
 class SubmittedReturnsPageSpec extends IntegrationBaseSpec {
 
@@ -33,6 +33,10 @@ class SubmittedReturnsPageSpec extends IntegrationBaseSpec {
       setupStubs()
       buildRequest("/submitted/2018")
     }
+
+    val backendFeatureEnabled: Boolean =
+      app.configuration.underlying.getBoolean("features.useVatObligationsService.enabled")
+    val obligationsStub = new VatObligationsStub(backendFeatureEnabled)
   }
 
   "Calling the returns route with an authenticated user with one obligation end date in 2018" should {
@@ -40,7 +44,7 @@ class SubmittedReturnsPageSpec extends IntegrationBaseSpec {
     "return 200" in new Test {
       override def setupStubs(): StubMapping = {
         AuthStub.authorised()
-        VatApiStub.stub2018Obligations
+        obligationsStub.stub2018Obligations
       }
       override def request(): WSRequest = {
         setupStubs()
@@ -55,7 +59,7 @@ class SubmittedReturnsPageSpec extends IntegrationBaseSpec {
 
       override def setupStubs(): StubMapping = {
         AuthStub.authorised()
-        VatApiStub.stub2018Obligations
+        obligationsStub.stub2018Obligations
       }
       override def request(): WSRequest = {
         setupStubs()

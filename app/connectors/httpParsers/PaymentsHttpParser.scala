@@ -30,7 +30,7 @@ object PaymentsHttpParser extends ResponseHttpParsers {
       response.status match {
         case OK => Right(removeNonVatReturnCharges(response.json).as[Payments])
         case NOT_FOUND => Right(Payments(Seq.empty))
-        case BAD_REQUEST => handleBadRequest(response.json)(ApiSingleError.apiSingleErrorFinancialReads)
+        case BAD_REQUEST => handleBadRequest(response.json)(ApiSingleError.desSingleErrorReads)
         case status if status >= 500 && status < 600 => Left(ServerSideError(response.status.toString, response.body))
         case _ => Left(UnexpectedStatusError(response.status.toString, response.body))
       }
