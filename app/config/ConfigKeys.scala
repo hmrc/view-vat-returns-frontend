@@ -32,7 +32,6 @@ object ConfigKeys {
 
   val signInBaseUrl: String = "signIn.url"
 
-  val simpleAuthFeature: String = "features.simpleAuth.enabled"
   val userResearchBannerFeature: String = "features.userResearchBanner.enabled"
   val allowPaymentsFeature: String = "features.allowPayments.enabled"
   val staticDateEnabledFeature: String = "features.staticDate.enabled"

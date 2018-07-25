@@ -108,7 +108,6 @@ returnDeadlines.receivedReturn = We received your return for the period {0}.
 featureSwitch.title = Feature switches
 featureSwitch.heading = Features
 featureSwitch.submit = Submit
-features.simpleAuth.enabled = Simple auth
 features.userResearchBanner.enabled = User research banner
 features.allowPayments.enabled = Payments allowed
 features.date-service.staticDate.enabled = Use static date (2018-05-01)

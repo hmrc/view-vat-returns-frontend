@@ -32,7 +32,6 @@ class FeatureSwitchController @Inject()(val messagesApi: MessagesApi,
   def featureSwitch: Action[AnyContent] = Action { implicit request =>
     Ok(testOnly.views.html.featureSwitch(FeatureSwitchForm.form.fill(
       FeatureSwitchModel(
-        simpleAuthEnabled = appConfig.features.simpleAuth(),
         userResearchBannerEnabled = appConfig.features.userResearchBanner(),
         allowPaymentsEnabled = appConfig.features.allowPayments(),
         staticDateEnabled = appConfig.features.staticDateEnabled(),
@@ -52,7 +51,6 @@ class FeatureSwitchController @Inject()(val messagesApi: MessagesApi,
   }
 
   def handleSuccess(model: FeatureSwitchModel): Result = {
-    appConfig.features.simpleAuth(model.simpleAuthEnabled)
     appConfig.features.userResearchBanner(model.userResearchBannerEnabled)
     appConfig.features.allowPayments(model.allowPaymentsEnabled)
     appConfig.features.staticDateEnabled(model.staticDateEnabled)
