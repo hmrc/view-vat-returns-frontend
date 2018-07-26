@@ -26,8 +26,6 @@ import org.jsoup.nodes.Document
 
 class VatReturnDetailsViewSpec extends ViewBaseSpec {
 
-  mockConfig.features.allowPayments(true)
-
   object Selectors {
     val pageHeading = "#content h1"
     val subHeading = "#content h2.heading-large"

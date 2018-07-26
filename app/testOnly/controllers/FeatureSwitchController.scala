@@ -33,7 +33,6 @@ class FeatureSwitchController @Inject()(val messagesApi: MessagesApi,
     Ok(testOnly.views.html.featureSwitch(FeatureSwitchForm.form.fill(
       FeatureSwitchModel(
         userResearchBannerEnabled = appConfig.features.userResearchBanner(),
-        allowPaymentsEnabled = appConfig.features.allowPayments(),
         staticDateEnabled = appConfig.features.staticDateEnabled(),
         auditingEnabled = appConfig.features.enableAuditing(),
         enableVatReturnsService = appConfig.features.enableVatReturnsService(),
@@ -51,7 +50,6 @@ class FeatureSwitchController @Inject()(val messagesApi: MessagesApi,
 
   def handleSuccess(model: FeatureSwitchModel): Result = {
     appConfig.features.userResearchBanner(model.userResearchBannerEnabled)
-    appConfig.features.allowPayments(model.allowPaymentsEnabled)
     appConfig.features.staticDateEnabled(model.staticDateEnabled)
     appConfig.features.enableAuditing(model.auditingEnabled)
     appConfig.features.enableVatReturnsService(model.enableVatReturnsService)

@@ -24,7 +24,6 @@ import play.api.Configuration
 @Singleton
 class Features @Inject()(config: Configuration) {
   val userResearchBanner = new Feature(ConfigKeys.userResearchBannerFeature, config)
-  val allowPayments = new Feature(ConfigKeys.allowPaymentsFeature, config)
   val staticDateEnabled = new Feature(ConfigKeys.staticDateEnabledFeature, config)
   val enableAuditing = new Feature(ConfigKeys.enableAuditingFeature, config)
   val enableVatReturnsService = new Feature(ConfigKeys.useVatReturnsService, config)
