@@ -24,8 +24,6 @@ import org.jsoup.nodes.Document
 
 class SubmittedReturnsViewSpec extends ViewBaseSpec {
 
-  mockConfig.features.allowNineBox(true)
-
   object Selectors {
     val pageHeading = "h1"
     val btaBreadcrumb = "div.breadcrumbs li:nth-of-type(1)"

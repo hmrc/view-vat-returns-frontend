@@ -35,7 +35,6 @@ class FeatureSwitchController @Inject()(val messagesApi: MessagesApi,
         userResearchBannerEnabled = appConfig.features.userResearchBanner(),
         allowPaymentsEnabled = appConfig.features.allowPayments(),
         staticDateEnabled = appConfig.features.staticDateEnabled(),
-        allowNineBoxEnabled = appConfig.features.allowNineBox(),
         auditingEnabled = appConfig.features.enableAuditing(),
         enableVatReturnsService = appConfig.features.enableVatReturnsService(),
         enableVatObligationsService = appConfig.features.enableVatObligationsService()
@@ -54,7 +53,6 @@ class FeatureSwitchController @Inject()(val messagesApi: MessagesApi,
     appConfig.features.userResearchBanner(model.userResearchBannerEnabled)
     appConfig.features.allowPayments(model.allowPaymentsEnabled)
     appConfig.features.staticDateEnabled(model.staticDateEnabled)
-    appConfig.features.allowNineBox(model.allowNineBoxEnabled)
     appConfig.features.enableAuditing(model.auditingEnabled)
     appConfig.features.enableVatReturnsService(model.enableVatReturnsService)
     appConfig.features.enableVatObligationsService(model.enableVatObligationsService)

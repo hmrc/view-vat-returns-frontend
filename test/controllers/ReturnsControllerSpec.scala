@@ -345,24 +345,9 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       val data = ReturnsControllerData(Right(exampleVatReturn), None, Some(examplePayment), Some(exampleObligation), Right(false))
       def result: Result = target.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
 
-      "the nine box feature switch is enabled" should {
-
-        "return an OK status" in {
-          successSetup()
-          mockConfig.features.allowNineBox(true)
-
-          result.header.status shouldBe Status.OK
-        }
-      }
-
-      "the nine box feature switch is disabled" should {
-
-        "return a Not Found status" in {
-          successSetup()
-          mockConfig.features.allowNineBox(false)
-
-          result.header.status shouldBe Status.NOT_FOUND
-        }
+      "return an OK status" in {
+        successSetup()
+        result.header.status shouldBe Status.OK
       }
     }
 

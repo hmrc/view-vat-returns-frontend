@@ -73,18 +73,11 @@
           <ul class="list list-bullet">
             @for(obligation <- model.obligations) {
               <li>
-                @if(appConfig.features.allowNineBox()) {
-                  <a href="@controllers.routes.ReturnsController.vatReturn(model.selectedYear, obligation.periodKey)"
-                     data-journey-click="returns:view-return-@{obligation.start}-to-@{obligation.end}:submitted-returns">
-                    <span class="visually-hidden">@messages("submittedReturns.periodPrefix")</span>
-                    @displayDateRange(obligation.start, obligation.end)
-                  </a>
-                }else{
-                  <p>
-                    <span class="visually-hidden">@messages("submittedReturns.periodPrefix")</span>
-                    @displayDateRange(obligation.start, obligation.end)
-                  </p>
-                }
+                <a href="@controllers.routes.ReturnsController.vatReturn(model.selectedYear, obligation.periodKey)"
+                   data-journey-click="returns:view-return-@{obligation.start}-to-@{obligation.end}:submitted-returns">
+                  <span class="visually-hidden">@messages("submittedReturns.periodPrefix")</span>
+                  @displayDateRange(obligation.start, obligation.end)
+                </a>
               </li>
             }
           </ul>

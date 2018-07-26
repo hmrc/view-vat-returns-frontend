@@ -19,7 +19,6 @@ package models
 case class FeatureSwitchModel(userResearchBannerEnabled: Boolean,
                               allowPaymentsEnabled: Boolean,
                               staticDateEnabled: Boolean,
-                              allowNineBoxEnabled: Boolean,
                               auditingEnabled: Boolean,
                               enableVatReturnsService: Boolean,
                               enableVatObligationsService: Boolean)
