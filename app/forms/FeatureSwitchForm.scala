@@ -27,7 +27,6 @@ object FeatureSwitchForm {
     mapping(
       ConfigKeys.userResearchBannerFeature -> boolean,
       ConfigKeys.staticDateEnabledFeature -> boolean,
-      ConfigKeys.enableAuditingFeature -> boolean,
       ConfigKeys.useVatReturnsService -> boolean,
       ConfigKeys.useVatObligationsService -> boolean
   )(FeatureSwitchModel.apply)(FeatureSwitchModel.unapply)

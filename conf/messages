@@ -110,7 +110,6 @@ featureSwitch.heading = Features
 featureSwitch.submit = Submit
 features.userResearchBanner.enabled = User research banner
 features.date-service.staticDate.enabled = Use static date (2018-05-01)
-features.auditing.enabled = Auditing service enabled
 features.useVatReturnsService.enabled = Use vat-returns microservice
 features.useVatObligationsService.enabled = Use vat-obligations microservice
 

@@ -34,7 +34,6 @@ class FeatureSwitchController @Inject()(val messagesApi: MessagesApi,
       FeatureSwitchModel(
         userResearchBannerEnabled = appConfig.features.userResearchBanner(),
         staticDateEnabled = appConfig.features.staticDateEnabled(),
-        auditingEnabled = appConfig.features.enableAuditing(),
         enableVatReturnsService = appConfig.features.enableVatReturnsService(),
         enableVatObligationsService = appConfig.features.enableVatObligationsService()
       )
@@ -51,7 +50,6 @@ class FeatureSwitchController @Inject()(val messagesApi: MessagesApi,
   def handleSuccess(model: FeatureSwitchModel): Result = {
     appConfig.features.userResearchBanner(model.userResearchBannerEnabled)
     appConfig.features.staticDateEnabled(model.staticDateEnabled)
-    appConfig.features.enableAuditing(model.auditingEnabled)
     appConfig.features.enableVatReturnsService(model.enableVatReturnsService)
     appConfig.features.enableVatObligationsService(model.enableVatObligationsService)
     Redirect(routes.FeatureSwitchController.featureSwitch())

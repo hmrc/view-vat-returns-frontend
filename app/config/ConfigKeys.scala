@@ -37,7 +37,6 @@ object ConfigKeys {
   val staticDateValue: String = "date-service.staticDate.value"
   val useVatReturnsService: String = "features.useVatReturnsService.enabled"
   val useVatObligationsService: String = "features.useVatObligationsService.enabled"
-  val enableAuditingFeature: String = "features.auditing.enabled"
 
   val businessTaxAccountBase: String = "business-tax-account.host"
   val businessTaxAccountUrl: String = "business-tax-account.homeUrl"

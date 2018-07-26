@@ -25,7 +25,6 @@ import play.api.Configuration
 class Features @Inject()(config: Configuration) {
   val userResearchBanner = new Feature(ConfigKeys.userResearchBannerFeature, config)
   val staticDateEnabled = new Feature(ConfigKeys.staticDateEnabledFeature, config)
-  val enableAuditing = new Feature(ConfigKeys.enableAuditingFeature, config)
   val enableVatReturnsService = new Feature(ConfigKeys.useVatReturnsService, config)
   val enableVatObligationsService = new Feature(ConfigKeys.useVatObligationsService, config)
 }
