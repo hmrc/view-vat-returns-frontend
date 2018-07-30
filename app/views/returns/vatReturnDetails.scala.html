@@ -151,7 +151,7 @@
       @expandingHelpSection(Messages("yourVatReturn.helpTitle"), "vatReturn", "vatReturn", hiddenHelpTextContent)
     </div>
 
-    @if(appConfig.features.allowPayments() && vatReturnViewModel.vatReturnDetails.payment.isDefined && vatReturnViewModel.vatReturnDetails.moneyOwed
+    @if(vatReturnViewModel.vatReturnDetails.payment.isDefined && vatReturnViewModel.vatReturnDetails.moneyOwed
             && !vatReturnViewModel.vatReturnDetails.isRepayment && !vatReturnViewModel.hasDirectDebit) {
       <div id="payment-detail">
         @form(action = controllers.routes.MakePaymentController.makePayment()) {

@@ -22,7 +22,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.http.Status
 import play.api.libs.ws.{WSRequest, WSResponse}
-import stubs.{AuthStub, VatApiStub}
+import stubs.{AuthStub, VatObligationsStub}
 
 class ReturnDeadlinesPageSpec extends IntegrationBaseSpec {
 
@@ -33,6 +33,10 @@ class ReturnDeadlinesPageSpec extends IntegrationBaseSpec {
       setupStubs()
       buildRequest("/return-deadlines")
     }
+
+    val backendFeatureEnabled: Boolean =
+      app.configuration.underlying.getBoolean("features.useVatObligationsService.enabled")
+    val obligationsStub = new VatObligationsStub(backendFeatureEnabled)
   }
 
   "Calling the return deadlines route with an authenticated user with one obligation" should {
@@ -40,7 +44,7 @@ class ReturnDeadlinesPageSpec extends IntegrationBaseSpec {
     "return 200" in new Test {
       override def setupStubs(): StubMapping = {
         AuthStub.authorised()
-        VatApiStub.stubOutstandingObligations
+        obligationsStub.stubOutstandingObligations
       }
 
       val response: WSResponse = await(request().get())
@@ -50,7 +54,7 @@ class ReturnDeadlinesPageSpec extends IntegrationBaseSpec {
     "return the one deadline" in new Test {
       override def setupStubs(): StubMapping = {
         AuthStub.authorised()
-        VatApiStub.stubOutstandingObligations
+        obligationsStub.stubOutstandingObligations
       }
 
       val response: WSResponse = await(request().get())

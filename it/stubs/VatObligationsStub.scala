@@ -25,11 +25,11 @@ import models.errors.{ApiMultiError, ApiSingleError}
 import play.api.http.Status._
 import play.api.libs.json.Json
 
-object VatApiStub extends WireMockMethods {
+class VatObligationsStub(backendFeatureEnabled: Boolean) extends WireMockMethods {
 
-  private val obligationsUri = "/([0-9]+)/obligations"
-  private val returnsUri = "/([0-9]+)/returns/(.+)"
-  private val dateRegex = "([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))"
+  private val obligationsUri =
+    if(backendFeatureEnabled) "/vat-obligations/([0-9]+)/obligations" else "/([0-9]+)/obligations"
+  val dateRegex = "([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))"
 
   def stubAllObligations: StubMapping = {
     when(method = GET, uri = obligationsUri, queryParams = Map(
@@ -80,16 +80,6 @@ object VatApiStub extends WireMockMethods {
       .thenReturn(BAD_REQUEST, body = Json.toJson(invalidVrn))
   }
 
-  def stubInvalidVrnForReturns: StubMapping = {
-    when(method = GET, uri = returnsUri)
-      .thenReturn(BAD_REQUEST, body = Json.toJson(invalidVrn))
-  }
-
-  def stubInvalidPeriodKey: StubMapping = {
-    when(method = GET, uri = returnsUri)
-      .thenReturn(BAD_REQUEST, body = Json.toJson(invalidPeriodKey))
-  }
-
   def stubInvalidFromDate: StubMapping = {
     when(method = GET, uri = obligationsUri, queryParams = Map(
       "from" -> dateRegex, "to" -> dateRegex, "status" -> "F"
@@ -125,12 +115,7 @@ object VatApiStub extends WireMockMethods {
       .thenReturn(BAD_REQUEST, body = Json.toJson(multipleErrors))
   }
 
-  def stubSuccessfulVatReturn: StubMapping = {
-    when(method = GET, uri = returnsUri)
-      .thenReturn(status = OK, body = validVatReturn)
-  }
-
-  private val pastFulfilledObligation = VatReturnObligation(
+  val pastFulfilledObligation = VatReturnObligation(
     start = LocalDate.parse("2018-01-01"),
     end = LocalDate.parse("2018-03-31"),
     due = LocalDate.parse("2018-05-07"),
@@ -139,7 +124,7 @@ object VatApiStub extends WireMockMethods {
     periodKey = "#001"
   )
 
-  private val pastOutstandingObligation = VatReturnObligation(
+  val pastOutstandingObligation = VatReturnObligation(
     start = LocalDate.parse("2018-01-01"),
     end = LocalDate.parse("2018-03-31"),
     due = LocalDate.parse("2018-05-07"),
@@ -148,14 +133,14 @@ object VatApiStub extends WireMockMethods {
     periodKey = "#004"
   )
 
-  private val allObligations = VatReturnObligations(
+  val allObligations = VatReturnObligations(
     Seq(
       pastFulfilledObligation,
       pastOutstandingObligation
     )
   )
 
-  private val obligationsFor2018 = VatReturnObligations(Seq(
+  val obligationsFor2018 = VatReturnObligations(Seq(
     VatReturnObligation(
       LocalDate.parse("2018-07-31"),
       LocalDate.parse("2018-10-31"),
@@ -166,7 +151,7 @@ object VatApiStub extends WireMockMethods {
     )
   ))
 
-  private val obligationsFor2017 = VatReturnObligations(Seq(
+  val obligationsFor2017 = VatReturnObligations(Seq(
     VatReturnObligation(
       LocalDate.parse("2017-07-31"),
       LocalDate.parse("2017-10-31"),
@@ -193,41 +178,22 @@ object VatApiStub extends WireMockMethods {
     ))
   )
 
-  private val outstandingObligations = VatReturnObligations(
+  val outstandingObligations = VatReturnObligations(
     allObligations.obligations.filter(_.status == "O")
   )
 
-  private val fulfilledObligations = VatReturnObligations(
+  val fulfilledObligations = VatReturnObligations(
     allObligations.obligations.filter(_.status == "F")
   )
 
-  private val noObligations = VatReturnObligations(Seq.empty)
+  val noObligations = VatReturnObligations(Seq.empty)
 
-  private val validVatReturn = Json.parse(
-    """
-      |{
-      |  "periodKey": "#001",
-      |  "vatDueSales": 100.00,
-      |  "vatDueAcquisitions": 100.00,
-      |  "totalVatDue": 200,
-      |  "vatReclaimedCurrPeriod": 100.00,
-      |  "netVatDue": 100,
-      |  "totalValueSalesExVAT": 500,
-      |  "totalValuePurchasesExVAT": 500,
-      |  "totalValueGoodsSuppliedExVAT": 500,
-      |  "totalAcquisitionsExVAT": 500
-      |}
-    """.stripMargin
-  )
-
-  private val invalidVrn = ApiSingleError("VRN_INVALID", "")
-  private val invalidFromDate = ApiSingleError("INVALID_DATE_FROM", "")
-  private val invalidToDate = ApiSingleError("INVALID_DATE_TO", "")
-  private val invalidDateRange = ApiSingleError("INVALID_DATE_RANGE", "")
-  private val invalidStatus = ApiSingleError("INVALID_STATUS", "")
-  private val invalidPeriodKey = ApiSingleError("PERIOD_KEY_INVALID", "")
-
-  private val multipleErrors = ApiMultiError("BAD_REQUEST", "", Seq(
+  val invalidVrn = ApiSingleError("VRN_INVALID", "")
+  val invalidFromDate = ApiSingleError("INVALID_DATE_FROM", "")
+  val invalidToDate = ApiSingleError("INVALID_DATE_TO", "")
+  val invalidDateRange = ApiSingleError("INVALID_DATE_RANGE", "")
+  val invalidStatus = ApiSingleError("INVALID_STATUS", "")
+  val multipleErrors = ApiMultiError("BAD_REQUEST", "", Seq(
     ApiSingleError("ERROR_1", "MESSAGE_1"),
     ApiSingleError("ERROR_2", "MESSAGE_2")
   ))

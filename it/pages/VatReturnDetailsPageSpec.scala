@@ -20,9 +20,17 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import helpers.IntegrationBaseSpec
 import play.api.http.Status
 import play.api.libs.ws.{WSRequest, WSResponse}
-import stubs.{AuthStub, CustomerInfoStub, FinancialDataStub, VatApiStub}
+import stubs._
 
 class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
+
+  val obligationsFeatureEnabled: Boolean =
+    app.configuration.underlying.getBoolean("features.useVatObligationsService.enabled")
+  val obligationsStub = new VatObligationsStub(obligationsFeatureEnabled)
+
+  val returnsFeatureEnabled: Boolean =
+    app.configuration.underlying.getBoolean("features.useVatReturnsService.enabled")
+  val returnsStub = new VatReturnsStub(returnsFeatureEnabled)
 
   private trait ReturnRouteTest {
     def setupStubs(): StubMapping
@@ -48,8 +56,8 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
           CustomerInfoStub.stubCustomerInfo
-          VatApiStub.stubSuccessfulVatReturn
-          VatApiStub.stubFulfilledObligations
+          returnsStub.stubSuccessfulVatReturn
+          obligationsStub.stubFulfilledObligations
           FinancialDataStub.stubAllOutstandingPayments
           FinancialDataStub.stubSuccessfulDirectDebit
         }
@@ -68,8 +76,8 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
           CustomerInfoStub.stubCustomerInfo
-          VatApiStub.stubSuccessfulVatReturn
-          VatApiStub.stubFulfilledObligations
+          returnsStub.stubSuccessfulVatReturn
+          obligationsStub.stubFulfilledObligations
           FinancialDataStub.stubAllOutstandingPayments
           FinancialDataStub.stubSuccessfulDirectDebit
         }

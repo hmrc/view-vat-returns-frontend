@@ -16,11 +16,7 @@
 
 package models
 
-case class FeatureSwitchModel(simpleAuthEnabled: Boolean,
-                              userResearchBannerEnabled: Boolean,
-                              allowPaymentsEnabled: Boolean,
+case class FeatureSwitchModel(userResearchBannerEnabled: Boolean,
                               staticDateEnabled: Boolean,
-                              allowNineBoxEnabled: Boolean,
-                              auditingEnabled: Boolean,
                               enableVatReturnsService: Boolean,
                               enableVatObligationsService: Boolean)

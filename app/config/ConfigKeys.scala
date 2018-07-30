@@ -32,15 +32,11 @@ object ConfigKeys {
 
   val signInBaseUrl: String = "signIn.url"
 
-  val simpleAuthFeature: String = "features.simpleAuth.enabled"
   val userResearchBannerFeature: String = "features.userResearchBanner.enabled"
-  val allowPaymentsFeature: String = "features.allowPayments.enabled"
   val staticDateEnabledFeature: String = "features.staticDate.enabled"
   val staticDateValue: String = "date-service.staticDate.value"
-  val allowNineBoxFeature: String = "features.allowNineBox.enabled"
   val useVatReturnsService: String = "features.useVatReturnsService.enabled"
   val useVatObligationsService: String = "features.useVatObligationsService.enabled"
-  val enableAuditingFeature: String = "features.auditing.enabled"
 
   val businessTaxAccountBase: String = "business-tax-account.host"
   val businessTaxAccountUrl: String = "business-tax-account.homeUrl"

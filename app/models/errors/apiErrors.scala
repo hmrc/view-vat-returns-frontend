@@ -31,7 +31,7 @@ object ApiSingleError {
     (JsPath \ "message").read[String]
   ) (ApiSingleError.apply _)
 
-  implicit val apiSingleErrorFinancialReads: Reads[ApiSingleError] = (
+  implicit val desSingleErrorReads: Reads[ApiSingleError] = (
     (JsPath \ "code").read[String] and
     (JsPath \ "reason").read[String]
   ) (ApiSingleError.apply _)
@@ -54,7 +54,7 @@ case class ApiMultiErrorFinancial(errors: Seq[ApiSingleError]) extends ApiError
 object ApiMultiErrorFinancial {
   implicit val apiMultiErrorFinancialWrites: Writes[ApiMultiErrorFinancial] = Json.writes[ApiMultiErrorFinancial]
 
-  implicit val apiMultiErrorFinancialReads: Reads[ApiMultiErrorFinancial] =
-   (JsPath \ "failures").read(Reads.seq[ApiSingleError](ApiSingleError.apiSingleErrorFinancialReads))
+  implicit val desMultiErrorReads: Reads[ApiMultiErrorFinancial] =
+   (JsPath \ "failures").read(Reads.seq[ApiSingleError](ApiSingleError.desSingleErrorReads))
     .map(ApiMultiErrorFinancial.apply)
 }

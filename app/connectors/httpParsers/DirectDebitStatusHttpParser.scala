@@ -27,7 +27,7 @@ object DirectDebitStatusHttpParser extends ResponseHttpParsers {
     override def read(method: String, url: String, response: HttpResponse): HttpGetResult[Boolean] = {
       response.status match {
         case OK => Right(response.json.as[Boolean])
-        case BAD_REQUEST => handleBadRequest(response.json)(ApiSingleError.apiSingleErrorFinancialReads)
+        case BAD_REQUEST => handleBadRequest(response.json)(ApiSingleError.desSingleErrorReads)
         case status if status >= 500 && status < 600 => Left(ServerSideError(response.status.toString, response.body))
         case _ => Left(UnexpectedStatusError(response.status.toString, response.body))
       }

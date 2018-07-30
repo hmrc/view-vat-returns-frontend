@@ -108,12 +108,8 @@ returnDeadlines.receivedReturn = We received your return for the period {0}.
 featureSwitch.title = Feature switches
 featureSwitch.heading = Features
 featureSwitch.submit = Submit
-features.simpleAuth.enabled = Simple auth
 features.userResearchBanner.enabled = User research banner
-features.allowPayments.enabled = Payments allowed
-features.date-service.staticDate.enabled = Use static date (2018-05-01)
-features.allowNineBox.enabled = Nine box page allowed
-features.auditing.enabled = Auditing service enabled
+features.staticDate.enabled = Use static date (2018-05-01)
 features.useVatReturnsService.enabled = Use vat-returns microservice
 features.useVatObligationsService.enabled = Use vat-obligations microservice
 

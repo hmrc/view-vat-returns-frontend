@@ -98,12 +98,8 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
         val returnDetails = returnsService.constructReturnDetailsModel(vatReturn, payment)
         val directDebit = getDirectDebitStatus(pageData.hasDirectDebit)
         val viewModel = constructViewModel(pageData.customerInfo, ob, returnDetails, isReturnsPageRequest, directDebit)
-        if (appConfig.features.allowNineBox()) {
-          auditEvent(isReturnsPageRequest, viewModel)
-          Ok(views.html.returns.vatReturnDetails(viewModel))
-        } else {
-          NotFound(views.html.errors.notFound())
-        }
+        auditEvent(isReturnsPageRequest, viewModel)
+        Ok(views.html.returns.vatReturnDetails(viewModel))
       case (Left(NotFoundError), _, _) =>
         NotFound(views.html.errors.notFound())
       case (Right(_), None, _) =>
