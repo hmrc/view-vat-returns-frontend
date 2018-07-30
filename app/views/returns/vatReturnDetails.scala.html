@@ -91,7 +91,7 @@
         <div class="grid-row" id="box-four">
           <div class="column-one-quarter form-hint">@messages("yourVatReturn.boxFour")</div>
           <div class="column-one-half form-hint">@messages("yourVatReturn.boxFourDescription")</div>
-          <div class="column-one-quarter form-hint text--right">
+          <div class="column-one-quarter form-hint text--right" style="white-space:nowrap">
             <span aria-hidden="true">&minus;</span>
             @displayMoney(vatReturnViewModel.vatReturnDetails.vatReturn.vatReclaimedCurrentPeriod.abs)
           </div>
