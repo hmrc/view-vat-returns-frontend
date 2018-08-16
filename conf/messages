@@ -1,5 +1,6 @@
 common.dateRangeSeparator = to
 common.overdue = overdue
+
 base.back = Back
 base.signOut = Sign out
 
@@ -35,7 +36,6 @@ breadcrumbs.vat = Your VAT details
 breadcrumbs.vatPayments = What you owe
 
 yourVatReturn.title = Submitted returns
-yourVatReturn.vrn = VAT registration number (VRN):
 yourVatReturn.dateSubmitted = Date submitted:
 yourVatReturn.returnDueDate = Return due date:
 yourVatReturn.vatDetails = VAT details
@@ -117,5 +117,6 @@ banner.newService = This is a new service – your
 banner.feedback = feedback
 banner.feedbackImprove = will help us to improve it.
 banner.phaseName = BETA
+
 feedback.title = Feedback
 feedbackThanks.title = Thank you
