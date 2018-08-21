@@ -105,14 +105,6 @@ returnDeadlines.nextDeadline = Your next deadline will show here on the first da
 returnDeadlines.noReturns = You do not have any returns due right now.
 returnDeadlines.receivedReturn = We received your return for the period {0}.
 
-featureSwitch.title = Feature switches
-featureSwitch.heading = Features
-featureSwitch.submit = Submit
-features.userResearchBanner.enabled = User research banner
-features.staticDate.enabled = Use static date (2018-05-01)
-features.useVatReturnsService.enabled = Use vat-returns microservice
-features.useVatObligationsService.enabled = Use vat-obligations microservice
-
 banner.newService = This is a new service – your
 banner.feedback = feedback
 banner.feedbackImprove = will help us to improve it.
