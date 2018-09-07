@@ -1,6 +1,5 @@
 # microservice specific routes
 
-
 # Get return deadlines
 GET        /return-deadlines            controllers.ReturnObligationsController.returnDeadlines
 
@@ -9,9 +8,6 @@ GET        /submitted/:year             controllers.ReturnObligationsController.
 
 # Get a return via the submitted returns page
 GET        /submitted/:year/:periodKey  controllers.ReturnsController.vatReturn(year: Int, periodKey: String)
-
-# hand off to payment service to make a payment
-POST       /make-payment                controllers.MakePaymentController.makePayment
 
 # Feedback link Routes
 GET         /feedback                   controllers.feedback.FeedbackController.show
