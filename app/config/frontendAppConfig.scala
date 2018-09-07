@@ -55,7 +55,7 @@ trait AppConfig extends ServicesConfig {
   val signOutUrl: String
   val mtdVatSignUpUrl: String
   val unauthorisedSignOutUrl: String
-  val vatPaymentsUrl: String 
+  val vatPaymentsUrl: String
   val selfHost: String
   val timeoutPeriod: Int
   val timeoutCountdown: Int

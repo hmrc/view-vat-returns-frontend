@@ -55,7 +55,6 @@ yourVatReturn.boxEight = Box 8
 yourVatReturn.boxEightDescription = Total value of supplied goods to EC countries and related costs (excluding VAT)
 yourVatReturn.boxNine = Box 9
 yourVatReturn.boxNineDescription = Total value of goods purchased from EC countries and brought into the UK, as well as any related costs (excluding VAT)
-yourVatReturn.paymentNow = Pay this now
 yourVatReturn.helpTitle = There is an error in my return
 yourVatReturn.helpLine = You can correct certain errors in your next return, using your accounting software. To do this, the error must have happened in an accounting period that ended in the last 4 years and be either:
 yourVatReturn.reportLink1 = You must

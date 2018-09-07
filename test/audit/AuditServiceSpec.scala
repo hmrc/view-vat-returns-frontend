@@ -14,21 +14,22 @@
  * limitations under the License.
  */
 
-package audit
+package auditSpec
 
 import audit.AuditingService
+import audit.models.ViewOpenVatObligationsAuditModel
 import config.FrontendAuditConnector
 import controllers.ControllerBaseSpec
-import models.User
-import models.VatReturnObligation
+import models.{User, VatReturnObligation}
 import org.scalatest.BeforeAndAfterEach
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
 import uk.gov.hmrc.play.audit.model.DataEvent
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
-import audit.models.ViewOpenVatObligationsAuditModel
 import java.time.LocalDate
+
 
 class AuditServiceSpec extends ControllerBaseSpec with BeforeAndAfterEach {
 
@@ -68,7 +69,7 @@ class AuditServiceSpec extends ControllerBaseSpec with BeforeAndAfterEach {
             .returns(Future.successful(AuditResult.Success))
         }
 
-        target.audit(testModel, controllers.feedback.routes.FeedbackController.show().url)
+        target().extendedAudit(testModel, controllers.feedback.routes.FeedbackController.show().url)
       }
     }
   }
