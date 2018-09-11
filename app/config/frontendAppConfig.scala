@@ -47,10 +47,6 @@ trait AppConfig extends ServicesConfig {
   val financialDataBaseUrl: String
   val btaHomeUrl: String
   val vatDetailsUrl: String
-  val vatPaymentsUrl: String
-  val paymentsServiceUrl: String
-  val paymentsReturnUrl: String
-  val unauthenticatedPaymentsUrl: String
   val reportVatErrorUrl: String
   val feedbackFormPartialUrl: String
   val contactFormServiceIdentifier: String
@@ -59,7 +55,7 @@ trait AppConfig extends ServicesConfig {
   val signOutUrl: String
   val mtdVatSignUpUrl: String
   val unauthorisedSignOutUrl: String
-  val setupPaymentsJourneyPath: String
+  val vatPaymentsUrl: String
   val selfHost: String
   val timeoutPeriod: Int
   val timeoutCountdown: Int
@@ -109,14 +105,6 @@ class FrontendAppConfig @Inject()(val runModeConfiguration: Configuration, val e
   private lazy val vatSummaryBase: String = getString(Keys.vatSummaryBase)
   override lazy val vatDetailsUrl: String = vatSummaryBase + getString(Keys.vatDetailsUrl)
   override lazy val vatPaymentsUrl: String = vatSummaryBase + getString(Keys.vatPaymentsUrl)
-
-  override lazy val paymentsServiceUrl: String = baseUrl(Keys.paymentsServiceBase)
-  override lazy val setupPaymentsJourneyPath: String = getString(Keys.setupPaymentsJourneyPath)
-
-  override lazy val paymentsReturnUrl: String = getString(Keys.paymentsReturnBase) + getString(Keys.paymentsReturnUrl)
-
-  override lazy val unauthenticatedPaymentsUrl: String =
-    getString(Keys.unauthenticatedPaymentsBase) + getString(Keys.unauthenticatedPaymentsUrl)
 
   override lazy val reportVatErrorUrl: String = getString(Keys.reportVatErrorUrl)
 

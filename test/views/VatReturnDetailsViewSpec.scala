@@ -48,7 +48,6 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     val helpBullet1 = "details li:nth-of-type(1)"
     val helpBullet2 = "details li:nth-of-type(2)"
 
-    val paymentButton = ".button"
     val btaBreadcrumb = "div.breadcrumbs li:nth-of-type(1)"
     val btaBreadcrumbLink = "div.breadcrumbs li:nth-of-type(1) a"
     val vatBreadcrumb = "div.breadcrumbs li:nth-of-type(2)"
@@ -56,10 +55,6 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     val previousPageBreadcrumb = "div.breadcrumbs li:nth-of-type(3)"
     val previousPageBreadcrumbLink = "div.breadcrumbs li:nth-of-type(3) a"
     val currentPage = "div.breadcrumbs li:nth-of-type(4)"
-
-    val paymentServiceDetailAmount = "#payment-detail input:nth-of-type(1)"
-    val paymentServiceDetailMonth = "#payment-detail input:nth-of-type(2)"
-    val paymentServiceDetailYear = "#payment-detail input:nth-of-type(3)"
 
     val gaTagElement = "#content ul"
     val minusSymbol = "#box-four > div.column-one-quarter.form-hint.text--right > span"
@@ -472,75 +467,6 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     "have the correct box 5 description in the table" in {
       elementText(boxElement(Selectors.boxes(4), 2)) shouldBe "Total VAT you owe"
     }
-
-    "have the pay button" in {
-      element(Selectors.paymentButton).attr("value") shouldBe "Pay this now"
-    }
-
-    "render the correct value for the amount hidden input for the payment service amount" in {
-      element(Selectors.paymentServiceDetailAmount).attr("value") shouldBe "100025"
-    }
-
-    "render the correct value for the tax period month hidden input for the payment service month" in {
-      element(Selectors.paymentServiceDetailMonth).attr("value") shouldBe "3"
-    }
-
-    "render the correct value for the tax period year hidden input payment service year" in {
-      element(Selectors.paymentServiceDetailYear).attr("value") shouldBe "2017"
-    }
-  }
-
-  "Rendering the vat return details page when amount (in pence) owed is more than the maximum Integer value (2147483647)" should {
-
-    val vatReturnViewModel = VatReturnViewModel(
-      Some("Cheapo Clothing"),
-      LocalDate.parse("2017-01-01"),
-      LocalDate.parse("2017-03-31"),
-      LocalDate.parse("2017-04-06"),
-      1000.00,
-      LocalDate.parse("2017-04-08"),
-      VatReturnDetails(
-        VatReturn(
-          "#001",
-          1297,
-          5755,
-          7052,
-          5732,
-          BigDecimal("21474836.48"),
-          77656,
-          765765,
-          55454,
-          545645
-        ),
-        moneyOwed = true,
-        isRepayment = false,
-        Some(Payment(
-          chargeType = "VAT",
-          start = LocalDate.parse("2017-01-01"),
-          end = LocalDate.parse("2017-03-31"),
-          due = LocalDate.parse("2017-04-06"),
-          outstandingAmount = 1000.00,
-          clearedAmount = 0,
-          periodKey = "#001"
-        ))
-      ),
-      showReturnsBreadcrumb = false,
-      currentYear,
-      hasFlatRateScheme = true,
-      hasDirectDebit = false
-    )
-
-    lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
-    lazy implicit val document: Document = Jsoup.parse(view.body)
-
-    "have the pay button" in {
-      element(Selectors.paymentButton).attr("value") shouldBe "Pay this now"
-    }
-
-    "render the correct value for the amount hidden input for the payment service amount" in {
-      element(Selectors.paymentServiceDetailAmount).attr("value") shouldBe "2147483648"
-    }
-
   }
 
   "Rendering the vat return details page when HMRC owe money on the return" should {
@@ -597,10 +523,6 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     "have the correct box 5 description in the table" in {
       elementText(boxElement(Selectors.boxes(4), 2)) shouldBe "Total VAT HMRC owes you"
     }
-
-    "not have the pay now button" in {
-      elementAsOpt(Selectors.paymentButton) shouldBe None
-    }
   }
 
   "Rendering the vat return details page when HMRC have paid what they owe on the return" should {
@@ -653,10 +575,6 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     "have the correct box 5 description in the table" in {
       elementText(boxElement(Selectors.boxes(4), 2)) shouldBe "Total VAT HMRC owed you"
     }
-
-    "not have the pay now button" in {
-      elementAsOpt(Selectors.paymentButton) shouldBe None
-    }
   }
 
   "Rendering the vat return details page when a charge hasn't been generated yet" should {
@@ -697,11 +615,6 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     "have the correct subheading" in {
       elementText(Selectors.subHeading) shouldBe "Return total: £1,000"
     }
-
-    "not have the pay now button" in {
-      elementAsOpt(Selectors.paymentButton) shouldBe None
-    }
-
   }
 
   "Rendering the vat return details page when the user has an active direct debit" should {
@@ -740,10 +653,6 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
 
     "have the correct subheading" in {
       elementText(Selectors.subHeading) shouldBe "Return total: £1,000"
-    }
-
-    "not have the pay now button" in {
-      elementAsOpt(Selectors.paymentButton) shouldBe None
     }
   }
 

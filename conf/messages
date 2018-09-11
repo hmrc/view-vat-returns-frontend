@@ -22,10 +22,6 @@ technicalProblem.title = There is a problem with the service - VAT reporting thr
 technicalProblem.heading = Sorry, there is a problem with the service
 technicalProblem.message = Try again later.
 
-paymentsError.payNowOne = If you know how much you owe,
-paymentsError.payNowTwo = use the payments service
-paymentsError.payNowThree = to pay now.
-
 userResearch.heading = Please help us improve our service
 userResearch.enterSurvey = Enter our survey
 userResearch.close = No thanks
@@ -59,7 +55,6 @@ yourVatReturn.boxEight = Box 8
 yourVatReturn.boxEightDescription = Total value of supplied goods to EC countries and related costs (excluding VAT)
 yourVatReturn.boxNine = Box 9
 yourVatReturn.boxNineDescription = Total value of goods purchased from EC countries and brought into the UK, as well as any related costs (excluding VAT)
-yourVatReturn.paymentNow = Pay this now
 yourVatReturn.helpTitle = There is an error in my return
 yourVatReturn.helpLine = You can correct certain errors in your next return, using your accounting software. To do this, the error must have happened in an accounting period that ended in the last 4 years and be either:
 yourVatReturn.reportLink1 = You must

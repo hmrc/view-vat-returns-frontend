@@ -17,11 +17,10 @@
 package auditSpec
 
 import audit.AuditingService
-import audit.models.PayVatReturnChargeAuditModel
+import audit.models.ViewOpenVatObligationsAuditModel
 import config.FrontendAuditConnector
 import controllers.ControllerBaseSpec
-import models.User
-import models.payments.PaymentDetailsModel
+import models.{User, VatReturnObligation}
 import org.scalatest.BeforeAndAfterEach
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
@@ -29,6 +28,8 @@ import uk.gov.hmrc.play.audit.model.DataEvent
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
+import java.time.LocalDate
+
 
 class AuditServiceSpec extends ControllerBaseSpec with BeforeAndAfterEach {
 
@@ -44,39 +45,32 @@ class AuditServiceSpec extends ControllerBaseSpec with BeforeAndAfterEach {
       new AuditingService(mockConfig, mockAuditConnector)
     }
 
-    "auditing a payment hand off" when {
+    "auditing a sequence of vat return obligations" should {
 
-      "payment details have been supplied" should {
-        "extract the data and pass it into the AuditConnector" in new Test {
+      "extract the data and pass it into the AuditConnector" in new Test {
 
-          val testModel = PayVatReturnChargeAuditModel(
-            User("111111111", true, true),
-            PaymentDetailsModel(
-              taxType = "vat",
-              taxReference = "123456789",
-              amountInPence = 99,
-              taxPeriodMonth = 1,
-              taxPeriodYear = 2018,
-              returnUrl = "/return-url",
-              backUrl = "/back-url",
-              periodKey = "ABCD"
-            ),
-            "/return-page-url"
-          )
+        val testModel = ViewOpenVatObligationsAuditModel(
+          User("111111111", true, true),
+          Seq(VatReturnObligation(
+            LocalDate.parse("2017-01-01"),
+            LocalDate.parse("2017-12-31"),
+            LocalDate.parse("2018-01-31"),
+            "O",
+            None,
+            "#001"
+          ))
+        )
 
-          override def setupMocks(): Unit = {
-            super.setupMocks()
+        override def setupMocks(): Unit = {
+          super.setupMocks()
 
-            (mockAuditConnector.sendEvent(_: DataEvent)(_: HeaderCarrier, _: ExecutionContext))
-              .expects(*, *, *)
-              .returns(Future.successful(AuditResult.Success))
-          }
-
-          target.audit(testModel, controllers.feedback.routes.FeedbackController.show().url)
+          (mockAuditConnector.sendEvent(_: DataEvent)(_: HeaderCarrier, _: ExecutionContext))
+            .expects(*, *, *)
+            .returns(Future.successful(AuditResult.Success))
         }
-      }
 
+        target().extendedAudit(testModel, controllers.feedback.routes.FeedbackController.show().url)
+      }
     }
   }
-
 }

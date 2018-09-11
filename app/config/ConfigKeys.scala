@@ -46,18 +46,8 @@ object ConfigKeys {
   val vatSummaryBase: String = "vat-summary-frontend.host"
   val vatDetailsUrl: String = "vat-summary-frontend.detailsUrl"
   val vatPaymentsUrl: String = "vat-summary-frontend.paymentsUrl"
-  val vatMakePaymentUrl: String = "vat-summary-frontend.makePaymentUrl"
 
   val reportVatErrorUrl: String = "reportVatErrorUrl"
-
-  val paymentsServiceBase: String = "pay-api"
-  val setupPaymentsJourneyPath: String = "microservice.services.pay-api.endpoints.setupJourney"
-
-  val paymentsReturnBase: String = "payments-frontend.returnHost"
-  val paymentsReturnUrl: String = "payments-frontend.returnUrl"
-
-  val unauthenticatedPaymentsBase: String = "unauthenticated-payments.host"
-  val unauthenticatedPaymentsUrl: String = "unauthenticated-payments.url"
 
   val governmentGatewayHost: String = "government-gateway.host"
 
