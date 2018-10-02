@@ -58,7 +58,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
   )
 
   val exampleEntityName: Option[String] = Some("Cheapo Clothing")
-  val exampleCustomerDetail: Option[CustomerDetail] = Some(CustomerDetail("Cheapo Clothing", hasFlatRateScheme = true))
+  val exampleCustomerDetail: Option[CustomerDetail] = Some(CustomerDetail("Cheapo Clothing", hasFlatRateScheme = true, isPartialMigration = false))
 
   val examplePayment: Payment = Payment(
     "VAT",

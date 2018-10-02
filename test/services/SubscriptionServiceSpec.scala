@@ -40,13 +40,15 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
   "Calling .getEntityName" when {
 
     "the connector retrieves a trading name" should {
+
       "return the trading name" in new Test {
         val exampleCustomerInfo: CustomerInformation = CustomerInformation(
           Some("My organisation name"),
           Some("John"),
           Some("Smith"),
           Some("My trading name"),
-          hasFlatRateSchemeYes
+          hasFlatRateSchemeYes,
+          Some(true)
         )
 
         (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
@@ -55,7 +57,7 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
 
         lazy val result: Option[CustomerDetail] = await(service.getUserDetails(User("999999999")))
 
-        result shouldBe Some(CustomerDetail("My trading name", hasFlatRateSchemeYes))
+        result shouldBe Some(CustomerDetail("My trading name", hasFlatRateSchemeYes, isPartialMigration = true))
       }
     }
 
@@ -67,7 +69,8 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           Some("John"),
           Some("Smith"),
           None,
-          hasFlatRateSchemeNo
+          hasFlatRateSchemeNo,
+          Some(false)
         )
 
         (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
@@ -76,7 +79,29 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
 
         val result: Option[CustomerDetail] = await(service.getUserDetails(User("999999999")))
 
-        result shouldBe Some(CustomerDetail("John Smith", hasFlatRateSchemeNo))
+        result shouldBe Some(CustomerDetail("John Smith", hasFlatRateSchemeNo, isPartialMigration = false))
+      }
+    }
+
+    "the connector does not retrieve a trading name, but receives both organisation name and first/last names" should {
+
+      "return the organisation name" in new Test {
+        val exampleCustomerInfo: CustomerInformation = CustomerInformation(
+          Some("My organisation name"),
+          Some("John"),
+          Some("Smith"),
+          None,
+          hasFlatRateSchemeNo,
+          Some(false)
+        )
+
+        (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
+          .expects(*, *, *)
+          .returns(Future.successful(Right(exampleCustomerInfo)))
+
+        val result: Option[CustomerDetail] = await(service.getUserDetails(User("999999999")))
+
+        result shouldBe Some(CustomerDetail("My organisation name", hasFlatRateSchemeNo, isPartialMigration = false))
       }
     }
 
@@ -88,7 +113,8 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           None,
           None,
           None,
-          hasFlatRateSchemeNo
+          hasFlatRateSchemeNo,
+          Some(true)
         )
 
         (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
@@ -97,19 +123,21 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
 
         val result: Option[CustomerDetail] = await(service.getUserDetails(User("999999999")))
 
-        result shouldBe Some(CustomerDetail("My organisation name", hasFlatRateSchemeNo))
+        result shouldBe Some(CustomerDetail("My organisation name", hasFlatRateSchemeNo, isPartialMigration = true))
       }
     }
 
-    "the connector does not retrieve a trading name, organisation name, or individual names" should {
 
-      "return None" in new Test {
+    "the connector does not retrieve an 'isPartialMigration' flag" should {
+
+      "return a model with 'isPartialMigration' defaulted to false" in new Test {
         val exampleCustomerInfo: CustomerInformation = CustomerInformation(
           None,
+          Some("John"),
+          Some("Smith"),
           None,
-          None,
-          None,
-          hasFlatRateSchemeYes
+          hasFlatRateSchemeNo,
+          None
         )
 
         (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
@@ -118,7 +146,7 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
 
         val result: Option[CustomerDetail] = await(service.getUserDetails(User("999999999")))
 
-        result shouldBe None
+        result shouldBe Some(CustomerDetail("John Smith", hasFlatRateSchemeNo, isPartialMigration = false))
       }
     }
 

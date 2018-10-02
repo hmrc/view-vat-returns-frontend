@@ -29,13 +29,21 @@ class SubscriptionService @Inject()(connector: VatSubscriptionConnector) {
 
   def getUserDetails(user: User)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[CustomerDetail]] = {
     connector.getCustomerInfo(user.vrn).map {
-      case Right(CustomerInformation(None, None, None, None, _)) => None
-      case Right(CustomerInformation(None, Some(firstName), Some(lastName), None, hasFlatRateScheme)) =>
-        Some(CustomerDetail(s"$firstName $lastName", hasFlatRateScheme))
-      case Right(CustomerInformation(organisationName, None, None, None, hasFlatRateScheme)) =>
-        organisationName.fold(Option.empty[CustomerDetail])(orgName => Some(CustomerDetail(orgName, hasFlatRateScheme)))
-      case Right(CustomerInformation(_, _, _, tradingName, hasFlatRateScheme)) =>
-        tradingName.fold(Option.empty[CustomerDetail])(tradeName => Some(CustomerDetail(tradeName, hasFlatRateScheme)))
+
+      case Right(CustomerInformation(None, None, None, None, _, _)) => None
+
+      case Right(model) =>
+
+        val entityName: String = (model.firstName, model.lastName, model.organisationName, model.tradingName) match {
+          case (_, _, _, Some(tradingName)) => tradingName
+          case (_, _, Some(organisationName), _) => organisationName
+          case (Some(firstName), Some(lastName), _, _) => s"$firstName $lastName"
+        }
+
+        val isPartialMigration: Boolean = model.isPartialMigration.contains(true)
+
+        Some(CustomerDetail(entityName, model.hasFlatRateScheme, isPartialMigration))
+
       case Left(_) => None
     }
   }

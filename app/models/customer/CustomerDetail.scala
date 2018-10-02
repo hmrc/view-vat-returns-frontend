@@ -16,4 +16,4 @@
 
 package models.customer
 
-case class CustomerDetail(entityName: String, hasFlatRateScheme: Boolean)
+case class CustomerDetail(entityName: String, hasFlatRateScheme: Boolean, isPartialMigration: Boolean)
