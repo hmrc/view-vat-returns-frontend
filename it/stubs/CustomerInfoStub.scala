@@ -41,7 +41,8 @@ object CustomerInfoStub extends WireMockMethods {
       |   "firstName" : "Vincent",
       |   "lastName" : "Vatreturn",
       |   "tradingName" : "Cheapo Clothing",
-      |   "hasFlatRateScheme": true
+      |   "hasFlatRateScheme": true,
+      |   "isPartialMigration":true
       |}""".stripMargin
   )
 
