@@ -153,7 +153,8 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
       showReturnsBreadcrumb = isReturnsPageRequest,
       currentYear = dateService.now().getYear,
       hasFlatRateScheme = customerDetail.fold(false)(_.hasFlatRateScheme),
-      hasDirectDebit = directDebitStatus
+      hasDirectDebit = directDebitStatus,
+      isHybridUser = customerDetail.fold(false)(_.isPartialMigration)
     )
   }
 }

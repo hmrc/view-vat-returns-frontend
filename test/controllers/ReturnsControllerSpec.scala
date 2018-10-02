@@ -299,7 +299,8 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         showReturnsBreadcrumb = true,
         currentYear = 2018,
         hasFlatRateScheme = true,
-        hasDirectDebit = false
+        hasDirectDebit = false,
+        isHybridUser = false
       )
 
       (mockDateService.now: () => LocalDate).stubs().returns(LocalDate.parse("2018-05-01"))
