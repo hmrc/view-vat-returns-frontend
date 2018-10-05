@@ -14,11 +14,19 @@
  * limitations under the License.
  *@
 
-@(moneyOwed: Boolean, isRepayment: Boolean)(implicit messages: Messages)
+@(moneyOwed: Boolean, isRepayment: Boolean, isHybridUser: Boolean)(implicit messages: Messages)
 
-@(moneyOwed, isRepayment) match {
-  case (true, true) => { @messages("boxFiveDescription.hmrcWillPay") }
-  case (false, true) => { @messages("boxFiveDescription.hmrcPaid") }
-  case (true, false) => { @messages("boxFiveDescription.totalYouOwe") }
-  case (false, false) => { @messages("boxFiveDescription.totalYouOwed") }
+@if(isHybridUser) {
+    @if(isRepayment) {
+        @messages("boxFiveDescription.hmrcWillPay")
+    } else {
+        @messages("boxFiveDescription.totalYouOwe")
+    }
+} else {
+    @(moneyOwed, isRepayment) match {
+        case (true, true) => { @messages("boxFiveDescription.hmrcWillPay") }
+        case (false, true) => { @messages("boxFiveDescription.hmrcPaid") }
+        case (true, false) => { @messages("boxFiveDescription.totalYouOwe") }
+        case (false, false) => { @messages("boxFiveDescription.totalYouOwed") }
+    }
 }
