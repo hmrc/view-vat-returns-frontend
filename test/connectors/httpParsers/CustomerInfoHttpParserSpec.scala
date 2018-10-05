@@ -40,7 +40,8 @@ class CustomerInfoHttpParserSpec extends UnitSpec {
             "firstName" -> "John",
             "lastName" -> "Smith",
             "tradingName" -> "Cheapo Clothing",
-            "hasFlatRateScheme" -> hasFlatRateSchemeYes
+            "hasFlatRateScheme" -> hasFlatRateSchemeYes,
+            "isPartialMigration" -> true
           )
         )
       )
@@ -50,7 +51,8 @@ class CustomerInfoHttpParserSpec extends UnitSpec {
         Some("John"),
         Some("Smith"),
         Some("Cheapo Clothing"),
-        hasFlatRateSchemeYes
+        hasFlatRateSchemeYes,
+        Some(true)
       ))
       val result = CustomerInfoReads.read("", "", httpResponse)
 

@@ -95,7 +95,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       showReturnsBreadcrumb = true,
       currentYear,
       hasFlatRateScheme = true,
-      hasDirectDebit = false
+      hasDirectDebit = false,
+      isHybridUser = false
     )
 
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
@@ -243,7 +244,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       showReturnsBreadcrumb = true,
       currentYear,
       hasFlatRateScheme = false,
-      hasDirectDebit = false
+      hasDirectDebit = false,
+      isHybridUser = false
     )
 
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
@@ -391,7 +393,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       showReturnsBreadcrumb = false,
       currentYear,
       hasFlatRateScheme = true,
-      hasDirectDebit = false
+      hasDirectDebit = false,
+      isHybridUser = false
     )
 
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
@@ -446,7 +449,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       showReturnsBreadcrumb = false,
       currentYear,
       hasFlatRateScheme = true,
-      hasDirectDebit = false
+      hasDirectDebit = false,
+      isHybridUser = false
     )
 
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
@@ -506,7 +510,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       showReturnsBreadcrumb = false,
       currentYear,
       hasFlatRateScheme = true,
-      hasDirectDebit = false
+      hasDirectDebit = false,
+      isHybridUser = false
     )
 
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
@@ -562,7 +567,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       showReturnsBreadcrumb = false,
       currentYear,
       hasFlatRateScheme = true,
-      hasDirectDebit = false
+      hasDirectDebit = false,
+      isHybridUser = false
     )
 
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
@@ -606,7 +612,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       showReturnsBreadcrumb = true,
       currentYear,
       hasFlatRateScheme = true,
-      hasDirectDebit = false
+      hasDirectDebit = false,
+      isHybridUser = false
     )
 
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
@@ -645,7 +652,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       showReturnsBreadcrumb = true,
       currentYear,
       hasFlatRateScheme = true,
-      hasDirectDebit = true
+      hasDirectDebit = true,
+      isHybridUser = false
     )
 
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
@@ -685,7 +693,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       showReturnsBreadcrumb = true,
       currentYear,
       hasFlatRateScheme = true,
-      hasDirectDebit = false
+      hasDirectDebit = false,
+      isHybridUser = false
     )
 
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)

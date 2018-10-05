@@ -30,7 +30,8 @@ class CustomerInformationSpec extends UnitSpec {
       Some("John"),
       Some("Smith"),
       Some("Cheapo Clothing"),
-      hasFlatRateSchemeYes
+      hasFlatRateSchemeYes,
+      Some(true)
     )
 
     val exampleInputString =
@@ -39,7 +40,8 @@ class CustomerInformationSpec extends UnitSpec {
         |"firstName":"John",
         |"lastName":"Smith",
         |"tradingName":"Cheapo Clothing",
-        |"hasFlatRateScheme":true
+        |"hasFlatRateScheme":true,
+        |"isPartialMigration":true
         |}"""
         .stripMargin.replace("\n", "")
 
@@ -49,7 +51,8 @@ class CustomerInformationSpec extends UnitSpec {
         |"firstName":"John",
         |"lastName":"Smith",
         |"tradingName":"Cheapo Clothing",
-        |"hasFlatRateScheme":true
+        |"hasFlatRateScheme":true,
+        |"isPartialMigration":true
         |}"""
         .stripMargin.replace("\n", "")
 

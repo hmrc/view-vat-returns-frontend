@@ -58,7 +58,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
   )
 
   val exampleEntityName: Option[String] = Some("Cheapo Clothing")
-  val exampleCustomerDetail: Option[CustomerDetail] = Some(CustomerDetail("Cheapo Clothing", hasFlatRateScheme = true))
+  val exampleCustomerDetail: Option[CustomerDetail] = Some(CustomerDetail("Cheapo Clothing", hasFlatRateScheme = true, isPartialMigration = false))
 
   val examplePayment: Payment = Payment(
     "VAT",
@@ -299,7 +299,8 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         showReturnsBreadcrumb = true,
         currentYear = 2018,
         hasFlatRateScheme = true,
-        hasDirectDebit = false
+        hasDirectDebit = false,
+        isHybridUser = false
       )
 
       (mockDateService.now: () => LocalDate).stubs().returns(LocalDate.parse("2018-05-01"))
