@@ -46,6 +46,7 @@ class MockAppConfig(val runModeConfiguration: Configuration, val mode: Mode = Mo
   override val feedbackFormPartialUrl: String = "BasefeedbackUrl"
   override val contactFormServiceIdentifier: String = "VATVC"
   override val staticDateValue: String = "2018-05-01"
+  override val finalReturnPeriodKey: String = "9999"
   override val surveyUrl: String = "/some-survey-url"
   override val signOutUrl: String = "/some-gg-signout-url"
   override val mtdVatSignUpUrl: String = "mtd-sign-up"

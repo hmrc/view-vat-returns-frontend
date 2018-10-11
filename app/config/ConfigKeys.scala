@@ -38,6 +38,8 @@ object ConfigKeys {
   val useVatReturnsService: String = "features.useVatReturnsService.enabled"
   val useVatObligationsService: String = "features.useVatObligationsService.enabled"
 
+  val finalReturnPeriodKey: String = "final-return.periodKey"
+
   val businessTaxAccountBase: String = "business-tax-account.host"
   val businessTaxAccountUrl: String = "business-tax-account.homeUrl"
 

@@ -105,6 +105,42 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
       }
     }
 
+    "there is a final return for the selected year of 2018" should {
+
+      lazy val exampleReturns: Seq[ReturnObligationsViewModel] =
+        Seq(
+          ReturnObligationsViewModel(
+            LocalDate.parse("2018-01-01"),
+            LocalDate.parse("2018-12-31"),
+            mockConfig.finalReturnPeriodKey
+          )
+        )
+
+      lazy val view = views.html.returns.submittedReturns(
+        VatReturnsViewModel(returnYears, 2018, exampleReturns, hasNonMtdVat = false, "999999999")
+      )
+      lazy implicit val document: Document = Jsoup.parse(view.body)
+
+      "have the correct return heading" in {
+        elementText(Selectors.returnsHeading) shouldBe "2018 returns"
+      }
+
+      "have the correct period text" in {
+        elementText(Selectors.period) shouldBe "For the period:"
+      }
+
+      "contain the first return which" should {
+
+        "contains the correct obligation period text" in {
+          elementText(Selectors.obligation(1)) shouldBe "View return for the period Final return"
+        }
+
+        "contains the correct link to view a specific return" in {
+          element(Selectors.obligationLink(1)).attr("href") shouldBe controllers.routes.ReturnsController.vatReturn(2018, "9999").url
+        }
+      }
+    }
+
     "there are no returns for the selected year of 2018" should {
 
       lazy val view = views.html.returns.submittedReturns(
