@@ -18,6 +18,11 @@ package models.viewModels
 
 import java.time.LocalDate
 
+import config.AppConfig
+
 case class ReturnObligationsViewModel(start: LocalDate,
                                       end: LocalDate,
-                                      periodKey: String)
+                                      periodKey: String) {
+
+  def isFinalObligation(implicit appConfig: AppConfig): Boolean = periodKey == appConfig.finalReturnPeriodKey
+}

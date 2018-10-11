@@ -76,7 +76,7 @@
                 <a href="@controllers.routes.ReturnsController.vatReturn(model.selectedYear, obligation.periodKey)"
                    data-journey-click="returns:view-return-@{obligation.start}-to-@{obligation.end}:submitted-returns">
                   <span class="visually-hidden">@messages("submittedReturns.periodPrefix")</span>
-                  @if(obligation.periodKey==appConfig.finalReturnPeriodKey) {
+                  @if(obligation.isFinalObligation) {
                     @messages("submittedReturns.finalReturn")
                   } else {
                     @displayDateRange(obligation.start, obligation.end)
