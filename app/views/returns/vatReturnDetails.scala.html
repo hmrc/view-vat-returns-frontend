@@ -33,6 +33,14 @@
   <p>@messages("yourVatReturn.reportLink1") <a target="_blank" href="@appConfig.reportVatErrorUrl" id="reportVatErrorLink">@messages("yourVatReturn.reportLink2")</a> @messages("yourVatReturn.reportLink3")</p>
 }
 
+@returnHeading(useShortDayFormat: Boolean) = {
+  @if(vatReturnViewModel.vatReturnDetails.isFinalReturn) {
+    @messages("yourVatReturn.finalReturn")
+  } else {
+    @displayDateRange(vatReturnViewModel.periodFrom, vatReturnViewModel.periodTo, useShortDayFormat)
+  }
+}
+
 @views.html.main_template(title = messages("yourVatReturn.title"), bodyClasses = None, appConfig = appConfig) {
 
   @navigationBreadcrumb(
@@ -42,14 +50,14 @@
       if(vatReturnViewModel.showReturnsBreadcrumb) controllers.routes.ReturnObligationsController.submittedReturns(vatReturnViewModel.currentYear).url -> messages("submittedReturns.title")
       else appConfig.vatPaymentsUrl -> messages("breadcrumbs.vatPayments")
     ),
-    currentPage = displayDateRange(vatReturnViewModel.periodFrom, vatReturnViewModel.periodTo).toString
+    currentPage = returnHeading(useShortDayFormat = false).toString
   )
 
   <section class="grid-row column-two-thirds">
 
     <h1 class="heading-xlarge">
       <span class="heading-secondary">@messages("yourVatReturn.title")</span>
-      @displayDateRange(vatReturnViewModel.periodFrom, vatReturnViewModel.periodTo, useShortDayFormat = true)
+      @returnHeading(useShortDayFormat = true)
     </h1>
 
     @views.html.templates.returns.paymentStatus(

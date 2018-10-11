@@ -708,4 +708,49 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       element(Selectors.gaTagElement).attr("data-metrics") shouldBe "error:hidden-text:vat-return-entity-name"
     }
   }
+
+  "Rendering the VAT return details page when the period key is 9999 (Final Return)" should {
+
+    val vatReturnViewModel = VatReturnViewModel(
+      None,
+      LocalDate.parse("2017-01-01"),
+      LocalDate.parse("2017-03-31"),
+      LocalDate.parse("2017-04-06"),
+      1000.00,
+      LocalDate.parse("2017-04-08"),
+      VatReturnDetails(
+        VatReturn(
+          "9999",
+          1297,
+          5755,
+          7052,
+          5732,
+          1000,
+          77656,
+          765765,
+          55454,
+          545645
+        ),
+        moneyOwed = true,
+        isRepayment = false,
+        None
+      ),
+      showReturnsBreadcrumb = true,
+      currentYear,
+      hasFlatRateScheme = true,
+      hasDirectDebit = false,
+      isHybridUser = false
+    )
+
+    lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
+    lazy implicit val document: Document = Jsoup.parse(view.body)
+
+    "have the pageHeading of 'Final return'" in {
+      elementText(Selectors.pageHeading) shouldBe "Submitted returns Final return"
+    }
+
+    "have the breadcrumb heading of 'Final return" in {
+      elementText(Selectors.currentPage) shouldBe "Final return"
+    }
+  }
 }

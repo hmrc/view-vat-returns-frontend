@@ -34,6 +34,7 @@ yourVatReturn.title = Submitted returns
 yourVatReturn.dateSubmitted = Date submitted:
 yourVatReturn.returnDueDate = Return due date:
 yourVatReturn.vatDetails = VAT details
+yourVatReturn.finalReturn = Final return
 yourVatReturn.additionalInfo = Additional information
 yourVatReturn.boxOne = Box 1
 yourVatReturn.boxOneDescription = VAT you charged on sales and other supplies

@@ -21,4 +21,8 @@ import models.payments.Payment
 case class VatReturnDetails(vatReturn: VatReturn,
                             moneyOwed: Boolean,
                             isRepayment: Boolean,
-                            payment: Option[Payment])
+                            payment: Option[Payment]) {
+
+  val isFinalReturn: Boolean = vatReturn.periodKey == "9999"
+
+}
