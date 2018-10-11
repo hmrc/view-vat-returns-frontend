@@ -26,7 +26,7 @@ class BoxFiveDescriptionTemplateSpec extends TemplateBaseSpec {
 
     "the user owes money on their VAT return" should {
 
-      val template = views.html.templates.returns.boxFiveDescription(moneyOwed = true, isRepayment = false)
+      val template = views.html.templates.returns.boxFiveDescription(moneyOwed = true, isRepayment = false, isHybridUser = false)
       val document: Document = Jsoup.parse(template.body)
 
       "render the expected text" in {
@@ -36,7 +36,7 @@ class BoxFiveDescriptionTemplateSpec extends TemplateBaseSpec {
 
     "the user has paid off their VAT return" should {
 
-      val template = views.html.templates.returns.boxFiveDescription(moneyOwed = false, isRepayment = false)
+      val template = views.html.templates.returns.boxFiveDescription(moneyOwed = false, isRepayment = false, isHybridUser = false)
       val document: Document = Jsoup.parse(template.body)
 
       "render the expected text" in {
@@ -46,7 +46,7 @@ class BoxFiveDescriptionTemplateSpec extends TemplateBaseSpec {
 
     "the user is waiting for HMRC to pay them back for their VAT return" should {
 
-      val template = views.html.templates.returns.boxFiveDescription(moneyOwed = true, isRepayment = true)
+      val template = views.html.templates.returns.boxFiveDescription(moneyOwed = true, isRepayment = true, isHybridUser = false)
       val document: Document = Jsoup.parse(template.body)
 
       "render the expected text" in {
@@ -56,11 +56,34 @@ class BoxFiveDescriptionTemplateSpec extends TemplateBaseSpec {
 
     "the user has been paid by HMRC for their VAT return" should {
 
-      val template = views.html.templates.returns.boxFiveDescription(moneyOwed = false, isRepayment = true)
+      val template = views.html.templates.returns.boxFiveDescription(moneyOwed = false, isRepayment = true, isHybridUser = false)
       val document: Document = Jsoup.parse(template.body)
 
       "render the expected text" in {
         document.body().text() shouldBe "Total VAT HMRC owed you"
+      }
+    }
+
+    "the user is hybrid and" when {
+
+      "a repayment from HMRC is due" should {
+
+        val template = views.html.templates.returns.boxFiveDescription(moneyOwed = false, isRepayment = true, isHybridUser = true)
+        val document: Document = Jsoup.parse(template.body)
+
+        "render the expected text" in {
+          document.body().text() shouldBe "Total VAT HMRC owes you"
+        }
+      }
+
+      "a repayment is NOT due from HMRC" should {
+
+        val template = views.html.templates.returns.boxFiveDescription(moneyOwed = false, isRepayment = false, isHybridUser = true)
+        val document: Document = Jsoup.parse(template.body)
+
+        "render the expected text" in {
+          document.body().text() shouldBe "Total VAT you owe"
+        }
       }
     }
   }
