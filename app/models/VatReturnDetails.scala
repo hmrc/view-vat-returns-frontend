@@ -16,6 +16,7 @@
 
 package models
 
+import config.AppConfig
 import models.payments.Payment
 
 case class VatReturnDetails(vatReturn: VatReturn,
@@ -23,6 +24,6 @@ case class VatReturnDetails(vatReturn: VatReturn,
                             isRepayment: Boolean,
                             payment: Option[Payment]) {
 
-  val isFinalReturn: Boolean = vatReturn.periodKey == "9999"
+  def isFinalReturn(implicit appConfig: AppConfig): Boolean = vatReturn.periodKey == appConfig.finalReturnPeriodKey
 
 }
