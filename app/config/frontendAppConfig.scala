@@ -60,6 +60,7 @@ trait AppConfig extends ServicesConfig {
   val selfHost: String
   val timeoutPeriod: Int
   val timeoutCountdown: Int
+  val finalReturnPeriodKey: String
 }
 
 @Singleton
@@ -128,4 +129,6 @@ class FrontendAppConfig @Inject()(val runModeConfiguration: Configuration, val e
 
   override lazy val timeoutPeriod: Int = getString(Keys.timeoutPeriod).toInt
   override lazy val timeoutCountdown: Int = getString(Keys.timeoutCountDown).toInt
+
+  override lazy val finalReturnPeriodKey: String = getString(Keys.finalReturnPeriodKey)
 }

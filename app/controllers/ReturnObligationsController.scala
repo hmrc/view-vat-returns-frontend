@@ -68,7 +68,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
             returnsService.getFulfilledObligations(currentDate).map(fulfilledObligations => fulfilledObligationsAction(fulfilledObligations))
           } else {
             val deadlines = obligations.map(obligation =>
-              ReturnDeadlineViewModel(obligation.due, obligation.start, obligation.end, obligation.due.isBefore(currentDate))
+              ReturnDeadlineViewModel(obligation.due, obligation.start, obligation.end, obligation.due.isBefore(currentDate), obligation.periodKey)
             )
             Future.successful(Ok(views.html.returns.returnDeadlines(deadlines)))
           }
@@ -85,9 +85,10 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
       case Right(VatReturnObligations(obligations)) =>
         val lastFulfilledObligation: VatReturnObligation = returnsService.getLastObligation(obligations)
         Ok(views.html.returns.noUpcomingReturnDeadlines(Some(ReturnDeadlineViewModel(
-          lastFulfilledObligation.due,
-          lastFulfilledObligation.start,
-          lastFulfilledObligation.end
+          due = lastFulfilledObligation.due,
+          start = lastFulfilledObligation.start,
+          end = lastFulfilledObligation.end,
+          periodKey = lastFulfilledObligation.periodKey
         ))))
       case Left(error) =>
         Logger.warn("[ReturnObligationsController][fulfilledObligationsAction] error: " + error.toString)
