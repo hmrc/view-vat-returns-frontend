@@ -52,7 +52,9 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
       ReturnDeadlineViewModel(
         LocalDate.parse("2018-02-02"),
         LocalDate.parse("2018-01-01"),
-        LocalDate.parse("2018-01-01"))
+        LocalDate.parse("2018-01-01"),
+        periodKey = "18CC"
+      )
     )
 
     lazy val view = views.html.returns.returnDeadlines(singleDeadline)
@@ -124,12 +126,16 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
       ReturnDeadlineViewModel(
         LocalDate.parse("2018-02-02"),
         LocalDate.parse("2018-01-01"),
-        LocalDate.parse("2018-01-01")),
+        LocalDate.parse("2018-01-01"),
+        periodKey = "18CC"
+      ),
       ReturnDeadlineViewModel(
         LocalDate.parse("2018-10-12"),
         LocalDate.parse("2018-09-07"),
         LocalDate.parse("2018-09-07"),
-        overdue = true)
+        overdue = true,
+        periodKey = "18CC"
+      )
     )
 
     lazy val view = views.html.returns.returnDeadlines(multipleDeadlines)
@@ -156,4 +162,26 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
     }
   }
 
+  "Rendering the Return deadlines page with a final return" should {
+
+    val finalReturnDeadline = Seq(
+      ReturnDeadlineViewModel(
+        LocalDate.parse("2018-02-02"),
+        LocalDate.parse("2018-01-01"),
+        LocalDate.parse("2018-01-01"),
+        periodKey = mockConfig.finalReturnPeriodKey
+      )
+    )
+
+    lazy val view = views.html.returns.returnDeadlines(finalReturnDeadline)
+    lazy implicit val document: Document = Jsoup.parse(view.body)
+
+    "have the correct obligation due date for the deadline" in {
+      elementText(Selectors.firstDeadlineDueDate) should include("2 February 2018")
+    }
+
+    "have the wording for the final return period" in {
+      elementText(Selectors.firstDeadlinePeriod) shouldBe "for your final return"
+    }
+  }
 }

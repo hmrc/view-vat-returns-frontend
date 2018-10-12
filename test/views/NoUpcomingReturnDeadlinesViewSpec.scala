@@ -79,7 +79,8 @@ class NoUpcomingReturnDeadlinesViewSpec extends ViewBaseSpec {
     val fulfilledObligation = Some(ReturnDeadlineViewModel(
       end = LocalDate.parse("2018-04-01"),
       start = LocalDate.parse("2018-01-01"),
-      due = LocalDate.parse("2018-05-01")
+      due = LocalDate.parse("2018-05-01"),
+      periodKey = "18CC"
     ))
     lazy val view = views.html.returns.noUpcomingReturnDeadlines(fulfilledObligation)
     lazy implicit val document: Document = Jsoup.parse(view.body)
