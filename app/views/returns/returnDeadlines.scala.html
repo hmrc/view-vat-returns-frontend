@@ -46,7 +46,11 @@
                   </span>
                 }
                 <span class="form-hint">
-                  @messages("returnDeadlines.periodEnding", displayDateRange(deadline.start, deadline.end))
+                  @if(deadline.isFinalReturn) {
+                    @messages("returnDeadlines.finalReturn")
+                  } else {
+                    @messages("returnDeadlines.periodEnding", displayDateRange(deadline.start, deadline.end))
+                  }
                 </span>
               </p>
             </li>

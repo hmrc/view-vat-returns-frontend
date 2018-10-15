@@ -100,6 +100,7 @@ returnDeadlines.sendReturns = Submit any VAT Returns before your deadlines.
 returnDeadlines.nextDeadline = Your next deadline will show here on the first day of your next accounting period.
 returnDeadlines.noReturns = You do not have any returns due right now.
 returnDeadlines.receivedReturn = We received your return for the period {0}.
+returnDeadlines.finalReturn = for your final return
 
 banner.newService = This is a new service – your
 banner.feedback = feedback

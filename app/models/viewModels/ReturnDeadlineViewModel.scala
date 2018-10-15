@@ -18,7 +18,13 @@ package models.viewModels
 
 import java.time.LocalDate
 
+import config.AppConfig
+
 case class ReturnDeadlineViewModel(due: LocalDate,
                                    start: LocalDate,
                                    end: LocalDate,
-                                   overdue: Boolean = false)
+                                   overdue: Boolean = false,
+                                   periodKey: String) {
+
+  def isFinalReturn(implicit appConfig: AppConfig): Boolean = periodKey == appConfig.finalReturnPeriodKey
+}
