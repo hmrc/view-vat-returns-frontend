@@ -108,7 +108,11 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
     }
 
     "have the correct message regarding downloading software in the hint box" in {
-      elementText(Selectors.downloadSoftware) shouldBe "Choose accounting software that supports this service if you have not already."
+      elementText(Selectors.downloadSoftware) shouldBe "Choose accounting software that supports this service (opens in a new tab) if you have not already."
+    }
+
+    "have a link to govuk commercial software page" in {
+      document.select("div > ul > li > a").first().attr("href") shouldBe "https://www.gov.uk/guidance/software-for-sending-income-tax-updates"
     }
 
     "have the correct message regarding VAT records in the hint box" in {

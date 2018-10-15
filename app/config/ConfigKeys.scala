@@ -63,4 +63,6 @@ object ConfigKeys {
 
   val timeoutPeriod: String = "timeout.period"
   val timeoutCountDown: String = "timeout.countDown"
+
+  val govUkCommercialSoftwareUrl: String = "govuk-commercial-software.url"
 }
