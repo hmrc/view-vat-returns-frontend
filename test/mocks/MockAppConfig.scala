@@ -55,5 +55,6 @@ class MockAppConfig(val runModeConfiguration: Configuration, val mode: Mode = Mo
   override val selfHost: String = "www.app.com"
   override val timeoutPeriod: Int = 1800
   override val timeoutCountdown: Int = 20
+  override val govUkCommercialSoftwareUrl: String = "https://www.gov.uk/guidance/software-for-sending-income-tax-updates"
 }
 
