@@ -53,7 +53,7 @@ class DisplayMoneyTemplateSpec extends TemplateBaseSpec {
       lazy val document: Document = Jsoup.parse(template.body)
 
       "render the amount with a negative prefix" in {
-        document.body().text() shouldEqual "− £1"
+        document.body().text() shouldEqual "−£1"
       }
     }
 
