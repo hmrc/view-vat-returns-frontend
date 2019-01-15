@@ -303,7 +303,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
           )
 
         val expectedResult = Right(VatReturnsViewModel(
-          Seq(2018),
+          Seq(2018, 2017),
           2017,
           Seq(
             ReturnObligationsViewModel(
@@ -328,7 +328,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
         val expectedResult = Right(
           VatReturnsViewModel(
-            Seq(2018),
+            Seq(2018, 2017),
             2017,
             Seq(),
             hasNonMtdVat = false,

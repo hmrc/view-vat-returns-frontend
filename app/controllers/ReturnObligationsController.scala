@@ -103,7 +103,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
   private[controllers] def getReturnObligations(user: User, selectedYear: Int, status: Obligation.Status.Value)
                                                (implicit hc: HeaderCarrier): Future[ServiceResponse[VatReturnsViewModel]] = {
 
-    val returnYears: Seq[Int] = Seq[Int](2018)
+    val returnYears: Seq[Int] = Seq[Int](dateService.now().getYear, dateService.now().getYear - 1)
 
     returnsService.getReturnObligationsForYear(user, selectedYear, status).map {
       case Right(VatReturnObligations(obligations)) =>
