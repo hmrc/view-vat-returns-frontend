@@ -17,13 +17,14 @@
 package services
 
 import java.time.LocalDate
-import javax.inject.{Inject, Singleton}
 
+import javax.inject.{Inject, Singleton}
 import connectors.{FinancialDataConnector, VatObligationsConnector, VatReturnsConnector}
 import models.Obligation.Status
 import models.payments.{Payment, Payments}
 import models._
 import models.errors._
+import play.api.Logger
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -51,6 +52,13 @@ class ReturnsService @Inject()(vatObligationsConnector: VatObligationsConnector,
       case Left(_) => Left(ObligationError)
     }
   }
+
+  def getAllOpenReturnObligations(user: User)
+                          (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ServiceResponse[VatReturnObligations]] =
+    vatObligationsConnector.getVatReturnObligations(user.vrn, Obligation.Status.Outstanding).map {
+      case Right(obligations) => Right(obligations)
+      case Left(_) => Left(ObligationError)
+    }
 
   def getFulfilledObligations(currentDate: LocalDate)
                              (implicit user: User, hc: HeaderCarrier, ec: ExecutionContext): Future[ServiceResponse[VatReturnObligations]] = {

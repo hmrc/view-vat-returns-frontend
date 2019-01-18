@@ -56,7 +56,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
   def returnDeadlines(): Action[AnyContent] = authorisedAction { implicit request =>
     implicit user =>
       val currentDate = dateService.now()
-      val openObligationsCall = returnsService.getReturnObligationsForYear(user, currentDate.getYear, Obligation.Status.Outstanding)
+      val openObligationsCall = returnsService.getAllOpenReturnObligations(user)
 
       openObligationsCall.flatMap {
         case Right(VatReturnObligations(obligations)) =>

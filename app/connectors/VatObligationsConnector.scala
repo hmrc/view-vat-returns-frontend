@@ -77,4 +77,31 @@ class VatObligationsConnector @Inject()(http: HttpClient,
         httpError
     }
   }
+
+  def getVatReturnObligations(vrn: String, status: Status.Value)
+                             (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[VatReturnObligations]] = {
+
+    import connectors.httpParsers.VatReturnObligationsHttpParser.VatReturnObligationsReads
+
+    val timer = metrics.getObligationsTimer.time()
+
+    val httpRequest = http.GET(
+      obligationsUrl(vrn),
+      Seq("status" -> status.toString)
+    )(
+      implicitly[HttpReads[HttpGetResult[VatReturnObligations]]],
+      headerCarrier(hc),
+      implicitly[ExecutionContext]
+    )
+
+    httpRequest.map {
+      case obligations@Right(_) =>
+        timer.stop()
+        obligations
+      case httpError@Left(error) =>
+        metrics.getObligationsCallFailureCounter.inc()
+        Logger.warn("VatObligationsConnector received error: " + error.message)
+        httpError
+    }
+  }
 }

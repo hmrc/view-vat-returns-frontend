@@ -61,6 +61,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
       )
     )
     val serviceCall: Boolean = true
+    val openObsServiceCall = false
     val openObligations: Boolean = true
     val authResult: Future[_]
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
@@ -81,6 +82,17 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         (mockVatReturnService.getReturnObligationsForYear(_: User, _: Int, _: Obligation.Status.Value)
         (_: HeaderCarrier, _: ExecutionContext))
           .expects(*, *, *, *, *)
+          .returns(exampleObligations)
+
+        (mockAuditService.extendedAudit(_: ExtendedAuditModel, _: String)(_: HeaderCarrier, _: ExecutionContext))
+          .stubs(*, *, *, *)
+          .returns({})
+      }
+
+      if(openObsServiceCall) {
+        (mockVatReturnService.getAllOpenReturnObligations(_: User)
+        (_: HeaderCarrier, _: ExecutionContext))
+          .expects(*, *, *)
           .returns(exampleObligations)
 
         (mockAuditService.extendedAudit(_: ExtendedAuditModel, _: String)(_: HeaderCarrier, _: ExecutionContext))
@@ -183,18 +195,24 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
       "return 200" in new Test {
         override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
+        override val serviceCall: Boolean = false
+        override val openObsServiceCall: Boolean = true
         private val result = target.returnDeadlines()(fakeRequest)
         status(result) shouldBe Status.OK
       }
 
       "return HTML" in new Test {
         override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
+        override val serviceCall: Boolean = false
+        override val openObsServiceCall: Boolean = true
         private val result = target.returnDeadlines()(fakeRequest)
         contentType(result) shouldBe Some("text/html")
       }
 
       "return charset of utf-8" in new Test {
         override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
+        override val serviceCall: Boolean = false
+        override val openObsServiceCall: Boolean = true
         private val result = target.returnDeadlines()(fakeRequest)
         charset(result) shouldBe Some("utf-8")
       }
@@ -204,6 +222,8 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
       "return the no returns view" in new Test {
         override val exampleObligations: Future[ServiceResponse[VatReturnObligations]] = Right(VatReturnObligations(Seq.empty))
+        override val serviceCall: Boolean = false
+        override val openObsServiceCall: Boolean = true
         override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
         override val openObligations: Boolean = false
 
@@ -240,7 +260,8 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
       "return the technical problem view" in new Test {
         override val exampleObligations: Future[ServiceResponse[Nothing]] = Left(ObligationError)
-        override val serviceCall = true
+        override val serviceCall: Boolean = false
+        override val openObsServiceCall: Boolean = true
         override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
 
         val result: Result = await(target.returnDeadlines()(fakeRequest))
