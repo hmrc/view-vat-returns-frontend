@@ -63,7 +63,7 @@ class FinancialDataConnectorISpec extends IntegrationBaseSpec {
       )))
 
       setupStubs()
-      private val result = await(connector.getPayments("111111111"))
+      private val result = await(connector.getPayments("111111111", None))
 
       result shouldBe expected
     }
@@ -74,7 +74,7 @@ class FinancialDataConnectorISpec extends IntegrationBaseSpec {
       val expected = Right(Payments(Seq.empty))
 
       setupStubs()
-      private val result = await(connector.getPayments("111111111"))
+      private val result = await(connector.getPayments("111111111", None))
 
       result shouldBe expected
     }
@@ -91,7 +91,7 @@ class FinancialDataConnectorISpec extends IntegrationBaseSpec {
       ))
 
       setupStubs()
-      private val result = await(connector.getPayments("111"))
+      private val result = await(connector.getPayments("111", Some(2018)))
 
       result shouldBe expected
     }

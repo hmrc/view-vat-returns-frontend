@@ -81,9 +81,9 @@ class ReturnsService @Inject()(vatObligationsConnector: VatObligationsConnector,
   private[services] def filterObligationsByDueDate(returnObligations: VatReturnObligations, searchYear: Int): VatReturnObligations =
     VatReturnObligations(returnObligations.obligations.filter(_.end.getYear == searchYear))
 
-  def getPayment(user: User, requiredPeriod: String)
+  def getPayment(user: User, requiredPeriod: String, year: Option[Int] = None)
                 (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[Payment]] =
-    financialDataConnector.getPayments(user.vrn).map {
+    financialDataConnector.getPayments(user.vrn, year).map {
       case Right(payments) => filterPaymentsByPeriodKey(payments, requiredPeriod)
       case Left(_) => None
     }

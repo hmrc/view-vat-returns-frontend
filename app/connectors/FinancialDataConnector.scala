@@ -37,18 +37,27 @@ class FinancialDataConnector @Inject()(http: HttpClient,
   private[connectors] def directDebitUrl(vrn: String): String = s"${appConfig.financialDataBaseUrl}/financial-transactions/has-direct-debit/$vrn"
 
 
-  def getPayments(vrn: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[Payments]] = {
+  def getPayments(vrn: String, year: Option[Int])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[Payments]] = {
 
     import connectors.httpParsers.PaymentsHttpParser.PaymentsReads
 
     val timer = metrics.getPaymentsTimer.time()
 
+    val querySeq = year match {
+      case Some(y) =>
+        Seq(
+          "dateFrom" -> s"$y-01-01",
+          "dateTo" -> s"$y-12-31"
+        )
+      case _ =>
+        Seq(
+          "onlyOpenItems" -> "true"
+        )
+    }
+
     val httpRequest = http.GET(
       paymentsUrl(vrn),
-      Seq(
-        "dateFrom" -> s"${dateService.now().getYear - 1}-01-01",
-        "dateTo" -> s"${dateService.now().getYear}-12-31"
-      )
+      querySeq
     )
 
     httpRequest.map {

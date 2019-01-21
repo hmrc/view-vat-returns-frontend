@@ -137,8 +137,8 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
     "return all of a user's open payments" in new Test {
       val examplePayments: Payments = Payments(Seq(examplePayment))
 
-      (mockFinancialDataApiConnector.getPayments(_: String)(_: HeaderCarrier, _: ExecutionContext))
-        .expects(*, *, *)
+      (mockFinancialDataApiConnector.getPayments(_: String, _: Option[Int])(_: HeaderCarrier, _: ExecutionContext))
+        .expects(*, *, *, *)
         .returns(Future.successful(Right(examplePayments)))
 
       lazy val result: Option[Payment] = await(service.getPayment(User("111111111"), "#003"))
