@@ -93,8 +93,8 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
   "Calling .getReturnObligationsForYear" should {
 
     "return all of a user's VAT return obligations" in new Test {
-      (mockVatObligationsConnector.getVatReturnObligations(_: String, _: LocalDate, _: LocalDate, _: Status.Value)
-                                                  (_: HeaderCarrier, _: ExecutionContext))
+      (mockVatObligationsConnector.getVatReturnObligations(_: String, _: Option[LocalDate], _: Option[LocalDate], _: Status.Value)
+                                                          (_: HeaderCarrier, _: ExecutionContext))
         .expects(*, *, *, *, *, *)
         .returns(Future.successful(Right(exampleObligations)))
 
@@ -188,7 +188,8 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
         "#001"
       )
 
-      (mockVatObligationsConnector.getVatReturnObligations(_: String, _: LocalDate, _: LocalDate, _: Status.Value)(_: HeaderCarrier, _: ExecutionContext))
+      (mockVatObligationsConnector.getVatReturnObligations(_: String, _: Option[LocalDate], _: Option[LocalDate], _: Status.Value)
+                                                          (_: HeaderCarrier, _: ExecutionContext))
         .expects(*, *, *, *, *, *)
         .returns(Future.successful(Right(obligations)))
 
@@ -197,7 +198,8 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
     }
 
     "return None" in new Test {
-      (mockVatObligationsConnector.getVatReturnObligations(_: String, _: LocalDate, _: LocalDate, _: Status.Value)(_: HeaderCarrier, _: ExecutionContext))
+      (mockVatObligationsConnector.getVatReturnObligations(_: String, _: Option[LocalDate], _: Option[LocalDate], _: Status.Value)
+                                                          (_: HeaderCarrier, _: ExecutionContext))
         .expects(*, *, *, *, *, *)
         .returns(Future.successful(Right(obligations)))
 
@@ -264,8 +266,8 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
     "return obligations" in new Test {
       implicit val user: User = User("999999999")
 
-      (mockVatObligationsConnector.getVatReturnObligations(_: String, _: LocalDate, _: LocalDate, _: Status.Value)
-                                                  (_: HeaderCarrier, _: ExecutionContext))
+      (mockVatObligationsConnector.getVatReturnObligations(_: String, _: Option[LocalDate], _: Option[LocalDate], _: Status.Value)
+                                                          (_: HeaderCarrier, _: ExecutionContext))
         .expects(*, *, *, *, *, *)
         .returns(Future.successful(Right(exampleObligations)))
 

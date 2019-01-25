@@ -51,43 +51,20 @@ class VatObligationsConnector @Inject()(http: HttpClient,
     HeaderNames.CONTENT_TYPE -> "application/json"
   )
 
-  def getVatReturnObligations(vrn: String, from: LocalDate, to: LocalDate, status: Status.Value)
+  def getVatReturnObligations(vrn: String, from: Option[LocalDate] = None, to: Option[LocalDate] = None, status: Status.Value)
                              (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[VatReturnObligations]] = {
 
     import connectors.httpParsers.VatReturnObligationsHttpParser.VatReturnObligationsReads
 
     val timer = metrics.getObligationsTimer.time()
-
-    val httpRequest = http.GET(
-      obligationsUrl(vrn),
-      Seq("from" -> from.toString, "to" -> to.toString, "status" -> status.toString)
-    )(
-      implicitly[HttpReads[HttpGetResult[VatReturnObligations]]],
-      headerCarrier(hc),
-      implicitly[ExecutionContext]
-    )
-
-    httpRequest.map {
-      case obligations@Right(_) =>
-        timer.stop()
-        obligations
-      case httpError@Left(error) =>
-        metrics.getObligationsCallFailureCounter.inc()
-        Logger.warn("VatObligationsConnector received error: " + error.message)
-        httpError
+    val queryString: Seq[(String, String)] = (to, from) match {
+      case (Some(dateTo), Some(dateFrom)) => Seq("from" -> dateFrom.toString, "to" -> dateTo.toString, "status" -> status.toString)
+      case (_, _) => Seq("status" -> status.toString)
     }
-  }
-
-  def getVatReturnObligations(vrn: String, status: Status.Value)
-                             (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[VatReturnObligations]] = {
-
-    import connectors.httpParsers.VatReturnObligationsHttpParser.VatReturnObligationsReads
-
-    val timer = metrics.getObligationsTimer.time()
 
     val httpRequest = http.GET(
       obligationsUrl(vrn),
-      Seq("status" -> status.toString)
+      queryString
     )(
       implicitly[HttpReads[HttpGetResult[VatReturnObligations]]],
       headerCarrier(hc),

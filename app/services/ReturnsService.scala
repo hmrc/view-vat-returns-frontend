@@ -46,7 +46,7 @@ class ReturnsService @Inject()(vatObligationsConnector: VatObligationsConnector,
     val from: LocalDate = LocalDate.parse(s"$searchYear-01-01")
     val to: LocalDate = LocalDate.parse(s"$searchYear-12-31")
 
-    vatObligationsConnector.getVatReturnObligations(user.vrn, from, to, status).map {
+    vatObligationsConnector.getVatReturnObligations(user.vrn, Some(from), Some(to), status).map {
       case Right(obligations) =>
         Right(filterObligationsByDueDate(obligations, searchYear))
       case Left(_) => Left(ObligationError)
@@ -55,7 +55,7 @@ class ReturnsService @Inject()(vatObligationsConnector: VatObligationsConnector,
 
   def getAllOpenReturnObligations(user: User)
                           (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ServiceResponse[VatReturnObligations]] =
-    vatObligationsConnector.getVatReturnObligations(user.vrn, Obligation.Status.Outstanding).map {
+    vatObligationsConnector.getVatReturnObligations(user.vrn, status = Obligation.Status.Outstanding).map {
       case Right(obligations) => Right(obligations)
       case Left(_) => Left(ObligationError)
     }
@@ -63,7 +63,7 @@ class ReturnsService @Inject()(vatObligationsConnector: VatObligationsConnector,
   def getFulfilledObligations(currentDate: LocalDate)
                              (implicit user: User, hc: HeaderCarrier, ec: ExecutionContext): Future[ServiceResponse[VatReturnObligations]] = {
     val from: LocalDate = currentDate.minusMonths(3)
-    vatObligationsConnector.getVatReturnObligations(user.vrn, from, currentDate, Status.Fulfilled).map {
+    vatObligationsConnector.getVatReturnObligations(user.vrn, Some(from), Some(currentDate), Status.Fulfilled).map {
       case Right(obligations) => Right(obligations)
       case Left(_) => Left(ObligationError)
     }
