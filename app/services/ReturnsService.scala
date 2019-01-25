@@ -53,8 +53,8 @@ class ReturnsService @Inject()(vatObligationsConnector: VatObligationsConnector,
     }
   }
 
-  def getAllOpenReturnObligations(user: User)
-                          (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ServiceResponse[VatReturnObligations]] =
+  def getOpenReturnObligations(user: User)
+                              (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ServiceResponse[VatReturnObligations]] =
     vatObligationsConnector.getVatReturnObligations(user.vrn, status = Obligation.Status.Outstanding).map {
       case Right(obligations) => Right(obligations)
       case Left(_) => Left(ObligationError)

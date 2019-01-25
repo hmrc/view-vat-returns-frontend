@@ -91,7 +91,7 @@ class FinancialDataConnectorISpec extends IntegrationBaseSpec {
       ))
 
       setupStubs()
-      private val result = await(connector.getPayments("111", Some(2018)))
+      private val result = await(connector.getPayments("111", None))
 
       result shouldBe expected
     }

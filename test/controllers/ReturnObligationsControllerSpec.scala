@@ -90,7 +90,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
       }
 
       if(openObsServiceCall) {
-        (mockVatReturnService.getAllOpenReturnObligations(_: User)
+        (mockVatReturnService.getOpenReturnObligations(_: User)
         (_: HeaderCarrier, _: ExecutionContext))
           .expects(*, *, *)
           .returns(exampleObligations)
