@@ -93,8 +93,8 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
   "Calling .getReturnObligationsForYear" should {
 
     "return all of a user's VAT return obligations" in new Test {
-      (mockVatObligationsConnector.getVatReturnObligations(_: String, _: LocalDate, _: LocalDate, _: Status.Value)
-                                                  (_: HeaderCarrier, _: ExecutionContext))
+      (mockVatObligationsConnector.getVatReturnObligations(_: String, _: Option[LocalDate], _: Option[LocalDate], _: Status.Value)
+                                                          (_: HeaderCarrier, _: ExecutionContext))
         .expects(*, *, *, *, *, *)
         .returns(Future.successful(Right(exampleObligations)))
 
@@ -132,18 +132,36 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
     }
   }
 
-  "Calling .getPayment" should {
+  "Calling .getPayment" when {
 
-    "return all of a user's open payments" in new Test {
-      val examplePayments: Payments = Payments(Seq(examplePayment))
+    "supplying without a year" should {
 
-      (mockFinancialDataApiConnector.getPayments(_: String)(_: HeaderCarrier, _: ExecutionContext))
-        .expects(*, *, *)
-        .returns(Future.successful(Right(examplePayments)))
+      "return all of a user's open payments" in new Test {
+        val examplePayments: Payments = Payments(Seq(examplePayment))
 
-      lazy val result: Option[Payment] = await(service.getPayment(User("111111111"), "#003"))
+        (mockFinancialDataApiConnector.getPayments(_: String, _: Option[Int])(_: HeaderCarrier, _: ExecutionContext))
+          .expects(*, *, *, *)
+          .returns(Future.successful(Right(examplePayments)))
 
-      result shouldBe Some(examplePayment)
+        lazy val result: Option[Payment] = await(service.getPayment(User("111111111"), "#003"))
+
+        result shouldBe Some(examplePayment)
+      }
+    }
+
+    "supplying with a year" should {
+
+      "return all of a user's open payments" in new Test {
+        val examplePayments: Payments = Payments(Seq(examplePayment))
+
+        (mockFinancialDataApiConnector.getPayments(_: String, _: Option[Int])(_: HeaderCarrier, _: ExecutionContext))
+          .expects(*, *, *, *)
+          .returns(Future.successful(Right(examplePayments)))
+
+        lazy val result: Option[Payment] = await(service.getPayment(User("111111111"), "#003", Some(2019)))
+
+        result shouldBe Some(examplePayment)
+      }
     }
   }
 
@@ -188,7 +206,8 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
         "#001"
       )
 
-      (mockVatObligationsConnector.getVatReturnObligations(_: String, _: LocalDate, _: LocalDate, _: Status.Value)(_: HeaderCarrier, _: ExecutionContext))
+      (mockVatObligationsConnector.getVatReturnObligations(_: String, _: Option[LocalDate], _: Option[LocalDate], _: Status.Value)
+                                                          (_: HeaderCarrier, _: ExecutionContext))
         .expects(*, *, *, *, *, *)
         .returns(Future.successful(Right(obligations)))
 
@@ -197,7 +216,8 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
     }
 
     "return None" in new Test {
-      (mockVatObligationsConnector.getVatReturnObligations(_: String, _: LocalDate, _: LocalDate, _: Status.Value)(_: HeaderCarrier, _: ExecutionContext))
+      (mockVatObligationsConnector.getVatReturnObligations(_: String, _: Option[LocalDate], _: Option[LocalDate], _: Status.Value)
+                                                          (_: HeaderCarrier, _: ExecutionContext))
         .expects(*, *, *, *, *, *)
         .returns(Future.successful(Right(obligations)))
 
@@ -264,8 +284,8 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
     "return obligations" in new Test {
       implicit val user: User = User("999999999")
 
-      (mockVatObligationsConnector.getVatReturnObligations(_: String, _: LocalDate, _: LocalDate, _: Status.Value)
-                                                  (_: HeaderCarrier, _: ExecutionContext))
+      (mockVatObligationsConnector.getVatReturnObligations(_: String, _: Option[LocalDate], _: Option[LocalDate], _: Status.Value)
+                                                          (_: HeaderCarrier, _: ExecutionContext))
         .expects(*, *, *, *, *, *)
         .returns(Future.successful(Right(exampleObligations)))
 

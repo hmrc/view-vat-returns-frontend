@@ -54,7 +54,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
 
         def financialDataCall(customerInfo: Option[CustomerDetail]): Future[Option[Payment]] = {
           val isHybridUser = customerInfo.fold(false)(_.isPartialMigration)
-          if (isHybridUser) Future.successful(None) else returnsService.getPayment(user, periodKey)
+          if (isHybridUser) Future.successful(None) else returnsService.getPayment(user, periodKey, Some(year))
         }
 
         for {

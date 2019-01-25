@@ -56,7 +56,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
   def returnDeadlines(): Action[AnyContent] = authorisedAction { implicit request =>
     implicit user =>
       val currentDate = dateService.now()
-      val openObligationsCall = returnsService.getReturnObligationsForYear(user, currentDate.getYear, Obligation.Status.Outstanding)
+      val openObligationsCall = returnsService.getOpenReturnObligations(user)
 
       openObligationsCall.flatMap {
         case Right(VatReturnObligations(obligations)) =>
@@ -103,7 +103,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
   private[controllers] def getReturnObligations(user: User, selectedYear: Int, status: Obligation.Status.Value)
                                                (implicit hc: HeaderCarrier): Future[ServiceResponse[VatReturnsViewModel]] = {
 
-    val returnYears: Seq[Int] = Seq[Int](2018)
+    val returnYears: Seq[Int] = Seq[Int](dateService.now().getYear, dateService.now().getYear - 1)
 
     returnsService.getReturnObligationsForYear(user, selectedYear, status).map {
       case Right(VatReturnObligations(obligations)) =>

@@ -17,13 +17,14 @@
 package services
 
 import java.time.LocalDate
-import javax.inject.{Inject, Singleton}
 
+import javax.inject.{Inject, Singleton}
 import connectors.{FinancialDataConnector, VatObligationsConnector, VatReturnsConnector}
 import models.Obligation.Status
 import models.payments.{Payment, Payments}
 import models._
 import models.errors._
+import play.api.Logger
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -45,17 +46,24 @@ class ReturnsService @Inject()(vatObligationsConnector: VatObligationsConnector,
     val from: LocalDate = LocalDate.parse(s"$searchYear-01-01")
     val to: LocalDate = LocalDate.parse(s"$searchYear-12-31")
 
-    vatObligationsConnector.getVatReturnObligations(user.vrn, from, to, status).map {
+    vatObligationsConnector.getVatReturnObligations(user.vrn, Some(from), Some(to), status).map {
       case Right(obligations) =>
         Right(filterObligationsByDueDate(obligations, searchYear))
       case Left(_) => Left(ObligationError)
     }
   }
 
+  def getOpenReturnObligations(user: User)
+                              (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ServiceResponse[VatReturnObligations]] =
+    vatObligationsConnector.getVatReturnObligations(user.vrn, status = Obligation.Status.Outstanding).map {
+      case Right(obligations) => Right(obligations)
+      case Left(_) => Left(ObligationError)
+    }
+
   def getFulfilledObligations(currentDate: LocalDate)
                              (implicit user: User, hc: HeaderCarrier, ec: ExecutionContext): Future[ServiceResponse[VatReturnObligations]] = {
     val from: LocalDate = currentDate.minusMonths(3)
-    vatObligationsConnector.getVatReturnObligations(user.vrn, from, currentDate, Status.Fulfilled).map {
+    vatObligationsConnector.getVatReturnObligations(user.vrn, Some(from), Some(currentDate), Status.Fulfilled).map {
       case Right(obligations) => Right(obligations)
       case Left(_) => Left(ObligationError)
     }
@@ -73,9 +81,9 @@ class ReturnsService @Inject()(vatObligationsConnector: VatObligationsConnector,
   private[services] def filterObligationsByDueDate(returnObligations: VatReturnObligations, searchYear: Int): VatReturnObligations =
     VatReturnObligations(returnObligations.obligations.filter(_.end.getYear == searchYear))
 
-  def getPayment(user: User, requiredPeriod: String)
+  def getPayment(user: User, requiredPeriod: String, year: Option[Int] = None)
                 (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[Payment]] =
-    financialDataConnector.getPayments(user.vrn).map {
+    financialDataConnector.getPayments(user.vrn, year).map {
       case Right(payments) => filterPaymentsByPeriodKey(payments, requiredPeriod)
       case Left(_) => None
     }

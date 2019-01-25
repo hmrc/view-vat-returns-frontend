@@ -36,66 +36,111 @@ class FinancialDataConnectorISpec extends IntegrationBaseSpec {
     implicit val hc: HeaderCarrier = HeaderCarrier()
   }
 
-  "calling getPayments" should {
+  "calling getPayments" when {
 
-    "return all payments" in new Test {
-      override def setupStubs(): StubMapping = FinancialDataStub.stubAllOutstandingPayments
+    "response contains payments" when {
 
-      val expected = Right(Payments(Seq(
-        Payment(
-          "VAT Return Debit Charge",
-          LocalDate.parse("2018-05-01"),
-          LocalDate.parse("2018-06-20"),
-          LocalDate.parse("2018-06-21"),
-          4000,
-          0,
-          "#001"
-        ),
-        Payment(
-          "VAT Return Debit Charge",
-          LocalDate.parse("2018-05-01"),
-          LocalDate.parse("2018-06-20"),
-          LocalDate.parse("2018-06-21"),
-          0,
-          4000,
-          "#002"
-        )
-      )))
+      "not supplying a year" should {
 
-      setupStubs()
-      private val result = await(connector.getPayments("111111111"))
+        "return all open payments" in new Test {
+          override def setupStubs(): StubMapping =
+            FinancialDataStub.stubAllOutstandingPayments(Map("onlyOpenItems" -> "true"))
 
-      result shouldBe expected
+          val expected = Right(Payments(Seq(
+            Payment(
+              "VAT Return Debit Charge",
+              LocalDate.parse("2018-05-01"),
+              LocalDate.parse("2018-06-20"),
+              LocalDate.parse("2018-06-21"),
+              4000,
+              0,
+              "#001"
+            ),
+            Payment(
+              "VAT Return Debit Charge",
+              LocalDate.parse("2018-05-01"),
+              LocalDate.parse("2018-06-20"),
+              LocalDate.parse("2018-06-21"),
+              0,
+              4000,
+              "#002"
+            )
+          )))
+
+          setupStubs()
+          private val result = await(connector.getPayments("111111111", None))
+
+          result shouldBe expected
+        }
+      }
+
+      "supplying a year" should {
+
+        "return all payments for 2019" in new Test {
+          override def setupStubs(): StubMapping =
+            FinancialDataStub.stubAllOutstandingPayments(Map("dateFrom" -> "2019-01-01", "dateTo" -> "2019-12-31"))
+
+          val expected = Right(Payments(Seq(
+            Payment(
+              "VAT Return Debit Charge",
+              LocalDate.parse("2018-05-01"),
+              LocalDate.parse("2018-06-20"),
+              LocalDate.parse("2018-06-21"),
+              4000,
+              0,
+              "#001"
+            ),
+            Payment(
+              "VAT Return Debit Charge",
+              LocalDate.parse("2018-05-01"),
+              LocalDate.parse("2018-06-20"),
+              LocalDate.parse("2018-06-21"),
+              0,
+              4000,
+              "#002"
+            )
+          )))
+
+          setupStubs()
+          private val result = await(connector.getPayments("111111111", Some(2019)))
+
+          result shouldBe expected
+        }
+      }
     }
 
-    "return an empty list of payments" in new Test {
-      override def setupStubs(): StubMapping = FinancialDataStub.stubNoPayments
+    "response does not contain payments" should {
 
-      val expected = Right(Payments(Seq.empty))
+      "return an empty list of payments" in new Test {
+        override def setupStubs(): StubMapping = FinancialDataStub.stubNoPayments
 
-      setupStubs()
-      private val result = await(connector.getPayments("111111111"))
+        val expected = Right(Payments(Seq.empty))
 
-      result shouldBe expected
+        setupStubs()
+        private val result = await(connector.getPayments("111111111", None))
+
+        result shouldBe expected
+      }
+    }
+
+    "supplying with an invalid VRN" should {
+
+      "return a BadRequestError" in new Test {
+        override def setupStubs(): StubMapping = FinancialDataStub.stubInvalidVrn
+
+        val expected = Left(BadRequestError(
+          code = "INVALID_VRN",
+          errorResponse = "VRN was invalid!"
+        ))
+
+        setupStubs()
+        private val result = await(connector.getPayments("111", None))
+
+        result shouldBe expected
+      }
     }
   }
 
-  "calling getPayments with an invalid VRN" should {
-
-    "return a BadRequestError" in new Test {
-      override def setupStubs(): StubMapping = FinancialDataStub.stubInvalidVrn
-
-      val expected = Left(BadRequestError(
-        code = "INVALID_VRN",
-        errorResponse = "VRN was invalid!"
-      ))
-
-      setupStubs()
-      private val result = await(connector.getPayments("111"))
-
-      result shouldBe expected
-    }
-  }
 
   "calling getDirectDebitStatus with a valid VRN" should {
     "return a Boolean" in new Test {

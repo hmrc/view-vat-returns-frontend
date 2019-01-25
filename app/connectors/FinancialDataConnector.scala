@@ -21,7 +21,7 @@ import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
 import javax.inject.{Inject, Singleton}
 import models.payments.Payments
 import play.api.Logger
-import services.MetricsService
+import services.{DateService, MetricsService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
@@ -30,24 +30,34 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class FinancialDataConnector @Inject()(http: HttpClient,
                                        appConfig: AppConfig,
-                                       metrics: MetricsService) {
+                                       metrics: MetricsService,
+                                       dateService: DateService) {
 
   private[connectors] def paymentsUrl(vrn: String): String = s"${appConfig.financialDataBaseUrl}/financial-transactions/vat/$vrn"
   private[connectors] def directDebitUrl(vrn: String): String = s"${appConfig.financialDataBaseUrl}/financial-transactions/has-direct-debit/$vrn"
 
 
-  def getPayments(vrn: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[Payments]] = {
+  def getPayments(vrn: String, year: Option[Int])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[Payments]] = {
 
     import connectors.httpParsers.PaymentsHttpParser.PaymentsReads
 
     val timer = metrics.getPaymentsTimer.time()
 
+    val querySeq = year match {
+      case Some(y) =>
+        Seq(
+          "dateFrom" -> s"$y-01-01",
+          "dateTo" -> s"$y-12-31"
+        )
+      case _ =>
+        Seq(
+          "onlyOpenItems" -> "true"
+        )
+    }
+
     val httpRequest = http.GET(
       paymentsUrl(vrn),
-      Seq(
-        "dateFrom" -> "2018-01-01",
-        "dateTo" -> "2018-12-31"
-      )
+      querySeq
     )
 
     httpRequest.map {

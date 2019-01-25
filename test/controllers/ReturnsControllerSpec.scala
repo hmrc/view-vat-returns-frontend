@@ -112,8 +112,8 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
           .expects(*, *, *, *, *)
           .returns(Some(exampleObligation))
 
-        (mockVatReturnService.getPayment(_: User, _: String)(_: HeaderCarrier, _: ExecutionContext))
-          .expects(*, *, *, *)
+        (mockVatReturnService.getPayment(_: User, _: String, _: Option[Int])(_: HeaderCarrier, _: ExecutionContext))
+          .expects(*, *, *, *, *)
           .returns(paymentResult)
 
         (mockVatReturnService.getDirectDebitStatus(_: String)(_: HeaderCarrier, _:ExecutionContext))

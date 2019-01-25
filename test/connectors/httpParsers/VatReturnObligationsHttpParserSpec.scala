@@ -18,7 +18,8 @@ package connectors.httpParsers
 
 import java.time.LocalDate
 
-import connectors.httpParsers.VatReturnObligationsHttpParser.{VatReturnObligationsReads}
+import connectors.httpParsers.PaymentsHttpParser.PaymentsReads
+import connectors.httpParsers.VatReturnObligationsHttpParser.VatReturnObligationsReads
 import models.errors._
 import models.{VatReturnObligation, VatReturnObligations}
 import play.api.http.Status
@@ -30,7 +31,7 @@ class VatReturnObligationsHttpParserSpec extends UnitSpec {
 
   "VatReturnObligationsReads" when {
 
-    "the HTTP response status is OK (200)" should {
+    "the HTTP response status is OK (200) and JSON is valid" should {
 
       val httpResponse = HttpResponse(Status.OK, responseJson = Some(
         Json.obj(
@@ -60,6 +61,25 @@ class VatReturnObligationsHttpParserSpec extends UnitSpec {
       val result = VatReturnObligationsReads.read("", "", httpResponse)
 
       "return a VatReturnObligations" in {
+        result shouldBe expected
+      }
+    }
+
+    "the http response status is 200 OK but the JSON is invalid" should {
+
+      val httpResponse = HttpResponse(Status.OK, responseJson = Some(
+        Json.obj(
+          "obligations" -> Json.arr(
+            Json.obj()
+          )
+        )
+      ))
+
+      val expected = Left(UnexpectedJsonFormat)
+
+      val result = VatReturnObligationsReads.read("", "", httpResponse)
+
+      "return a UnexpectedJsonFormat error" in {
         result shouldBe expected
       }
     }
