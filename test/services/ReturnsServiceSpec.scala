@@ -132,18 +132,36 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
     }
   }
 
-  "Calling .getPayment" should {
+  "Calling .getPayment" when {
 
-    "return all of a user's open payments" in new Test {
-      val examplePayments: Payments = Payments(Seq(examplePayment))
+    "supplying without a year" should {
 
-      (mockFinancialDataApiConnector.getPayments(_: String, _: Option[Int])(_: HeaderCarrier, _: ExecutionContext))
-        .expects(*, *, *, *)
-        .returns(Future.successful(Right(examplePayments)))
+      "return all of a user's open payments" in new Test {
+        val examplePayments: Payments = Payments(Seq(examplePayment))
 
-      lazy val result: Option[Payment] = await(service.getPayment(User("111111111"), "#003"))
+        (mockFinancialDataApiConnector.getPayments(_: String, _: Option[Int])(_: HeaderCarrier, _: ExecutionContext))
+          .expects(*, *, *, *)
+          .returns(Future.successful(Right(examplePayments)))
 
-      result shouldBe Some(examplePayment)
+        lazy val result: Option[Payment] = await(service.getPayment(User("111111111"), "#003"))
+
+        result shouldBe Some(examplePayment)
+      }
+    }
+
+    "supplying with a year" should {
+
+      "return all of a user's open payments" in new Test {
+        val examplePayments: Payments = Payments(Seq(examplePayment))
+
+        (mockFinancialDataApiConnector.getPayments(_: String, _: Option[Int])(_: HeaderCarrier, _: ExecutionContext))
+          .expects(*, *, *, *)
+          .returns(Future.successful(Right(examplePayments)))
+
+        lazy val result: Option[Payment] = await(service.getPayment(User("111111111"), "#003", Some(2019)))
+
+        result shouldBe Some(examplePayment)
+      }
     }
   }
 
