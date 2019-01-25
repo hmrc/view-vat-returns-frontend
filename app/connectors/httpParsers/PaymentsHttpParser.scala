@@ -17,18 +17,26 @@
 package connectors.httpParsers
 
 import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
-import models.errors.{ApiSingleError, ServerSideError, UnexpectedStatusError}
+import models.errors.{ApiSingleError, ServerSideError, UnexpectedJsonFormat, UnexpectedStatusError}
 import models.payments.Payments
-import play.api.http.Status.{BAD_REQUEST, OK, NOT_FOUND}
+import play.api.Logger
+import play.api.http.Status.{BAD_REQUEST, NOT_FOUND, OK}
 import play.api.libs.json.{JsArray, JsValue, Json}
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
+import scala.util.{Failure, Success, Try}
 
 object PaymentsHttpParser extends ResponseHttpParsers {
 
   implicit object PaymentsReads extends HttpReads[HttpGetResult[Payments]] {
     override def read(method: String, url: String, response: HttpResponse): HttpGetResult[Payments] = {
       response.status match {
-        case OK => Right(removeNonVatReturnCharges(response.json).as[Payments])
+        case OK => Try(removeNonVatReturnCharges(response.json).as[Payments]) match {
+          case Success(model) => Right(model)
+          case Failure(_) =>
+            Logger.warn(s"[PaymentsReads][read] Could not parse JSON. Received: ${response.json}")
+            Logger.warn("[PaymentsReads][read] Unexpected JSON received.")
+            Left(UnexpectedJsonFormat)
+        }
         case NOT_FOUND => Right(Payments(Seq.empty))
         case BAD_REQUEST => handleBadRequest(response.json)(ApiSingleError.desSingleErrorReads)
         case status if status >= 500 && status < 600 => Left(ServerSideError(response.status.toString, response.body))

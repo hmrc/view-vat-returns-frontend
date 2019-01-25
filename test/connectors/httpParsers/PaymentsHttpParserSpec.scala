@@ -89,6 +89,25 @@ class PaymentsHttpParserSpec extends UnitSpec {
       }
     }
 
+    "the http response status is 200 OK but the JSON is invalid" should {
+
+      val httpResponse = HttpResponse(Status.OK, responseJson = Some(
+        Json.obj(
+          "financialTransactions" -> Json.arr(
+            Json.obj()
+          )
+        )
+      ))
+
+      val expected = Left(UnexpectedJsonFormat)
+
+      val result = PaymentsReads.read("", "", httpResponse)
+
+      "return a UnexpectedJsonFormat error" in {
+        result shouldBe expected
+      }
+    }
+
     "the http response is 200 OK and there are no valid charge types" should {
       val httpResponse = HttpResponse(Status.OK, responseJson = Some(
         Json.obj(
