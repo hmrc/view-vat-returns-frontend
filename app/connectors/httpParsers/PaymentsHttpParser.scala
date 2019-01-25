@@ -33,7 +33,7 @@ object PaymentsHttpParser extends ResponseHttpParsers {
         case OK => Try(removeNonVatReturnCharges(response.json).as[Payments]) match {
           case Success(model) => Right(model)
           case Failure(_) =>
-            Logger.warn(s"[PaymentsReads][read] Could not parse JSON. Received: ${response.json}")
+            Logger.debug(s"[PaymentsReads][read] Could not parse JSON. Received: ${response.json}")
             Logger.warn("[PaymentsReads][read] Unexpected JSON received.")
             Left(UnexpectedJsonFormat)
         }
