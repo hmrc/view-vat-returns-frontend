@@ -26,6 +26,11 @@ object FinancialDataStub extends WireMockMethods{
   private val financialDataUri = "/financial-transactions/vat/([0-9]+)"
   private val financialDataDirectDebitUri = "/financial-transactions/has-direct-debit/([0-9]+)"
 
+  def stubAllOutstandingPayments(queryParams: Map[String, String]): StubMapping = {
+    when(method = GET, uri = financialDataUri, queryParams = queryParams)
+      .thenReturn(status = OK, body = allPayments)
+  }
+
   def stubAllOutstandingPayments: StubMapping = {
     when(method = GET, uri = financialDataUri)
       .thenReturn(status = OK, body = allPayments)
