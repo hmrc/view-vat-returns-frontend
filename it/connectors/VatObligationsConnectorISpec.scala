@@ -193,6 +193,35 @@ class VatObligationsConnectorISpec extends IntegrationBaseSpec {
     }
   }
 
+  "Calling getVatReturnObligations with no to and from dates" should {
+
+    "return all outstanding obligations" in new Test {
+      override def setupStubs(): StubMapping = obligationsStub.stubOutstandingObligations
+
+      val expected = Right(VatReturnObligations(
+        Seq(
+          VatReturnObligation(
+            start = LocalDate.parse("2018-01-01"),
+            end = LocalDate.parse("2018-03-31"),
+            due = LocalDate.parse("2018-05-07"),
+            status = "O",
+            received = None,
+            periodKey = "#004"
+          )
+        )
+      ))
+
+      setupStubs()
+      private val result = await(connector.getVatReturnObligations("123456789",
+        None,
+        None,
+        Status.Outstanding))
+
+      result shouldBe expected
+    }
+
+  }
+
   "Calling getVatReturnObligations with an invalid date range" should {
 
     "return a BadRequestError" in new Test {
