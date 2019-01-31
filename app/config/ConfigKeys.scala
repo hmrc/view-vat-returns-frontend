@@ -35,8 +35,10 @@ object ConfigKeys {
   val userResearchBannerFeature: String = "features.userResearchBanner.enabled"
   val staticDateEnabledFeature: String = "features.staticDate.enabled"
   val staticDateValue: String = "date-service.staticDate.value"
+  val future2020DateValue: String = "date-service.futureDate.value"
   val useVatReturnsService: String = "features.useVatReturnsService.enabled"
   val useVatObligationsService: String = "features.useVatObligationsService.enabled"
+  val future2020DateEnabledFeature: String = "features.futureDate.enabled"
 
   val finalReturnPeriodKey: String = "final-return.periodKey"
 

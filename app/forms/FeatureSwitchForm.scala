@@ -28,7 +28,8 @@ object FeatureSwitchForm {
       ConfigKeys.userResearchBannerFeature -> boolean,
       ConfigKeys.staticDateEnabledFeature -> boolean,
       ConfigKeys.useVatReturnsService -> boolean,
-      ConfigKeys.useVatObligationsService -> boolean
+      ConfigKeys.useVatObligationsService -> boolean,
+      ConfigKeys.future2020DateEnabledFeature -> boolean
   )(FeatureSwitchModel.apply)(FeatureSwitchModel.unapply)
   )
 }

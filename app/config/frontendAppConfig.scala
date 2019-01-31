@@ -51,6 +51,7 @@ trait AppConfig extends ServicesConfig {
   val feedbackFormPartialUrl: String
   val contactFormServiceIdentifier: String
   val staticDateValue: String
+  val future2020DateValue: String
   val finalReturnPeriodKey: String
   val surveyUrl: String
   val signOutUrl: String
@@ -111,6 +112,7 @@ class FrontendAppConfig @Inject()(val runModeConfiguration: Configuration, val e
   override lazy val reportVatErrorUrl: String = getString(Keys.reportVatErrorUrl)
 
   override lazy val staticDateValue: String = getString(Keys.staticDateValue)
+  override lazy val future2020DateValue: String = getString(Keys.future2020DateValue)
 
   override lazy val finalReturnPeriodKey: String = getString(Keys.finalReturnPeriodKey)
 
