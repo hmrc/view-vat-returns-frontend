@@ -35,7 +35,8 @@ class FeatureSwitchController @Inject()(val messagesApi: MessagesApi,
         userResearchBannerEnabled = appConfig.features.userResearchBanner(),
         staticDateEnabled = appConfig.features.staticDateEnabled(),
         enableVatReturnsService = appConfig.features.enableVatReturnsService(),
-        enableVatObligationsService = appConfig.features.enableVatObligationsService()
+        enableVatObligationsService = appConfig.features.enableVatObligationsService(),
+        future2020DateEnabled = appConfig.features.future2020DateEnabled()
       )
     )))
   }
@@ -52,6 +53,7 @@ class FeatureSwitchController @Inject()(val messagesApi: MessagesApi,
     appConfig.features.staticDateEnabled(model.staticDateEnabled)
     appConfig.features.enableVatReturnsService(model.enableVatReturnsService)
     appConfig.features.enableVatObligationsService(model.enableVatObligationsService)
+    appConfig.features.future2020DateEnabled(model.future2020DateEnabled)
     Redirect(routes.FeatureSwitchController.featureSwitch())
   }
 }
