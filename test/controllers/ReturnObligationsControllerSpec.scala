@@ -26,6 +26,7 @@ import models.User
 import models.viewModels.{ReturnObligationsViewModel, VatReturnsViewModel}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.scalatools.testing.Logger
 import play.api.http.Status
 import play.api.mvc.Result
 import play.api.test.Helpers._
@@ -61,7 +62,6 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
       )
     )
     val serviceCall: Boolean = true
-    val openObsServiceCall = false
     val openObligations: Boolean = true
     val authResult: Future[_]
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
@@ -69,7 +69,6 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     val mockDateService: DateService = mock[DateService]
     val mockAuditService: AuditingService = mock[AuditingService]
     val previousYear: Int = 2017
-    val auditingExpected: Boolean = false
 
     def setup(): Any = {
       (mockDateService.now: () => LocalDate).stubs().returns(LocalDate.parse("2018-05-01"))
@@ -84,27 +83,14 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
           .expects(*, *, *, *, *)
           .returns(exampleObligations)
 
-        (mockAuditService.extendedAudit(_: ExtendedAuditModel, _: String)(_: HeaderCarrier, _: ExecutionContext))
-          .stubs(*, *, *, *)
-          .returns({})
-      }
-
-      if(openObsServiceCall) {
-        (mockVatReturnService.getOpenReturnObligations(_: User)
+        (mockVatReturnService.getReturnObligationsForYear(_: User, _: Int, _: Obligation.Status.Value)
         (_: HeaderCarrier, _: ExecutionContext))
-          .expects(*, *, *)
+          .expects(*, *, *, *, *)
           .returns(exampleObligations)
 
         (mockAuditService.extendedAudit(_: ExtendedAuditModel, _: String)(_: HeaderCarrier, _: ExecutionContext))
           .stubs(*, *, *, *)
           .returns({})
-      }
-
-      if(!openObligations) {
-        (mockVatReturnService.getFulfilledObligations(_: LocalDate)
-        (_: User, _: HeaderCarrier, _: ExecutionContext))
-          .expects(*, *, *, *)
-          .returns(Right(VatReturnObligations(Seq.empty)))
       }
     }
 
@@ -189,11 +175,94 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     }
   }
 
+  private trait ReturnDeadlinesTest {
+    val goodEnrolments: Enrolments = Enrolments(
+      Set(
+        Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("VRN", "999999999")), "Active")
+      )
+    )
+
+    val exampleObligations: Future[ServiceResponse[VatReturnObligations]] = Right(
+      VatReturnObligations(
+        Seq(
+          VatReturnObligation(
+            LocalDate.parse("2017-01-01"),
+            LocalDate.parse("2017-12-31"),
+            LocalDate.parse("2018-01-31"),
+            "O",
+            None,
+            "#001"
+          )
+        )
+      )
+    )
+    val serviceCall: Boolean = true
+    val openObsServiceCall = false
+    val openObligations: Boolean = true
+    val authResult: Future[_]
+    val mockAuthConnector: AuthConnector = mock[AuthConnector]
+    val mockVatReturnService: ReturnsService = mock[ReturnsService]
+    val mockDateService: DateService = mock[DateService]
+    val mockAuditService: AuditingService = mock[AuditingService]
+    val previousYear: Int = 201
+    val auditingExpected: Boolean = false
+
+    def setup(): Any = {
+      (mockDateService.now: () => LocalDate).stubs().returns(LocalDate.parse("2018-05-01"))
+
+      (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
+        .expects(*, *, *, *)
+        .returns(authResult)
+
+      if (serviceCall) {
+        (mockVatReturnService.getReturnObligationsForYear(_: User, _: Int, _: Obligation.Status.Value)
+        (_: HeaderCarrier, _: ExecutionContext))
+          .expects(*, *, *, *, *)
+          .returns(exampleObligations)
+
+        (mockAuditService.extendedAudit(_: ExtendedAuditModel, _: String)(_: HeaderCarrier, _: ExecutionContext))
+          .stubs(*, *, *, *)
+          .returns({})
+      }
+
+      if (openObsServiceCall) {
+        (mockVatReturnService.getOpenReturnObligations(_: User)
+        (_: HeaderCarrier, _: ExecutionContext))
+          .expects(*, *, *)
+          .returns(exampleObligations)
+
+        (mockAuditService.extendedAudit(_: ExtendedAuditModel, _: String)(_: HeaderCarrier, _: ExecutionContext))
+          .stubs(*, *, *, *)
+          .returns({})
+      }
+
+      if (!openObligations) {
+        (mockVatReturnService.getFulfilledObligations(_: LocalDate)
+        (_: User, _: HeaderCarrier, _: ExecutionContext))
+          .expects(*, *, *, *)
+          .returns(Right(VatReturnObligations(Seq.empty)))
+      }
+    }
+
+    val mockEnrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
+
+    def target: ReturnObligationsController = {
+      setup()
+      new ReturnObligationsController(
+        messages,
+        mockEnrolmentsAuthService,
+        mockVatReturnService,
+        mockDateService,
+        mockConfig,
+        mockAuditService)
+    }
+  }
+
   "Calling the .returnDeadlines action" when {
 
     "A user is logged in and enrolled to HMRC-MTD-VAT" should {
 
-      "return 200" in new Test {
+      "return 200" in new ReturnDeadlinesTest {
         override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
         override val serviceCall: Boolean = false
         override val openObsServiceCall: Boolean = true
@@ -201,7 +270,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         status(result) shouldBe Status.OK
       }
 
-      "return HTML" in new Test {
+      "return HTML" in new ReturnDeadlinesTest {
         override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
         override val serviceCall: Boolean = false
         override val openObsServiceCall: Boolean = true
@@ -209,7 +278,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         contentType(result) shouldBe Some("text/html")
       }
 
-      "return charset of utf-8" in new Test {
+      "return charset of utf-8" in new ReturnDeadlinesTest {
         override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
         override val serviceCall: Boolean = false
         override val openObsServiceCall: Boolean = true
@@ -220,7 +289,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
     "A user with no open obligations" should {
 
-      "return the no returns view" in new Test {
+      "return the no returns view" in new ReturnDeadlinesTest {
         override val exampleObligations: Future[ServiceResponse[VatReturnObligations]] = Right(VatReturnObligations(Seq.empty))
         override val serviceCall: Boolean = false
         override val openObsServiceCall: Boolean = true
@@ -238,7 +307,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
     "A user is not authorised" should {
 
-      "return 403 (Forbidden)" in new Test {
+      "return 403 (Forbidden)" in new ReturnDeadlinesTest {
         override val serviceCall = false
         override val authResult: Future[Nothing] = Future.failed(InsufficientEnrolments())
         private val result = target.returnDeadlines()(fakeRequest)
@@ -248,7 +317,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
     "A user is not authenticated" should {
 
-      "return 401 (Unauthorised)" in new Test {
+      "return 401 (Unauthorised)" in new ReturnDeadlinesTest {
         override val serviceCall = false
         override val authResult: Future[Nothing] = Future.failed(MissingBearerToken())
         private val result = target.returnDeadlines()(fakeRequest)
@@ -258,7 +327,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
     "the Obligations API call fails" should {
 
-      "return the technical problem view" in new Test {
+      "return the technical problem view" in new ReturnDeadlinesTest {
         override val exampleObligations: Future[ServiceResponse[Nothing]] = Left(ObligationError)
         override val serviceCall: Boolean = false
         override val openObsServiceCall: Boolean = true
@@ -273,7 +342,9 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
   }
 
   private trait HandleReturnObligationsTest {
+    val mockedDate: String = "2018-05-01"
     val vatServiceResult: Future[ServiceResponse[VatReturnObligations]]
+    val vatServicePre2020CallResult: Future[ServiceResponse[VatReturnObligations]]
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
     val mockVatReturnService: ReturnsService = mock[ReturnsService]
     val mockDateService: DateService = mock[DateService]
@@ -283,12 +354,17 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     implicit val hc: HeaderCarrier = HeaderCarrier()
 
     def setup(): Any = {
-      (mockDateService.now: () => LocalDate).stubs().returns(LocalDate.parse("2018-05-01"))
+      (mockDateService.now: () => LocalDate).stubs().returns(LocalDate.parse(mockedDate))
 
       (mockVatReturnService.getReturnObligationsForYear(_: User, _: Int, _: Obligation.Status.Value)
       (_: HeaderCarrier, _: ExecutionContext))
         .expects(*, *, *, *, *)
         .returns(vatServiceResult)
+
+      (mockVatReturnService.getReturnObligationsForYear(_: User, _: Int, _: Obligation.Status.Value)
+      (_: HeaderCarrier, _: ExecutionContext))
+        .expects(*, *, *, *, *)
+        .returns(vatServicePre2020CallResult)
 
       (mockAuditService.extendedAudit(_: ExtendedAuditModel, _: String)(_: HeaderCarrier, _: ExecutionContext))
         .stubs(*, *, *, *)
@@ -308,48 +384,132 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
   "Calling the .handleReturnObligations function" when {
 
-    "the vatReturnsService retrieves a valid list of VatReturnObligations" should {
+    "the vatReturnsService retrieves a valid list of VatReturnObligations" when {
 
-      "return a VatReturnsViewModel with valid obligations" in new HandleReturnObligationsTest {
-        override val vatServiceResult: Future[ServiceResponse[VatReturnObligations]] =
-          Right(
-            VatReturnObligations(Seq(VatReturnObligation(
-              LocalDate.parse("2017-01-01"),
-              LocalDate.parse("2017-01-01"),
-              LocalDate.parse("2017-01-01"),
-              "O",
-              None,
-              "#001"
-            )))
-          )
+      "the mocked date is 2020 or above" should {
 
-        val expectedResult = Right(VatReturnsViewModel(
-          Seq(2018, 2017),
-          2017,
-          Seq(
-            ReturnObligationsViewModel(
-              LocalDate.parse("2017-01-01"),
-              LocalDate.parse("2017-01-01"),
-              "#001"
+        "return a VatReturnsViewModel with valid obligations" in new HandleReturnObligationsTest {
+          override val mockedDate: String = "2020-05-05"
+          override val vatServiceResult: Future[ServiceResponse[VatReturnObligations]] =
+            Right(
+              VatReturnObligations(Seq(VatReturnObligation(
+                LocalDate.parse("2020-01-01"),
+                LocalDate.parse("2020-01-01"),
+                LocalDate.parse("2020-01-01"),
+                "O",
+                None,
+                "#001"
+              )))
             )
-          ),
-          hasNonMtdVatEnrolment = false,
-          "999999999"
-        ))
-        private val result = await(target.getReturnObligations(testUser, 2017, Obligation.Status.All))
 
-        result shouldBe expectedResult
+          override val vatServicePre2020CallResult: Future[ServiceResponse[VatReturnObligations]] =
+            Right(
+              VatReturnObligations(Seq(VatReturnObligation(
+                LocalDate.parse("2018-01-01"),
+                LocalDate.parse("2018-01-01"),
+                LocalDate.parse("2018-01-01"),
+                "O",
+                None,
+                "#001"
+              )))
+            )
+
+          val expectedResult = Right(VatReturnsViewModel(
+            Seq(2020, 2019, 2018),
+            2020,
+            Seq(
+              ReturnObligationsViewModel(
+                LocalDate.parse("2018-01-01"),
+                LocalDate.parse("2018-01-01"),
+                "#001"
+              )
+            ),
+            hasNonMtdVatEnrolment = false,
+            "999999999"
+          ))
+          private val result = await(target.getReturnObligations(testUser, 2020, Obligation.Status.All))
+
+          result shouldBe expectedResult
+        }
+
       }
+
+      "the mocked date is below 2020" should {
+
+        "return a VatReturnsViewModel with valid obligations" in new HandleReturnObligationsTest {
+          override val mockedDate: String = "2018-12-12"
+          override val vatServiceResult: Future[ServiceResponse[VatReturnObligations]] =
+            Right(
+              VatReturnObligations(
+                Seq(
+                  VatReturnObligation(
+                    LocalDate.parse("2020-01-01"),
+                    LocalDate.parse("2020-01-01"),
+                    LocalDate.parse("2020-01-01"),
+                    "O",
+                    None,
+                    "#001"
+                  ),
+                  VatReturnObligation(
+                    LocalDate.parse("2020-01-01"),
+                    LocalDate.parse("2020-01-01"),
+                    LocalDate.parse("2020-01-01"),
+                    "O",
+                    None,
+                    "#001"
+                  )
+                )
+              )
+            )
+
+          override val vatServicePre2020CallResult: Future[ServiceResponse[VatReturnObligations]] =
+            Right(
+              VatReturnObligations(
+                Seq(
+                  VatReturnObligation(
+                    LocalDate.parse("2017-01-01"),
+                    LocalDate.parse("2017-01-01"),
+                    LocalDate.parse("2017-01-01"),
+                    "O",
+                    None,
+                    "#001"
+                  )
+                )
+              )
+            )
+
+
+          val expectedResult = Right(VatReturnsViewModel(
+            Seq(2018, 2017),
+            2017,
+            Seq(
+              ReturnObligationsViewModel(
+                LocalDate.parse("2017-01-01"),
+                LocalDate.parse("2017-01-01"),
+                "#001"
+              )
+            ),
+            hasNonMtdVatEnrolment = false,
+            "999999999"
+          ))
+          private val result = await(target.getReturnObligations(testUser, 2017, Obligation.Status.All))
+
+          result shouldBe expectedResult
+        }
+
+      }
+
     }
 
     "the vatReturnsService retrieves an empty list of VatReturnObligations" should {
 
       "return a VatReturnsViewModel with empty obligations" in new HandleReturnObligationsTest {
         override val vatServiceResult: Future[ServiceResponse[VatReturnObligations]] = Right(VatReturnObligations(Seq.empty))
+        override val vatServicePre2020CallResult: Future[ServiceResponse[VatReturnObligations]] = Right(VatReturnObligations(Seq.empty))
 
         val expectedResult = Right(
           VatReturnsViewModel(
-            Seq(2018, 2017),
+            Seq(2018),
             2017,
             Seq(),
             hasNonMtdVatEnrolment = false,
@@ -365,7 +525,43 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     "the vatReturnsService retrieves an error" should {
 
       "return None" in new HandleReturnObligationsTest {
+        override val mockedDate: String = "2020-01-01"
         override val vatServiceResult: Future[ServiceResponse[Nothing]] = Left(ObligationError)
+
+        override val vatServicePre2020CallResult: Future[ServiceResponse[VatReturnObligations]] =
+          Right(
+            VatReturnObligations(Seq(VatReturnObligation(
+              LocalDate.parse("2018-01-01"),
+              LocalDate.parse("2018-01-01"),
+              LocalDate.parse("2018-01-01"),
+              "O",
+              None,
+              "#001"
+            )))
+          )
+
+        private val expectedResult = Left(ObligationError)
+        private val result = await(target.getReturnObligations(testUser, 2017, Obligation.Status.All))
+
+        result shouldBe expectedResult
+      }
+    }
+
+    "the Pre2020 vatReturnsService retrieves an error" should {
+
+      "return None" in new HandleReturnObligationsTest {
+        override val vatServiceResult: Future[ServiceResponse[VatReturnObligations]] =
+          Right(VatReturnObligations(Seq(VatReturnObligation(
+            LocalDate.parse("2018-01-01"),
+            LocalDate.parse("2018-01-01"),
+            LocalDate.parse("2018-01-01"),
+            "O",
+            None,
+            "#001"
+          )))
+          )
+
+        override val vatServicePre2020CallResult: Future[ServiceResponse[Nothing]] = Left(ObligationError)
         private val expectedResult = Left(ObligationError)
         private val result = await(target.getReturnObligations(testUser, 2017, Obligation.Status.All))
 
@@ -380,6 +576,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
       "return true" in new Test {
         override val authResult: Future[_] = Future.successful("")
+
         override def setup(): Any = "" // Prevent the unused mocks causing trouble
         val result: Boolean = target.isValidSearchYear(2018, 2018)
         result shouldBe true
@@ -390,6 +587,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
       "return false" in new Test {
         override val authResult: Future[_] = Future.successful("")
+
         override def setup(): Any = "" // Prevent the unused mocks causing trouble
         val result: Boolean = target.isValidSearchYear(2019, 2018)
         result shouldBe false
@@ -400,8 +598,9 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
       "return true" in new Test {
         override val authResult: Future[_] = Future.successful("")
+
         override def setup(): Any = "" // Prevent the unused mocks causing trouble
-        val result: Boolean = target.isValidSearchYear(2017, 2018)
+        val result: Boolean = target.isValidSearchYear(2017, 2019)
         result shouldBe true
       }
     }
@@ -410,6 +609,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
       "return false" in new Test {
         override val authResult: Future[_] = Future.successful("")
+
         override def setup(): Any = "" // Prevent the unused mocks causing trouble
         val result: Boolean = target.isValidSearchYear(2014, 2018)
         result shouldBe false
@@ -420,9 +620,12 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
       "return true" in new Test {
         override val authResult: Future[_] = Future.successful("")
+
         override def setup(): Any = "" // Prevent the unused mocks causing trouble
         val result: Boolean = target.isValidSearchYear(2017, 2018)
         result shouldBe true
+
+        Logger
       }
     }
   }
@@ -433,6 +636,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     val mockVatReturnService: ReturnsService = mock[ReturnsService]
     val mockDateService: DateService = mock[DateService]
     val mockAuditService: AuditingService = mock[AuditingService]
+
     def target: ReturnObligationsController = {
       new ReturnObligationsController(
         messages,
@@ -471,7 +675,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
       )
       val obligationsResult: ServiceResponse[VatReturnObligations] = Right(VatReturnObligations(Seq(obligation)))
 
-      "return noUpcomingReturnDeadlines view with the obligation dates"  in new FulfilledObligationsTest {
+      "return noUpcomingReturnDeadlines view with the obligation dates" in new FulfilledObligationsTest {
         val mockReturnsService: ReturnsService = mock[ReturnsService]
         (mockReturnsService.getLastObligation(_: Seq[VatReturnObligation]))
           .expects(*)

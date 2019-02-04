@@ -97,25 +97,66 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
   }
 
   private[controllers] def isValidSearchYear(year: Int, upperBound: Int = dateService.now().getYear) = {
-    year <= upperBound && year >= upperBound - 1
+    year <= upperBound && year >= upperBound - 2
+  }
+
+  private[controllers] def getReturnsYearsPre2020(user: User, status: Obligation.Status.Value, currentYear: Int)
+                                                 (implicit hc: HeaderCarrier): Future[ServiceResponse[Seq[Int]]] = {
+
+    returnsService.getReturnObligationsForYear(user, currentYear - 1, status) map {
+      case Right(VatReturnObligations(obligations)) =>
+        if (obligations.nonEmpty) {
+          Right(Seq[Int](currentYear, currentYear - 1))
+        }
+        else {
+          Right(Seq[Int](currentYear))
+        }
+      case Left(error) =>
+        Logger.warn("[ReturnObligationsController][getReturnObligations] error: " + error.toString)
+        Left(error)
+    }
+  }
+
+
+  private[controllers] def getReturnYears(user: User, status: Obligation.Status.Value)(implicit hc: HeaderCarrier): Future[ServiceResponse[Seq[Int]]] = {
+
+    val currentYear = dateService.now().getYear
+
+    if (currentYear > 2019) {
+      returnsService.getReturnObligationsForYear(user, currentYear - 2, status) flatMap {
+        case Right(VatReturnObligations(obligations)) =>
+          if (obligations.nonEmpty) {
+            Future.successful(Right(Seq[Int](currentYear, currentYear - 1, currentYear - 2)))
+          } else {
+            getReturnsYearsPre2020(user, status, currentYear)
+          }
+        case Left(error) =>
+          Logger.warn("[ReturnObligationsController][getReturnObligations] error: " + error.toString)
+          Future.successful(Left(error))
+      }
+    }
+    else {
+      getReturnsYearsPre2020(user, status, currentYear)
+    }
   }
 
   private[controllers] def getReturnObligations(user: User, selectedYear: Int, status: Obligation.Status.Value)
                                                (implicit hc: HeaderCarrier): Future[ServiceResponse[VatReturnsViewModel]] = {
 
-    val returnYears: Seq[Int] = Seq[Int](dateService.now().getYear, dateService.now().getYear - 1)
 
-    returnsService.getReturnObligationsForYear(user, selectedYear, status).map {
-      case Right(VatReturnObligations(obligations)) =>
+    for {
+      yearsForTabs <- getReturnYears(user, status)
+      obligation <- returnsService.getReturnObligationsForYear(user, selectedYear, status)
+    } yield (yearsForTabs, obligation) match {
+      case (Right(years), Right(obs)) =>
         auditService.extendedAudit(
-          ViewSubmittedVatObligationsAuditModel(user, obligations),
+          ViewSubmittedVatObligationsAuditModel(user, obs.obligations),
           routes.ReturnObligationsController.submittedReturns(selectedYear).url
         )
-
         Right(VatReturnsViewModel(
-          returnYears,
+          years,
           selectedYear,
-          obligations.map(obligation =>
+          obs.obligations.map(obligation =>
             ReturnObligationsViewModel(
               obligation.start,
               obligation.end,
@@ -125,9 +166,15 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
           user.hasNonMtdVat,
           user.vrn
         ))
-      case Left(error) =>
-        Logger.warn("[ReturnObligationsController][getReturnObligations] error: " + error.toString)
+
+      case (Left(error), _) =>
+        Logger.warn(s"[ReturnObligationsController][getReturnObligations] error: $error.toString")
         Left(error)
+
+      case (_, Left(error)) =>
+        Logger.warn(s"[ReturnObligationsController][getReturnObligations] error: $error.toString")
+        Left(error)
+
     }
   }
 }
