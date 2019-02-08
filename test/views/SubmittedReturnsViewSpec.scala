@@ -420,11 +420,17 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
 
       }
 
-      "have a tab for previous returns" in {
-        elementText(Selectors.tabThree) should include("Previous returns")
+      "have a tab for previous returns" should {
 
+        "have the text 'Previous Returns'" in {
+          elementText(Selectors.tabThree) should include("Previous returns")
+        }
+
+        s"contain the correct link to ${controllers.routes.ReturnObligationsController.submittedReturns(2018)}" in {
+          element(Selectors.tabTwo).select("a").attr("href") shouldBe
+            controllers.routes.ReturnObligationsController.submittedReturns(2018).url
+        }
       }
     }
-
   }
 }

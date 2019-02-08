@@ -34,25 +34,39 @@
   <div class="grid-row">
     <div class="column-two-thirds">
       <h1 class="heading-xlarge">@messages("submittedReturns.title")</h1>
-      @if(model.returnYears.length > 1) {
-        <ul class="tabs-nav">
-          @submittedReturnsTabs(model.returnYears, model.selectedYear)
 
-            @if(model.returnYears.length < 3 && model.hasNonMtdVatEnrolment) {
+      @(model.returnYears.length, model.hasNonMtdVatEnrolment) match {
 
-                @if(model.returnYears.head != model.selectedYear) {
-                    @activeTab(messages("submittedReturns.previousReturns"), messages("submittedReturns.activePrevious"))
-                } else {
-                    @inactiveTab(
-                        messages("submittedReturns.previousReturns"),
-                        messages("submittedReturns.inactivePrevious"),
-                        controllers.routes.ReturnObligationsController.submittedReturns(model.returnYears.head).url
-                    )
-                }
+
+
+
+        case (1, false) => {
+
+        }
+
+        case (_, true) => {
+          <ul class="tabs-nav">
+            @submittedReturnsTabs(model.returnYears, model.selectedYear)
+
+            @if(!model.returnYears.contains(model.selectedYear)) {
+              @activeTab(messages("submittedReturns.previousReturns"), messages("submittedReturns.activePrevious"))
+            } else {
+              @inactiveTab(
+                messages("submittedReturns.previousReturns"),
+                messages("submittedReturns.inactivePrevious"),
+                controllers.routes.ReturnObligationsController.submittedReturns(model.returnYears.last - 1).url
+              )
             }
+          </ul>
+        }
 
-        </ul>
+        case (_, false) => {
+          <ul class="tabs-nav">
+            @submittedReturnsTabs(model.returnYears, model.selectedYear)
+          </ul>
+        }
       }
+
 
 
       @if(model.returnYears.length < 1 && model.returnYears.head != model.selectedYear) {
@@ -61,7 +75,7 @@
         <p id="previous-one">
           @messages("submittedReturns.previousReturnsOne")
           <a target="_blank" href="@appConfig.portalUrl(model.vrn)" data-journey-click="return:view-portal-returns:submitted-returns">
-            @messages("submittedReturns.previousReturnsTwo")</a>.
+          @messages("submittedReturns.previousReturnsTwo")</a>.
         </p>
       } else {
 
@@ -72,19 +86,23 @@
           <p aria-hidden="true">@messages("submittedReturns.period")</p>
 
           <ul class="list list-bullet">
-            @for(obligation <- model.obligations) {
-              <li>
-                <a href="@controllers.routes.ReturnsController.vatReturn(model.selectedYear, obligation.periodKey)"
-                   data-journey-click="returns:view-return-@{obligation.start}-to-@{obligation.end}:submitted-returns">
-                  <span class="visually-hidden">@messages("submittedReturns.periodPrefix")</span>
-                  @if(obligation.isFinalObligation) {
-                    @messages("submittedReturns.finalReturn")
-                  } else {
-                    @displayDateRange(obligation.start, obligation.end)
-                  }
-                </a>
-              </li>
-            }
+          @for(obligation <- model.obligations) {
+            <li>
+              <a href="@controllers.routes.ReturnsController.vatReturn(model.selectedYear, obligation.periodKey)"
+              data-journey-click="returns:view-return-@{
+                obligation.start
+              }-to-@{
+                obligation.end
+              }:submitted-returns">
+                <span class="visually-hidden">@messages("submittedReturns.periodPrefix")</span>
+                @if(obligation.isFinalObligation) {
+                  @messages("submittedReturns.finalReturn")
+                } else {
+                  @displayDateRange(obligation.start, obligation.end)
+                }
+              </a>
+            </li>
+          }
           </ul>
         }
       }

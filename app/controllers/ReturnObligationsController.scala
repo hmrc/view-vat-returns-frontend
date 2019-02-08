@@ -153,6 +153,13 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
           ViewSubmittedVatObligationsAuditModel(user, obs.obligations),
           routes.ReturnObligationsController.submittedReturns(selectedYear).url
         )
+
+//        (years.length > 1, user.hasNonMtdVat) match {
+//          case (true, false) => {}
+//          case (true, true) => {}
+//        }
+
+
         Right(VatReturnsViewModel(
           years,
           selectedYear,

@@ -624,8 +624,6 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         override def setup(): Any = "" // Prevent the unused mocks causing trouble
         val result: Boolean = target.isValidSearchYear(2017, 2018)
         result shouldBe true
-
-        Logger
       }
     }
   }
