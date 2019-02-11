@@ -427,7 +427,7 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
         }
 
         s"contain the correct link to ${controllers.routes.ReturnObligationsController.submittedReturns(2018)}" in {
-          element(Selectors.tabTwo).select("a").attr("href") shouldBe
+          element(Selectors.tabThree).select("a").attr("href") shouldBe
             controllers.routes.ReturnObligationsController.submittedReturns(2018).url
         }
       }

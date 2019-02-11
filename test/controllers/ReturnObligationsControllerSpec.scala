@@ -26,7 +26,6 @@ import models.User
 import models.viewModels.{ReturnObligationsViewModel, VatReturnsViewModel}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.scalatools.testing.Logger
 import play.api.http.Status
 import play.api.mvc.Result
 import play.api.test.Helpers._
@@ -62,7 +61,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
       )
     )
     val serviceCall: Boolean = true
-    val openObligations: Boolean = true
+    val secondServiceCall: Boolean = true
     val authResult: Future[_]
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
     val mockVatReturnService: ReturnsService = mock[ReturnsService]
@@ -83,14 +82,17 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
           .expects(*, *, *, *, *)
           .returns(exampleObligations)
 
-        (mockVatReturnService.getReturnObligationsForYear(_: User, _: Int, _: Obligation.Status.Value)
-        (_: HeaderCarrier, _: ExecutionContext))
-          .expects(*, *, *, *, *)
-          .returns(exampleObligations)
+        if(secondServiceCall) {
+          (mockVatReturnService.getReturnObligationsForYear(_: User, _: Int, _: Obligation.Status.Value)
+          (_: HeaderCarrier, _: ExecutionContext))
+            .expects(*, *, *, *, *)
+            .returns(exampleObligations)
 
-        (mockAuditService.extendedAudit(_: ExtendedAuditModel, _: String)(_: HeaderCarrier, _: ExecutionContext))
-          .stubs(*, *, *, *)
-          .returns({})
+          (mockAuditService.extendedAudit(_: ExtendedAuditModel, _: String)(_: HeaderCarrier, _: ExecutionContext))
+            .stubs(*, *, *, *)
+            .returns({})
+        }
+
       }
     }
 
@@ -164,6 +166,8 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     "An error occurs upstream" should {
 
       "return the submitted returns error view" in new Test {
+        override val serviceCall = true
+        override val secondServiceCall: Boolean = false
         override val exampleObligations: Future[ServiceResponse[Nothing]] = Left(ObligationError)
         override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
 
@@ -343,6 +347,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
   private trait HandleReturnObligationsTest {
     val mockedDate: String = "2018-05-01"
+    val callSecondMock: Boolean = true //used to prevent mocks for services
     val vatServiceResult: Future[ServiceResponse[VatReturnObligations]]
     val vatServicePre2020CallResult: Future[ServiceResponse[VatReturnObligations]]
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
@@ -361,10 +366,13 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         .expects(*, *, *, *, *)
         .returns(vatServiceResult)
 
-      (mockVatReturnService.getReturnObligationsForYear(_: User, _: Int, _: Obligation.Status.Value)
-      (_: HeaderCarrier, _: ExecutionContext))
-        .expects(*, *, *, *, *)
-        .returns(vatServicePre2020CallResult)
+      if(callSecondMock) {
+        (mockVatReturnService.getReturnObligationsForYear(_: User, _: Int, _: Obligation.Status.Value)
+        (_: HeaderCarrier, _: ExecutionContext))
+          .expects(*, *, *, *, *)
+          .returns(vatServicePre2020CallResult)
+      }
+
 
       (mockAuditService.extendedAudit(_: ExtendedAuditModel, _: String)(_: HeaderCarrier, _: ExecutionContext))
         .stubs(*, *, *, *)
@@ -506,6 +514,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
       "return a VatReturnsViewModel with empty obligations" in new HandleReturnObligationsTest {
         override val vatServiceResult: Future[ServiceResponse[VatReturnObligations]] = Right(VatReturnObligations(Seq.empty))
         override val vatServicePre2020CallResult: Future[ServiceResponse[VatReturnObligations]] = Right(VatReturnObligations(Seq.empty))
+        override val callSecondMock = false
 
         val expectedResult = Right(
           VatReturnsViewModel(
@@ -527,6 +536,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
       "return None" in new HandleReturnObligationsTest {
         override val mockedDate: String = "2020-01-01"
         override val vatServiceResult: Future[ServiceResponse[Nothing]] = Left(ObligationError)
+        override val callSecondMock: Boolean = false
 
         override val vatServicePre2020CallResult: Future[ServiceResponse[VatReturnObligations]] =
           Right(

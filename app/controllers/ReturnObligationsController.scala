@@ -22,6 +22,7 @@ import config.AppConfig
 import javax.inject.{Inject, Singleton}
 import models.viewModels.{ReturnDeadlineViewModel, ReturnObligationsViewModel, VatReturnsViewModel}
 import models._
+import models.errors.ServiceError
 import play.api.Logger
 import play.api.i18n.MessagesApi
 import play.api.mvc.{Action, AnyContent, Request, Result}
@@ -42,7 +43,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
   def submittedReturns(year: Int): Action[AnyContent] = authorisedAction { implicit request =>
     implicit user =>
       if (isValidSearchYear(year)) {
-        getReturnObligations(user, year, Obligation.Status.Fulfilled).map {
+        getReturnObligations(user, year, Obligation.Status.Fulfilled) map {
           case Right(model) => Ok(views.html.returns.submittedReturns(model))
           case Left(error) =>
             Logger.warn("[ReturnObligationsController][submittedReturns] error: " + error.toString)
@@ -141,47 +142,49 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
   }
 
   private[controllers] def getReturnObligations(user: User, selectedYear: Int, status: Obligation.Status.Value)
-                                               (implicit hc: HeaderCarrier): Future[ServiceResponse[VatReturnsViewModel]] = {
+                                               (implicit hc: HeaderCarrier): Future[Either[ServiceError, VatReturnsViewModel]] = {
 
+    getReturnYears(user, status) flatMap {
+      case (Right(years)) =>
 
-    for {
-      yearsForTabs <- getReturnYears(user, status)
-      obligation <- returnsService.getReturnObligationsForYear(user, selectedYear, status)
-    } yield (yearsForTabs, obligation) match {
-      case (Right(years), Right(obs)) =>
-        auditService.extendedAudit(
-          ViewSubmittedVatObligationsAuditModel(user, obs.obligations),
-          routes.ReturnObligationsController.submittedReturns(selectedYear).url
-        )
+        if (years.contains(selectedYear)) {
+          returnsService.getReturnObligationsForYear(user, selectedYear, status) map {
+            case Right(VatReturnObligations(obligations)) =>
+              auditService.extendedAudit(
+                ViewSubmittedVatObligationsAuditModel(user, obligations),
+                routes.ReturnObligationsController.submittedReturns(selectedYear).url
+              )
 
-//        (years.length > 1, user.hasNonMtdVat) match {
-//          case (true, false) => {}
-//          case (true, true) => {}
-//        }
-
-
-        Right(VatReturnsViewModel(
-          years,
-          selectedYear,
-          obs.obligations.map(obligation =>
-            ReturnObligationsViewModel(
-              obligation.start,
-              obligation.end,
-              obligation.periodKey
-            )
-          ),
-          user.hasNonMtdVat,
-          user.vrn
-        ))
-
-      case (Left(error), _) =>
+              Right(VatReturnsViewModel(
+                years,
+                selectedYear,
+                obligations.map(obligation =>
+                  ReturnObligationsViewModel(
+                    obligation.start,
+                    obligation.end,
+                    obligation.periodKey
+                  )
+                ),
+                user.hasNonMtdVat,
+                user.vrn
+              ))
+            case (Left(error)) =>
+              Logger.warn(s"[ReturnObligationsController][getReturnObligations] error: $error.toString")
+              Left(error)
+          }
+        }
+        else {
+          Future.successful(Right(VatReturnsViewModel(
+            years,
+            selectedYear,
+            Seq(),
+            user.hasNonMtdVat,
+            user.vrn
+          )))
+        }
+      case (Left(error)) =>
         Logger.warn(s"[ReturnObligationsController][getReturnObligations] error: $error.toString")
-        Left(error)
-
-      case (_, Left(error)) =>
-        Logger.warn(s"[ReturnObligationsController][getReturnObligations] error: $error.toString")
-        Left(error)
-
+        Future.successful(Left(error))
     }
   }
 }
