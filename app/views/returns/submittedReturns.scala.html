@@ -43,15 +43,20 @@
           }
 
           case (false, _, true) => {
-            @if(!model.returnYears.contains(model.selectedYear)) {
-              @activeTab(messages("submittedReturns.previousReturns"), messages("submittedReturns.activePrevious"))
-            } else {
-              @inactiveTab(
-                messages("submittedReturns.previousReturns"),
-                messages("submittedReturns.inactivePrevious"),
-                controllers.routes.ReturnObligationsController.submittedReturns(model.returnYears.last - 1).url
-              )
-            }
+            <ul class="tabs-nav">
+
+              @submittedReturnsTabs(model.returnYears, model.selectedYear)
+
+              @if(!model.returnYears.contains(model.selectedYear)) {
+                @activeTab(messages("submittedReturns.previousReturns"), messages("submittedReturns.activePrevious"))
+              } else {
+                @inactiveTab(
+                  messages("submittedReturns.previousReturns"),
+                  messages("submittedReturns.inactivePrevious"),
+                  controllers.routes.ReturnObligationsController.submittedReturns(model.returnYears.last - 1).url
+                )
+              }
+            </ul>
           }
 
           case (true, true, true) => {
@@ -84,7 +89,7 @@
         }
 
 
-        @if(!model.returnYears.contains(model.selectedYear)) {
+        @if(model.hasNonMtdVatEnrolment && !model.returnYears.contains(model.selectedYear)) {
 
           <h2>@messages("submittedReturns.previousReturns")</h2>
           <p id="previous-one">

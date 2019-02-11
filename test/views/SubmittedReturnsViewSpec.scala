@@ -27,12 +27,13 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
 
   object Selectors {
     val pageHeading = "h1"
+    val secondaryHeading = "h2"
     val btaBreadcrumb = "div.breadcrumbs li:nth-of-type(1)"
     val btaBreadcrumbLink = s"$btaBreadcrumb a"
     val vatBreadcrumb = "div.breadcrumbs li:nth-of-type(2)"
     val vatBreadcrumbLink = s"$vatBreadcrumb a"
     val submittedReturnsBreadcrumb = "div.breadcrumbs li:nth-of-type(3)"
-    val submitThroughSoftware = "div > div > p:nth-child(2)"
+    val submitThroughSoftwareLink = "div > div > a"
     val noReturnsFound = ".column-two-thirds p"
     val tabOne = ".tabs-nav li:nth-of-type(1)"
     val tabOneHiddenText = ".tabs-nav li:nth-of-type(1) span"
@@ -41,7 +42,6 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
     val tabThree = ".tabs-nav li:nth-of-type(3)"
     val tabThreeHiddenText = ".tabs-nav li:nth-of-type(3) span"
     val tabFour = ".tabs-nav li:nth-of-type(4)"
-    val tabFourHiddenText = ".tabs-nav li:nth-of-type(4) span"
     val returnsHeading = "h2"
     val period = ".column-two-thirds p"
 
@@ -253,6 +253,102 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
 
     }
 
+    "three return years are retrieved" should {
+
+      val returnYears = Seq(2020, 2019, 2018)
+
+      lazy val exampleReturns: Seq[ReturnObligationsViewModel] =
+        Seq(
+          ReturnObligationsViewModel(
+            LocalDate.parse("2020-01-01"),
+            LocalDate.parse("2020-03-31"),
+            "#001"
+          ),
+          ReturnObligationsViewModel(
+            LocalDate.parse("2020-04-01"),
+            LocalDate.parse("2020-06-30"),
+            "#002"
+          ),
+          ReturnObligationsViewModel(
+            LocalDate.parse("2019-01-01"),
+            LocalDate.parse("2019-03-31"),
+            "#001"
+          ),
+          ReturnObligationsViewModel(
+            LocalDate.parse("2019-04-01"),
+            LocalDate.parse("2019-06-30"),
+            "#002"
+          ),
+          ReturnObligationsViewModel(
+            LocalDate.parse("2018-01-01"),
+            LocalDate.parse("2018-03-31"),
+            "#001"
+          ),
+          ReturnObligationsViewModel(
+            LocalDate.parse("2018-04-01"),
+            LocalDate.parse("2018-06-30"),
+            "#002"
+          )
+        )
+
+      lazy val view = views.html.returns.submittedReturns(
+        VatReturnsViewModel(returnYears, 2020, exampleReturns, hasNonMtdVatEnrolment = false, "999999999")
+      )
+
+      lazy implicit val document: Document = Jsoup.parse(view.body)
+
+      "have a tab for 2020" should {
+
+        "have the text '2020'" in {
+          elementText(Selectors.tabOne) should include("2020")
+        }
+
+        "contain visually hidden text" in {
+          elementText(Selectors.tabOneHiddenText) shouldBe "Currently viewing returns from 2020"
+        }
+
+      }
+
+      "have a tab for 2019" should {
+
+        "have the text '2019'" in {
+          elementText(Selectors.tabTwo) should include("2019")
+        }
+
+        "contain visually hidden text" in {
+          elementText(Selectors.tabTwoHiddenText) shouldBe "View returns from 2019"
+        }
+
+        s"contain the correct link to ${controllers.routes.ReturnObligationsController.submittedReturns(2019)}" in {
+          element(Selectors.tabTwo).select("a").attr("href") shouldBe
+            controllers.routes.ReturnObligationsController.submittedReturns(2019).url
+        }
+
+      }
+
+      "have a tab for 2018" should {
+
+        "have the text '2018'" in {
+          elementText(Selectors.tabThree) should include("2018")
+        }
+
+        "contain visually hidden text" in {
+          elementText(Selectors.tabThreeHiddenText) shouldBe "View returns from 2018"
+        }
+
+        s"contain the correct link to ${controllers.routes.ReturnObligationsController.submittedReturns(2018)}" in {
+          element(Selectors.tabThree).select("a").attr("href") shouldBe
+            controllers.routes.ReturnObligationsController.submittedReturns(2018).url
+        }
+
+      }
+
+      "not display the previous returns tab" in {
+        document.select(Selectors.tabFour).size shouldBe 0
+      }
+
+    }
+
     "there are no returns for the year retrieved" should {
 
       lazy val view = views.html.returns.submittedReturns(
@@ -275,6 +371,178 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
   }
 
   "Rendering the Submitted Returns page with a HMRC-MTD-VAT enrolment and a HMCE-VATDEC-ORG / HMCE-VATVAT-ORG enrolment" when {
+
+    "one year is retrieved" when {
+
+      val returnYears = Seq(2018)
+
+      lazy val exampleReturns: Seq[ReturnObligationsViewModel] =
+        Seq(
+          ReturnObligationsViewModel(
+            LocalDate.parse("2018-01-01"),
+            LocalDate.parse("2018-03-31"),
+            "#001"
+          ),
+          ReturnObligationsViewModel(
+            LocalDate.parse("2018-04-01"),
+            LocalDate.parse("2018-06-30"),
+            "#002"
+          )
+        )
+
+      "the 2018 tab is selected" should {
+
+        lazy val view = views.html.returns.submittedReturns(
+          VatReturnsViewModel(returnYears, 2018, exampleReturns, hasNonMtdVatEnrolment = true, "999999999")
+        )
+
+        lazy implicit val document: Document = Jsoup.parse(view.body)
+
+        "have a tab for 2018" should {
+
+
+          "have the text '2018'" in {
+            elementText(Selectors.tabOne) should include("2018")
+          }
+
+          "contain visually hidden text" in {
+            elementText(Selectors.tabOneHiddenText) shouldBe "Currently viewing returns from 2018"
+          }
+        }
+
+        "have a tab for Previous Returns" should {
+
+          "have the text 'Previous returns'" in {
+            elementText(Selectors.tabTwo) should include("Previous returns")
+          }
+
+          s"contain the correct link to ${controllers.routes.ReturnObligationsController.submittedReturns(2017)}" in {
+            element(Selectors.tabTwo).select("a").attr("href") shouldBe
+              controllers.routes.ReturnObligationsController.submittedReturns(2017).url
+          }
+        }
+      }
+
+      "the Previous returns tab is selected" should {
+
+        lazy val view = views.html.returns.submittedReturns(
+          VatReturnsViewModel(returnYears, 2017, exampleReturns, hasNonMtdVatEnrolment = true, "999999999")
+        )
+
+        lazy implicit val document: Document = Jsoup.parse(view.body)
+
+        "have a tab for 2018" should {
+
+
+          "have the text '2018'" in {
+            elementText(Selectors.tabOne) should include("2018")
+          }
+
+          "contain visually hidden text" in {
+            elementText(Selectors.tabOneHiddenText) shouldBe "View returns from 2018"
+          }
+        }
+
+        "have a tab for Previous Returns" should {
+
+          "have the text 'Previous returns'" in {
+            elementText(Selectors.tabTwo) should include("Previous returns")
+          }
+
+          "contain visually hidden text" in {
+            elementText(Selectors.tabTwoHiddenText) shouldBe "Currently viewing previous returns"
+          }
+        }
+
+        "display the correct information for the previous return tab" should {
+
+          "have the header" in {
+            elementText(Selectors.secondaryHeading) shouldBe "Previous returns"
+
+          }
+
+          "have the paragraph" in {
+            elementText(Selectors.previousReturnsText) shouldBe "If you have submitted returns without using the software for this new service," +
+              " you can view your previous returns (opens in a new tab)."
+          }
+
+          "have the correct link" in {
+            element(Selectors.previousReturnsLink).select("a").attr("href") shouldBe "/portal-url/999999999"
+          }
+        }
+      }
+    }
+
+    "two return years are retrieved" should {
+
+      val returnYears = Seq(2020, 2019)
+
+      lazy val exampleReturns: Seq[ReturnObligationsViewModel] =
+        Seq(
+          ReturnObligationsViewModel(
+            LocalDate.parse("2020-01-01"),
+            LocalDate.parse("2020-03-31"),
+            "#001"
+          ),
+          ReturnObligationsViewModel(
+            LocalDate.parse("2020-04-01"),
+            LocalDate.parse("2020-06-30"),
+            "#002"
+          ),
+          ReturnObligationsViewModel(
+            LocalDate.parse("2019-01-01"),
+            LocalDate.parse("2019-03-31"),
+            "#001"
+          ),
+          ReturnObligationsViewModel(
+            LocalDate.parse("2019-04-01"),
+            LocalDate.parse("2019-06-30"),
+            "#002"
+          )
+        )
+
+      lazy val view = views.html.returns.submittedReturns(
+        VatReturnsViewModel(returnYears, 2020, exampleReturns, hasNonMtdVatEnrolment = true, "999999999")
+      )
+
+      lazy implicit val document: Document = Jsoup.parse(view.body)
+
+      "have a tab for 2020" should {
+
+        "have the text '2020'" in {
+          elementText(Selectors.tabOne) should include("2020")
+        }
+
+        "contain visually hidden text" in {
+          elementText(Selectors.tabOneHiddenText) shouldBe "Currently viewing returns from 2020"
+        }
+
+      }
+
+      "have a tab for 2019" should {
+
+        "have the text '2019'" in {
+          elementText(Selectors.tabTwo) should include("2019")
+        }
+
+        "contain visually hidden text" in {
+          elementText(Selectors.tabTwoHiddenText) shouldBe "View returns from 2019"
+        }
+
+      }
+
+      "have a tab for previous returns" should {
+
+        "have the text 'Previous Returns'" in {
+          elementText(Selectors.tabThree) should include("Previous returns")
+        }
+
+        s"contain the correct link to ${controllers.routes.ReturnObligationsController.submittedReturns(2018)}" in {
+          element(Selectors.tabThree).select("a").attr("href") shouldBe
+            controllers.routes.ReturnObligationsController.submittedReturns(2018).url
+        }
+      }
+    }
 
     "more than two return years are retrieved" should {
 
@@ -362,75 +630,5 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
 
     }
 
-    "two return years are retrieved" should {
-
-      val returnYears = Seq(2020, 2019)
-
-      lazy val exampleReturns: Seq[ReturnObligationsViewModel] =
-        Seq(
-          ReturnObligationsViewModel(
-            LocalDate.parse("2020-01-01"),
-            LocalDate.parse("2020-03-31"),
-            "#001"
-          ),
-          ReturnObligationsViewModel(
-            LocalDate.parse("2020-04-01"),
-            LocalDate.parse("2020-06-30"),
-            "#002"
-          ),
-          ReturnObligationsViewModel(
-            LocalDate.parse("2019-01-01"),
-            LocalDate.parse("2019-03-31"),
-            "#001"
-          ),
-          ReturnObligationsViewModel(
-            LocalDate.parse("2019-04-01"),
-            LocalDate.parse("2019-06-30"),
-            "#002"
-          )
-        )
-
-      lazy val view = views.html.returns.submittedReturns(
-        VatReturnsViewModel(returnYears, 2020, exampleReturns, hasNonMtdVatEnrolment = true, "999999999")
-      )
-
-      lazy implicit val document: Document = Jsoup.parse(view.body)
-
-      "have a tab for 2020" should {
-
-        "have the text '2020'" in {
-          elementText(Selectors.tabOne) should include("2020")
-        }
-
-        "contain visually hidden text" in {
-          elementText(Selectors.tabOneHiddenText) shouldBe "Currently viewing returns from 2020"
-        }
-
-      }
-
-      "have a tab for 2019" should {
-
-        "have the text '2019'" in {
-          elementText(Selectors.tabTwo) should include("2019")
-        }
-
-        "contain visually hidden text" in {
-          elementText(Selectors.tabTwoHiddenText) shouldBe "View returns from 2019"
-        }
-
-      }
-
-      "have a tab for previous returns" should {
-
-        "have the text 'Previous Returns'" in {
-          elementText(Selectors.tabThree) should include("Previous returns")
-        }
-
-        s"contain the correct link to ${controllers.routes.ReturnObligationsController.submittedReturns(2018)}" in {
-          element(Selectors.tabThree).select("a").attr("href") shouldBe
-            controllers.routes.ReturnObligationsController.submittedReturns(2018).url
-        }
-      }
-    }
   }
 }
