@@ -35,14 +35,10 @@
       <div class="column-two-thirds">
         <h1 class="heading-xlarge">@messages("submittedReturns.title")</h1>
 
-        @(model.returnYears.length > 1, model.returnYears.length < 3, model.hasNonMtdVatEnrolment) match {
+        @(model.returnYears.length, model.hasNonMtdVatEnrolment) match {
 
+          case (0 | 1 | 2, true) => {
 
-          case (false, _, false) => {
-
-          }
-
-          case (false, _, true) => {
             <ul class="tabs-nav">
 
               @submittedReturnsTabs(model.returnYears, model.selectedYear)
@@ -59,33 +55,15 @@
             </ul>
           }
 
-          case (true, true, true) => {
-            <ul class="tabs-nav">
-              @submittedReturnsTabs(model.returnYears, model.selectedYear)
+          case (2 | 3, _) => {
 
-              @if(!model.returnYears.contains(model.selectedYear)) {
-                @activeTab(messages("submittedReturns.previousReturns"), messages("submittedReturns.activePrevious"))
-              } else {
-                @inactiveTab(
-                  messages("submittedReturns.previousReturns"),
-                  messages("submittedReturns.inactivePrevious"),
-                  controllers.routes.ReturnObligationsController.submittedReturns(model.returnYears.last - 1).url
-                )
-              }
-            </ul>
-          }
-
-          case (_, _, false) => {
             <ul class="tabs-nav">
             @submittedReturnsTabs(model.returnYears, model.selectedYear)
             </ul>
           }
 
-          case (true, false, true) => {
-            <ul class="tabs-nav">
-            @submittedReturnsTabs(model.returnYears, model.selectedYear)
-            </ul>
-          }
+          case (_, _) => { }
+
         }
 
 

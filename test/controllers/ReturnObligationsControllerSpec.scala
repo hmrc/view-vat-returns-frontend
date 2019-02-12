@@ -82,7 +82,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
           .expects(*, *, *, *, *)
           .returns(exampleObligations)
 
-        if(secondServiceCall) {
+        if (secondServiceCall) {
           (mockVatReturnService.getReturnObligationsForYear(_: User, _: Int, _: Obligation.Status.Value)
           (_: HeaderCarrier, _: ExecutionContext))
             .expects(*, *, *, *, *)
@@ -345,11 +345,14 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     }
   }
 
-  private trait HandleReturnObligationsTest {
+  private trait GetReturnObligationsTest {
     val mockedDate: String = "2018-05-01"
     val callSecondMock: Boolean = true //used to prevent mocks for services
+    val callThirdMock: Boolean = true //used to prevent mocks for services
+    val auditMockRequired: Boolean = true //used to prevent mocks for services
     val vatServiceResult: Future[ServiceResponse[VatReturnObligations]]
     val vatServicePre2020CallResult: Future[ServiceResponse[VatReturnObligations]]
+    val vatServiceThirdCallResult: Future[ServiceResponse[VatReturnObligations]]
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
     val mockVatReturnService: ReturnsService = mock[ReturnsService]
     val mockDateService: DateService = mock[DateService]
@@ -366,17 +369,26 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         .expects(*, *, *, *, *)
         .returns(vatServiceResult)
 
-      if(callSecondMock) {
+      if (callSecondMock) {
         (mockVatReturnService.getReturnObligationsForYear(_: User, _: Int, _: Obligation.Status.Value)
         (_: HeaderCarrier, _: ExecutionContext))
           .expects(*, *, *, *, *)
           .returns(vatServicePre2020CallResult)
       }
 
+      if (callThirdMock) {
+        (mockVatReturnService.getReturnObligationsForYear(_: User, _: Int, _: Obligation.Status.Value)
+        (_: HeaderCarrier, _: ExecutionContext))
+          .expects(*, *, *, *, *)
+          .returns(vatServiceThirdCallResult)
+      }
 
-      (mockAuditService.extendedAudit(_: ExtendedAuditModel, _: String)(_: HeaderCarrier, _: ExecutionContext))
-        .stubs(*, *, *, *)
-        .returns({})
+
+      if (auditMockRequired) {
+        (mockAuditService.extendedAudit(_: ExtendedAuditModel, _: String)(_: HeaderCarrier, _: ExecutionContext))
+          .stubs(*, *, *, *)
+          .returns({})
+      }
     }
 
     def target: ReturnObligationsController = {
@@ -390,14 +402,15 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     }
   }
 
-  "Calling the .handleReturnObligations function" when {
+  "Calling the .getReturnObligations function" when {
 
     "the vatReturnsService retrieves a valid list of VatReturnObligations" when {
 
       "the mocked date is 2020 or above" should {
 
-        "return a VatReturnsViewModel with valid obligations" in new HandleReturnObligationsTest {
+        "return a VatReturnsViewModel with valid obligations" in new GetReturnObligationsTest {
           override val mockedDate: String = "2020-05-05"
+          override val callThirdMock: Boolean = false
           override val vatServiceResult: Future[ServiceResponse[VatReturnObligations]] =
             Right(
               VatReturnObligations(Seq(VatReturnObligation(
@@ -422,6 +435,8 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
               )))
             )
 
+          override val vatServiceThirdCallResult: Future[ServiceResponse[VatReturnObligations]] = Right(VatReturnObligations(Seq.empty))
+
           val expectedResult = Right(VatReturnsViewModel(
             Seq(2020, 2019, 2018),
             2020,
@@ -440,12 +455,32 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
           result shouldBe expectedResult
         }
 
+        "return a VatReturnsViewModel with valid but empty list of obligations" in new GetReturnObligationsTest {
+          override val mockedDate: String = "2020-05-05"
+          override val vatServiceResult: Future[ServiceResponse[VatReturnObligations]] = Right(VatReturnObligations(Seq.empty))
+          override val vatServicePre2020CallResult: Future[ServiceResponse[VatReturnObligations]] = Right(VatReturnObligations(Seq.empty))
+          override val vatServiceThirdCallResult: Future[ServiceResponse[VatReturnObligations]] = Right(VatReturnObligations(Seq.empty))
+
+          val expectedResult = Right(VatReturnsViewModel(
+            Seq(2020),
+            2020,
+            List(),
+            hasNonMtdVatEnrolment = false,
+            "999999999"
+          ))
+          private val result = await(target.getReturnObligations(testUser, 2020, Obligation.Status.All))
+
+          result shouldBe expectedResult
+        }
+
       }
 
       "the mocked date is below 2020" should {
 
-        "return a VatReturnsViewModel with valid obligations" in new HandleReturnObligationsTest {
+        "return a VatReturnsViewModel with valid obligations" in new GetReturnObligationsTest {
           override val mockedDate: String = "2018-12-12"
+          override val callThirdMock: Boolean = false
+          override val vatServiceThirdCallResult: Future[ServiceResponse[VatReturnObligations]] = Right(VatReturnObligations(Seq.empty))
           override val vatServiceResult: Future[ServiceResponse[VatReturnObligations]] =
             Right(
               VatReturnObligations(
@@ -511,10 +546,12 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
     "the vatReturnsService retrieves an empty list of VatReturnObligations" should {
 
-      "return a VatReturnsViewModel with empty obligations" in new HandleReturnObligationsTest {
+      "return a VatReturnsViewModel with empty obligations" in new GetReturnObligationsTest {
         override val vatServiceResult: Future[ServiceResponse[VatReturnObligations]] = Right(VatReturnObligations(Seq.empty))
         override val vatServicePre2020CallResult: Future[ServiceResponse[VatReturnObligations]] = Right(VatReturnObligations(Seq.empty))
+        override val vatServiceThirdCallResult: Future[ServiceResponse[VatReturnObligations]] = Right(VatReturnObligations(Seq.empty))
         override val callSecondMock = false
+        override val callThirdMock: Boolean = false
 
         val expectedResult = Right(
           VatReturnsViewModel(
@@ -533,10 +570,12 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
     "the vatReturnsService retrieves an error" should {
 
-      "return None" in new HandleReturnObligationsTest {
+      "return None" in new GetReturnObligationsTest {
         override val mockedDate: String = "2020-01-01"
         override val vatServiceResult: Future[ServiceResponse[Nothing]] = Left(ObligationError)
+        override val vatServiceThirdCallResult: Future[ServiceResponse[VatReturnObligations]] = Right(VatReturnObligations(Seq.empty))
         override val callSecondMock: Boolean = false
+        override val callThirdMock: Boolean = false
 
         override val vatServicePre2020CallResult: Future[ServiceResponse[VatReturnObligations]] =
           Right(
@@ -559,7 +598,8 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
     "the Pre2020 vatReturnsService retrieves an error" should {
 
-      "return None" in new HandleReturnObligationsTest {
+      "return None" in new GetReturnObligationsTest {
+        override val callThirdMock: Boolean = false
         override val vatServiceResult: Future[ServiceResponse[VatReturnObligations]] =
           Right(VatReturnObligations(Seq(VatReturnObligation(
             LocalDate.parse("2018-01-01"),
@@ -572,6 +612,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
           )
 
         override val vatServicePre2020CallResult: Future[ServiceResponse[Nothing]] = Left(ObligationError)
+        override val vatServiceThirdCallResult: Future[ServiceResponse[VatReturnObligations]] = Right(VatReturnObligations(Seq.empty))
         private val expectedResult = Left(ObligationError)
         private val result = await(target.getReturnObligations(testUser, 2017, Obligation.Status.All))
 

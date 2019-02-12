@@ -101,19 +101,21 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
     year <= upperBound && year >= upperBound - 2
   }
 
-  private[controllers] def getReturnsYearsPre2020(user: User, status: Obligation.Status.Value, currentYear: Int)
+  private[controllers] def getPreviousReturnYears(user: User, status: Obligation.Status.Value, currentYear: Int)
                                                  (implicit hc: HeaderCarrier): Future[ServiceResponse[Seq[Int]]] = {
 
-    returnsService.getReturnObligationsForYear(user, currentYear - 1, status) map {
+    val currentYearMinusOne = currentYear - 1
+
+    returnsService.getReturnObligationsForYear(user, currentYearMinusOne, status) map {
       case Right(VatReturnObligations(obligations)) =>
         if (obligations.nonEmpty) {
-          Right(Seq[Int](currentYear, currentYear - 1))
+          Right(Seq[Int](currentYear, currentYearMinusOne))
         }
         else {
           Right(Seq[Int](currentYear))
         }
       case Left(error) =>
-        Logger.warn("[ReturnObligationsController][getReturnObligations] error: " + error.toString)
+        Logger.warn("[ReturnObligationsController][getPreviousReturnYears] error: " + error.toString)
         Left(error)
     }
   }
@@ -122,22 +124,23 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
   private[controllers] def getReturnYears(user: User, status: Obligation.Status.Value)(implicit hc: HeaderCarrier): Future[ServiceResponse[Seq[Int]]] = {
 
     val currentYear = dateService.now().getYear
+    val currentYearMinusTwo = currentYear - 2
 
     if (currentYear > 2019) {
-      returnsService.getReturnObligationsForYear(user, currentYear - 2, status) flatMap {
+      returnsService.getReturnObligationsForYear(user, currentYearMinusTwo, status) flatMap {
         case Right(VatReturnObligations(obligations)) =>
           if (obligations.nonEmpty) {
-            Future.successful(Right(Seq[Int](currentYear, currentYear - 1, currentYear - 2)))
+            Future.successful(Right(Seq[Int](currentYear, currentYear - 1, currentYearMinusTwo)))
           } else {
-            getReturnsYearsPre2020(user, status, currentYear)
+            getPreviousReturnYears(user, status, currentYear)
           }
         case Left(error) =>
-          Logger.warn("[ReturnObligationsController][getReturnObligations] error: " + error.toString)
+          Logger.warn("[ReturnObligationsController][getReturnYears] error: " + error.toString)
           Future.successful(Left(error))
       }
     }
     else {
-      getReturnsYearsPre2020(user, status, currentYear)
+      getPreviousReturnYears(user, status, currentYear)
     }
   }
 
@@ -169,7 +172,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
                 user.vrn
               ))
             case (Left(error)) =>
-              Logger.warn(s"[ReturnObligationsController][getReturnObligations] error: $error.toString")
+              Logger.warn(s"[ReturnObligationsController][getReturnObligations] error: ${error.toString}")
               Left(error)
           }
         }
@@ -183,7 +186,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
           )))
         }
       case (Left(error)) =>
-        Logger.warn(s"[ReturnObligationsController][getReturnObligations] error: $error.toString")
+        Logger.warn(s"[ReturnObligationsController][getReturnObligations] error: ${error.toString}")
         Future.successful(Left(error))
     }
   }
