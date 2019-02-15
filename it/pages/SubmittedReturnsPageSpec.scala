@@ -39,40 +39,48 @@ class SubmittedReturnsPageSpec extends IntegrationBaseSpec {
     val obligationsStub = new VatObligationsStub(backendFeatureEnabled)
   }
 
-  "Calling the returns route with an authenticated user with one obligation end date in 2018" should {
+  "Calling the returns route" when {
 
-    "return 200" in new Test {
-      override def setupStubs(): StubMapping = {
-        AuthStub.authorised()
-        obligationsStub.stub2018Obligations
+    "an authenticated user" should {
+
+      "return an obligation with an end date in 2018" should {
+
+        "return 200" in new Test {
+          override def setupStubs(): StubMapping = {
+            AuthStub.authorised()
+            obligationsStub.stub2018Obligations
+          }
+
+          override def request(): WSRequest = {
+            setupStubs()
+            buildRequest("/submitted/2018")
+          }
+
+          val response: WSResponse = await(request().get())
+          response.status shouldBe Status.OK
+        }
+
+        "return one obligation" in new Test {
+
+          override def setupStubs(): StubMapping = {
+            AuthStub.authorised()
+            obligationsStub.stub2018Obligations
+          }
+
+          override def request(): WSRequest = {
+            setupStubs()
+            buildRequest("/submitted/2018")
+          }
+
+          val response: WSResponse = await(request().get())
+
+          lazy implicit val document: Document = Jsoup.parse(response.body)
+
+          val bulletPointSelector = ".list-bullet li"
+
+          document.select(bulletPointSelector).size() shouldBe 1
+        }
       }
-      override def request(): WSRequest = {
-        setupStubs()
-        buildRequest("/submitted/2018")
-      }
-
-      val response: WSResponse = await(request().get())
-      response.status shouldBe Status.OK
-    }
-
-    "return one obligation" in new Test {
-
-      override def setupStubs(): StubMapping = {
-        AuthStub.authorised()
-        obligationsStub.stub2018Obligations
-      }
-      override def request(): WSRequest = {
-        setupStubs()
-        buildRequest("/submitted/2018")
-      }
-
-      val response: WSResponse = await(request().get())
-
-      lazy implicit val document: Document = Jsoup.parse(response.body)
-
-      val bulletPointSelector = ".list-bullet li"
-
-      document.select(bulletPointSelector).size() shouldBe 1
     }
   }
 }
