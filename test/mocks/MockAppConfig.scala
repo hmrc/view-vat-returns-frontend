@@ -19,6 +19,7 @@ package mocks
 import config.AppConfig
 import config.features.Features
 import play.api.Mode.Mode
+import play.api.i18n.Lang
 import play.api.{Configuration, Mode}
 import play.api.mvc.Call
 
@@ -57,5 +58,9 @@ class MockAppConfig(val runModeConfiguration: Configuration, val mode: Mode = Mo
   override val timeoutPeriod: Int = 1800
   override val timeoutCountdown: Int = 20
   override val govUkCommercialSoftwareUrl: String = "https://www.gov.uk/guidance/software-for-sending-income-tax-updates"
+  override val languageMap: Map[String, Lang] = Map(
+    "english" -> Lang("en"),
+    "cymraeg" -> Lang("cy")
+  )
 }
 
