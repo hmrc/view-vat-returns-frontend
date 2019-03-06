@@ -26,7 +26,7 @@ class SubmittedReturnsErrorViewSpec extends ViewBaseSpec {
 
   object Selectors {
     val heading = "h1"
-    val ledeText = "#content p"
+    val ledeText = "#content > article > div > div > p"
     val previousReturn = "p:nth-of-type(2)"
     val previousReturnsLink = s"$previousReturn > a"
   }

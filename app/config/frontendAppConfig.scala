@@ -64,6 +64,7 @@ trait AppConfig extends ServicesConfig {
   val timeoutCountdown: Int
   val govUkCommercialSoftwareUrl: String
   val languageMap: Map[String, Lang]
+  val routeToSwitchLanguage :String => Call
 }
 
 @Singleton
@@ -140,4 +141,6 @@ class FrontendAppConfig @Inject()(val runModeConfiguration: Configuration, val e
     "english" -> Lang("en"),
     "cymraeg" -> Lang("cy")
   )
+
+  override val routeToSwitchLanguage: String => Call = (lang: String) => controllers.routes.LanguageController.switchLanguage(lang)
 }

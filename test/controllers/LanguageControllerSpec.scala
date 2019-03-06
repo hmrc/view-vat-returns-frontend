@@ -58,7 +58,7 @@ class LanguageControllerSpec extends ControllerBaseSpec {
       "one is not provided" in {
         lazy val result = controller.switchLanguage("english")(fakeRequest)
 
-        val expectedResponse = "vat-through-software/vat-overview"
+        val expectedResponse = mockConfig.vatDetailsUrl
 
         status(result) shouldBe SEE_OTHER
         cookies(result).get(Play.langCookieName(messages)) shouldBe Some(Cookie("PLAY_LANG", "en", None, "/", None, secure = false, httpOnly = false))

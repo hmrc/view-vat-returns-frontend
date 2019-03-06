@@ -62,5 +62,6 @@ class MockAppConfig(val runModeConfiguration: Configuration, val mode: Mode = Mo
     "english" -> Lang("en"),
     "cymraeg" -> Lang("cy")
   )
+  override val routeToSwitchLanguage: String => Call = (lang: String) => controllers.routes.LanguageController.switchLanguage(lang)
 }
 
