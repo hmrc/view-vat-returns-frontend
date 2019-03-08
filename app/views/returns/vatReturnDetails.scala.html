@@ -22,7 +22,7 @@
 @import java.time.LocalDate
 @import uk.gov.hmrc.play.views.html.helpers.form
 
-@(vatReturnViewModel: VatReturnViewModel)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
+@(vatReturnViewModel: VatReturnViewModel)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig, lang: Lang)
 
 @hiddenHelpTextContent = {
   <p>@messages("yourVatReturn.helpLine")</p>

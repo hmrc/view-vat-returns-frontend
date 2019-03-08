@@ -16,12 +16,15 @@
 
 @import java.time.LocalDate
 @import java.time.format.{DateTimeFormatter, ResolverStyle}
+@import play.api.i18n.Messages
 
-@(date: LocalDate, showYear: Boolean = true, useShortDayFormat: Boolean = false)
+@(date: LocalDate, showYear: Boolean = true, useShortDayFormat: Boolean = false)(implicit messages: Messages, lang: Lang)
 
 @defining( {
-  val format = (if (useShortDayFormat) "d MMM" else "d MMMM") + (if (showYear) " uuuu" else "")
-  val formatter = DateTimeFormatter.ofPattern(format).withResolverStyle(ResolverStyle.STRICT)
-  formatter.format(date)
-  }) { displayDate =>
-  @displayDate}
+val englishFormat = (if (useShortDayFormat) "d MMM" else "d MMMM") + (if (showYear) " uuuu" else "")
+val welshFormat = s"""d '${messages(s"month.${date.getMonthValue}")}'""" + (if (showYear) " uuuu" else "")
+val format = if(lang.language == "cy") welshFormat else englishFormat
+val formatter = DateTimeFormatter.ofPattern(format).withResolverStyle(ResolverStyle.STRICT)
+date.format(formatter)
+}) { displayDate =>
+@displayDate}
