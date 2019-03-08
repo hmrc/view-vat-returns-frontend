@@ -21,5 +21,8 @@ GET         /time-out              controllers.SignOutController.timeout
 # Get a return via the payments page - NOTE THIS ROUTE MUST APPEAR AT THE END OF THE LIST
 GET        /:periodKey                  controllers.ReturnsController.vatReturnViaPayments(periodKey: String)
 
+#Language Controller
+GET        /language/:lang              controllers.LanguageController.switchLanguage(lang: String)
+
 # Custom assets route
 GET        /assets/*file                controllers.Assets.at(path="/public", file)
