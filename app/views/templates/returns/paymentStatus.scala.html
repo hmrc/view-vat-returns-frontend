@@ -18,7 +18,7 @@
 @import views.html.templates.formatters.dates._
 @import views.html.templates.formatters.money._
 
-@(amount: BigDecimal, dueDate: LocalDate, moneyOwed: Boolean, isRepayment: Boolean, isHybridUser: Boolean)(implicit messages: Messages)
+@(amount: BigDecimal, dueDate: LocalDate, moneyOwed: Boolean, isRepayment: Boolean, isHybridUser: Boolean)(implicit messages: Messages, lang: Lang)
 
 @if(isHybridUser) {
     <h2 class="heading-large">@messages("paymentStatus.returnTotal") @displayMoney(amount)</h2>

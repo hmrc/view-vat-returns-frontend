@@ -20,7 +20,7 @@
 @import views.html.templates.returns.submittedReturnsTabs
 @import models.viewModels._
 
-@(model: VatReturnsViewModel)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
+@(model: VatReturnsViewModel)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig, lang: Lang)
 
   @views.html.main_template(title = messages("submittedReturns.title"), bodyClasses = None, appConfig = appConfig) {
 
