@@ -26,7 +26,7 @@ class LanguageControllerSpec extends ControllerBaseSpec {
   lazy val controller = new LanguageController(mockConfig, messages)
 
   lazy val fRequest: FakeRequest[AnyContentAsEmpty.type] =
-    FakeRequest("get", "aurl").withSession(REFERER -> "thisIsMyNextLocation")
+    FakeRequest("get", "aurl").withHeaders(REFERER -> "thisIsMyNextLocation")
 
   "switchLanguage" should {
     "correctly change the language session property" when {
