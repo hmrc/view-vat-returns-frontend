@@ -21,4 +21,5 @@ case class FeatureSwitchModel(userResearchBannerEnabled: Boolean,
                               enableVatReturnsService: Boolean,
                               enableVatObligationsService: Boolean,
                               future2020DateEnabled: Boolean,
-                              useLanguageSelector: Boolean)
+                              useLanguageSelector: Boolean,
+                              submitReturnFeatures: Boolean)

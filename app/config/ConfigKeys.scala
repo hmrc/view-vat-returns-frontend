@@ -40,6 +40,7 @@ object ConfigKeys {
   val useVatObligationsService: String = "features.useVatObligationsService.enabled"
   val future2020DateEnabledFeature: String = "features.futureDate.enabled"
   val useLanguageSelectorFeature: String = "features.useLanguageSelector.enabled"
+  val submitReturnFeatures: String = "features.submitReturnFeatures.enabled"
 
   val finalReturnPeriodKey: String = "final-return.periodKey"
 
