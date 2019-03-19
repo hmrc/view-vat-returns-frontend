@@ -18,15 +18,15 @@ package services
 
 import java.time.LocalDate
 
-import connectors.{FinancialDataConnector, VatObligationsConnector, VatReturnsConnector}
+import connectors.{FinancialDataConnector, VatObligationsConnector, VatReturnsConnector, VatSubscriptionConnector}
 import controllers.ControllerBaseSpec
 import models._
 import models.Obligation.Status
 import models.payments.{Payment, Payments}
 import models.User
-import models.errors.{DirectDebitStatusError, ServerSideError}
-import org.scalatest.Matchers
-import uk.gov.hmrc.http.{HeaderCarrier, Upstream5xxResponse}
+import models.errors.{DirectDebitStatusError, ServerSideError, mandationStatusError}
+import org.apache.http.client.methods.HttpGet
+import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.{ExecutionContext, Future}
@@ -37,7 +37,8 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
     val mockVatObligationsConnector: VatObligationsConnector = mock[VatObligationsConnector]
     val mockVatReturnsConnector: VatReturnsConnector = mock[VatReturnsConnector]
     val mockFinancialDataApiConnector: FinancialDataConnector = mock[FinancialDataConnector]
-    val service = new ReturnsService(mockVatObligationsConnector, mockFinancialDataApiConnector, mockVatReturnsConnector)
+    val mockVatSubscriptionApiConnector: VatSubscriptionConnector = mock[VatSubscriptionConnector]
+    val service = new ReturnsService(mockVatObligationsConnector, mockFinancialDataApiConnector, mockVatReturnsConnector,mockVatSubscriptionApiConnector)
     implicit val hc: HeaderCarrier = HeaderCarrier()
 
     val exampleVatReturn: VatReturn = VatReturn(
@@ -320,6 +321,36 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
         val paymentsResponse: ServiceResponse[Boolean] = await(service.getDirectDebitStatus("123456789"))
 
         paymentsResponse shouldBe Left(DirectDebitStatusError)
+      }
+    }
+  }
+
+  "Calling the .getMandationStatus function" when {
+
+    val mandationStatusReturned: MandationStatus = MandationStatus("3")
+
+    "the user is not mandated" should {
+
+      "return a status" in new Test {
+        (mockVatSubscriptionApiConnector.getMandationStatusInfo(_: String)
+        (_: HeaderCarrier, _: ExecutionContext))
+          .expects(*, *, *)
+          .returns(Future.successful(Right(mandationStatusReturned)))
+        val mandationStatusResponse: ServiceResponse[MandationStatus] = await(service.getMandationStatus("123456789"))
+        mandationStatusResponse shouldBe Right(mandationStatusReturned)
+      }
+    }
+
+    "the connector call fails" should {
+
+      "return None" in new Test {
+        (mockVatSubscriptionApiConnector.getMandationStatusInfo(_: String)
+        (_: HeaderCarrier, _: ExecutionContext))
+          .expects(*, *, *)
+          .returns(Future.successful(Left(ServerSideError("", ""))))
+        val mandationStatusResponse: ServiceResponse[MandationStatus] = await(service.getMandationStatus("123456789"))
+
+        mandationStatusResponse shouldBe Left(mandationStatusError)
       }
     }
   }

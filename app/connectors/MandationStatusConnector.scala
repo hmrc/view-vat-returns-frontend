@@ -16,12 +16,10 @@
 
 package connectors
 
-import javax.inject.{Inject, Singleton}
-
 import config.AppConfig
 import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
+import javax.inject.Inject
 import models.CustomerInformation
-import models.MandationStatus
 import play.api.Logger
 import services.MetricsService
 import uk.gov.hmrc.http.HeaderCarrier
@@ -29,48 +27,28 @@ import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import scala.concurrent.{ExecutionContext, Future}
 
-@Singleton
-class VatSubscriptionConnector @Inject()(http: HttpClient,
+class MandationStatusConnector @Inject()(http: HttpClient,
                                          appConfig: AppConfig,
                                          metrics: MetricsService) {
-
-  private[connectors] def customerInfoUrl(vrn: String): String = s"${appConfig.vatSubscriptionBaseUrl}/vat-subscription/$vrn/customer-details"
 
   private[connectors] def mandationStatusUrl(vrn: String): String = s"${appConfig.vatSubscriptionBaseUrl}/vat-subscription/$vrn/mandation-status"
 
 
-  def getCustomerInfo(vrn: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[CustomerInformation]] = {
+  def getMandationStatusInfo(vrn: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[CustomerInformation]] = {
 
     import connectors.httpParsers.CustomerInfoHttpParser.CustomerInfoReads
 
     val timer = metrics.getCustomerInfoTimer.time()
 
-    http.GET(customerInfoUrl(vrn)).map {
+    http.GET(mandationStatusUrl(vrn)).map {
       case customerInfo@Right(_) =>
         timer.stop()
         customerInfo
       case httpError@Left(error) =>
-        metrics.getCustomerInfoCallFailureCounter.inc()
+        metrics.getMandationStatusInfoCallFailureCounter.inc()
         Logger.warn("VatSubscriptionConnector received error: " + error.message)
         httpError
     }
   }
-
-  def getMandationStatusInfo(vrn: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[MandationStatus]] = {
-
-    import connectors.httpParsers.mandationInfoHttpParser.MandationInfoReads
-
-    val timer = metrics.getCustomerInfoTimer.time()
-
-    http.GET(mandationStatusUrl(vrn)).map {
-      case mandationInfo@Right(_) =>
-        timer.stop()
-        mandationInfo
-      case httpError@Left(error) =>
-        Logger.warn("VatSubscriptionConnector received error: " + error.message)
-        httpError
-    }
-  }
-
 
 }

@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-package models.errors
+package models
 
-sealed trait ServiceError
+import play.api.libs.json.{JsPath, Json, Reads, Writes}
+import play.api.libs.json._
 
-case object PaymentSetupError extends ServiceError
-case object NotFoundError extends ServiceError
-case object VatReturnError extends ServiceError
-case object ObligationError extends ServiceError
-case object DirectDebitStatusError extends ServiceError
-case object mandationStatusError extends ServiceError
+case class MandationStatus (mandationStatus: String)
+
+object MandationStatus {
+
+implicit val format: Format[MandationStatus] = Json.format[MandationStatus]
+
+}
+
 
