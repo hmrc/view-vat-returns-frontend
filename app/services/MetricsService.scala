@@ -32,6 +32,9 @@ trait MetricsService {
   val getCustomerInfoTimer: Timer
   val getCustomerInfoCallFailureCounter: Counter
 
+  val getMandationStatusInfoTimer: Timer
+  val getMandationStatusInfoCallFailureCounter: Counter
+
   val getVatReturnTimer: Timer
   val getVatReturnCallFailureCounter: Counter
 
@@ -52,8 +55,12 @@ class MetricsServiceImpl @Inject()(metrics: Metrics) extends MetricsService {
   val getPaymentsTimer: Timer = metrics.defaultRegistry.timer("get-payments-from-financial-transactions-timer")
   val getPaymentsCallFailureCounter: Counter = metrics.defaultRegistry.counter("get-payments-from-financial-transactions-failure-counter")
 
-  val getCustomerInfoTimer: Timer = metrics.defaultRegistry.timer("get-customer-info-from-vat-subscription-timer")
+  val getCustomerInfoTimer: Timer = metrics.defaultRegistry.timer("get-mandation-status-from-vat-subscription-timer")
   val getCustomerInfoCallFailureCounter: Counter = metrics.defaultRegistry.counter("get-customer-info-from-vat-subscription-failure-counter")
+
+  val getMandationStatusInfoTimer: Timer = metrics.defaultRegistry.timer("get-mandation-info-from-vat-subscription-timer")
+  val getMandationStatusInfoCallFailureCounter: Counter = metrics.defaultRegistry.counter("get-customer-info-from-vat-subscription-failure-counter")
+
 
   val getVatReturnTimer: Timer = metrics.defaultRegistry.timer("get-vat-return-from-vat-api-timer")
   val getVatReturnCallFailureCounter: Counter = metrics.defaultRegistry.counter("get-vat-return-from-vat-api-failure-counter")
