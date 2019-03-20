@@ -47,6 +47,7 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           Some("John"),
           Some("Smith"),
           Some("My trading name"),
+          Some("3"),
           hasFlatRateSchemeYes,
           Some(true)
         )
@@ -69,6 +70,7 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           Some("John"),
           Some("Smith"),
           None,
+          Some("3"),
           hasFlatRateSchemeNo,
           Some(false)
         )
@@ -91,6 +93,7 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           Some("John"),
           Some("Smith"),
           None,
+          Some("3"),
           hasFlatRateSchemeNo,
           Some(false)
         )
@@ -113,6 +116,7 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           None,
           None,
           None,
+          Some("3"),
           hasFlatRateSchemeNo,
           Some(true)
         )
@@ -136,6 +140,7 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           Some("John"),
           Some("Smith"),
           None,
+          Some("3"),
           hasFlatRateSchemeNo,
           None
         )
