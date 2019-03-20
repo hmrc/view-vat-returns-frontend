@@ -40,7 +40,6 @@ class CustomerInfoHttpParserSpec extends UnitSpec {
             "firstName" -> "John",
             "lastName" -> "Smith",
             "tradingName" -> "Cheapo Clothing",
-            "mandationStatus" -> "3",
             "hasFlatRateScheme" -> hasFlatRateSchemeYes,
             "isPartialMigration" -> true
           )
@@ -52,7 +51,6 @@ class CustomerInfoHttpParserSpec extends UnitSpec {
         Some("John"),
         Some("Smith"),
         Some("Cheapo Clothing"),
-        Some("3"),
         hasFlatRateSchemeYes,
         Some(true)
       ))

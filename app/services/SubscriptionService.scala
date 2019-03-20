@@ -30,7 +30,7 @@ class SubscriptionService @Inject()(connector: VatSubscriptionConnector) {
   def getUserDetails(user: User)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[CustomerDetail]] = {
     connector.getCustomerInfo(user.vrn).map {
 
-      case Right(CustomerInformation(None, None, None, None,None, _, _)) => None
+      case Right(CustomerInformation(None, None, None, None, _, _)) => None
 
       case Right(model) =>
 

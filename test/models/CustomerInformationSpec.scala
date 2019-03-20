@@ -30,7 +30,6 @@ class CustomerInformationSpec extends UnitSpec {
       Some("John"),
       Some("Smith"),
       Some("Cheapo Clothing"),
-      Some("3"),
       hasFlatRateSchemeYes,
       Some(true)
     )
@@ -41,7 +40,6 @@ class CustomerInformationSpec extends UnitSpec {
         |"firstName":"John",
         |"lastName":"Smith",
         |"tradingName":"Cheapo Clothing",
-        |"mandationStatus":"3",
         |"hasFlatRateScheme":true,
         |"isPartialMigration":true
         |}"""
@@ -53,7 +51,6 @@ class CustomerInformationSpec extends UnitSpec {
         |"firstName":"John",
         |"lastName":"Smith",
         |"tradingName":"Cheapo Clothing",
-        |"mandationStatus":"3",
         |"hasFlatRateScheme":true,
         |"isPartialMigration":true
         |}"""
