@@ -21,6 +21,7 @@ import javax.inject.{Inject, Singleton}
 import config.AppConfig
 import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
 import models.CustomerInformation
+import models.MandationStatus
 import play.api.Logger
 import services.MetricsService
 import uk.gov.hmrc.http.HeaderCarrier
@@ -34,6 +35,9 @@ class VatSubscriptionConnector @Inject()(http: HttpClient,
                                          metrics: MetricsService) {
 
   private[connectors] def customerInfoUrl(vrn: String): String = s"${appConfig.vatSubscriptionBaseUrl}/vat-subscription/$vrn/customer-details"
+
+  private[connectors] def mandationStatusUrl(vrn: String): String = s"${appConfig.vatSubscriptionBaseUrl}/vat-subscription/$vrn/mandation-status"
+
 
   def getCustomerInfo(vrn: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[CustomerInformation]] = {
 
@@ -51,4 +55,22 @@ class VatSubscriptionConnector @Inject()(http: HttpClient,
         httpError
     }
   }
+
+  def getMandationStatusInfo(vrn: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[MandationStatus]] = {
+
+    import connectors.httpParsers.MandationInfoHttpParser.MandationInfoReads
+
+    val timer = metrics.getCustomerInfoTimer.time()
+
+    http.GET(mandationStatusUrl(vrn)).map {
+      case mandationInfo@Right(_) =>
+        timer.stop()
+        mandationInfo
+      case httpError@Left(error) =>
+        Logger.warn("VatSubscriptionConnector received error: " + error.message)
+        httpError
+    }
+  }
+
+
 }
