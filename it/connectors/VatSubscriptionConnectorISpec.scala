@@ -49,7 +49,6 @@ class VatSubscriptionConnectorISpec extends IntegrationBaseSpec {
           Some("Vincent"),
           Some("Vatreturn"),
           Some("Cheapo Clothing"),
-          Some("3"),
           hasFlatRateScheme,
           Some(true)
         ))

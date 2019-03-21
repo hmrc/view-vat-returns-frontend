@@ -24,8 +24,7 @@ import models._
 import models.Obligation.Status
 import models.payments.{Payment, Payments}
 import models.User
-import models.errors.{DirectDebitStatusError, ServerSideError, mandationStatusError}
-import org.apache.http.client.methods.HttpGet
+import models.errors.{DirectDebitStatusError, MandationStatusError, ServerSideError}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits._
@@ -350,7 +349,7 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
           .returns(Future.successful(Left(ServerSideError("", ""))))
         val mandationStatusResponse: ServiceResponse[MandationStatus] = await(service.getMandationStatus("123456789"))
 
-        mandationStatusResponse shouldBe Left(mandationStatusError)
+        mandationStatusResponse shouldBe Left(MandationStatusError)
       }
     }
   }

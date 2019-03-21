@@ -58,7 +58,7 @@ class VatSubscriptionConnector @Inject()(http: HttpClient,
 
   def getMandationStatusInfo(vrn: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[MandationStatus]] = {
 
-    import connectors.httpParsers.mandationInfoHttpParser.MandationInfoReads
+    import connectors.httpParsers.MandationInfoHttpParser.MandationInfoReads
 
     val timer = metrics.getCustomerInfoTimer.time()
 

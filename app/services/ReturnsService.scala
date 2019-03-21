@@ -24,7 +24,6 @@ import models.Obligation.Status
 import models.payments.{Payment, Payments}
 import models._
 import models.errors._
-import play.api.Logger
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -107,7 +106,7 @@ class ReturnsService @Inject()(vatObligationsConnector: VatObligationsConnector,
   def getMandationStatus(vrn: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ServiceResponse[MandationStatus]] = {
   vatSubscriptionConnector.getMandationStatusInfo(vrn) map {
   case Right(manStatus) => Right(manStatus)
-  case Left(_) => Left(mandationStatusError)
+  case Left(_) => Left(MandationStatusError)
 }
 }
 

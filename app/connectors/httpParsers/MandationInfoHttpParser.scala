@@ -23,7 +23,7 @@ import models.errors.{ApiSingleError, ServerSideError, UnexpectedStatusError}
 import play.api.http.Status.{BAD_REQUEST, OK}
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
 
-object mandationInfoHttpParser extends  ResponseHttpParsers{
+object MandationInfoHttpParser extends  ResponseHttpParsers{
 
   implicit object MandationInfoReads extends HttpReads[HttpGetResult[MandationStatus]] {
     override def read(method: String, url: String, response: HttpResponse): HttpGetResult[MandationStatus] = {
