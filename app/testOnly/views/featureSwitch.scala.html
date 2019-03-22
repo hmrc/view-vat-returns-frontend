@@ -21,26 +21,28 @@
 
 @views.html.main_template(title = "Feature switches", bodyClasses = None, appConfig = appConfig) {
 
-  @helper.form(action = testOnly.controllers.routes.FeatureSwitchController.submitFeatureSwitch) {
-    @CSRF.formField
+    @helper.form(action = testOnly.controllers.routes.FeatureSwitchController.submitFeatureSwitch) {
+        @CSRF.formField
 
-    <div class="form-group">
-      <fieldset>
-        <legend>
-         <h1 class="heading-medium">Features</h1>
-        </legend>
+        <div class="form-group">
+            <fieldset>
+                <legend>
+                    <h1 class="heading-medium">Features</h1>
+                </legend>
 
-        @views.html.templates.inputs.singleCheckbox(form(ConfigKeys.userResearchBannerFeature), "User research banner")
-        @views.html.templates.inputs.singleCheckbox(form(ConfigKeys.staticDateEnabledFeature), "Use static date (2018-05-01)")
-        @views.html.templates.inputs.singleCheckbox(form(ConfigKeys.useVatReturnsService), "Ues vat-returns microservice")
-        @views.html.templates.inputs.singleCheckbox(form(ConfigKeys.useVatObligationsService), "Use vat-obligations microservice")
-        @views.html.templates.inputs.singleCheckbox(form(ConfigKeys.future2020DateEnabledFeature), "Static date set to 2020-05-01")
-        @views.html.templates.inputs.singleCheckbox(form(ConfigKeys.useLanguageSelectorFeature), "Allow language selection")
-        @views.html.templates.inputs.singleCheckbox(form(ConfigKeys.submitReturnFeatures), "Opted-out users - Submit Return enabled")
+                @views.html.templates.inputs.singleCheckbox(form(ConfigKeys.userResearchBannerFeature), "User research banner")
+                @views.html.templates.inputs.singleCheckbox(form(ConfigKeys.staticDateEnabledFeature), "Use static date (2018-05-01)")
+                @views.html.templates.inputs.singleCheckbox(form(ConfigKeys.useVatReturnsService), "Ues vat-returns microservice")
+                @views.html.templates.inputs.singleCheckbox(form(ConfigKeys.useVatObligationsService), "Use vat-obligations microservice")
+                @views.html.templates.inputs.singleCheckbox(form(ConfigKeys.future2020DateEnabledFeature), "Static date set to 2020-05-01")
+                @views.html.templates.inputs.singleCheckbox(form(ConfigKeys.useLanguageSelectorFeature), "Allow language selection")
+                @views.html.templates.inputs.singleCheckbox(form(ConfigKeys.submitReturnFeatures), "Opted-out users - Submit Return enabled")
+                @views.html.templates.inputs.singleCheckbox(form(ConfigKeys.mandationStatusFeatures), "Opted-out users - Submit Vat Return link displayed")
 
-      </fieldset>
-    </div>
 
-    <button class="button" type="submit" id="continue-button">Submit</button>
-  }
+            </fieldset>
+        </div>
+
+        <button class="button" type="submit" id="continue-button">Submit</button>
+    }
 }

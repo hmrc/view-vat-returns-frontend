@@ -30,4 +30,6 @@ class Features @Inject()(config: Configuration) {
   val future2020DateEnabled = new Feature(ConfigKeys.future2020DateEnabledFeature, config)
   val useLanguageSelector = new Feature(ConfigKeys.useLanguageSelectorFeature, config)
   val submitReturnFeatures = new Feature(ConfigKeys.submitReturnFeatures, config)
+  val mandationStatusFeatures = new Feature(ConfigKeys.mandationStatusFeatures,config)
+
 }

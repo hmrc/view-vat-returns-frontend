@@ -38,7 +38,8 @@ class FeatureSwitchController @Inject()(val messagesApi: MessagesApi,
         enableVatObligationsService = appConfig.features.enableVatObligationsService(),
         future2020DateEnabled = appConfig.features.future2020DateEnabled(),
         useLanguageSelector = appConfig.features.useLanguageSelector(),
-        submitReturnFeatures = appConfig.features.submitReturnFeatures()
+        submitReturnFeatures = appConfig.features.submitReturnFeatures(),
+        mandationStatusFeatures = appConfig.features.mandationStatusFeatures()
       )
     )))
   }
@@ -58,6 +59,7 @@ class FeatureSwitchController @Inject()(val messagesApi: MessagesApi,
     appConfig.features.future2020DateEnabled(model.future2020DateEnabled)
     appConfig.features.useLanguageSelector(model.useLanguageSelector)
     appConfig.features.submitReturnFeatures(model.submitReturnFeatures)
+    appConfig.features.mandationStatusFeatures(model.mandationStatusFeatures)
     Redirect(routes.FeatureSwitchController.featureSwitch())
   }
 }
