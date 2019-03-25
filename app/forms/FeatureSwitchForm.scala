@@ -31,8 +31,7 @@ object FeatureSwitchForm {
       ConfigKeys.useVatObligationsService -> boolean,
       ConfigKeys.future2020DateEnabledFeature -> boolean,
       ConfigKeys.useLanguageSelectorFeature -> boolean,
-      ConfigKeys.submitReturnFeatures -> boolean,
-      ConfigKeys.mandationStatusFeatures -> boolean
+      ConfigKeys.submitReturnFeatures -> boolean
   )(FeatureSwitchModel.apply)(FeatureSwitchModel.unapply)
   )
 }

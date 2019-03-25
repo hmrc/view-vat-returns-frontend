@@ -41,7 +41,6 @@ object ConfigKeys {
   val future2020DateEnabledFeature: String = "features.futureDate.enabled"
   val useLanguageSelectorFeature: String = "features.useLanguageSelector.enabled"
   val submitReturnFeatures: String = "features.submitReturnFeatures.enabled"
-  val mandationStatusFeatures: String = "features.mandationStatusFeatures.enabled"
 
   val finalReturnPeriodKey: String = "final-return.periodKey"
 
@@ -53,6 +52,9 @@ object ConfigKeys {
   val vatSummaryBase: String = "vat-summary-frontend.host"
   val vatDetailsUrl: String = "vat-summary-frontend.detailsUrl"
   val vatPaymentsUrl: String = "vat-summary-frontend.paymentsUrl"
+
+  val submitVatReturnBase: String = "submit-vat-return-frontend.host"
+  val submitVatReturnUrl: String = "submit-vat-return-frontend.url"
 
   val reportVatErrorUrl: String = "reportVatErrorUrl"
 

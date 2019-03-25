@@ -54,54 +54,85 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
       }
   }
 
+  def returnDeadlines(): Action[AnyContent] = authorisedAction { implicit request =>
+
+    implicit user =>
+      val currentDate = dateService.now()
+      val openObligationsCall = returnsService.getOpenReturnObligations(user)
+
+      openObligationsCall.flatMap {
+        case Right(VatReturnObligations(obligations)) =>
+          auditService.extendedAudit(
+            ViewOpenVatObligationsAuditModel(user, obligations),
+            routes.ReturnObligationsController.returnDeadlines().url
+          )
+          if (obligations.isEmpty) {
+            returnsService.getFulfilledObligations(currentDate).map(fulfilledObligations => fulfilledObligationsAction(fulfilledObligations))
+          }
+          else {
+            val deadlines = obligations.map(obligation =>
+              ReturnDeadlineViewModel(obligation.due, obligation.start, obligation.end, obligation.due.isBefore(currentDate), obligation.periodKey)
+            )
+            if (appConfig.features.submitReturnFeatures()) {
+
+              for {
+                status <- returnsService.getMandationStatus(user.vrn)
+              } yield status match {
+                case Right(MandationStatus("Non MTDfB")) => Ok(views.html.returns.optOutReturnDeadlines(deadlines))
+                case _ => Ok(views.html.returns.returnDeadlines(deadlines))
+              }
+
+            }
+            else {
+              Future.successful(Ok(views.html.returns.returnDeadlines(deadlines)))
+            }
+
+          }
+        case Left(error) =>
+          Logger.warn("[ReturnObligationsController][returnDeadlines] error: " + error.toString)
+          Future.successful(InternalServerError(views.html.errors.technicalProblem()))
+
+      }
+  }
+
+  private[controllers] def fulfilledObligationsAction(obligationsResult: ServiceResponse[VatReturnObligations])
+                                                     (implicit request: Request[AnyContent]): Result = {
+    obligationsResult match {
+      case Right(VatReturnObligations(Seq())) => Ok(views.html.returns.noUpcomingReturnDeadlines(None))
+      case Right(VatReturnObligations(obligations)) =>
+        val lastFulfilledObligation: VatReturnObligation = returnsService.getLastObligation(obligations)
+        Ok(views.html.returns.noUpcomingReturnDeadlines(Some(ReturnDeadlineViewModel(
+          due = lastFulfilledObligation.due,
+          start = lastFulfilledObligation.start,
+          end = lastFulfilledObligation.end,
+          periodKey = lastFulfilledObligation.periodKey
+        ))))
+      case Left(error) =>
+        Logger.warn("[ReturnObligationsController][fulfilledObligationsAction] error: " + error.toString)
+        InternalServerError(views.html.errors.technicalProblem())
+    }
+  }
+
   private[controllers] def isValidSearchYear(year: Int, upperBound: Int = dateService.now().getYear) = {
     year <= upperBound && year >= upperBound - 2
   }
 
-  private[controllers] def getReturnObligations(user: User, selectedYear: Int, status: Obligation.Status.Value)
-                                               (implicit hc: HeaderCarrier): Future[Either[ServiceError, VatReturnsViewModel]] = {
+  private[controllers] def getPreviousReturnYears(user: User, status: Obligation.Status.Value, currentYear: Int)
+                                                 (implicit hc: HeaderCarrier): Future[ServiceResponse[Seq[Int]]] = {
 
-    getReturnYears(user, status) flatMap {
-      case (Right(years)) =>
+    val currentYearMinusOne = currentYear - 1
 
-        if (years.contains(selectedYear)) {
-          returnsService.getReturnObligationsForYear(user, selectedYear, status) map {
-            case Right(VatReturnObligations(obligations)) =>
-              auditService.extendedAudit(
-                ViewSubmittedVatObligationsAuditModel(user, obligations),
-                routes.ReturnObligationsController.submittedReturns(selectedYear).url
-              )
-
-              Right(VatReturnsViewModel(
-                years,
-                selectedYear,
-                obligations.map(obligation =>
-                  ReturnObligationsViewModel(
-                    obligation.start,
-                    obligation.end,
-                    obligation.periodKey
-                  )
-                ),
-                user.hasNonMtdVat,
-                user.vrn
-              ))
-            case (Left(error)) =>
-              Logger.warn(s"[ReturnObligationsController][getReturnObligations] error: ${error.toString}")
-              Left(error)
-          }
+    returnsService.getReturnObligationsForYear(user, currentYearMinusOne, status) map {
+      case Right(VatReturnObligations(obligations)) =>
+        if (obligations.nonEmpty) {
+          Right(Seq[Int](currentYear, currentYearMinusOne))
         }
         else {
-          Future.successful(Right(VatReturnsViewModel(
-            years,
-            selectedYear,
-            Seq(),
-            user.hasNonMtdVat,
-            user.vrn
-          )))
+          Right(Seq[Int](currentYear))
         }
-      case (Left(error)) =>
-        Logger.warn(s"[ReturnObligationsController][getReturnObligations] error: ${error.toString}")
-        Future.successful(Left(error))
+      case Left(error) =>
+        Logger.warn("[ReturnObligationsController][getPreviousReturnYears] error: " + error.toString)
+        Left(error)
     }
   }
 
@@ -128,79 +159,51 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
     }
   }
 
-  private[controllers] def getPreviousReturnYears(user: User, status: Obligation.Status.Value, currentYear: Int)
-                                                 (implicit hc: HeaderCarrier): Future[ServiceResponse[Seq[Int]]] = {
+  private[controllers] def getReturnObligations(user: User, selectedYear: Int, status: Obligation.Status.Value)
+                                               (implicit hc: HeaderCarrier): Future[Either[ServiceError, VatReturnsViewModel]] = {
 
-    val currentYearMinusOne = currentYear - 1
+    getReturnYears(user, status) flatMap {
+      case Right(years) =>
 
-    returnsService.getReturnObligationsForYear(user, currentYearMinusOne, status) map {
-      case Right(VatReturnObligations(obligations)) =>
-        if (obligations.nonEmpty) {
-          Right(Seq[Int](currentYear, currentYearMinusOne))
-        }
-        else {
-          Right(Seq[Int](currentYear))
-        }
-      case Left(error) =>
-        Logger.warn("[ReturnObligationsController][getPreviousReturnYears] error: " + error.toString)
-        Left(error)
-    }
-  }
+        if (years.contains(selectedYear)) {
+          returnsService.getReturnObligationsForYear(user, selectedYear, status) map {
+            case Right(VatReturnObligations(obligations)) =>
+              auditService.extendedAudit(
+                ViewSubmittedVatObligationsAuditModel(user, obligations),
+                routes.ReturnObligationsController.submittedReturns(selectedYear).url
+              )
 
-  def returnDeadlines(): Action[AnyContent] = authorisedAction { implicit request =>
-
-    implicit user =>
-      val currentDate = dateService.now()
-      val openObligationsCall = returnsService.getOpenReturnObligations(user)
-
-    openObligationsCall.flatMap {
-      case Right(VatReturnObligations(obligations)) =>
-        auditService.extendedAudit(
-          ViewOpenVatObligationsAuditModel(user, obligations),
-          routes.ReturnObligationsController.returnDeadlines().url
-        )
-        if (obligations.isEmpty) {
-          returnsService.getFulfilledObligations(currentDate).map(fulfilledObligations => fulfilledObligationsAction(fulfilledObligations))
-        }
-        else {
-          val deadlines = obligations.map(obligation =>
-            ReturnDeadlineViewModel(obligation.due, obligation.start, obligation.end, obligation.due.isBefore(currentDate), obligation.periodKey)
-          )
-          if (appConfig.features.mandationStatusFeatures()) {
-
-            val callMandationStatus = returnsService.getMandationStatus(user.vrn)
-            val mandationStatusReturned: MandationStatus = MandationStatus("3")
-
-            callMandationStatus match {
-              case mandationStatusReturned => Future.successful(Ok(views.html.returns.optOutReturnDeadlines(deadlines)))
-            }
+              Right(VatReturnsViewModel(
+                years,
+                selectedYear,
+                obligations.map(obligation =>
+                  ReturnObligationsViewModel(
+                    obligation.start,
+                    obligation.end,
+                    obligation.periodKey
+                  )
+                ),
+                user.hasNonMtdVat,
+                user.vrn
+              ))
+            case Left(error) =>
+              Logger.warn(s"[ReturnObligationsController][getReturnObligations] error: ${error.toString}")
+              Left(error)
           }
-          else
-          Future.successful(Ok(views.html.returns.returnDeadlines(deadlines)))
+        }
+        else {
+          Future.successful(Right(VatReturnsViewModel(
+            years,
+            selectedYear,
+            Seq(),
+            user.hasNonMtdVat,
+            user.vrn
+          )))
         }
       case Left(error) =>
-        Logger.warn("[ReturnObligationsController][returnDeadlines] error: " + error.toString)
-        Future.successful(InternalServerError(views.html.errors.technicalProblem()))
-
+        Logger.warn(s"[ReturnObligationsController][getReturnObligations] error: ${error.toString}")
+        Future.successful(Left(error))
     }
   }
 
-
-  private[controllers] def fulfilledObligationsAction(obligationsResult: ServiceResponse[VatReturnObligations])
-                                                     (implicit request: Request[AnyContent]): Result = {
-    obligationsResult match {
-      case Right(VatReturnObligations(Seq())) => Ok(views.html.returns.noUpcomingReturnDeadlines(None))
-      case Right(VatReturnObligations(obligations)) =>
-        val lastFulfilledObligation: VatReturnObligation = returnsService.getLastObligation(obligations)
-        Ok(views.html.returns.noUpcomingReturnDeadlines(Some(ReturnDeadlineViewModel(
-          due = lastFulfilledObligation.due,
-          start = lastFulfilledObligation.start,
-          end = lastFulfilledObligation.end,
-          periodKey = lastFulfilledObligation.periodKey
-        ))))
-      case Left(error) =>
-        Logger.warn("[ReturnObligationsController][fulfilledObligationsAction] error: " + error.toString)
-        InternalServerError(views.html.errors.technicalProblem())
-    }
-  }
 }

@@ -65,6 +65,8 @@ trait AppConfig extends ServicesConfig {
   val govUkCommercialSoftwareUrl: String
   val languageMap: Map[String, Lang]
   val routeToSwitchLanguage :String => Call
+  val submitVatReturnBase: String
+  val submitVatReturnUrl: String
 }
 
 @Singleton
@@ -111,6 +113,9 @@ class FrontendAppConfig @Inject()(val runModeConfiguration: Configuration, val e
   private lazy val vatSummaryBase: String = getString(Keys.vatSummaryBase)
   override lazy val vatDetailsUrl: String = vatSummaryBase + getString(Keys.vatDetailsUrl)
   override lazy val vatPaymentsUrl: String = vatSummaryBase + getString(Keys.vatPaymentsUrl)
+
+  override lazy val submitVatReturnBase: String = getString(Keys.submitVatReturnBase)
+  override lazy val submitVatReturnUrl: String = submitVatReturnBase + getString(Keys.submitVatReturnUrl)
 
   override lazy val reportVatErrorUrl: String = getString(Keys.reportVatErrorUrl)
 
