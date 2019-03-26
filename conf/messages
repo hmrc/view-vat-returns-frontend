@@ -103,6 +103,8 @@ returnDeadlines.noReturns = You do not have any returns due right now.
 returnDeadlines.receivedReturn = We received your return for the period {0}.
 returnDeadlines.finalReturn = for your final return
 
+returnDeadlines.submitReturn = Submit VAT Return
+
 banner.newService = This is a new service – your
 banner.feedback = feedback
 banner.feedbackImprove = will help us to improve it.

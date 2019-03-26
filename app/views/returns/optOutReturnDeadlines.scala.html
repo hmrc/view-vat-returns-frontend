@@ -52,7 +52,7 @@
                                     @messages("returnDeadlines.periodEnding", displayDateRange(deadline.start, deadline.end))
                                 }
                                 </span>
-                                <a href="@{appConfig.submitVatReturnUrl}/@{deadline.periodKey}/submit-form" id="submit-return-link">Submit VAT Return</a>
+                                <a href="@{appConfig.submitVatReturnUrl}/@{deadline.periodKey}/submit-form" id="submit-return-link">@messages("returnDeadlines.submitReturn")</a>
                             </p>
                         </li>
                     }
