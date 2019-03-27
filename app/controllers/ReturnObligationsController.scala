@@ -75,11 +75,13 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
             )
             if (appConfig.features.submitReturnFeatures()) {
 
-              for {
-                status <- returnsService.getMandationStatus(user.vrn)
-              } yield status match {
+              returnsService.getMandationStatus(user.vrn) map {
                 case Right(MandationStatus("Non MTDfB")) => Ok(views.html.returns.optOutReturnDeadlines(deadlines))
-                case _ => Ok(views.html.returns.returnDeadlines(deadlines))
+                case Right(_) => Ok(views.html.returns.returnDeadlines(deadlines))
+                case _ => {
+                  Logger.warn("[ReturnObligationsController][returnDeadlines] - getMandationStatus returned an Error")
+                  InternalServerError
+                }
               }
 
             }

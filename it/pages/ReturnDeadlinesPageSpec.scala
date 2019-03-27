@@ -99,5 +99,16 @@ class ReturnDeadlinesPageSpec extends IntegrationBaseSpec {
         (mockAppConfig.submitVatReturnBase + "/vat-through-software/submit-vat-return/#004/submit-form")
     }
 
+    "return error status when an error is returned from Mandation status" in new Test {
+      override def setupStubs(): StubMapping = {
+        AuthStub.authorised()
+        obligationsStub.stubOutstandingObligations
+        SubmitReturnStub.stubMandationError
+      }
+
+      val response: WSResponse = await(request().get())
+      response.status shouldBe Status.INTERNAL_SERVER_ERROR
+    }
+
   }
 }

@@ -23,11 +23,16 @@ import play.api.libs.json.Json
 
 object SubmitReturnStub extends WireMockMethods {
 
-  private val omandationUri = "/vat-subscription/([0-9]+)/mandation-status"
+  private val mandationUri = "/vat-subscription/([0-9]+)/mandation-status"
 
   def stubMandationInfo: StubMapping = {
-    when(method = GET, uri = omandationUri)
+    when(method = GET, uri = mandationUri)
       .thenReturn(status = OK, body = customerInfo)
+  }
+
+  def stubMandationError: StubMapping = {
+    when(method = GET, uri = mandationUri)
+      .thenReturn(status = OK, body = errorJson)
   }
 
   private val customerInfo = Json.parse(
