@@ -31,14 +31,11 @@
         <div class="grid-row">
             <div class="column-two-thirds">
                 <h1 class="heading-xlarge">@messages("returnDeadlines.title")</h1>
-                <p aria-hidden="true">@messages("returnDeadlines.submitBy")</p>
-
                 <div class="form-group">
                     <ul class="list">
                     @for(deadline <- deadlines){
                         <li class="section divider--bottom">
                             <p>
-                                <span class="visually-hidden">@messages("returnDeadlines.submitByPrefix")</span>
                                 <span class="bold-medium">@displayDate(deadline.due)</span>
                                 @if(deadline.overdue) {
                                     <span>
@@ -52,25 +49,12 @@
                                     @messages("returnDeadlines.periodEnding", displayDateRange(deadline.start, deadline.end))
                                 }
                                 </span>
-                                <a href="@{appConfig.submitVatReturnUrl}/@{deadline.periodKey}/submit-form" id="submit-return-link">@messages("returnDeadlines.submitReturn")</a>
+                                <a href="@{appConfig.submitVatReturnForm(deadline.periodKey)}" id="submit-return-link">@messages("returnDeadlines.submitReturn")</a>
                             </p>
                         </li>
                     }
                     </ul>
                 </div>
-
-                <details>
-
-                    <summary><span class="summary">@messages("returnDeadlines.howToSubmit")</span></summary>
-
-                    <div class="panel panel-border-narrow">
-                        <ul class="list list-number">
-                            <li><a href="@appConfig.govUkCommercialSoftwareUrl" target="_blank">@messages("returnDeadlines.softwareOne")</a> @messages("returnDeadlines.softwareTwo")</li>
-                            <li>@messages("returnDeadlines.vatRecords")</li>
-                            <li>@messages("returnDeadlines.sendReturns")</li>
-                        </ul>
-                    </div>
-                </details>
             </div>
         </div>
     }

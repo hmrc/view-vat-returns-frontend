@@ -55,6 +55,7 @@ object ConfigKeys {
 
   val submitVatReturnBase: String = "submit-vat-return-frontend.host"
   val submitVatReturnUrl: String = "submit-vat-return-frontend.url"
+  val submitVatReturnForm: String = "submit-vat-return-frontend.submit-form"
 
   val reportVatErrorUrl: String = "reportVatErrorUrl"
 

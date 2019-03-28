@@ -91,10 +91,6 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
       elementText(Selectors.pageHeading) shouldBe "Return deadlines"
     }
 
-    "have the correct message regarding submitting returns through software" in {
-      elementText(Selectors.submitThroughSoftware) shouldBe "Use your accounting software to submit a return by:"
-    }
-
     "have the correct obligation due date" in {
       elementText(Selectors.firstDeadlineDueDate) should include ("2 February 2018")
     }
@@ -105,26 +101,6 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
 
     "have a submit-your-return link" in {
       document.getElementById("submit-return-link").text() shouldBe "Submit VAT Return"
-    }
-
-    "have the correct hint box title" in {
-      elementText(Selectors.howToDoThis) shouldBe "How to submit a return"
-    }
-
-    "have the correct message regarding downloading software in the hint box" in {
-      elementText(Selectors.downloadSoftware) shouldBe "Choose accounting software that supports this service (opens in a new tab) if you have not already."
-    }
-
-    "have a link to govuk commercial software page" in {
-      document.select("div > ul > li > a").first().attr("href") shouldBe "https://www.gov.uk/guidance/software-for-sending-income-tax-updates"
-    }
-
-    "have the correct message regarding VAT records in the hint box" in {
-      elementText(Selectors.vatRecords) shouldBe "Keep your VAT records in your accounting software."
-    }
-
-    "have the correct message regarding sending HMRC VAT returns in the hint box" in {
-      elementText(Selectors.sendReturns) shouldBe "Submit any VAT Returns before your deadlines."
     }
   }
 

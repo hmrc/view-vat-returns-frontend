@@ -25,25 +25,36 @@ object SubmitReturnStub extends WireMockMethods {
 
   private val mandationUri = "/vat-subscription/([0-9]+)/mandation-status"
 
-  def stubMandationInfo: StubMapping = {
+  def stubNonMtdfbMandationInfo: StubMapping = {
     when(method = GET, uri = mandationUri)
-      .thenReturn(status = OK, body = customerInfo)
+      .thenReturn(status = OK, body = nonMtdfbUser)
+  }
+
+  def stubMtdfbMandationInfo: StubMapping = {
+    when(method = GET, uri = mandationUri)
+      .thenReturn(status = OK, body = mtdfbUser)
   }
 
   def stubMandationError: StubMapping = {
     when(method = GET, uri = mandationUri)
-      .thenReturn(status = OK, body = errorJson)
+      .thenReturn(status = INTERNAL_SERVER_ERROR, body = errorJson)
   }
 
-  private val customerInfo = Json.parse(
+  private val nonMtdfbUser = Json.parse(
     """{
       |   "mandationStatus" : "Non MTDfB"
       |}""".stripMargin
   )
 
+  private val mtdfbUser = Json.parse(
+    """{
+      |   "mandationStatus" : "MTDfB Mandated"
+      |}""".stripMargin
+  )
+
   private val errorJson = Json.obj(
-    "code" -> "500",
-    "message" -> "INTERNAL_SERVER_ERROR"
+    "status" -> "500",
+    "body" -> "INTERNAL_SERVER_ERROR"
   )
 
 }
