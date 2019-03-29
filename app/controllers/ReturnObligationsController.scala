@@ -55,6 +55,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
   }
 
   def returnDeadlines(): Action[AnyContent] = authorisedAction { implicit request =>
+
     implicit user =>
       val currentDate = dateService.now()
       val openObligationsCall = returnsService.getOpenReturnObligations(user)
@@ -67,15 +68,30 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
           )
           if (obligations.isEmpty) {
             returnsService.getFulfilledObligations(currentDate).map(fulfilledObligations => fulfilledObligationsAction(fulfilledObligations))
-          } else {
+          }
+          else {
             val deadlines = obligations.map(obligation =>
               ReturnDeadlineViewModel(obligation.due, obligation.start, obligation.end, obligation.due.isBefore(currentDate), obligation.periodKey)
             )
-            Future.successful(Ok(views.html.returns.returnDeadlines(deadlines)))
+            if (appConfig.features.submitReturnFeatures()) {
+
+              returnsService.getMandationStatus(user.vrn) map {
+                case Right(NonMtdfb) => Ok(views.html.returns.optOutReturnDeadlines(deadlines))
+                case Right(_) => Ok(views.html.returns.returnDeadlines(deadlines))
+                case error =>
+                  Logger.warn(s"[ReturnObligationsController][returnDeadlines] - getMandationStatus returned an Error: $error")
+                  InternalServerError(views.html.errors.technicalProblem())
+              }
+            }
+            else {
+              Future.successful(Ok(views.html.returns.returnDeadlines(deadlines)))
+            }
+
           }
         case Left(error) =>
           Logger.warn("[ReturnObligationsController][returnDeadlines] error: " + error.toString)
           Future.successful(InternalServerError(views.html.errors.technicalProblem()))
+
       }
   }
 
@@ -120,7 +136,6 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
     }
   }
 
-
   private[controllers] def getReturnYears(user: User, status: Obligation.Status.Value)(implicit hc: HeaderCarrier): Future[ServiceResponse[Seq[Int]]] = {
 
     val currentYear = dateService.now().getYear
@@ -148,7 +163,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
                                                (implicit hc: HeaderCarrier): Future[Either[ServiceError, VatReturnsViewModel]] = {
 
     getReturnYears(user, status) flatMap {
-      case (Right(years)) =>
+      case Right(years) =>
 
         if (years.contains(selectedYear)) {
           returnsService.getReturnObligationsForYear(user, selectedYear, status) map {
@@ -171,7 +186,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
                 user.hasNonMtdVat,
                 user.vrn
               ))
-            case (Left(error)) =>
+            case Left(error) =>
               Logger.warn(s"[ReturnObligationsController][getReturnObligations] error: ${error.toString}")
               Left(error)
           }
@@ -185,9 +200,10 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
             user.vrn
           )))
         }
-      case (Left(error)) =>
+      case Left(error) =>
         Logger.warn(s"[ReturnObligationsController][getReturnObligations] error: ${error.toString}")
         Future.successful(Left(error))
     }
   }
+
 }

@@ -53,6 +53,10 @@ object ConfigKeys {
   val vatDetailsUrl: String = "vat-summary-frontend.detailsUrl"
   val vatPaymentsUrl: String = "vat-summary-frontend.paymentsUrl"
 
+  val submitVatReturnBase: String = "submit-vat-return-frontend.host"
+  val submitVatReturnUrl: String = "submit-vat-return-frontend.url"
+  val submitVatReturnForm: String = "submit-vat-return-frontend.submit-form"
+
   val reportVatErrorUrl: String = "reportVatErrorUrl"
 
   val governmentGatewayHost: String = "government-gateway.host"

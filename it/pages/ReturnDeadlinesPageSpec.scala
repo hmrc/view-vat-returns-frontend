@@ -16,15 +16,22 @@
 
 package pages
 
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import config.FrontendAppConfig
 import helpers.IntegrationBaseSpec
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.http.Status
 import play.api.libs.ws.{WSRequest, WSResponse}
-import stubs.{AuthStub, VatObligationsStub}
+import stubs.{AuthStub, VatObligationsStub, SubmitReturnStub}
 
 class ReturnDeadlinesPageSpec extends IntegrationBaseSpec {
+
+  override def beforeEach(): Unit = {
+    mockAppConfig.features.submitReturnFeatures(false)
+    super.beforeEach()
+  }
 
   private trait Test {
     def setupStubs(): StubMapping
@@ -38,6 +45,8 @@ class ReturnDeadlinesPageSpec extends IntegrationBaseSpec {
       app.configuration.underlying.getBoolean("features.useVatObligationsService.enabled")
     val obligationsStub = new VatObligationsStub(backendFeatureEnabled)
   }
+
+  lazy val mockAppConfig: FrontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
 
   "Calling the return deadlines route with an authenticated user with one obligation" should {
 
@@ -62,5 +71,84 @@ class ReturnDeadlinesPageSpec extends IntegrationBaseSpec {
       val deadlineSelector = ".list li.divider--bottom"
       document.select(deadlineSelector).size() shouldBe 1
     }
+  }
+
+  "When the submit-returns feature is enabled" when {
+
+    "the user is a Non-MTDfB user" should {
+
+      "return 200" in new Test {
+        mockAppConfig.features.submitReturnFeatures(true)
+        override def setupStubs(): StubMapping = {
+          AuthStub.authorised()
+          obligationsStub.stubOutstandingObligations
+          SubmitReturnStub.stubNonMtdfbMandationInfo
+        }
+
+        val response: WSResponse = await(request().get())
+        response.status shouldBe Status.OK
+      }
+
+      "return the one deadline with submit link" in new Test {
+        mockAppConfig.features.submitReturnFeatures(true)
+        override def setupStubs(): StubMapping = {
+          AuthStub.authorised()
+          obligationsStub.stubOutstandingObligations
+          SubmitReturnStub.stubNonMtdfbMandationInfo
+        }
+
+        val response: WSResponse = await(request().get())
+        lazy implicit val document: Document = Jsoup.parse(response.body)
+        val deadlineSelector = ".list li.divider--bottom"
+        document.select(deadlineSelector).size() shouldBe 1
+        document.getElementById("submit-return-link").text() shouldBe "Submit VAT Return"
+        document.getElementById("submit-return-link").attr("href") shouldBe mockAppConfig.submitVatReturnForm("#004")
+      }
+
+    }
+
+    "the user is signed up to MTDfB" should {
+
+      "return 200" in new Test {
+        mockAppConfig.features.submitReturnFeatures(true)
+        override def setupStubs(): StubMapping = {
+          AuthStub.authorised()
+          obligationsStub.stubOutstandingObligations
+          SubmitReturnStub.stubMtdfbMandationInfo
+        }
+
+        val response: WSResponse = await(request().get())
+        response.status shouldBe Status.OK
+      }
+
+      "return the one deadline with no submit link" in new Test {
+        mockAppConfig.features.submitReturnFeatures(true)
+        override def setupStubs(): StubMapping = {
+          AuthStub.authorised()
+          obligationsStub.stubOutstandingObligations
+          SubmitReturnStub.stubMtdfbMandationInfo
+        }
+
+        val response: WSResponse = await(request().get())
+        lazy implicit val document: Document = Jsoup.parse(response.body)
+        val deadlineSelector = ".list li.divider--bottom"
+        document.select(deadlineSelector).size() shouldBe 1
+        document.getElementById("submit-return-link") shouldBe null
+      }
+
+      "return error status when an error is returned from Mandation status" in new Test {
+        mockAppConfig.features.submitReturnFeatures(true)
+        override def setupStubs(): StubMapping = {
+          AuthStub.authorised()
+          obligationsStub.stubOutstandingObligations
+          SubmitReturnStub.stubMandationError
+        }
+
+        val response: WSResponse = await(request().get())
+        response.status shouldBe Status.INTERNAL_SERVER_ERROR
+      }
+
+    }
+
   }
 }

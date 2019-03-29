@@ -63,5 +63,8 @@ class MockAppConfig(val runModeConfiguration: Configuration, val mode: Mode = Mo
     "cymraeg" -> Lang("cy")
   )
   override val routeToSwitchLanguage: String => Call = (lang: String) => controllers.routes.LanguageController.switchLanguage(lang)
+  val submitVatReturnBase: String = "submitReturnBase"
+  val submitVatReturnUrl: String = submitVatReturnBase + "/submitUrl"
+  val submitVatReturnForm: String => String = periodKey => submitVatReturnUrl + s"$periodKey/submit-form"
 }
 
