@@ -9,11 +9,6 @@ GET        /submitted/:year             controllers.ReturnObligationsController.
 # Get a return via the submitted returns page
 GET        /submitted/:year/:periodKey  controllers.ReturnsController.vatReturn(year: Int, periodKey: String)
 
-# Feedback link Routes
-GET         /feedback                   controllers.feedback.FeedbackController.show
-POST        /feedback                   controllers.feedback.FeedbackController.submit
-GET         /thankyou                   controllers.feedback.FeedbackController.thankyou
-
 #Sign Out Routes
 GET         /sign-out              controllers.SignOutController.signOut(authorised: Boolean)
 GET         /time-out              controllers.SignOutController.timeout

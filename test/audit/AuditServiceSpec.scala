@@ -69,7 +69,7 @@ class AuditServiceSpec extends ControllerBaseSpec with BeforeAndAfterEach {
             .returns(Future.successful(AuditResult.Success))
         }
 
-        target().extendedAudit(testModel, controllers.feedback.routes.FeedbackController.show().url)
+        target().extendedAudit(testModel, "localhost")
       }
     }
   }
