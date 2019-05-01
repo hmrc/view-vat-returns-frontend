@@ -46,53 +46,63 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
   def vatReturn(year: Int, periodKey: String): Action[AnyContent] = authorisedAction {
     implicit request =>
       implicit user =>
-        val isReturnsPageRequest = true
-        val vatReturnCall = returnsService.getVatReturn(user, periodKey)
-        val entityNameCall = subscriptionService.getUserDetails(user)
-        val obligationCall = returnsService.getObligationWithMatchingPeriodKey(user, year, periodKey)
-        val hasDirectDebitCall = returnsService.getDirectDebitStatus(user.vrn)
+        if(validPeriodKey(periodKey)) {
+          val isReturnsPageRequest = true
+          val vatReturnCall = returnsService.getVatReturn(user, periodKey)
+          val entityNameCall = subscriptionService.getUserDetails(user)
+          val obligationCall = returnsService.getObligationWithMatchingPeriodKey(user, year, periodKey)
+          val hasDirectDebitCall = returnsService.getDirectDebitStatus(user.vrn)
 
-        def financialDataCall(customerInfo: Option[CustomerDetail]): Future[Option[Payment]] = {
-          val isHybridUser = customerInfo.fold(false)(_.isPartialMigration)
-          if (isHybridUser) Future.successful(None) else returnsService.getPayment(user, periodKey, Some(year))
-        }
+          def financialDataCall(customerInfo: Option[CustomerDetail]): Future[Option[Payment]] = {
+            val isHybridUser = customerInfo.fold(false)(_.isPartialMigration)
+            if (isHybridUser) Future.successful(None) else returnsService.getPayment(user, periodKey, Some(year))
+          }
 
-        for {
-          vatReturn <- vatReturnCall
-          customerInfo <- entityNameCall
-          payment <- financialDataCall(customerInfo)
-          obligation <- obligationCall
-          directDebit <- hasDirectDebitCall
-        } yield {
-          val data = ReturnsControllerData(vatReturn, customerInfo, payment, obligation, directDebit)
-          renderResult(data, isReturnsPageRequest)
+          for {
+            vatReturn <- vatReturnCall
+            customerInfo <- entityNameCall
+            payment <- financialDataCall(customerInfo)
+            obligation <- obligationCall
+            directDebit <- hasDirectDebitCall
+          } yield {
+            val data = ReturnsControllerData(vatReturn, customerInfo, payment, obligation, directDebit)
+            renderResult(data, isReturnsPageRequest)
+          }
+        } else {
+          Logger.warn(s"[ReturnsController][vatReturn] - The given period key was invalid - `$periodKey`")
+          Future.successful(NotFound(views.html.errors.notFound()))
         }
   }
 
   def vatReturnViaPayments(periodKey: String): Action[AnyContent] = authorisedAction {
     implicit request =>
       implicit user =>
-        val isReturnsPageRequest = false
-        val vatReturnCall = returnsService.getVatReturn(user, periodKey)
-        val entityNameCall = subscriptionService.getUserDetails(user)
-        val financialDataCall = returnsService.getPayment(user, periodKey)
-        val hasDirectDebitCall = returnsService.getDirectDebitStatus(user.vrn)
+        if(validPeriodKey(periodKey)) {
+          val isReturnsPageRequest = false
+          val vatReturnCall = returnsService.getVatReturn(user, periodKey)
+          val entityNameCall = subscriptionService.getUserDetails(user)
+          val financialDataCall = returnsService.getPayment(user, periodKey)
+          val hasDirectDebitCall = returnsService.getDirectDebitStatus(user.vrn)
 
-        def obligationCall(payment: Option[Payment]) = {
-          payment.fold(Future.successful(Option.empty[VatReturnObligation])) { p =>
-            returnsService.getObligationWithMatchingPeriodKey(user, p.end.getYear, periodKey)
+          def obligationCall(payment: Option[Payment]) = {
+            payment.fold(Future.successful(Option.empty[VatReturnObligation])) { p =>
+              returnsService.getObligationWithMatchingPeriodKey(user, p.end.getYear, periodKey)
+            }
           }
-        }
 
-        for {
-          vatReturnResult <- vatReturnCall
-          customerInfo <- entityNameCall
-          payment <- financialDataCall
-          obligation <- obligationCall(payment)
-          directDebit <- hasDirectDebitCall
-        } yield {
-          val data = ReturnsControllerData(vatReturnResult, customerInfo, payment, obligation, directDebit)
-          renderResult(data, isReturnsPageRequest)
+          for {
+            vatReturnResult <- vatReturnCall
+            customerInfo <- entityNameCall
+            payment <- financialDataCall
+            obligation <- obligationCall(payment)
+            directDebit <- hasDirectDebitCall
+          } yield {
+            val data = ReturnsControllerData(vatReturnResult, customerInfo, payment, obligation, directDebit)
+            renderResult(data, isReturnsPageRequest)
+          }
+        } else {
+          Logger.warn(s"[ReturnsController][vatReturnViaPayments] - The given period key was invalid - `$periodKey`")
+          Future.successful(NotFound(views.html.errors.notFound()))
         }
   }
 
@@ -160,5 +170,10 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
       hasDirectDebit = directDebitStatus,
       isHybridUser = customerDetail.fold(false)(_.isPartialMigration)
     )
+  }
+
+  private[controllers] def validPeriodKey(periodKey: String): Boolean = {
+    val periodKeyRegex = """^([0-9 A-Z]{4})$|^(#[0-9]{3})$"""
+    periodKey.matches(periodKeyRegex)
   }
 }

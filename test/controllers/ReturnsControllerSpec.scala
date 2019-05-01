@@ -39,6 +39,16 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ReturnsControllerSpec extends ControllerBaseSpec {
 
+  def controller: ReturnsController = new ReturnsController(
+    messages,
+    mockEnrolmentsAuthService,
+    mockVatReturnService,
+    mockSubscriptionService,
+    mockDateService,
+    mockConfig,
+    mockAuditService
+  )
+
   val goodEnrolments: Enrolments = Enrolments(
     Set(
       Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("VRN", "999999999")), "Active")
@@ -140,35 +150,51 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
     def target: ReturnsController = {
       setup()
-      new ReturnsController(
-        messages,
-        mockEnrolmentsAuthService,
-        mockVatReturnService,
-        mockSubscriptionService,
-        mockDateService,
-        mockConfig,
-        mockAuditService
-      )
+      controller
     }
   }
 
   "Calling the .vatReturn action" when {
 
-    "a user is logged in and enrolled to HMRC-MTD-VAT" should {
+    "a user is logged in and enrolled to HMRC-MTD-VAT" when {
 
-      "return 200" in new Test {
-        private val result = target.vatReturn(2018, "#001")(fakeRequest)
-        status(result) shouldBe Status.OK
+      "a valid period key is provided" should {
+
+        "return 200" in new Test {
+          private val result = target.vatReturn(2018, "#001")(fakeRequest)
+          status(result) shouldBe Status.OK
+        }
+
+        "return HTML" in new Test {
+          private val result = target.vatReturn(2018, "#001")(fakeRequest)
+          contentType(result) shouldBe Some("text/html")
+        }
+
+        "return charset of utf-8" in new Test {
+          private val result = target.vatReturn(2018, "#001")(fakeRequest)
+          charset(result) shouldBe Some("utf-8")
+        }
       }
 
-      "return HTML" in new Test {
-        private val result = target.vatReturn(2018, "#001")(fakeRequest)
-        contentType(result) shouldBe Some("text/html")
-      }
+      "an invalid period key is provided" should {
 
-      "return charset of utf-8" in new Test {
-        private val result = target.vatReturn(2018, "#001")(fakeRequest)
-        charset(result) shouldBe Some("utf-8")
+        "return 404" in new Test {
+          override val serviceCall = false
+          private val result = target.vatReturn(2018, "form-label")(fakeRequest)
+          status(result) shouldBe Status.NOT_FOUND
+        }
+
+        "return HTML" in new Test {
+          override val serviceCall = false
+          private val result = target.vatReturn(2018, "form-label")(fakeRequest)
+          contentType(result) shouldBe Some("text/html")
+        }
+
+        "return charset of utf-8" in new Test {
+          override val serviceCall = false
+          private val result = target.vatReturn(2018, "form-label")(fakeRequest)
+          charset(result) shouldBe Some("utf-8")
+        }
       }
     }
 
@@ -215,21 +241,45 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
   "Calling the .vatReturnViaPayments action" when {
 
-    "a user is logged in and enrolled to HMRC-MTD-VAT" should {
+    "a user is logged in and enrolled to HMRC-MTD-VAT" when {
 
-      "return 200" in new Test {
-        private val result = target.vatReturnViaPayments("#001")(fakeRequest)
-        status(result) shouldBe Status.OK
+      "a valid period key is provided" should {
+
+        "return 200" in new Test {
+          private val result = target.vatReturnViaPayments("#001")(fakeRequest)
+          status(result) shouldBe Status.OK
+        }
+
+        "return HTML" in new Test {
+          private val result = target.vatReturnViaPayments("#001")(fakeRequest)
+          contentType(result) shouldBe Some("text/html")
+        }
+
+        "return charset of utf-8" in new Test {
+          private val result = target.vatReturnViaPayments("#001")(fakeRequest)
+          charset(result) shouldBe Some("utf-8")
+        }
       }
 
-      "return HTML" in new Test {
-        private val result = target.vatReturnViaPayments("#001")(fakeRequest)
-        contentType(result) shouldBe Some("text/html")
-      }
+      "an invalid period key is provided" should {
 
-      "return charset of utf-8" in new Test {
-        private val result = target.vatReturnViaPayments("#001")(fakeRequest)
-        charset(result) shouldBe Some("utf-8")
+        "return 404" in new Test {
+          override val serviceCall = false
+          private val result = target.vatReturn(2018, "form-label")(fakeRequest)
+          status(result) shouldBe Status.NOT_FOUND
+        }
+
+        "return HTML" in new Test {
+          override val serviceCall = false
+          private val result = target.vatReturn(2018, "form-label")(fakeRequest)
+          contentType(result) shouldBe Some("text/html")
+        }
+
+        "return charset of utf-8" in new Test {
+          override val serviceCall = false
+          private val result = target.vatReturn(2018, "form-label")(fakeRequest)
+          charset(result) shouldBe Some("utf-8")
+        }
       }
     }
 
@@ -276,16 +326,6 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
   "Calling .constructViewModel" should {
 
-    val target = new ReturnsController(
-      messages,
-      mockEnrolmentsAuthService,
-      mockVatReturnService,
-      mockVatApiService,
-      mockDateService,
-      mockConfig,
-      mockAuditService
-    )
-
     "populate a VatReturnViewModel" in {
 
       val expectedViewModel = VatReturnViewModel(
@@ -305,7 +345,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
       (mockDateService.now: () => LocalDate).stubs().returns(LocalDate.parse("2018-05-01"))
 
-      val result: VatReturnViewModel = target.constructViewModel(
+      val result: VatReturnViewModel = controller.constructViewModel(
         exampleCustomerDetail,
         exampleObligation,
         exampleVatReturnDetails,
@@ -319,16 +359,6 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
   "Calling .renderResult" when {
 
     val user = models.User("123456789", hasNonMtdVat = true)
-
-    val target = new ReturnsController(
-      messages,
-      mockEnrolmentsAuthService,
-      mockVatReturnService,
-      mockVatApiService,
-      mockDateService,
-      mockConfig,
-      mockAuditService
-    )
 
     "there is a VAT return, obligation and payment" when {
 
@@ -344,7 +374,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
           .returns({})
       }
       val data = ReturnsControllerData(Right(exampleVatReturn), None, Some(examplePayment), Some(exampleObligation), Right(false))
-      def result: Result = target.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
+      def result: Result = controller.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
 
       "return an OK status" in {
         successSetup()
@@ -356,7 +386,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
       "return a Not Found status" in {
         val data = ReturnsControllerData(Left(NotFoundError), None, None, None, Left(DirectDebitStatusError))
-        val result = target.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
+        val result = controller.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
         result.header.status shouldBe Status.NOT_FOUND
       }
     }
@@ -365,7 +395,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
       "return an Internal Server Error status" in {
         val data = ReturnsControllerData(Right(exampleVatReturn), None, None, None, Right(false))
-        val result = target.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
+        val result = controller.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
         result.header.status shouldBe Status.INTERNAL_SERVER_ERROR
       }
     }
@@ -374,7 +404,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
       "return an Internal Server Error status" in {
         val data = ReturnsControllerData(Left(VatReturnError), None, None, None, Left(DirectDebitStatusError))
-        val result = target.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
+        val result = controller.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
         result.header.status shouldBe Status.INTERNAL_SERVER_ERROR
       }
     }
@@ -399,6 +429,51 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         val serviceResponse = Left(DirectDebitStatusError)
         val result: Boolean = target.getDirectDebitStatus(serviceResponse)
         result shouldBe false
+      }
+    }
+  }
+
+  "Calling .validPeriodKey" when {
+
+    "a valid alphanumeric-only period key is provided" should {
+
+      "return true" in {
+        controller.validPeriodKey("13AC") shouldBe true
+      }
+    }
+
+    "a valid period key beginning with a # is provided" should {
+
+      "return true" in {
+        controller.validPeriodKey("#001") shouldBe true
+      }
+    }
+
+    "a period key with lower case alphanumeric characters is provided" should {
+
+      "return false" in {
+        controller.validPeriodKey("13ac") shouldBe false
+      }
+    }
+
+    "a period key with an unsupported character is provided" should {
+
+      "return false" in {
+        controller.validPeriodKey("13A*") shouldBe false
+      }
+    }
+
+    "a period key with more than 4 characters is provided" should {
+
+      "return false" in {
+        controller.validPeriodKey("13ACL") shouldBe false
+      }
+    }
+
+    "a period key with less than 4 characters is provided" should {
+
+      "return false" in {
+        controller.validPeriodKey("13A") shouldBe false
       }
     }
   }
