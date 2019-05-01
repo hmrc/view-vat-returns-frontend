@@ -68,7 +68,6 @@ trait AppConfig extends ServicesConfig {
   val submitVatReturnBase: String
   val submitVatReturnUrl: String
   val submitVatReturnForm: String => String
-  val host: String
   def feedbackUrl(redirect: String): String
 }
 
@@ -153,7 +152,7 @@ class FrontendAppConfig @Inject()(val runModeConfiguration: Configuration, val e
 
   override val routeToSwitchLanguage: String => Call = (lang: String) => controllers.routes.LanguageController.switchLanguage(lang)
 
-  override val host: String = getString(Keys.host)
+  private val host: String = getString(Keys.host)
 
   override def feedbackUrl(redirect: String): String = s"$contactHost/contact/beta-feedback?service=$contactFormServiceIdentifier" +
     s"&backUrl=${ContinueUrl(host + redirect).encodedUrl}"
