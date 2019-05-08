@@ -62,6 +62,7 @@ yourVatReturn.reportLink2 = report any other errors (opens in a new tab)
 yourVatReturn.reportLink3 = to HMRC.
 yourVatReturn.bullet1 = £10,000 or less
 yourVatReturn.bullet2 = 1% or less of your box 6 figure and below £50,000
+yourVatReturn.returnTotal = Return total
 
 paymentStatus.youPaid = You paid:
 paymentStatus.returnTotal = Return total:
@@ -70,6 +71,7 @@ paymentStatus.hmrcPaid = HMRC paid you:
 paymentStatus.billToPay = You need to pay this bill by {0}.
 paymentStatus.paymentProcessing = It can take up to 7 days to show that you have made a payment.
 paymentStatus.repaymentProcessing = It can take up to 30 days for you to receive a repayment.
+paymentStatus.whatYouOweCalc = We have worked out what you owe based on any payments you might have made on your account.
 
 boxFiveDescription.totalYouOwed = Total VAT you owed
 boxFiveDescription.totalYouOwe = Total VAT you owe

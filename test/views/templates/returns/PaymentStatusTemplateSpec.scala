@@ -24,13 +24,16 @@ import views.templates.TemplateBaseSpec
 
 class PaymentStatusTemplateSpec extends TemplateBaseSpec {
 
+  val whatYouOweCalc = "We have worked out what you owe based on any payments you might have made on your account. "
+
   "Rendering the payment status information" when {
 
     "then User is NOT Hybrid and" when {
 
       "the user owes money on their VAT return" should {
 
-        val expectedText = "You need to pay this bill by 11 November 2011. " +
+        val expectedText = whatYouOweCalc +
+          "You need to pay this bill by 11 November 2011. " +
           "It can take up to 7 days to show that you have made a payment. Return total: £1,000"
 
         val template = views.html.templates.returns.paymentStatus(
@@ -49,7 +52,7 @@ class PaymentStatusTemplateSpec extends TemplateBaseSpec {
 
       "the user has paid off their VAT return" should {
 
-        val expectedText = "You paid: £1,000"
+        val expectedText = whatYouOweCalc + "You paid: £1,000"
 
         val template = views.html.templates.returns.paymentStatus(
           1000,
@@ -67,7 +70,8 @@ class PaymentStatusTemplateSpec extends TemplateBaseSpec {
 
       "the user is waiting for HMRC to pay them back for their VAT return" should {
 
-        val expectedText = "It can take up to 30 days for you to receive a repayment. HMRC will pay you: £1,000"
+        val expectedText = whatYouOweCalc + "It can take up to 30 days for you to receive a repayment. " +
+          "HMRC will pay you: £1,000"
 
         val template = views.html.templates.returns.paymentStatus(
           1000,
@@ -85,7 +89,7 @@ class PaymentStatusTemplateSpec extends TemplateBaseSpec {
 
       "the user has been paid by HMRC for their VAT return" should {
 
-        val expectedText = "HMRC paid you: £1,000"
+        val expectedText = whatYouOweCalc + "HMRC paid you: £1,000"
 
         val template = views.html.templates.returns.paymentStatus(
           1000,
@@ -117,6 +121,14 @@ class PaymentStatusTemplateSpec extends TemplateBaseSpec {
 
       "render the expected text" in {
         document.body().text() shouldBe expectedText
+      }
+
+      "not render the paragraph about how what you owe has been calculated" in {
+        document.body().text() shouldNot contain(whatYouOweCalc)
+      }
+
+      "not render what you have paid" in {
+        document.body().text() shouldNot contain("You paid:")
       }
     }
   }

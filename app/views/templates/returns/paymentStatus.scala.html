@@ -23,6 +23,9 @@
 @if(isHybridUser) {
     <h2 class="heading-large">@messages("paymentStatus.returnTotal") @displayMoney(amount)</h2>
 } else {
+
+    <p>@messages("paymentStatus.whatYouOweCalc")</p>
+
     @(moneyOwed, isRepayment) match {
         case (true, true) => {
             <p>@messages("paymentStatus.repaymentProcessing")</p>
@@ -32,8 +35,7 @@
             <h2 class="heading-large">@messages("paymentStatus.hmrcPaid") @displayMoney(amount)</h2>
         }
         case (true, false) => {
-            <p>@messages("paymentStatus.billToPay", displayDate(dueDate))</p>
-            <p>@messages("paymentStatus.paymentProcessing")</p>
+            <p>@messages("paymentStatus.billToPay", displayDate(dueDate)) @messages("paymentStatus.paymentProcessing")</p>
             <h2 class="heading-large">@messages("paymentStatus.returnTotal") @displayMoney(amount)</h2>
         }
         case (false, false) => {
