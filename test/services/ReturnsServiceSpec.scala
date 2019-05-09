@@ -24,7 +24,7 @@ import models._
 import models.Obligation.Status
 import models.payments.{Payment, Payments}
 import models.User
-import models.errors.{DirectDebitStatusError, MandationStatusError, ServerSideError}
+import models.errors.{MandationStatusError, ServerSideError}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits._
@@ -295,34 +295,6 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
     }
   }
 
-  "Calling the .getDirectDebitStatus function" when {
-
-    "the user has a direct debit setup" should {
-
-      "return a DirectDebitStatus with true" in new Test {
-        (mockFinancialDataApiConnector.getDirectDebitStatus(_: String)
-        (_: HeaderCarrier, _: ExecutionContext))
-          .expects(*, *, *)
-          .returns(Future.successful(Right(true)))
-        val paymentsResponse: ServiceResponse[Boolean] = await(service.getDirectDebitStatus("123456789"))
-
-        paymentsResponse shouldBe Right(true)
-      }
-    }
-
-    "the connector call fails" should {
-
-      "return None" in new Test {
-        (mockFinancialDataApiConnector.getDirectDebitStatus(_: String)
-        (_: HeaderCarrier, _: ExecutionContext))
-          .expects(*, *, *)
-          .returns(Future.successful(Left(ServerSideError("", ""))))
-        val paymentsResponse: ServiceResponse[Boolean] = await(service.getDirectDebitStatus("123456789"))
-
-        paymentsResponse shouldBe Left(DirectDebitStatusError)
-      }
-    }
-  }
 
   "Calling the .getMandationStatus function" when {
 

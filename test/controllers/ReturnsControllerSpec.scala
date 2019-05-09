@@ -23,7 +23,7 @@ import audit.models.AuditModel
 import models._
 import models.User
 import models.customer.CustomerDetail
-import models.errors.{DirectDebitStatusError, NotFoundError, VatReturnError}
+import models.errors.{NotFoundError, VatReturnError}
 import models.payments.Payment
 import models.viewModels.VatReturnViewModel
 import play.api.http.Status
@@ -103,7 +103,6 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
   private trait Test {
     val serviceCall: Boolean = true
     val successReturn: Boolean = true
-    val directDebitStatus: ServiceResponse[Boolean] = Right(false)
     val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
     val vatReturnResult: Future[ServiceResponse[VatReturn]] = Future.successful(Right(exampleVatReturn))
     val paymentResult: Future[Option[Payment]] = Future.successful(Some(examplePayment))
@@ -125,10 +124,6 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         (mockVatReturnService.getPayment(_: User, _: String, _: Option[Int])(_: HeaderCarrier, _: ExecutionContext))
           .expects(*, *, *, *, *)
           .returns(paymentResult)
-
-        (mockVatReturnService.getDirectDebitStatus(_: String)(_: HeaderCarrier, _:ExecutionContext))
-          .expects(*, *, *)
-          .returns(directDebitStatus)
 
         (mockSubscriptionService.getUserDetails(_: User)(_: HeaderCarrier, _: ExecutionContext))
           .expects(*, *, *)
@@ -339,7 +334,6 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         showReturnsBreadcrumb = true,
         currentYear = 2018,
         hasFlatRateScheme = true,
-        hasDirectDebit = false,
         isHybridUser = false
       )
 
@@ -349,8 +343,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         exampleCustomerDetail,
         exampleObligation,
         exampleVatReturnDetails,
-        isReturnsPageRequest = true,
-        directDebitStatus = false
+        isReturnsPageRequest = true
       )
       result shouldBe expectedViewModel
     }
@@ -373,7 +366,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
           .stubs(*, *, *, *)
           .returns({})
       }
-      val data = ReturnsControllerData(Right(exampleVatReturn), None, Some(examplePayment), Some(exampleObligation), Right(false))
+      val data = ReturnsControllerData(Right(exampleVatReturn), None, Some(examplePayment), Some(exampleObligation))
       def result: Result = controller.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
 
       "return an OK status" in {
@@ -385,7 +378,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     "the VAT return is not found" should {
 
       "return a Not Found status" in {
-        val data = ReturnsControllerData(Left(NotFoundError), None, None, None, Left(DirectDebitStatusError))
+        val data = ReturnsControllerData(Left(NotFoundError), None, None, None)
         val result = controller.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
         result.header.status shouldBe Status.NOT_FOUND
       }
@@ -394,7 +387,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     "there is a VAT return but no obligation" should {
 
       "return an Internal Server Error status" in {
-        val data = ReturnsControllerData(Right(exampleVatReturn), None, None, None, Right(false))
+        val data = ReturnsControllerData(Right(exampleVatReturn), None, None, None)
         val result = controller.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
         result.header.status shouldBe Status.INTERNAL_SERVER_ERROR
       }
@@ -403,35 +396,13 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     "there is any other combination" should {
 
       "return an Internal Server Error status" in {
-        val data = ReturnsControllerData(Left(VatReturnError), None, None, None, Left(DirectDebitStatusError))
+        val data = ReturnsControllerData(Left(VatReturnError), None, None, None)
         val result = controller.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
         result.header.status shouldBe Status.INTERNAL_SERVER_ERROR
       }
     }
   }
 
-  "Calling .getDirectDebitStatus" when {
-
-    "the service response is successful" should {
-
-      "return the boolean in the service response" in new Test {
-        override def setup(): Any = ()
-        val serviceResponse = Right(true)
-        val result: Boolean = target.getDirectDebitStatus(serviceResponse)
-        result shouldBe true
-      }
-    }
-
-    "the service response fails" should {
-
-      "return false" in new Test {
-        override def setup(): Any = ()
-        val serviceResponse = Left(DirectDebitStatusError)
-        val result: Boolean = target.getDirectDebitStatus(serviceResponse)
-        result shouldBe false
-      }
-    }
-  }
 
   "Calling .validPeriodKey" when {
 

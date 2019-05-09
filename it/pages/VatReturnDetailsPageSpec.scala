@@ -59,7 +59,6 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
           returnsStub.stubSuccessfulVatReturn
           obligationsStub.stubFulfilledObligations
           FinancialDataStub.stubAllOutstandingPayments
-          FinancialDataStub.stubSuccessfulDirectDebit
         }
 
         val response: WSResponse = await(request().get())
@@ -79,7 +78,6 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
           returnsStub.stubSuccessfulVatReturn
           obligationsStub.stubFulfilledObligations
           FinancialDataStub.stubAllOutstandingPayments
-          FinancialDataStub.stubSuccessfulDirectDebit
         }
 
         val response: WSResponse = await(request().get())

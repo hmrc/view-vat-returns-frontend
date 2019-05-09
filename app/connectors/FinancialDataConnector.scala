@@ -34,8 +34,6 @@ class FinancialDataConnector @Inject()(http: HttpClient,
                                        dateService: DateService) {
 
   private[connectors] def paymentsUrl(vrn: String): String = s"${appConfig.financialDataBaseUrl}/financial-transactions/vat/$vrn"
-  private[connectors] def directDebitUrl(vrn: String): String = s"${appConfig.financialDataBaseUrl}/financial-transactions/has-direct-debit/$vrn"
-
 
   def getPayments(vrn: String, year: Option[Int])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[Payments]] = {
 
@@ -66,24 +64,6 @@ class FinancialDataConnector @Inject()(http: HttpClient,
         payments
       case httpError@Left(error) =>
         metrics.getPaymentsCallFailureCounter.inc()
-        Logger.warn("FinancialDataConnector received error: " + error.message)
-        httpError
-    }
-  }
-
-
-  def getDirectDebitStatus(vrn: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[Boolean]] = {
-
-    import connectors.httpParsers.DirectDebitStatusHttpParser.DirectDebitStatusReads
-
-    val timer = metrics.getDirectDebitStatusTimer.time()
-
-    http.GET(directDebitUrl(vrn)).map{
-      case directDebitStatus@Right(_) =>
-        timer.stop()
-        directDebitStatus
-      case httpError@Left(error) =>
-        metrics.getDirectDebitStatusFailureCounter.inc()
         Logger.warn("FinancialDataConnector received error: " + error.message)
         httpError
     }

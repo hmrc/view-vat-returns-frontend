@@ -141,34 +141,4 @@ class FinancialDataConnectorISpec extends IntegrationBaseSpec {
     }
   }
 
-
-  "calling getDirectDebitStatus with a valid VRN" should {
-    "return a Boolean" in new Test {
-      override def setupStubs(): StubMapping = FinancialDataStub.stubSuccessfulDirectDebit
-
-      val expected = Right(true)
-
-      setupStubs()
-      private val result = await(connector.getDirectDebitStatus("111111111"))
-
-      result shouldEqual expected
-    }
-  }
-
-  "calling getDirectDebitStatus with an invalid VRN" should {
-
-    "return an BadRequestError" in new Test {
-      override def setupStubs(): StubMapping = FinancialDataStub.stubInvalidVrnDirectDebit
-
-      val expected = Left(BadRequestError(
-        code = "INVALID_VRN",
-        errorResponse = "VRN was invalid!"
-      ))
-
-      setupStubs()
-      private val result = await(connector.getDirectDebitStatus("111"))
-
-      result shouldEqual expected
-    }
-  }
 }
