@@ -81,21 +81,23 @@ class ReturnsService @Inject()(vatObligationsConnector: VatObligationsConnector,
     VatReturnObligations(returnObligations.obligations.filter(_.end.getYear == searchYear))
 
   def getPayment(user: User, requiredPeriod: String, year: Option[Int] = None)
-                (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[Payment]] =
+                (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[Payment]] = {
     financialDataConnector.getPayments(user.vrn, year).map {
       case Right(payments) => filterPaymentsByPeriodKey(payments, requiredPeriod)
       case Left(_) => None
     }
+  }
 
   private[services] def filterPaymentsByPeriodKey(payments: Payments, requiredPeriod: String): Option[Payment] =
     payments.financialTransactions.find(_.periodKey == requiredPeriod)
 
   def constructReturnDetailsModel(vatReturn: VatReturn, payment: Option[Payment]): VatReturnDetails = {
     val moneyOwed = payment.fold(true)(_.outstandingAmount != 0)
-    val isRepayment = vatReturn.vatReclaimedCurrentPeriod > vatReturn.totalVatDue
-    VatReturnDetails(vatReturn, moneyOwed, isRepayment, payment)
+    val oweHmrc: Option[Boolean] = payment map {
+      _.outstandingAmount > 0
+    }
+    VatReturnDetails(vatReturn, moneyOwed, oweHmrc, payment)
   }
-
 
   def getMandationStatus(vrn: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ServiceResponse[MandationStatus]] = {
     vatSubscriptionConnector.getMandationStatusInfo(vrn) map {
@@ -103,5 +105,4 @@ class ReturnsService @Inject()(vatObligationsConnector: VatObligationsConnector,
       case Left(_) => Left(MandationStatusError)
     }
   }
-
 }

@@ -62,9 +62,10 @@
 
     @views.html.templates.returns.paymentStatus(
       vatReturnViewModel.vatReturnDetails.vatReturn.netVatDue,
+      vatReturnViewModel.vatReturnDetails.payment.map(_.outstandingAmount),
       vatReturnViewModel.dueDate,
       vatReturnViewModel.vatReturnDetails.moneyOwed,
-      vatReturnViewModel.vatReturnDetails.isRepayment,
+      vatReturnViewModel.vatReturnDetails.oweHmrc,
       vatReturnViewModel.isHybridUser
     )
 

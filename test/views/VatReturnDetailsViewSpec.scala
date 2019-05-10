@@ -86,9 +86,10 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
         55454,
         545645
       ),
-      moneyOwed = false,
-      isRepayment = false,
-      None
+      moneyOwed = true,
+      oweHmrc = Some(true),
+      Some(Payment("VAT Return Debit Charge", LocalDate.parse("2017-01-01"), LocalDate.parse("2017-03-31"),
+        LocalDate.parse("2017-04-05"), 1000.00, 0, "#001"))
     ),
     showReturnsBreadcrumb = true,
     currentYear,
@@ -143,7 +144,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     }
 
     "have the correct subheading" in {
-      elementText(Selectors.subHeading) shouldBe "You paid: £1,000"
+      elementText(Selectors.subHeading) shouldBe "Return total: £1,000 You owe HMRC: £1,000"
     }
 
     "have the correct trading name" in {
@@ -251,7 +252,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
           545645
         ),
         moneyOwed = false,
-        isRepayment = false,
+        oweHmrc = Some(true),
         None
       ),
       showReturnsBreadcrumb = false,
@@ -298,7 +299,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
           545645
         ),
         moneyOwed = true,
-        isRepayment = false,
+        oweHmrc = Some(true),
         Some(Payment(
           chargeType = "VAT",
           start = LocalDate.parse("2017-01-01"),
@@ -319,7 +320,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct subheading" in {
-      elementText(Selectors.subHeading) shouldBe "Return total: £1,000.25"
+      elementText(Selectors.subHeading) shouldBe "Return total: £1,000.25 You owe HMRC: £1,000"
     }
 
     "have the correct information text under the heading" in {
@@ -358,7 +359,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
           545645
         ),
         moneyOwed = true,
-        isRepayment = true,
+        oweHmrc = Some(false),
         Some(Payment(
           chargeType = "VAT",
           start = LocalDate.parse("2017-01-01"),
@@ -379,7 +380,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct subheading" in {
-      elementText(Selectors.subHeading) shouldBe "HMRC will pay you: £1,000"
+      elementText(Selectors.subHeading) shouldBe "Return total: £1,000 HMRC owes you: £1,000"
     }
 
     "have the correct information text under the heading" in {
@@ -414,13 +415,13 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
           545645
         ),
         moneyOwed = false,
-        isRepayment = true,
+        oweHmrc = Some(false),
         Some(Payment(
-          chargeType = "VAT",
+          chargeType = "VAT Return Credit Charge",
           start = LocalDate.parse("2017-01-01"),
           end = LocalDate.parse("2017-03-31"),
           due = LocalDate.parse("2017-04-06"),
-          outstandingAmount = 1000.00,
+          outstandingAmount = 0,
           clearedAmount = 0,
           periodKey = "#001"
         ))
@@ -435,7 +436,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct subheading" in {
-      elementText(Selectors.subHeading) shouldBe "HMRC paid you: £1,000"
+      elementText(Selectors.subHeading) shouldBe "Return total: £1,000 You owe HMRC: £0"
     }
 
     "have the correct box 5 description in the table" in {
@@ -466,7 +467,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
           545645
         ),
         moneyOwed = true,
-        isRepayment = false,
+        oweHmrc = None,
         None
       ),
       showReturnsBreadcrumb = true,
@@ -507,7 +508,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
           545645
         ),
         moneyOwed = true,
-        isRepayment = false,
+        oweHmrc = Some(true),
         None
       ),
       showReturnsBreadcrumb = true,
@@ -551,7 +552,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
           545645
         ),
         moneyOwed = true,
-        isRepayment = false,
+        oweHmrc = Some(true),
         None
       ),
       showReturnsBreadcrumb = true,

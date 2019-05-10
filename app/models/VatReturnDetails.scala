@@ -21,7 +21,7 @@ import models.payments.Payment
 
 case class VatReturnDetails(vatReturn: VatReturn,
                             moneyOwed: Boolean,
-                            isRepayment: Boolean,
+                            oweHmrc: Option[Boolean],
                             payment: Option[Payment]) {
 
   def isFinalReturn(implicit appConfig: AppConfig): Boolean = vatReturn.periodKey == appConfig.finalReturnPeriodKey

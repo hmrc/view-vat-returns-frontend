@@ -90,7 +90,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
   )
 
   val exampleVatReturnDetails =
-    VatReturnDetails(exampleVatReturn, moneyOwed = true, isRepayment = false, Some(examplePayment))
+    VatReturnDetails(exampleVatReturn, moneyOwed = true, oweHmrc = Some(true), Some(examplePayment))
 
   val mockAuditService: AuditingService = mock[AuditingService]
   val mockDateService: DateService = mock[DateService]
@@ -328,7 +328,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         periodFrom = exampleObligation.start,
         periodTo = exampleObligation.end,
         dueDate = exampleObligation.due,
-        outstandingAmount = examplePayment.outstandingAmount,
+        returnTotal = examplePayment.outstandingAmount,
         dateSubmitted = exampleObligation.received.get,
         vatReturnDetails = exampleVatReturnDetails,
         showReturnsBreadcrumb = true,
