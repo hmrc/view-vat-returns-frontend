@@ -79,16 +79,16 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
       }
 
       "have the 'Return deadlines' title" in {
-        elementText(Selectors.returnDeadlinesBreadCrumb) shouldBe "Return deadlines"
+        elementText(Selectors.returnDeadlinesBreadCrumb) shouldBe "Submit VAT Return"
       }
     }
 
     "have the correct document title" in {
-      document.title shouldBe "Return deadlines"
+      document.title shouldBe "Submit VAT Return"
     }
 
     "have the correct page heading" in {
-      elementText(Selectors.pageHeading) shouldBe "Return deadlines"
+      elementText(Selectors.pageHeading) shouldBe "Submit VAT Return"
     }
 
     "have the correct obligation due date" in {
@@ -126,7 +126,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct obligation due date for the first deadline" in {
-      elementText(Selectors.firstDeadlineDueDate) should include("2 February 2018")
+      elementText(Selectors.firstDeadlineDueDate) should include("Return deadline 2 February 2018")
     }
 
     "have the correct obligation start and end date text for the first deadline" in {
@@ -138,7 +138,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
     }
 
     "have the correct obligation due date for the second deadline" in {
-      elementText(Selectors.secondDeadlineDueDate) should include("12 October 2018")
+      elementText(Selectors.secondDeadlineDueDate) should include("Return deadline 12 October 2018")
     }
 
     "have the correct obligation start and end date text for the second deadline" in {
@@ -161,11 +161,11 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
       )
     )
 
-    lazy val view = views.html.returns.returnDeadlines(finalReturnDeadline)
+    lazy val view = views.html.returns.optOutReturnDeadlines(finalReturnDeadline)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct obligation due date for the deadline" in {
-      elementText(Selectors.firstDeadlineDueDate) should include("2 February 2018")
+      elementText(Selectors.firstDeadlineDueDate) should include("Return deadline 2 February 2018")
     }
 
     "have the wording for the final return period" in {

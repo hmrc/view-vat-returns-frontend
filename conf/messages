@@ -103,6 +103,8 @@ returnDeadlines.receivedReturn = We received your return for the period {0}.
 returnDeadlines.finalReturn = for your final return
 
 returnDeadlines.submitReturn = Submit VAT Return
+returnDeadlines.submitReturn.title = Submit VAT Return
+returnDeadlines.submitReturn.returnDeadline = Return deadline
 
 banner.newService = This is a new service – your
 banner.feedback = feedback
