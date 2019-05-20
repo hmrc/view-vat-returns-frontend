@@ -31,7 +31,7 @@
         case (true, Some(false), Some(outstandingAmnt)) => {
             <p>@messages("paymentStatus.repaymentProcessing")</p>
             <h2 class="heading-large">@messages("paymentStatus.returnTotal") @displayMoney(amount)
-                <span class="heading-medium">@messages("paymentStatus.hmrcOwesYou") @displayMoney(outstandingAmnt)</span>
+                <span class="heading-medium">@messages("paymentStatus.hmrcOwesYou") @displayMoney(outstandingAmnt.abs)</span>
             </h2>
         }
         case (true, Some(true), Some(outstandingAmnt)) => {

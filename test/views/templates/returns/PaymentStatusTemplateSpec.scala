@@ -106,7 +106,7 @@ class PaymentStatusTemplateSpec extends TemplateBaseSpec {
           moneyOwed = true,
           oweHmrc = Some(false),
           isHybridUser = false,
-          outstandingAmount = Some(1000)
+          outstandingAmount = Some(-1000)
         )
         val document: Document = Jsoup.parse(template.body)
 
