@@ -20,34 +20,37 @@
 
 @(deadlines: Seq[ReturnDeadlineViewModel])(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig, lang: Lang)
 
-    @views.html.main_template(title = messages("returnDeadlines.title"), bodyClasses = None, appConfig = appConfig) {
+    @views.html.main_template(title = messages("returnDeadlines.submitReturn.title"), bodyClasses = None, appConfig = appConfig) {
 
         @navigationBreadcrumb(Map(
             appConfig.btaHomeUrl -> messages("breadcrumbs.bta"),
             appConfig.vatDetailsUrl -> messages("breadcrumbs.vat")),
-            currentPage = messages("returnDeadlines.title")
+            currentPage = messages("returnDeadlines.submitReturn.title")
         )
 
         <div class="grid-row">
             <div class="column-two-thirds">
-                <h1 class="heading-xlarge">@messages("returnDeadlines.title")</h1>
+                <h1 class="heading-xlarge">@messages("returnDeadlines.submitReturn.title")</h1>
                 <div class="form-group">
                     <ul class="list">
                     @for(deadline <- deadlines){
                         <li class="section divider--bottom">
                             <p>
-                                <span class="bold-medium">@displayDate(deadline.due)</span>
+                                <span class="bold-medium">
+                                    @messages("returnDeadlines.submitReturn.returnDeadline")
+                                    @displayDate(deadline.due)
+                                </span>
                                 @if(deadline.overdue) {
                                     <span>
                                         <strong class="task-overdue">@messages("common.overdue")</strong>
                                     </span>
                                 }
                                 <span class="form-hint">
-                                @if(deadline.isFinalReturn) {
-                                    @messages("returnDeadlines.finalReturn")
-                                } else {
-                                    @messages("returnDeadlines.periodEnding", displayDateRange(deadline.start, deadline.end))
-                                }
+                                    @if(deadline.isFinalReturn) {
+                                        @messages("returnDeadlines.finalReturn")
+                                    } else {
+                                        @messages("returnDeadlines.periodEnding", displayDateRange(deadline.start, deadline.end))
+                                    }
                                 </span>
                                 <a href="@{appConfig.submitVatReturnForm(deadline.periodKey)}" id="submit-return-link">@messages("returnDeadlines.submitReturn")</a>
                             </p>

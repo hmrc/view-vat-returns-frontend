@@ -38,7 +38,7 @@
             @for(deadline <- deadlines){
             <li class="section divider--bottom">
               <p>
-                <span class="visually-hidden">@messages("returnDeadlines.submitByPrefix")</span>
+                <span class="visually-hidden">@messages("returnDeadlines.submitBy")</span>
                 <span class="bold-medium">@displayDate(deadline.due)</span>
                 @if(deadline.overdue) {
                   <span>
