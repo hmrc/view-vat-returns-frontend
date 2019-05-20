@@ -50,7 +50,9 @@ object PaymentsHttpParser extends ResponseHttpParsers {
     val validCharges: Set[String] = Set(
       "VAT Return Debit Charge",
       "VAT Return Credit Charge",
-      "VAT EC Debit Charge"
+      "VAT EC Debit Charge",
+      "VAT AA Return Debit Charge",
+      "VAT AA Return Credit Charge"
     )
 
     val charges: Seq[JsValue] = (json \ "financialTransactions").as[JsArray].value

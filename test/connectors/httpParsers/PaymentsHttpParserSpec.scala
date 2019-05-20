@@ -54,8 +54,30 @@ class PaymentsHttpParserSpec extends UnitSpec {
               "items" -> Json.arr(
                 Json.obj("dueDate" -> "2018-10-25")
               ),
-              "outstandingAmount" -> 1000,
+              "outstandingAmount" -> -1000,
               "periodKey" -> "#004"
+            ),
+            Json.obj(
+              "mainType" -> "VAT AA Return Charge",
+              "chargeType" -> "VAT AA Return Debit Charge",
+              "taxPeriodFrom" -> "2018-12-01",
+              "taxPeriodTo" -> "2019-01-01",
+              "items" -> Json.arr(
+                Json.obj("dueDate" -> "2019-10-25")
+              ),
+              "outstandingAmount" -> 1000,
+              "periodKey" -> "#005"
+            ),
+            Json.obj(
+              "mainType" -> "VAT AA Return Charge",
+              "chargeType" -> "VAT AA Return Credit Charge",
+              "taxPeriodFrom" -> "2019-12-01",
+              "taxPeriodTo" -> "2020-01-01",
+              "items" -> Json.arr(
+                Json.obj("dueDate" -> "2020-10-25")
+              ),
+              "outstandingAmount" -> -1000,
+              "periodKey" -> "#006"
             )
           )
         )
@@ -76,9 +98,27 @@ class PaymentsHttpParserSpec extends UnitSpec {
           start = LocalDate.parse("2017-12-01"),
           end = LocalDate.parse("2018-01-01"),
           due = LocalDate.parse("2018-10-25"),
-          outstandingAmount = BigDecimal(1000.00),
+          outstandingAmount = BigDecimal(-1000.00),
           clearedAmount = BigDecimal(0),
           periodKey = "#004"
+        ),
+        Payment(
+          "VAT AA Return Debit Charge",
+          start = LocalDate.parse("2018-12-01"),
+          end = LocalDate.parse("2019-01-01"),
+          due = LocalDate.parse("2019-10-25"),
+          outstandingAmount = BigDecimal(1000.00),
+          clearedAmount = BigDecimal(0),
+          periodKey = "#005"
+        ),
+        Payment(
+          "VAT AA Return Credit Charge",
+          start = LocalDate.parse("2019-12-01"),
+          end = LocalDate.parse("2020-01-01"),
+          due = LocalDate.parse("2020-10-25"),
+          outstandingAmount = BigDecimal(-1000.00),
+          clearedAmount = BigDecimal(0),
+          periodKey = "#006"
         )
       )))
 
