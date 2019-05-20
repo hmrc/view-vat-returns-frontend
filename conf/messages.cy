@@ -88,19 +88,17 @@ yourVatReturn.reportLink2 = roi gwybod am unrhyw wallau eraill (yn agor mewn tab
 yourVatReturn.reportLink3 = i CThEM.
 yourVatReturn.bullet1 = £10,000 neu lai
 yourVatReturn.bullet2 = 1% neu’n llai o’ch ffigur ym mlwch 6 ac yn is na £50,000
+yourVatReturn.returnTotal = Cyfanswm y Ffurflen TAW
 
 paymentStatus.youPaid = Rydych wedi talu:
 paymentStatus.returnTotal = Cyfanswm y Ffurflen TAW:
-paymentStatus.hmrcWillPay = Bydd CThEM yn talu’r canlynol i chi:
 paymentStatus.hmrcPaid = Talodd CThEM y canlynol i chi:
+paymentStatus.hmrcOwesYou = Mae ar CThEM y swm hwn i chi:
+paymentStatus.youOweHmrc = Mae arnoch y swm hwn i CThEM:
 paymentStatus.billToPay = Mae’n rhaid i chi dalu’r bil hwn erbyn {0}.
 paymentStatus.paymentProcessing = Gall gymryd hyd at 7 diwrnod i ddangos eich bod wedi gwneud taliad.
 paymentStatus.repaymentProcessing = Gall gymryd hyd at 30 diwrnod i chi gael ad-daliad.
-
-boxFiveDescription.totalYouOwed = Cyfanswm y TAW yr oedd arnoch
-boxFiveDescription.totalYouOwe = Cyfanswm y TAW sydd arnoch
-boxFiveDescription.hmrcWillPay = Cyfanswm y TAW sydd ar CThEM i chi
-boxFiveDescription.hmrcPaid = Cyfanswm y TAW yr oedd ar CThEM i chi
+paymentStatus.whatYouOweCalc = Rydym wedi cyfrifo’r hyn sydd arnoch ar sail unrhyw daliadau mae’n bosibl eich bod wedi eu gwneud ar eich cyfrif.
 
 submittedReturns.title = Ffurflenni TAW wedi’u cyflwyno
 submittedReturns.yearReturns = {0} Ffurflen TAW

@@ -24,21 +24,27 @@ import views.templates.TemplateBaseSpec
 
 class PaymentStatusTemplateSpec extends TemplateBaseSpec {
 
+  val whatYouOweCalc = "We have worked out what you owe based on any payments you might have made on your account. "
+
   "Rendering the payment status information" when {
 
     "then User is NOT Hybrid and" when {
 
       "the user owes money on their VAT return" should {
 
-        val expectedText = "You need to pay this bill by 11 November 2011. " +
-          "It can take up to 7 days to show that you have made a payment. Return total: £1,000"
+        val expectedText = whatYouOweCalc +
+          "You need to pay this bill by 11 November 2011. " +
+          "It can take up to 7 days to show that you have made a payment. " +
+          "Return total: £1,000 " +
+          "You owe HMRC: £1,000"
 
         val template = views.html.templates.returns.paymentStatus(
           1000,
-          LocalDate.parse("2011-11-11"),
+          dueDate = LocalDate.parse("2011-11-11"),
           moneyOwed = true,
-          isRepayment = false,
-          isHybridUser = false
+          oweHmrc = Some(true),
+          isHybridUser = false,
+          outstandingAmount = Some(1000)
         )
         val document: Document = Jsoup.parse(template.body)
 
@@ -47,16 +53,40 @@ class PaymentStatusTemplateSpec extends TemplateBaseSpec {
         }
       }
 
-      "the user has paid off their VAT return" should {
+      "the outstanding amount on the return is zero" should {
 
-        val expectedText = "You paid: £1,000"
+        val expectedText = whatYouOweCalc + "Return total: £0 You owe HMRC: £0"
+
+        val template = views.html.templates.returns.paymentStatus(
+          0,
+          dueDate = LocalDate.parse("2011-11-11"),
+          moneyOwed = false,
+          oweHmrc = Some(false),
+          isHybridUser = false,
+          outstandingAmount = Some(0)
+        )
+        val document: Document = Jsoup.parse(template.body)
+
+        "render the expected text" in {
+          document.body().text() shouldBe expectedText
+        }
+      }
+
+      "the outstanding amount on the return is less than the return amount" should {
+
+        val expectedText = whatYouOweCalc +
+          "You need to pay this bill by 11 November 2011. " +
+          "It can take up to 7 days to show that you have made a payment. " +
+          "Return total: £1,000 " +
+          "You owe HMRC: £500"
 
         val template = views.html.templates.returns.paymentStatus(
           1000,
-          LocalDate.parse("2011-11-11"),
-          moneyOwed = false,
-          isRepayment = false,
-          isHybridUser = false
+          dueDate = LocalDate.parse("2011-11-11"),
+          moneyOwed = true,
+          oweHmrc = Some(true),
+          isHybridUser = false,
+          outstandingAmount = Some(500)
         )
         val document: Document = Jsoup.parse(template.body)
 
@@ -67,32 +97,16 @@ class PaymentStatusTemplateSpec extends TemplateBaseSpec {
 
       "the user is waiting for HMRC to pay them back for their VAT return" should {
 
-        val expectedText = "It can take up to 30 days for you to receive a repayment. HMRC will pay you: £1,000"
+        val expectedText = whatYouOweCalc + "It can take up to 30 days for you to receive a repayment. " +
+          "Return total: £1,000 HMRC owes you: £1,000"
 
         val template = views.html.templates.returns.paymentStatus(
           1000,
-          LocalDate.parse("2011-11-11"),
+          dueDate = LocalDate.parse("2011-11-11"),
           moneyOwed = true,
-          isRepayment = true,
-          isHybridUser = false
-        )
-        val document: Document = Jsoup.parse(template.body)
-
-        "render the expected text" in {
-          document.body().text() shouldBe expectedText
-        }
-      }
-
-      "the user has been paid by HMRC for their VAT return" should {
-
-        val expectedText = "HMRC paid you: £1,000"
-
-        val template = views.html.templates.returns.paymentStatus(
-          1000,
-          LocalDate.parse("2011-11-11"),
-          moneyOwed = false,
-          isRepayment = true,
-          isHybridUser = false
+          oweHmrc = Some(false),
+          isHybridUser = false,
+          outstandingAmount = Some(1000)
         )
         val document: Document = Jsoup.parse(template.body)
 
@@ -108,15 +122,24 @@ class PaymentStatusTemplateSpec extends TemplateBaseSpec {
 
       val template = views.html.templates.returns.paymentStatus(
         1000,
-        LocalDate.parse("2011-11-11"),
+        dueDate = LocalDate.parse("2011-11-11"),
+        oweHmrc = Some(false),
         moneyOwed = false,
-        isRepayment = false,
-        isHybridUser = true
+        isHybridUser = true,
+        outstandingAmount = Some(1000)
       )
       val document: Document = Jsoup.parse(template.body)
 
       "render the expected text" in {
         document.body().text() shouldBe expectedText
+      }
+
+      "not render the paragraph about how what you owe has been calculated" in {
+        document.body().text() shouldNot contain(whatYouOweCalc)
+      }
+
+      "not render what HMRC owes the user" in {
+        document.body().text() shouldNot contain("HMRC owes you: £1,000")
       }
     }
   }

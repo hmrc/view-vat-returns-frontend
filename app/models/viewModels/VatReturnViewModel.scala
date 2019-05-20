@@ -24,12 +24,11 @@ case class VatReturnViewModel(entityName: Option[String],
                               periodFrom: LocalDate,
                               periodTo: LocalDate,
                               dueDate: LocalDate,
-                              outstandingAmount: BigDecimal,
+                              returnTotal: BigDecimal,
                               dateSubmitted: LocalDate,
                               vatReturnDetails: VatReturnDetails,
                               showReturnsBreadcrumb: Boolean,
                               currentYear: Int,
                               hasFlatRateScheme: Boolean,
-                              hasDirectDebit: Boolean,
                               isHybridUser: Boolean
                              )

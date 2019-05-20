@@ -51,7 +51,6 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
           val vatReturnCall = returnsService.getVatReturn(user, periodKey)
           val entityNameCall = subscriptionService.getUserDetails(user)
           val obligationCall = returnsService.getObligationWithMatchingPeriodKey(user, year, periodKey)
-          val hasDirectDebitCall = returnsService.getDirectDebitStatus(user.vrn)
 
           def financialDataCall(customerInfo: Option[CustomerDetail]): Future[Option[Payment]] = {
             val isHybridUser = customerInfo.fold(false)(_.isPartialMigration)
@@ -63,9 +62,8 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
             customerInfo <- entityNameCall
             payment <- financialDataCall(customerInfo)
             obligation <- obligationCall
-            directDebit <- hasDirectDebitCall
           } yield {
-            val data = ReturnsControllerData(vatReturn, customerInfo, payment, obligation, directDebit)
+            val data = ReturnsControllerData(vatReturn, customerInfo, payment, obligation)
             renderResult(data, isReturnsPageRequest)
           }
         } else {
@@ -82,7 +80,6 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
           val vatReturnCall = returnsService.getVatReturn(user, periodKey)
           val entityNameCall = subscriptionService.getUserDetails(user)
           val financialDataCall = returnsService.getPayment(user, periodKey)
-          val hasDirectDebitCall = returnsService.getDirectDebitStatus(user.vrn)
 
           def obligationCall(payment: Option[Payment]) = {
             payment.fold(Future.successful(Option.empty[VatReturnObligation])) { p =>
@@ -95,9 +92,8 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
             customerInfo <- entityNameCall
             payment <- financialDataCall
             obligation <- obligationCall(payment)
-            directDebit <- hasDirectDebitCall
           } yield {
-            val data = ReturnsControllerData(vatReturnResult, customerInfo, payment, obligation, directDebit)
+            val data = ReturnsControllerData(vatReturnResult, customerInfo, payment, obligation)
             renderResult(data, isReturnsPageRequest)
           }
         } else {
@@ -110,8 +106,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
     (pageData.vatReturnResult, pageData.obligation, pageData.payment) match {
       case (Right(vatReturn), Some(ob), payment) =>
         val returnDetails = returnsService.constructReturnDetailsModel(vatReturn, payment)
-        val directDebit = getDirectDebitStatus(pageData.hasDirectDebit)
-        val viewModel = constructViewModel(pageData.customerInfo, ob, returnDetails, isReturnsPageRequest, directDebit)
+        val viewModel = constructViewModel(pageData.customerInfo, ob, returnDetails, isReturnsPageRequest)
         auditEvent(isReturnsPageRequest, viewModel)
         Ok(views.html.returns.vatReturnDetails(viewModel))
       case (Left(NotFoundError), _, _) =>
@@ -122,15 +117,6 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
       case _ =>
         Logger.warn("[ReturnsController][renderResult] error: Unknown error")
         InternalServerError(views.html.errors.technicalProblem())
-    }
-  }
-
-  private[controllers] def getDirectDebitStatus(response: ServiceResponse[Boolean]): Boolean = {
-    response match {
-      case Right(directDebit) => directDebit
-      case Left(error) =>
-        Logger.warn("[ReturnsController][getDirectDebitStatus] error: " + error.toString)
-        false
     }
   }
 
@@ -151,8 +137,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
   private[controllers] def constructViewModel(customerDetail: Option[CustomerDetail],
                                               obligation: VatReturnObligation,
                                               returnDetails: VatReturnDetails,
-                                              isReturnsPageRequest: Boolean,
-                                              directDebitStatus: Boolean): VatReturnViewModel = {
+                                              isReturnsPageRequest: Boolean): VatReturnViewModel = {
 
     val amountToShow: BigDecimal = returnDetails.vatReturn.netVatDue
 
@@ -161,13 +146,12 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
       periodFrom = obligation.start,
       periodTo = obligation.end,
       dueDate = obligation.due,
-      outstandingAmount = amountToShow,
+      returnTotal = amountToShow,
       dateSubmitted = obligation.received.get,
       vatReturnDetails = returnDetails,
       showReturnsBreadcrumb = isReturnsPageRequest,
       currentYear = dateService.now().getYear,
       hasFlatRateScheme = customerDetail.fold(false)(_.hasFlatRateScheme),
-      hasDirectDebit = directDebitStatus,
       isHybridUser = customerDetail.fold(false)(_.isPartialMigration)
     )
   }

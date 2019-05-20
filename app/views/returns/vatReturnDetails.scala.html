@@ -62,9 +62,10 @@
 
     @views.html.templates.returns.paymentStatus(
       vatReturnViewModel.vatReturnDetails.vatReturn.netVatDue,
+      vatReturnViewModel.vatReturnDetails.payment.map(_.outstandingAmount),
       vatReturnViewModel.dueDate,
       vatReturnViewModel.vatReturnDetails.moneyOwed,
-      vatReturnViewModel.vatReturnDetails.isRepayment,
+      vatReturnViewModel.vatReturnDetails.oweHmrc,
       vatReturnViewModel.isHybridUser
     )
 
@@ -111,7 +112,7 @@
           <div class="column-one-quarter"><strong class="bold-small">@messages("yourVatReturn.boxFive")</strong></div>
           <div class="column-one-half">
             <strong class="bold-small">
-              @views.html.templates.returns.boxFiveDescription(vatReturnViewModel.vatReturnDetails.moneyOwed, vatReturnViewModel.vatReturnDetails.isRepayment, vatReturnViewModel.isHybridUser)
+              @messages("yourVatReturn.returnTotal")
             </strong>
           </div>
           <div class="column-one-quarter text--right">
