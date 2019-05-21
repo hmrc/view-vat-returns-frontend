@@ -94,6 +94,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     showReturnsBreadcrumb = true,
     currentYear,
     hasFlatRateScheme = true,
+    isOptOutMtdVatUser = false,
     isHybridUser = false
   )
 
@@ -258,6 +259,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       showReturnsBreadcrumb = false,
       currentYear,
       hasFlatRateScheme = true,
+      isOptOutMtdVatUser = false,
       isHybridUser = false
     )
 
@@ -313,6 +315,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       showReturnsBreadcrumb = false,
       currentYear,
       hasFlatRateScheme = true,
+      isOptOutMtdVatUser = false,
       isHybridUser = false
     )
 
@@ -373,6 +376,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       showReturnsBreadcrumb = false,
       currentYear,
       hasFlatRateScheme = true,
+      isOptOutMtdVatUser = false,
       isHybridUser = false
     )
 
@@ -429,6 +433,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       showReturnsBreadcrumb = false,
       currentYear,
       hasFlatRateScheme = true,
+      isOptOutMtdVatUser = false,
       isHybridUser = false
     )
 
@@ -473,6 +478,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       showReturnsBreadcrumb = true,
       currentYear,
       hasFlatRateScheme = true,
+      isOptOutMtdVatUser = false,
       isHybridUser = false
     )
 
@@ -514,6 +520,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       showReturnsBreadcrumb = true,
       currentYear,
       hasFlatRateScheme = true,
+      isOptOutMtdVatUser = false,
       isHybridUser = false
     )
 
@@ -558,6 +565,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       showReturnsBreadcrumb = true,
       currentYear,
       hasFlatRateScheme = true,
+      isOptOutMtdVatUser = false,
       isHybridUser = false
     )
 

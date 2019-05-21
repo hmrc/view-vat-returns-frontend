@@ -334,6 +334,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         showReturnsBreadcrumb = true,
         currentYear = 2018,
         hasFlatRateScheme = true,
+        isOptOutMtdVatUser = true,
         isHybridUser = false
       )
 

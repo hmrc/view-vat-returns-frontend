@@ -30,5 +30,6 @@ case class VatReturnViewModel(entityName: Option[String],
                               showReturnsBreadcrumb: Boolean,
                               currentYear: Int,
                               hasFlatRateScheme: Boolean,
+                              isOptOutMtdVatUser: Boolean,
                               isHybridUser: Boolean
                              )
