@@ -108,7 +108,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     }
 
     "have the correct page heading" in {
-      elementText(Selectors.pageHeading) should include ("Submitted returns")
+      elementText(Selectors.pageHeading) should include("Submitted returns")
     }
 
     "render breadcrumbs which" should {
@@ -190,7 +190,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
 
     "render the correct text for the help section first paragraph" in {
       elementText(Selectors.helpLine1) shouldBe
-        "You can correct certain errors in your next return, using your accounting software. To do this, "  +
+        "You can correct certain errors in your next return, using your accounting software. To do this, " +
           "the error must have happened in an accounting period that ended in the last 4 years and be either:"
     }
 
@@ -569,15 +569,50 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       isHybridUser = false
     )
 
-    lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
-    lazy implicit val document: Document = Jsoup.parse(view.body)
 
-    "have the pageHeading of 'Final return'" in {
-      elementText(Selectors.pageHeading) shouldBe "Submitted returns Final return"
-    }
+    "Rendering the VAT return details page when the user is opted out" should {
 
-    "have the breadcrumb heading of 'Final return" in {
-      elementText(Selectors.currentPage) shouldBe "Final return"
+      val vatReturnViewModel = VatReturnViewModel(
+        None,
+        LocalDate.parse("2017-01-01"),
+        LocalDate.parse("2017-03-31"),
+        LocalDate.parse("2017-04-06"),
+        1000.00,
+        LocalDate.parse("2017-04-08"),
+        VatReturnDetails(
+          VatReturn(
+            "9999",
+            1297,
+            5755,
+            7052,
+            5732,
+            1000,
+            77656,
+            765765,
+            55454,
+            545645
+          ),
+          moneyOwed = true,
+          oweHmrc = Some(true),
+          None
+        ),
+        showReturnsBreadcrumb = true,
+        currentYear,
+        hasFlatRateScheme = true,
+        isOptOutMtdVatUser = true,
+        isHybridUser = false
+      )
+
+      lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
+      lazy implicit val document: Document = Jsoup.parse(view.body)
+
+      "have the pageHeading of 'Final return'" in {
+        elementText(Selectors.pageHeading) shouldBe "Submitted returns Final return"
+      }
+
+      "have the breadcrumb heading of 'Final return" in {
+        elementText(Selectors.currentPage) shouldBe "Final return"
+      }
     }
   }
 }
