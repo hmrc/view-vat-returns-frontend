@@ -65,6 +65,57 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
         response.status shouldBe Status.OK
       }
     }
+
+    "the user is authenticated, has an outstanding obligation and a related " +
+      "VAT AA Return Credit Charge with an outstanding amount owed to the user" should {
+
+      "return 200" in new PaymentReturnRouteTest {
+        override def setupStubs(): StubMapping = {
+          AuthStub.authorised()
+          CustomerInfoStub.stubCustomerInfo
+          returnsStub.stubSuccessfulVatReturn
+          obligationsStub.stubFulfilledObligations
+          FinancialDataStub.stubAAReturnCreditChargeOutstandingPayment
+        }
+
+        val response: WSResponse = await(request().get())
+        response.status shouldBe Status.OK
+      }
+    }
+
+    "the user is authenticated, has an outstanding obligation and a related " +
+      "VAT AA Return Debit Charge with an outstanding amount of zero" should {
+
+      "return 200" in new PaymentReturnRouteTest {
+        override def setupStubs(): StubMapping = {
+          AuthStub.authorised()
+          CustomerInfoStub.stubCustomerInfo
+          returnsStub.stubSuccessfulVatReturn
+          obligationsStub.stubFulfilledObligations
+          FinancialDataStub.stubAAReturnDebitChargeOutstandingPayment(0)
+        }
+
+        val response: WSResponse = await(request().get())
+        response.status shouldBe Status.OK
+      }
+    }
+
+    "the user is authenticated, has outstanding obligations and no related charge" should {
+
+      "return 200" in new ReturnRouteTest {
+
+        override def setupStubs(): StubMapping = {
+          AuthStub.authorised()
+          CustomerInfoStub.stubCustomerInfo
+          returnsStub.stubSuccessfulVatReturn
+          obligationsStub.stubFulfilledObligations
+          FinancialDataStub.stubNoPayments
+        }
+
+        val response: WSResponse = await(request().get())
+        response.status shouldBe Status.OK
+      }
+    }
   }
 
   "Calling the /:periodKey route" when {
@@ -78,6 +129,23 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
           returnsStub.stubSuccessfulVatReturn
           obligationsStub.stubFulfilledObligations
           FinancialDataStub.stubAllOutstandingPayments
+        }
+
+        val response: WSResponse = await(request().get())
+        response.status shouldBe Status.OK
+      }
+    }
+
+    "the user is authenticated, has an outstanding obligation and a related " +
+      "VAT AA Return Debit Charge with an outstanding amount owed to HMRC" should {
+
+      "return 200" in new PaymentReturnRouteTest {
+        override def setupStubs(): StubMapping = {
+          AuthStub.authorised()
+          CustomerInfoStub.stubCustomerInfo
+          returnsStub.stubSuccessfulVatReturn
+          obligationsStub.stubFulfilledObligations
+          FinancialDataStub.stubAAReturnDebitChargeOutstandingPayment(5000)
         }
 
         val response: WSResponse = await(request().get())
