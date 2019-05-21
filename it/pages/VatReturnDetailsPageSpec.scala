@@ -50,7 +50,8 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
 
   "Calling the /submitted/:year/:periodKey route" when {
 
-    "the user is authenticated and all dependent APIs return a valid response" should {
+    "the user is authenticated, has an outstanding obligation and a related + " +
+      "VAT Return Credit Charge with an outstanding amount owed to the user" should {
 
       "return 200" in new ReturnRouteTest {
         override def setupStubs(): StubMapping = {
@@ -58,7 +59,24 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
           CustomerInfoStub.stubCustomerInfo
           returnsStub.stubSuccessfulVatReturn
           obligationsStub.stubFulfilledObligations
-          FinancialDataStub.stubAllOutstandingPayments
+          FinancialDataStub.stubVatReturnCreditCharge
+        }
+
+        val response: WSResponse = await(request().get())
+        response.status shouldBe Status.OK
+      }
+    }
+
+    "the user is authenticated, has an outstanding obligation and a related + " +
+      "VAT Return Debit Charge with an outstanding amount of zero" should {
+
+      "return 200" in new ReturnRouteTest {
+        override def setupStubs(): StubMapping = {
+          AuthStub.authorised()
+          CustomerInfoStub.stubCustomerInfo
+          returnsStub.stubSuccessfulVatReturn
+          obligationsStub.stubFulfilledObligations
+          FinancialDataStub.stubVatReturnDebitCharge(0)
         }
 
         val response: WSResponse = await(request().get())
@@ -120,7 +138,8 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
 
   "Calling the /:periodKey route" when {
 
-    "the user is authenticated and all dependent APIs return a valid response" should {
+    "the user is authenticated, has an outstanding obligation and a related " +
+      "VAT Return Debit Charge with an outstanding amount owed to HMRC" should {
 
       "return 200" in new PaymentReturnRouteTest {
         override def setupStubs(): StubMapping = {
@@ -128,7 +147,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
           CustomerInfoStub.stubCustomerInfo
           returnsStub.stubSuccessfulVatReturn
           obligationsStub.stubFulfilledObligations
-          FinancialDataStub.stubAllOutstandingPayments
+          FinancialDataStub.stubVatReturnDebitCharge(4000)
         }
 
         val response: WSResponse = await(request().get())

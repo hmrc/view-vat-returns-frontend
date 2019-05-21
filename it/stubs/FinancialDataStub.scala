@@ -45,9 +45,14 @@ object FinancialDataStub extends WireMockMethods{
       .thenReturn(status = OK, body = allPayments)
   }
 
-  def stubSingleAAInstalmentCharge: StubMapping = {
+  def stubVatReturnDebitCharge(outstandingAmount: BigDecimal): StubMapping = {
     when(method = GET, uri = financialDataUri)
-      .thenReturn(status = OK, body = aaSingleInstalment)
+      .thenReturn(status = OK, body = generateTransaction("VAT Return Debit Charge", outstandingAmount))
+  }
+
+  def stubVatReturnCreditCharge: StubMapping = {
+    when(method = GET, uri = financialDataUri)
+      .thenReturn(status = OK, body = generateTransaction("VAT Return Credit Charge", -100))
   }
 
   def stubNoPayments: StubMapping = {
@@ -60,90 +65,48 @@ object FinancialDataStub extends WireMockMethods{
       .thenReturn(BAD_REQUEST, body = invalidVrn)
   }
 
+  def generateCharge(chargeType: String, periodKey: String, outstandingAmount: BigDecimal): String =
+    s"""{
+       |   "chargeType" : "$chargeType",
+       |   "mainType" : "Blah",
+       |   "periodKey" : "$periodKey",
+       |   "taxPeriodFrom" : "2018-05-01",
+       |   "taxPeriodTo" : "2018-06-20",
+       |   "originalAmount" : 4000,
+       |   "outstandingAmount" : $outstandingAmount,
+       |   "clearedAmount" : 4000,
+       |   "items" : [
+       |     {
+       |       "amount" : 4000,
+       |       "dueDate" : "2018-06-21"
+       |     }
+       |   ]
+       |}""".stripMargin
+
+  private def generateTransaction(chargeType: String, outstandingAmount: BigDecimal): JsValue = Json.parse(
+    s"""{
+       |    "idType" : "VRN",
+       |    "idNumber" : 555555555,
+       |    "regimeType" : "VATC",
+       |    "processingDate" : "2017-03-07T09:30:00.000Z",
+       |    "financialTransactions" : [
+       |      ${generateCharge(chargeType, "#001", outstandingAmount)}
+       |    ]
+       |  }""".stripMargin
+  )
+
   private val allPayments: JsValue = Json.parse(
-    """{
+    s"""{
       |    "idType" : "VRN",
       |    "idNumber" : 555555555,
       |    "regimeType" : "VATC",
       |    "processingDate" : "2017-03-07T09:30:00.000Z",
       |    "financialTransactions" : [
-      |      {
-      |        "chargeType" : "VAT Return Debit Charge",
-      |        "mainType" : "VAT Return Charge",
-      |        "periodKey" : "#001",
-      |        "periodKeyDescription" : "March 2015",
-      |        "taxPeriodFrom" : "2018-05-01",
-      |        "taxPeriodTo" : "2018-06-20",
-      |        "businessPartner" : "0",
-      |        "contractAccountCategory" : "33",
-      |        "contractAccount" : "X",
-      |        "contractObjectType" : "ABCD",
-      |        "contractObject" : "0",
-      |        "sapDocumentNumber" : "0",
-      |        "sapDocumentNumberItem" : "0",
-      |        "chargeReference" : "XD002750002155",
-      |        "mainTransaction" : "1234",
-      |        "subTransaction" : "1174",
-      |        "originalAmount" : 4000,
-      |        "outstandingAmount" : 4000,
-      |        "clearedAmount" : 0,
-      |        "items" : [
-      |          {
-      |            "subItem" : "000",
-      |            "dueDate" : "2018-06-21",
-      |            "amount" : 4000
-      |          }
-      |        ]
-      |      },
-      |      {
-      |        "chargeType" : "VAT Return Debit Charge",
-      |        "mainType" : "VAT Return Charge",
-      |        "periodKey" : "#002",
-      |        "periodKeyDescription" : "March 2015",
-      |        "taxPeriodFrom" : "2018-05-01",
-      |        "taxPeriodTo" : "2018-06-20",
-      |        "businessPartner" : "0",
-      |        "contractAccountCategory" : "33",
-      |        "contractAccount" : "X",
-      |        "contractObjectType" : "ABCD",
-      |        "contractObject" : "0",
-      |        "sapDocumentNumber" : "0",
-      |        "sapDocumentNumberItem" : "0",
-      |        "chargeReference" : "XD002750002155",
-      |        "mainTransaction" : "1234",
-      |        "subTransaction" : "1174",
-      |        "originalAmount" : 4000,
-      |        "outstandingAmount" : 0,
-      |        "clearedAmount" : 4000,
-      |        "items" : [
-      |          {
-      |            "subItem" : "000",
-      |            "dueDate" : "2018-06-21",
-      |            "amount" : 4000
-      |          }
-      |        ]
-      |      }
+      |      ${generateCharge("VAT Return Debit Charge", "#001", 4000)},
+      |      ${generateCharge("VAT Return Debit Charge", "#002", 0)}
       |    ]
       |  }""".stripMargin
   )
-
-  private val aaSingleInstalment: String =
-    """{
-      |    "chargeType" : "VAT AA Monthly Instalment",
-      |    "mainType" : "VAT Annual Accounting",
-      |    "periodKey" : "#002",
-      |    "taxPeriodFrom" : "2018-05-01",
-      |    "originalAmount" : 4000,
-      |    "outstandingAmount" : 0,
-      |    "clearedAmount" : 4000,
-      |    "items" : [
-      |      {
-      |        "dueDate" : "2018-06-21",
-      |        "amount" : 4000,
-      |        "clearingDate" : "2018-06-21"
-      |      }
-      |    ]
-      |}"""
 
   private def aaDebitChargePayment(outstandingAmount: BigDecimal): JsValue = Json.parse(
     s"""{
@@ -152,23 +115,8 @@ object FinancialDataStub extends WireMockMethods{
       |    "regimeType" : "VATC",
       |    "processingDate" : "2017-03-07T09:30:00.000Z",
       |    "financialTransactions" : [
-      |      {
-      |        "chargeType" : "VAT AA Return Debit Charge",
-      |        "mainType" : "VAT AA Return Charge",
-      |        "periodKey" : "#001",
-      |        "taxPeriodFrom" : "2018-05-01",
-      |        "taxPeriodTo" : "2018-06-20",
-      |        "originalAmount" : 4000,
-      |        "outstandingAmount" : "$outstandingAmount",
-      |        "items" : [
-      |          {
-      |            "subItem" : "000",
-      |            "dueDate" : "2018-06-21",
-      |            "amount" : 4000
-      |          }
-      |        ]
-      |      },
-      |      $aaSingleInstalment
+      |      ${generateCharge("VAT AA Return Debit Charge", "#001", outstandingAmount)},
+      |      ${generateCharge("VAT AA Monthly Instalment", "#001", 0)}
       |    ]
       |  }""".stripMargin
   )
@@ -180,24 +128,8 @@ object FinancialDataStub extends WireMockMethods{
       |    "regimeType" : "VATC",
       |    "processingDate" : "2017-03-07T09:30:00.000Z",
       |    "financialTransactions" : [
-      |      {
-      |        "chargeType" : "VAT AA Return Credit Charge",
-      |        "mainType" : "VAT AA Return Charge",
-      |        "periodKey" : "#001",
-      |        "taxPeriodFrom" : "2018-05-01",
-      |        "taxPeriodTo" : "2018-06-20",
-      |        "originalAmount" : -4000,
-      |        "outstandingAmount" : -2000,
-      |        "clearedAmount" : 0,
-      |        "items" : [
-      |          {
-      |            "subItem" : "000",
-      |            "dueDate" : "2018-06-21",
-      |            "amount" : -2000
-      |          }
-      |        ]
-      |      },
-      |      $aaSingleInstalment
+      |      ${generateCharge("VAT AA Return Credit Charge", "#001", -2000)},
+      |      ${generateCharge("VAT AA Monthly Instalment", "#001", 0)}
       |    ]
       |  }""".stripMargin
   )

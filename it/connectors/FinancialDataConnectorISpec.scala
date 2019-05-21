@@ -53,7 +53,7 @@ class FinancialDataConnectorISpec extends IntegrationBaseSpec {
               LocalDate.parse("2018-06-20"),
               LocalDate.parse("2018-06-21"),
               4000,
-              0,
+              4000,
               "#001"
             ),
             Payment(
@@ -87,7 +87,7 @@ class FinancialDataConnectorISpec extends IntegrationBaseSpec {
               LocalDate.parse("2018-06-20"),
               LocalDate.parse("2018-06-21"),
               4000,
-              0,
+              4000,
               "#001"
             ),
             Payment(
