@@ -20,6 +20,7 @@ import java.time.LocalDate
 
 import audit.AuditingService
 import audit.models.ExtendedAuditModel
+import common.SessionKeys
 import models._
 import models.errors.ObligationError
 import models.User
@@ -325,10 +326,13 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
           override val mandationStatusCall: Boolean = true
           override val mandationStatusCallResponse: String = "Non MTDfB"
           override val openObsServiceCall: Boolean = true
+
           private val result = target.returnDeadlines()(fakeRequest)
+
           status(result) shouldBe Status.OK
           val document: Document = Jsoup.parse(bodyOf(result))
           document.getElementById("submit-return-link").text() shouldBe "Submit VAT Return"
+          result.session.get(SessionKeys.mtdVatMandationStatus) shouldBe Some("Non MTDfB")
         }
       }
     }
@@ -359,6 +363,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
           override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
           override val serviceCall: Boolean = false
           override val mandationStatusCall: Boolean = true
+          override val mandationStatusCallResponse: String = "MTDfB Mandated"
           override val openObsServiceCall: Boolean = true
 
           private val result = target.returnDeadlines()(fakeRequest)
@@ -366,6 +371,8 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
           status(result) shouldBe Status.OK
           val document: Document = Jsoup.parse(bodyOf(result))
           document.getElementById("submit-return-link") shouldBe null
+
+          result.session.get(SessionKeys.mtdVatMandationStatus) shouldBe Some("MTDfB Mandated")
         }
       }
     }
