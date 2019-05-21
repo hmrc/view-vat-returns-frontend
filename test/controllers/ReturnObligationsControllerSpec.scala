@@ -299,34 +299,74 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
       }
     }
 
-    "for a non-MTDfB user (with the submit return feature enabled)" should {
+    "for a non-MTDfB user (with the submit return feature enabled)" when {
 
-      "return the opt-out return deadlines page" in new ReturnDeadlinesTest {
-        mockConfig.features.submitReturnFeatures(true)
-        override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
-        override val serviceCall: Boolean = false
-        override val mandationStatusCall: Boolean = true
-        override val mandationStatusCallResponse: String = "Non MTDfB"
-        override val openObsServiceCall: Boolean = true
-        private val result = target.returnDeadlines()(fakeRequest)
-        status(result) shouldBe Status.OK
-        val document: Document = Jsoup.parse(bodyOf(result))
-        document.getElementById("submit-return-link").text() shouldBe "Submit VAT Return"
+      "mandation status is in session" should {
+
+        "return the opt-out return deadlines page" in new ReturnDeadlinesTest {
+          mockConfig.features.submitReturnFeatures(true)
+          override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
+          override val serviceCall: Boolean = false
+          override val mandationStatusCall: Boolean = false
+          override val openObsServiceCall: Boolean = true
+          private val result = target.returnDeadlines()(fakeRequest.withSession("mtdVatMandationStatus" -> "Non MTDfB"))
+          status(result) shouldBe Status.OK
+          val document: Document = Jsoup.parse(bodyOf(result))
+          document.getElementById("submit-return-link").text() shouldBe "Submit VAT Return"
+        }
+      }
+
+      "mandation status is not in session" should {
+
+        "return the opt-out return deadlines page" in new ReturnDeadlinesTest {
+          mockConfig.features.submitReturnFeatures(true)
+          override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
+          override val serviceCall: Boolean = false
+          override val mandationStatusCall: Boolean = true
+          override val mandationStatusCallResponse: String = "Non MTDfB"
+          override val openObsServiceCall: Boolean = true
+          private val result = target.returnDeadlines()(fakeRequest)
+          status(result) shouldBe Status.OK
+          val document: Document = Jsoup.parse(bodyOf(result))
+          document.getElementById("submit-return-link").text() shouldBe "Submit VAT Return"
+        }
       }
     }
 
-    "for an MTDfB user (with the submit return feature enabled)" should {
+    "for an MTDfB user (with the submit return feature enabled)" when {
 
-      "return the regular return deadlines page" in new ReturnDeadlinesTest {
-        mockConfig.features.submitReturnFeatures(true)
-        override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
-        override val serviceCall: Boolean = false
-        override val mandationStatusCall: Boolean = true
-        override val openObsServiceCall: Boolean = true
-        private val result = target.returnDeadlines()(fakeRequest)
-        status(result) shouldBe Status.OK
-        val document: Document = Jsoup.parse(bodyOf(result))
-        document.getElementById("submit-return-link") shouldBe null
+      "mandation status is in session" should {
+
+        "return the regular return deadlines page" in new ReturnDeadlinesTest {
+          mockConfig.features.submitReturnFeatures(true)
+          override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
+          override val serviceCall: Boolean = false
+          override val mandationStatusCall: Boolean = false
+          override val openObsServiceCall: Boolean = true
+
+          private val result = target.returnDeadlines()(fakeRequest.withSession("mtdVatMandationStatus" -> "MTDfB Mandated"))
+
+          status(result) shouldBe Status.OK
+          val document: Document = Jsoup.parse(bodyOf(result))
+          document.getElementById("submit-return-link") shouldBe null
+        }
+      }
+
+      "mandation status is not in session" should {
+
+        "return the regular return deadlines page" in new ReturnDeadlinesTest {
+          mockConfig.features.submitReturnFeatures(true)
+          override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
+          override val serviceCall: Boolean = false
+          override val mandationStatusCall: Boolean = true
+          override val openObsServiceCall: Boolean = true
+
+          private val result = target.returnDeadlines()(fakeRequest)
+
+          status(result) shouldBe Status.OK
+          val document: Document = Jsoup.parse(bodyOf(result))
+          document.getElementById("submit-return-link") shouldBe null
+        }
       }
     }
 
