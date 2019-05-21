@@ -18,7 +18,7 @@ package stubs
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import helpers.WireMockMethods
-import play.api.http.Status.{BAD_REQUEST, OK}
+import play.api.http.Status.{BAD_REQUEST, OK, NOT_FOUND}
 import play.api.libs.json.{JsValue, Json}
 
 object FinancialDataStub extends WireMockMethods{
@@ -30,14 +30,29 @@ object FinancialDataStub extends WireMockMethods{
       .thenReturn(status = OK, body = allPayments)
   }
 
+  def stubAAReturnDebitChargeOutstandingPayment(outstandingAmount: BigDecimal): StubMapping = {
+    when(method = GET, uri = financialDataUri)
+      .thenReturn(status = OK, body = aaDebitChargePayment(outstandingAmount))
+  }
+
+  def stubAAReturnCreditChargeOutstandingPayment: StubMapping = {
+    when(method = GET, uri = financialDataUri)
+      .thenReturn(status = OK, body = aaCreditChargePayment)
+  }
+
   def stubAllOutstandingPayments: StubMapping = {
     when(method = GET, uri = financialDataUri)
       .thenReturn(status = OK, body = allPayments)
   }
 
+  def stubSingleAAInstalmentCharge: StubMapping = {
+    when(method = GET, uri = financialDataUri)
+      .thenReturn(status = OK, body = aaSingleInstalment)
+  }
+
   def stubNoPayments: StubMapping = {
     when(method = GET, uri = financialDataUri)
-      .thenReturn(status = OK, body = Json.toJson(noPayments))
+      .thenReturn(status = NOT_FOUND, body = notFound)
   }
 
   def stubInvalidVrn: StubMapping = {
@@ -112,18 +127,88 @@ object FinancialDataStub extends WireMockMethods{
       |  }""".stripMargin
   )
 
-  private val noPayments: JsValue = Json.parse(
+  private val aaSingleInstalment: String =
     """{
+      |    "chargeType" : "VAT AA Monthly Instalment",
+      |    "mainType" : "VAT Annual Accounting",
+      |    "periodKey" : "#002",
+      |    "taxPeriodFrom" : "2018-05-01",
+      |    "originalAmount" : 4000,
+      |    "outstandingAmount" : 0,
+      |    "clearedAmount" : 4000,
+      |    "items" : [
+      |      {
+      |        "dueDate" : "2018-06-21",
+      |        "amount" : 4000,
+      |        "clearingDate" : "2018-06-21"
+      |      }
+      |    ]
+      |}"""
+
+  private def aaDebitChargePayment(outstandingAmount: BigDecimal): JsValue = Json.parse(
+    s"""{
       |    "idType" : "VRN",
-      |    "idNumber" : 111111111,
+      |    "idNumber" : 555555555,
       |    "regimeType" : "VATC",
       |    "processingDate" : "2017-03-07T09:30:00.000Z",
-      |    "financialTransactions" : []
+      |    "financialTransactions" : [
+      |      {
+      |        "chargeType" : "VAT AA Return Debit Charge",
+      |        "mainType" : "VAT AA Return Charge",
+      |        "periodKey" : "#001",
+      |        "taxPeriodFrom" : "2018-05-01",
+      |        "taxPeriodTo" : "2018-06-20",
+      |        "originalAmount" : 4000,
+      |        "outstandingAmount" : "$outstandingAmount",
+      |        "items" : [
+      |          {
+      |            "subItem" : "000",
+      |            "dueDate" : "2018-06-21",
+      |            "amount" : 4000
+      |          }
+      |        ]
+      |      },
+      |      $aaSingleInstalment
+      |    ]
+      |  }""".stripMargin
+  )
+
+  private val aaCreditChargePayment: JsValue = Json.parse(
+    s"""{
+      |    "idType" : "VRN",
+      |    "idNumber" : 555555555,
+      |    "regimeType" : "VATC",
+      |    "processingDate" : "2017-03-07T09:30:00.000Z",
+      |    "financialTransactions" : [
+      |      {
+      |        "chargeType" : "VAT AA Return Credit Charge",
+      |        "mainType" : "VAT AA Return Charge",
+      |        "periodKey" : "#001",
+      |        "taxPeriodFrom" : "2018-05-01",
+      |        "taxPeriodTo" : "2018-06-20",
+      |        "originalAmount" : -4000,
+      |        "outstandingAmount" : -2000,
+      |        "clearedAmount" : 0,
+      |        "items" : [
+      |          {
+      |            "subItem" : "000",
+      |            "dueDate" : "2018-06-21",
+      |            "amount" : -2000
+      |          }
+      |        ]
+      |      },
+      |      $aaSingleInstalment
+      |    ]
       |  }""".stripMargin
   )
 
   private val invalidVrn = Json.obj(
     "code" -> "INVALID_VRN",
     "reason" -> "VRN was invalid!"
+  )
+
+  private val notFound = Json.obj(
+    "code" -> "NOT_FOUND",
+    "reason" -> "No payments"
   )
 }
