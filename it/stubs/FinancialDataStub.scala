@@ -32,12 +32,22 @@ object FinancialDataStub extends WireMockMethods{
 
   def stubAAReturnDebitChargeOutstandingPayment(outstandingAmount: BigDecimal): StubMapping = {
     when(method = GET, uri = financialDataUri)
-      .thenReturn(status = OK, body = aaDebitChargePayment(outstandingAmount))
+      .thenReturn(status = OK, body = generateTransaction("VAT AA Return Debit Charge", outstandingAmount))
   }
 
   def stubAAReturnCreditChargeOutstandingPayment: StubMapping = {
     when(method = GET, uri = financialDataUri)
-      .thenReturn(status = OK, body = aaCreditChargePayment)
+      .thenReturn(status = OK, body = generateTransaction("VAT AA Return Credit Charge", -100))
+  }
+
+  def stubPOAReturnDebitCharge(outstandingAmount: BigDecimal): StubMapping = {
+    when(method = GET, uri = financialDataUri)
+      .thenReturn(status = OK, body = generateTransaction("VAT POA Return Debit Charge", outstandingAmount))
+  }
+
+  def stubPOAReturnCreditCharge: StubMapping = {
+    when(method = GET, uri = financialDataUri)
+      .thenReturn(status = OK, body = generateTransaction("VAT POA Return Credit Charge", -100))
   }
 
   def stubAllOutstandingPayments: StubMapping = {
@@ -90,7 +100,8 @@ object FinancialDataStub extends WireMockMethods{
        |    "regimeType" : "VATC",
        |    "processingDate" : "2017-03-07T09:30:00.000Z",
        |    "financialTransactions" : [
-       |      ${generateCharge(chargeType, "#001", outstandingAmount)}
+       |      ${generateCharge(chargeType, "#001", outstandingAmount)},
+       |      ${generateCharge("Irrelevant Charge", "#001", 1000)}
        |    ]
        |  }""".stripMargin
   )
@@ -104,32 +115,6 @@ object FinancialDataStub extends WireMockMethods{
       |    "financialTransactions" : [
       |      ${generateCharge("VAT Return Debit Charge", "#001", 4000)},
       |      ${generateCharge("VAT Return Debit Charge", "#002", 0)}
-      |    ]
-      |  }""".stripMargin
-  )
-
-  private def aaDebitChargePayment(outstandingAmount: BigDecimal): JsValue = Json.parse(
-    s"""{
-      |    "idType" : "VRN",
-      |    "idNumber" : 555555555,
-      |    "regimeType" : "VATC",
-      |    "processingDate" : "2017-03-07T09:30:00.000Z",
-      |    "financialTransactions" : [
-      |      ${generateCharge("VAT AA Return Debit Charge", "#001", outstandingAmount)},
-      |      ${generateCharge("VAT AA Monthly Instalment", "#001", 0)}
-      |    ]
-      |  }""".stripMargin
-  )
-
-  private val aaCreditChargePayment: JsValue = Json.parse(
-    s"""{
-      |    "idType" : "VRN",
-      |    "idNumber" : 555555555,
-      |    "regimeType" : "VATC",
-      |    "processingDate" : "2017-03-07T09:30:00.000Z",
-      |    "financialTransactions" : [
-      |      ${generateCharge("VAT AA Return Credit Charge", "#001", -2000)},
-      |      ${generateCharge("VAT AA Monthly Instalment", "#001", 0)}
       |    ]
       |  }""".stripMargin
   )

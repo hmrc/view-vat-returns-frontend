@@ -52,7 +52,9 @@ object PaymentsHttpParser extends ResponseHttpParsers {
       "VAT Return Credit Charge",
       "VAT EC Debit Charge",
       "VAT AA Return Debit Charge",
-      "VAT AA Return Credit Charge"
+      "VAT AA Return Credit Charge",
+      "VAT POA Return Debit Charge",
+      "VAT POA Return Credit Charge"
     )
 
     val charges: Seq[JsValue] = (json \ "financialTransactions").as[JsArray].value

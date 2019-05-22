@@ -78,6 +78,28 @@ class PaymentsHttpParserSpec extends UnitSpec {
               ),
               "outstandingAmount" -> -1000,
               "periodKey" -> "#006"
+            ),
+            Json.obj(
+              "mainType" -> "VAT POA Return Charge",
+              "chargeType" -> "VAT POA Return Debit Charge",
+              "taxPeriodFrom" -> "2020-12-01",
+              "taxPeriodTo" -> "2021-01-01",
+              "items" -> Json.arr(
+                Json.obj("dueDate" -> "2021-10-25")
+              ),
+              "outstandingAmount" -> 1000,
+              "periodKey" -> "#007"
+            ),
+            Json.obj(
+              "mainType" -> "VAT POA Return Charge",
+              "chargeType" -> "VAT POA Return Credit Charge",
+              "taxPeriodFrom" -> "2021-12-01",
+              "taxPeriodTo" -> "2022-01-01",
+              "items" -> Json.arr(
+                Json.obj("dueDate" -> "2022-10-25")
+              ),
+              "outstandingAmount" -> -1000,
+              "periodKey" -> "#008"
             )
           )
         )
@@ -119,6 +141,24 @@ class PaymentsHttpParserSpec extends UnitSpec {
           outstandingAmount = BigDecimal(-1000.00),
           clearedAmount = BigDecimal(0),
           periodKey = "#006"
+        ),
+        Payment(
+          "VAT POA Return Debit Charge",
+          start = LocalDate.parse("2020-12-01"),
+          end = LocalDate.parse("2021-01-01"),
+          due = LocalDate.parse("2021-10-25"),
+          outstandingAmount = BigDecimal(1000.00),
+          clearedAmount = BigDecimal(0),
+          periodKey = "#007"
+        ),
+        Payment(
+          "VAT POA Return Credit Charge",
+          start = LocalDate.parse("2021-12-01"),
+          end = LocalDate.parse("2022-01-01"),
+          due = LocalDate.parse("2022-10-25"),
+          outstandingAmount = BigDecimal(-1000.00),
+          clearedAmount = BigDecimal(0),
+          periodKey = "#008"
         )
       )))
 
