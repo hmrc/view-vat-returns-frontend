@@ -569,6 +569,16 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       isHybridUser = false
     )
 
+    lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
+    lazy implicit val document: Document = Jsoup.parse(view.body)
+
+    "have the pageHeading of 'Final return'" in {
+      elementText(Selectors.pageHeading) shouldBe "Submitted returns Final return"
+    }
+
+    "have the breadcrumb heading of 'Final return" in {
+      elementText(Selectors.currentPage) shouldBe "Final return"
+    }
 
     "Rendering the VAT return details page when the user is opted out" should {
 
@@ -603,16 +613,11 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
         isHybridUser = false
       )
 
-      lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
-      lazy implicit val document: Document = Jsoup.parse(view.body)
-
-      "have the pageHeading of 'Final return'" in {
-        elementText(Selectors.pageHeading) shouldBe "Submitted returns Final return"
-      }
-
-      "have the breadcrumb heading of 'Final return" in {
-        elementText(Selectors.currentPage) shouldBe "Final return"
+      "render the correct text for the help section for opted out user" in {
+        elementText(Selectors.helpLine1) shouldBe
+          "You can correct some errors in your next return. " +
+            "The error must have happened in an accounting period that ended in the last 4 years and be either:"
       }
     }
-  }
+ }
 }
