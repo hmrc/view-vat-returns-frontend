@@ -101,30 +101,41 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
         }
   }
 
-  private def handleMandationStatus(viewModel: VatReturnViewModel)
+  private def handleMandationStatus(customerDetail: Option[CustomerDetail],
+                                    obligation: VatReturnObligation,
+                                    returnDetails: VatReturnDetails,
+                                    isReturnsPageRequest: Boolean)
                                    (implicit user: User, request: Request[AnyContent]): Future[Result] = {
+
+    def viewModel(isOptedOutUser: Boolean) = constructViewModel(
+      customerDetail,
+      obligation,
+      returnDetails,
+      isReturnsPageRequest,
+      isOptedOutUser
+    )
 
     if(appConfig.features.submitReturnFeatures()) {
       request.session.get(SessionKeys.mtdVatMandationStatus) match {
         case Some(status) =>
-          val isOptedOut = status == NonMtdfb.mandationStatus
-          //TODO: add boolean into parameters
-          Future.successful(Ok(views.html.returns.vatReturnDetails(viewModel)))
+          val model = viewModel(status == NonMtdfb.mandationStatus)
+          auditEvent(isReturnsPageRequest, model)
+          Future.successful(Ok(views.html.returns.vatReturnDetails(model)))
         case None =>
           returnsService.getMandationStatus(user.vrn) map {
             case Right(MandationStatus(status)) =>
-              //TODO: add boolean into parameters
-              val isOptedOut = status == NonMtdfb.mandationStatus
-              Ok(views.html.returns.vatReturnDetails(viewModel)).addingToSession(SessionKeys.mtdVatMandationStatus -> status)
+              val model = viewModel(status == NonMtdfb.mandationStatus)
+              auditEvent(isReturnsPageRequest, model)
+              Ok(views.html.returns.vatReturnDetails(model)).addingToSession(SessionKeys.mtdVatMandationStatus -> status)
             case error =>
               Logger.warn(s"[ReturnsController][handleMandationStatus] - getMandationStatus returned an Error: $error")
               InternalServerError(views.html.errors.technicalProblem())
         }
       }
     } else {
-      //TODO: add boolean into parameters
-      val isOptedOut = false
-      Future.successful(Ok(views.html.returns.vatReturnDetails(viewModel)))
+      val model = viewModel(false)
+      auditEvent(isReturnsPageRequest, model)
+      Future.successful(Ok(views.html.returns.vatReturnDetails(model)))
     }
   }
 
@@ -133,9 +144,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
     (pageData.vatReturnResult, pageData.obligation, pageData.payment) match {
       case (Right(vatReturn), Some(ob), payment) =>
         val returnDetails = returnsService.constructReturnDetailsModel(vatReturn, payment)
-        val viewModel = constructViewModel(pageData.customerInfo, ob, returnDetails, isReturnsPageRequest)
-        auditEvent(isReturnsPageRequest, viewModel)
-        handleMandationStatus(viewModel)
+        handleMandationStatus(pageData.customerInfo, ob, returnDetails, isReturnsPageRequest)
       case (Left(NotFoundError), _, _) =>
         Future.successful(NotFound(views.html.errors.notFound()))
       case (Right(_), None, _) =>
@@ -164,7 +173,8 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
   private[controllers] def constructViewModel(customerDetail: Option[CustomerDetail],
                                               obligation: VatReturnObligation,
                                               returnDetails: VatReturnDetails,
-                                              isReturnsPageRequest: Boolean): VatReturnViewModel = {
+                                              isReturnsPageRequest: Boolean,
+                                              isOptedOutUser: Boolean): VatReturnViewModel = {
 
     val amountToShow: BigDecimal = returnDetails.vatReturn.netVatDue
 
@@ -179,7 +189,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
       showReturnsBreadcrumb = isReturnsPageRequest,
       currentYear = dateService.now().getYear,
       hasFlatRateScheme = customerDetail.fold(false)(_.hasFlatRateScheme),
-      isOptOutMtdVatUser = false,
+      isOptOutMtdVatUser = isOptedOutUser,
       isHybridUser = customerDetail.fold(false)(_.isPartialMigration)
     )
   }

@@ -23,7 +23,7 @@ import audit.models.AuditModel
 import models._
 import models.User
 import models.customer.CustomerDetail
-import models.errors.{NotFoundError, VatReturnError}
+import models.errors.{MandationStatusError, NotFoundError, VatReturnError}
 import models.payments.Payment
 import models.viewModels.VatReturnViewModel
 import play.api.http.Status
@@ -108,6 +108,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
     val vatReturnResult: Future[ServiceResponse[VatReturn]] = Future.successful(Right(exampleVatReturn))
     val paymentResult: Future[Option[Payment]] = Future.successful(Some(examplePayment))
+    val mandationStatusResult: Future[ServiceResponse[MandationStatus]] = Future.successful(Right(MandationStatus("Non MTDfB")))
 
     def setup(): Any = {
 
@@ -150,7 +151,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       if(mandationStatusCall) {
         (mockVatReturnService.getMandationStatus(_: String)(_: HeaderCarrier, _: ExecutionContext))
           .expects("999999999", *, *)
-          .returns(Future.successful(Right(MandationStatus("Non MTDfB"))))
+          .returns(mandationStatusResult)
       }
     }
 
@@ -188,6 +189,17 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
             status(result) shouldBe Status.NOT_FOUND
             contentType(result) shouldBe Some("text/html")
             charset(result) shouldBe Some("utf-8")
+          }
+        }
+
+        "mandation status call returns an error" should {
+
+          "return 500" in new Test {
+            override val mandationStatusResult = Future.successful(Left(MandationStatusError))
+
+            private val result = target.vatReturn(2018, "#001")(fakeRequest)
+
+            status(result) shouldBe Status.INTERNAL_SERVER_ERROR
           }
         }
       }
@@ -407,7 +419,8 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         exampleCustomerDetail,
         exampleObligation,
         exampleVatReturnDetails,
-        isReturnsPageRequest = true
+        isReturnsPageRequest = true,
+        isOptedOutUser = false
       )
       result shouldBe expectedViewModel
     }

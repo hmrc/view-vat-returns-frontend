@@ -60,6 +60,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
           returnsStub.stubSuccessfulVatReturn
           obligationsStub.stubFulfilledObligations
           FinancialDataStub.stubVatReturnCreditCharge
+          SubmitReturnStub.stubMtdfbMandationInfo
         }
 
         val response: WSResponse = await(request().get())
@@ -77,6 +78,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
           returnsStub.stubSuccessfulVatReturn
           obligationsStub.stubFulfilledObligations
           FinancialDataStub.stubVatReturnDebitCharge(0)
+          SubmitReturnStub.stubMtdfbMandationInfo
         }
 
         val response: WSResponse = await(request().get())
@@ -94,6 +96,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
           returnsStub.stubSuccessfulVatReturn
           obligationsStub.stubFulfilledObligations
           FinancialDataStub.stubAAReturnCreditChargeOutstandingPayment
+          SubmitReturnStub.stubMtdfbMandationInfo
         }
 
         val response: WSResponse = await(request().get())
@@ -111,6 +114,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
           returnsStub.stubSuccessfulVatReturn
           obligationsStub.stubFulfilledObligations
           FinancialDataStub.stubAAReturnDebitChargeOutstandingPayment(0)
+          SubmitReturnStub.stubMtdfbMandationInfo
         }
 
         val response: WSResponse = await(request().get())
@@ -162,6 +166,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
           returnsStub.stubSuccessfulVatReturn
           obligationsStub.stubFulfilledObligations
           FinancialDataStub.stubNoPayments
+          SubmitReturnStub.stubMtdfbMandationInfo
         }
 
         val response: WSResponse = await(request().get())
@@ -182,6 +187,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
           returnsStub.stubSuccessfulVatReturn
           obligationsStub.stubFulfilledObligations
           FinancialDataStub.stubVatReturnDebitCharge(4000)
+          SubmitReturnStub.stubMtdfbMandationInfo
         }
 
         val response: WSResponse = await(request().get())
@@ -199,6 +205,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
           returnsStub.stubSuccessfulVatReturn
           obligationsStub.stubFulfilledObligations
           FinancialDataStub.stubAAReturnDebitChargeOutstandingPayment(5000)
+          SubmitReturnStub.stubMtdfbMandationInfo
         }
 
         val response: WSResponse = await(request().get())
