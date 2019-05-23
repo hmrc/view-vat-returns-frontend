@@ -18,6 +18,7 @@ package controllers
 
 import audit.AuditingService
 import audit.models.{ViewOpenVatObligationsAuditModel, ViewSubmittedVatObligationsAuditModel}
+import common.SessionKeys
 import config.AppConfig
 import javax.inject.{Inject, Singleton}
 import models.viewModels.{ReturnDeadlineViewModel, ReturnObligationsViewModel, VatReturnsViewModel}
@@ -29,7 +30,7 @@ import play.api.mvc.{Action, AnyContent, Request, Result}
 import services.{DateService, EnrolmentsAuthService, ReturnsService}
 import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
@@ -68,31 +69,47 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
           )
           if (obligations.isEmpty) {
             returnsService.getFulfilledObligations(currentDate).map(fulfilledObligations => fulfilledObligationsAction(fulfilledObligations))
-          }
-          else {
+          } else {
             val deadlines = obligations.map(obligation =>
-              ReturnDeadlineViewModel(obligation.due, obligation.start, obligation.end, obligation.due.isBefore(currentDate), obligation.periodKey)
+              ReturnDeadlineViewModel(
+                obligation.due,
+                obligation.start,
+                obligation.end,
+                obligation.due.isBefore(currentDate),
+                obligation.periodKey
+              )
             )
             if (appConfig.features.submitReturnFeatures()) {
-
-              returnsService.getMandationStatus(user.vrn) map {
-                case Right(NonMtdfb) => Ok(views.html.returns.optOutReturnDeadlines(deadlines))
-                case Right(_) => Ok(views.html.returns.returnDeadlines(deadlines))
-                case error =>
-                  Logger.warn(s"[ReturnObligationsController][returnDeadlines] - getMandationStatus returned an Error: $error")
-                  InternalServerError(views.html.errors.technicalProblem())
-              }
-            }
-            else {
+              handleMandationStatus(deadlines)
+            } else {
               Future.successful(Ok(views.html.returns.returnDeadlines(deadlines)))
             }
-
           }
         case Left(error) =>
           Logger.warn("[ReturnObligationsController][returnDeadlines] error: " + error.toString)
           Future.successful(InternalServerError(views.html.errors.technicalProblem()))
-
       }
+  }
+
+  private def handleMandationStatus(obligations: Seq[ReturnDeadlineViewModel])
+                                   (implicit user: User, request: Request[AnyContent]): Future[Result] = {
+
+    def view(mandationStatus: String) = mandationStatus match {
+      case NonMtdfb.mandationStatus => views.html.returns.optOutReturnDeadlines(obligations)
+      case _ => views.html.returns.returnDeadlines(obligations)
+    }
+
+    request.session.get(SessionKeys.mtdVatMandationStatus) match {
+      case Some(status) => Future.successful(Ok(view(status)))
+      case None =>
+        returnsService.getMandationStatus(user.vrn) map {
+          case Right(MandationStatus(status)) =>
+            Ok(view(status)).addingToSession(SessionKeys.mtdVatMandationStatus -> status)
+          case error =>
+            Logger.warn(s"[ReturnObligationsController][handleMandationStatus] - getMandationStatus returned an Error: $error")
+            InternalServerError(views.html.errors.technicalProblem())
+        }
+    }
   }
 
   private[controllers] def fulfilledObligationsAction(obligationsResult: ServiceResponse[VatReturnObligations])

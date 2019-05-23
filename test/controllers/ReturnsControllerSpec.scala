@@ -23,7 +23,7 @@ import audit.models.AuditModel
 import models._
 import models.User
 import models.customer.CustomerDetail
-import models.errors.{NotFoundError, VatReturnError}
+import models.errors.{MandationStatusError, NotFoundError, VatReturnError}
 import models.payments.Payment
 import models.viewModels.VatReturnViewModel
 import play.api.http.Status
@@ -101,13 +101,19 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
   val mockSubscriptionService: SubscriptionService = mock[SubscriptionService]
 
   private trait Test {
+    val submitReturnFeatureEnabled = true
     val serviceCall: Boolean = true
     val successReturn: Boolean = true
+    val mandationStatusCall: Boolean = true
     val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
     val vatReturnResult: Future[ServiceResponse[VatReturn]] = Future.successful(Right(exampleVatReturn))
     val paymentResult: Future[Option[Payment]] = Future.successful(Some(examplePayment))
+    val mandationStatusResult: Future[ServiceResponse[MandationStatus]] = Future.successful(Right(MandationStatus("Non MTDfB")))
 
     def setup(): Any = {
+
+      mockConfig.features.submitReturnFeatures(submitReturnFeatureEnabled)
+
       (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
         .expects(*, *, *, *)
         .returns(authResult)
@@ -141,6 +147,12 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
         (mockDateService.now: () => LocalDate).stubs().returns(LocalDate.parse("2018-05-01"))
       }
+
+      if(mandationStatusCall) {
+        (mockVatReturnService.getMandationStatus(_: String)(_: HeaderCarrier, _: ExecutionContext))
+          .expects("999999999", *, *)
+          .returns(mandationStatusResult)
+      }
     }
 
     def target: ReturnsController = {
@@ -153,42 +165,67 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
     "a user is logged in and enrolled to HMRC-MTD-VAT" when {
 
-      "a valid period key is provided" should {
+      "mandation status is not in session" when {
 
-        "return 200" in new Test {
-          private val result = target.vatReturn(2018, "#001")(fakeRequest)
-          status(result) shouldBe Status.OK
+        "a valid period key is provided" should {
+
+          "return 200" in new Test {
+            private val result = target.vatReturn(2018, "#001")(fakeRequest)
+
+            status(result) shouldBe Status.OK
+            contentType(result) shouldBe Some("text/html")
+            charset(result) shouldBe Some("utf-8")
+          }
         }
 
-        "return HTML" in new Test {
-          private val result = target.vatReturn(2018, "#001")(fakeRequest)
-          contentType(result) shouldBe Some("text/html")
+        "an invalid period key is provided" should {
+
+          "return 404" in new Test {
+            override val serviceCall = false
+            override val mandationStatusCall = false
+
+            private val result = target.vatReturn(2018, "form-label")(fakeRequest)
+
+            status(result) shouldBe Status.NOT_FOUND
+            contentType(result) shouldBe Some("text/html")
+            charset(result) shouldBe Some("utf-8")
+          }
         }
 
-        "return charset of utf-8" in new Test {
-          private val result = target.vatReturn(2018, "#001")(fakeRequest)
-          charset(result) shouldBe Some("utf-8")
+        "mandation status call returns an error" should {
+
+          "return 500" in new Test {
+            override val mandationStatusResult = Future.successful(Left(MandationStatusError))
+
+            private val result = target.vatReturn(2018, "#001")(fakeRequest)
+
+            status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+          }
         }
       }
 
-      "an invalid period key is provided" should {
+      "mandation status is in session" should {
 
-        "return 404" in new Test {
-          override val serviceCall = false
-          private val result = target.vatReturn(2018, "form-label")(fakeRequest)
-          status(result) shouldBe Status.NOT_FOUND
+        lazy val request = fakeRequest.withSession("mtdVatMandationStatus" -> "Non MTDfB")
+
+        "not make a call to retrieve mandation status" in new Test {
+          override val mandationStatusCall: Boolean = false
+
+          private val result = target.vatReturn(2018, "#001")(request)
+
+          status(result) shouldBe Status.OK
         }
+      }
 
-        "return HTML" in new Test {
-          override val serviceCall = false
-          private val result = target.vatReturn(2018, "form-label")(fakeRequest)
-          contentType(result) shouldBe Some("text/html")
-        }
+      "submit return feature switch is off" should {
 
-        "return charset of utf-8" in new Test {
-          override val serviceCall = false
-          private val result = target.vatReturn(2018, "form-label")(fakeRequest)
-          charset(result) shouldBe Some("utf-8")
+        "not make a call to retrieve mandation status" in new Test {
+          override val submitReturnFeatureEnabled = false
+          override val mandationStatusCall: Boolean = false
+
+          private val result = target.vatReturn(2018, "#001")(fakeRequest)
+
+          status(result) shouldBe Status.OK
         }
       }
     }
@@ -197,8 +234,11 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
       "return 403 (Forbidden)" in new Test {
         override val serviceCall = false
+        override val mandationStatusCall = false
         override val authResult: Future[Nothing] = Future.failed(InsufficientEnrolments())
+
         private val result = target.vatReturn(2018, "#001")(fakeRequest)
+
         status(result) shouldBe Status.FORBIDDEN
       }
     }
@@ -208,7 +248,10 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       "return 401 (Unauthorised)" in new Test {
         override val serviceCall = false
         override val authResult: Future[Nothing] = Future.failed(MissingBearerToken())
+        override val mandationStatusCall = false
+
         private val result = target.vatReturn(2018, "#001")(fakeRequest)
+
         status(result) shouldBe Status.UNAUTHORIZED
       }
     }
@@ -217,8 +260,11 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
       "return 404 (Not Found)" in new Test {
         override val successReturn = false
+        override val mandationStatusCall = false
         override val vatReturnResult: Future[ServiceResponse[Nothing]] = Left(NotFoundError)
+
         private val result = target.vatReturn(2018, "#001")(fakeRequest)
+
         status(result) shouldBe Status.NOT_FOUND
       }
     }
@@ -227,8 +273,11 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
       "return 500 (Internal Server Error)" in new Test {
         override val successReturn = false
+        override val mandationStatusCall = false
         override val vatReturnResult: Future[ServiceResponse[Nothing]] = Left(VatReturnError)
+
         private val result = target.vatReturn(2018, "#001")(fakeRequest)
+
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
       }
     }
@@ -238,42 +287,56 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
     "a user is logged in and enrolled to HMRC-MTD-VAT" when {
 
-      "a valid period key is provided" should {
+      "mandation status is not in session" when {
 
-        "return 200" in new Test {
-          private val result = target.vatReturnViaPayments("#001")(fakeRequest)
-          status(result) shouldBe Status.OK
+        "a valid period key is provided" should {
+
+          "return 200" in new Test {
+            private val result = target.vatReturnViaPayments("#001")(fakeRequest)
+
+            status(result) shouldBe Status.OK
+            contentType(result) shouldBe Some("text/html")
+            charset(result) shouldBe Some("utf-8")
+          }
         }
 
-        "return HTML" in new Test {
-          private val result = target.vatReturnViaPayments("#001")(fakeRequest)
-          contentType(result) shouldBe Some("text/html")
-        }
+        "an invalid period key is provided" should {
 
-        "return charset of utf-8" in new Test {
-          private val result = target.vatReturnViaPayments("#001")(fakeRequest)
-          charset(result) shouldBe Some("utf-8")
+          "return 404" in new Test {
+            override val serviceCall = false
+            override val mandationStatusCall = false
+
+            private val result = target.vatReturnViaPayments("form-label")(fakeRequest)
+
+            status(result) shouldBe Status.NOT_FOUND
+            contentType(result) shouldBe Some("text/html")
+            charset(result) shouldBe Some("utf-8")
+          }
         }
       }
 
-      "an invalid period key is provided" should {
+      "mandation status is in session" should {
 
-        "return 404" in new Test {
-          override val serviceCall = false
-          private val result = target.vatReturn(2018, "form-label")(fakeRequest)
-          status(result) shouldBe Status.NOT_FOUND
+        lazy val request = fakeRequest.withSession("mtdVatMandationStatus" -> "Non MTDfB")
+
+        "not make a call to retrieve mandation status" in new Test {
+          override val mandationStatusCall: Boolean = false
+
+          private val result = target.vatReturnViaPayments("#001")(request)
+
+          status(result) shouldBe Status.OK
         }
+      }
 
-        "return HTML" in new Test {
-          override val serviceCall = false
-          private val result = target.vatReturn(2018, "form-label")(fakeRequest)
-          contentType(result) shouldBe Some("text/html")
-        }
+      "submit return feature switch is off" should {
 
-        "return charset of utf-8" in new Test {
-          override val serviceCall = false
-          private val result = target.vatReturn(2018, "form-label")(fakeRequest)
-          charset(result) shouldBe Some("utf-8")
+        "not make a call to retrieve mandation status" in new Test {
+          override val submitReturnFeatureEnabled = false
+          override val mandationStatusCall: Boolean = false
+
+          private val result = target.vatReturnViaPayments("#001")(fakeRequest)
+
+          status(result) shouldBe Status.OK
         }
       }
     }
@@ -282,8 +345,11 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
       "return 403 (Forbidden)" in new Test {
         override val serviceCall = false
+        override val mandationStatusCall = false
         override val authResult: Future[Nothing] = Future.failed(InsufficientEnrolments())
+
         private val result = target.vatReturnViaPayments("#001")(fakeRequest)
+
         status(result) shouldBe Status.FORBIDDEN
       }
     }
@@ -292,8 +358,11 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
       "return 401 (Unauthorised)" in new Test {
         override val serviceCall = false
+        override val mandationStatusCall = false
         override val authResult: Future[Nothing] = Future.failed(MissingBearerToken())
+
         private val result = target.vatReturnViaPayments("#001")(fakeRequest)
+
         status(result) shouldBe Status.UNAUTHORIZED
       }
     }
@@ -302,8 +371,11 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
       "return 404 (Not Found)" in new Test {
         override val successReturn = false
+        override val mandationStatusCall = false
         override val vatReturnResult: Future[ServiceResponse[Nothing]] = Left(NotFoundError)
+
         private val result = target.vatReturnViaPayments("#001")(fakeRequest)
+
         status(result) shouldBe Status.NOT_FOUND
       }
     }
@@ -312,8 +384,11 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
       "return 500 (Internal Server Error)" in new Test {
         override val successReturn = false
+        override val mandationStatusCall = false
         override val vatReturnResult: Future[ServiceResponse[Nothing]] = Left(VatReturnError)
+
         private val result = target.vatReturnViaPayments("#001")(fakeRequest)
+
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
       }
     }
@@ -344,7 +419,8 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         exampleCustomerDetail,
         exampleObligation,
         exampleVatReturnDetails,
-        isReturnsPageRequest = true
+        isReturnsPageRequest = true,
+        isOptedOutUser = false
       )
       result shouldBe expectedViewModel
     }
@@ -403,7 +479,6 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       }
     }
   }
-
 
   "Calling .validPeriodKey" when {
 

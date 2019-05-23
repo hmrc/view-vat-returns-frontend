@@ -18,13 +18,14 @@ package controllers
 
 import audit.AuditingService
 import audit.models.ViewVatReturnAuditModel
+import common.SessionKeys
 import config.AppConfig
 import javax.inject.{Inject, Singleton}
+import models._
 import models.customer.CustomerDetail
 import models.errors.NotFoundError
 import models.payments.Payment
 import models.viewModels.VatReturnViewModel
-import models._
 import play.api.Logger
 import play.api.i18n.MessagesApi
 import play.api.mvc._
@@ -57,15 +58,14 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
             if (isHybridUser) Future.successful(None) else returnsService.getPayment(user, periodKey, Some(year))
           }
 
-          for {
+          (for {
             vatReturn <- vatReturnCall
             customerInfo <- entityNameCall
             payment <- financialDataCall(customerInfo)
             obligation <- obligationCall
-          } yield {
-            val data = ReturnsControllerData(vatReturn, customerInfo, payment, obligation)
-            renderResult(data, isReturnsPageRequest)
-          }
+          } yield ReturnsControllerData(vatReturn, customerInfo, payment, obligation))
+            .flatMap(pageData => renderResult(pageData, isReturnsPageRequest))
+
         } else {
           Logger.warn(s"[ReturnsController][vatReturn] - The given period key was invalid - `$periodKey`")
           Future.successful(NotFound(views.html.errors.notFound()))
@@ -87,36 +87,72 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
             }
           }
 
-          for {
+          (for {
             vatReturnResult <- vatReturnCall
             customerInfo <- entityNameCall
             payment <- financialDataCall
             obligation <- obligationCall(payment)
-          } yield {
-            val data = ReturnsControllerData(vatReturnResult, customerInfo, payment, obligation)
-            renderResult(data, isReturnsPageRequest)
-          }
+          } yield ReturnsControllerData(vatReturnResult, customerInfo, payment, obligation))
+            .flatMap(pageData => renderResult(pageData, isReturnsPageRequest))
+
         } else {
           Logger.warn(s"[ReturnsController][vatReturnViaPayments] - The given period key was invalid - `$periodKey`")
           Future.successful(NotFound(views.html.errors.notFound()))
         }
   }
 
-  private[controllers] def renderResult(pageData: ReturnsControllerData, isReturnsPageRequest: Boolean)(implicit req: Request[_], user: User) = {
+  private def handleMandationStatus(customerDetail: Option[CustomerDetail],
+                                    obligation: VatReturnObligation,
+                                    returnDetails: VatReturnDetails,
+                                    isReturnsPageRequest: Boolean)
+                                   (implicit user: User, request: Request[AnyContent]): Future[Result] = {
+
+    def viewModel(isOptedOutUser: Boolean) = constructViewModel(
+      customerDetail,
+      obligation,
+      returnDetails,
+      isReturnsPageRequest,
+      isOptedOutUser
+    )
+
+    if(appConfig.features.submitReturnFeatures()) {
+      request.session.get(SessionKeys.mtdVatMandationStatus) match {
+        case Some(status) =>
+          val model = viewModel(status == NonMtdfb.mandationStatus)
+          auditEvent(isReturnsPageRequest, model)
+          Future.successful(Ok(views.html.returns.vatReturnDetails(model)))
+        case None =>
+          returnsService.getMandationStatus(user.vrn) map {
+            case Right(MandationStatus(status)) =>
+              val model = viewModel(status == NonMtdfb.mandationStatus)
+              auditEvent(isReturnsPageRequest, model)
+              Ok(views.html.returns.vatReturnDetails(model)).addingToSession(SessionKeys.mtdVatMandationStatus -> status)
+            case error =>
+              Logger.warn(s"[ReturnsController][handleMandationStatus] - getMandationStatus returned an Error: $error")
+              InternalServerError(views.html.errors.technicalProblem())
+        }
+      }
+    } else {
+      val model = viewModel(false)
+      auditEvent(isReturnsPageRequest, model)
+      Future.successful(Ok(views.html.returns.vatReturnDetails(model)))
+    }
+  }
+
+  private[controllers] def renderResult(pageData: ReturnsControllerData, isReturnsPageRequest: Boolean)
+                                       (implicit req: Request[AnyContent], user: User): Future[Result] = {
     (pageData.vatReturnResult, pageData.obligation, pageData.payment) match {
       case (Right(vatReturn), Some(ob), payment) =>
         val returnDetails = returnsService.constructReturnDetailsModel(vatReturn, payment)
-        val viewModel = constructViewModel(pageData.customerInfo, ob, returnDetails, isReturnsPageRequest)
-        auditEvent(isReturnsPageRequest, viewModel)
-        Ok(views.html.returns.vatReturnDetails(viewModel))
+        handleMandationStatus(pageData.customerInfo, ob, returnDetails, isReturnsPageRequest)
       case (Left(NotFoundError), _, _) =>
-        NotFound(views.html.errors.notFound())
+        Future.successful(NotFound(views.html.errors.notFound()))
       case (Right(_), None, _) =>
         Logger.warn("[ReturnsController][renderResult] error: render required a valid obligation but none was returned")
-        InternalServerError(views.html.errors.technicalProblem())
+        Future.successful(InternalServerError(views.html.errors.technicalProblem()))
       case _ =>
         Logger.warn("[ReturnsController][renderResult] error: Unknown error")
-        InternalServerError(views.html.errors.technicalProblem())
+        Future.successful(InternalServerError(views.html.errors.technicalProblem()))
     }
   }
 
@@ -137,7 +173,8 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
   private[controllers] def constructViewModel(customerDetail: Option[CustomerDetail],
                                               obligation: VatReturnObligation,
                                               returnDetails: VatReturnDetails,
-                                              isReturnsPageRequest: Boolean): VatReturnViewModel = {
+                                              isReturnsPageRequest: Boolean,
+                                              isOptedOutUser: Boolean): VatReturnViewModel = {
 
     val amountToShow: BigDecimal = returnDetails.vatReturn.netVatDue
 
@@ -152,7 +189,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
       showReturnsBreadcrumb = isReturnsPageRequest,
       currentYear = dateService.now().getYear,
       hasFlatRateScheme = customerDetail.fold(false)(_.hasFlatRateScheme),
-      isOptOutMtdVatUser = false,
+      isOptOutMtdVatUser = isOptedOutUser,
       isHybridUser = customerDetail.fold(false)(_.isPartialMigration)
     )
   }
