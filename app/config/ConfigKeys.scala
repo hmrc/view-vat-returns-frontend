@@ -41,6 +41,7 @@ object ConfigKeys {
   val future2020DateEnabledFeature: String = "features.futureDate.enabled"
   val useLanguageSelectorFeature: String = "features.useLanguageSelector.enabled"
   val submitReturnFeatures: String = "features.submitReturnFeatures.enabled"
+  val agentAccessFeature: String = "features.agentAccess.enabled"
 
   val finalReturnPeriodKey: String = "final-return.periodKey"
 
