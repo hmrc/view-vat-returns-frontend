@@ -69,7 +69,7 @@ class UserSpec extends UnitSpec {
       )
     )
 
-    val user = User(enrolments)
+    val user = User(enrolments, None)
 
     "say that it has the VATDEC and VATVAR enrolments" in {
       user.hasNonMtdVat shouldBe true
@@ -87,7 +87,7 @@ class UserSpec extends UnitSpec {
       ))
     )
 
-    val user = User(enrolments)
+    val user = User(enrolments, None)
 
     "say that it doesn't have the VATDEC and VATVAR enrolments" in {
       user.hasNonMtdVat shouldBe false
@@ -105,7 +105,7 @@ class UserSpec extends UnitSpec {
         ))
     )
 
-    val user = User(enrolments)
+    val user = User(enrolments, None)
 
     "have the VRN specified in the VAT Enrolment" in {
       user.vrn shouldBe "123456789"
@@ -126,7 +126,7 @@ class UserSpec extends UnitSpec {
         ))
     )
 
-    val user = User(enrolments)
+    val user = User(enrolments, None)
 
     "have the VRN specified in the VAT Enrolment" in {
       user.vrn shouldBe "123456789"
@@ -149,13 +149,13 @@ class UserSpec extends UnitSpec {
 
     "throw an exception" in {
       intercept[AuthorisationException] {
-        User(enrolments)
+        User(enrolments, None)
       }
     }
 
     "have the correct message in the exception" in {
       the[AuthorisationException] thrownBy {
-        User(enrolments)
+        User(enrolments, None)
       } should have message "VAT identifier invalid"
     }
   }
@@ -172,13 +172,13 @@ class UserSpec extends UnitSpec {
 
     "throw an exception" in {
       intercept[AuthorisationException] {
-        User(enrolments)
+        User(enrolments, None)
       }
     }
 
     "have the correct message in the exception" in {
       the[AuthorisationException] thrownBy {
-        User(enrolments)
+        User(enrolments, None)
       } should have message "VRN is invalid"
     }
   }

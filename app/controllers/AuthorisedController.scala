@@ -22,28 +22,29 @@ import models.User
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Request, Result}
 import services.EnrolmentsAuthService
-import uk.gov.hmrc.auth.core.{AuthorisationException, Enrolment, NoActiveSession}
-import uk.gov.hmrc.auth.core.retrieve.Retrievals
+import uk.gov.hmrc.auth.core.{AffinityGroup, AuthorisationException, Enrolment, NoActiveSession}
+import uk.gov.hmrc.auth.core.retrieve.{Retrievals, ~}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import controllers.predicate.AuthoriseAgentWithClient
+import javax.inject.Inject
 
 import scala.concurrent.Future
 
-abstract class AuthorisedController extends FrontendController with I18nSupport {
+class AuthorisedController @Inject()(enrolmentsAuthService: EnrolmentsAuthService,
+                                     val messagesApi: MessagesApi,
+                                     val agentWithClientPredicate: AuthoriseAgentWithClient,
+                                     implicit val appConfig: AppConfig) extends FrontendController with I18nSupport {
 
-  val messagesApi: MessagesApi
-  val enrolmentsAuthService: EnrolmentsAuthService
-  implicit val appConfig: AppConfig
-
-  def authorisedAction(block: Request[AnyContent] => User => Future[Result]): Action[AnyContent] = Action.async {
+  def authorisedAction(block: Request[AnyContent] => User => Future[Result], allowAgentAccess: Boolean = false): Action[AnyContent] = Action.async {
     implicit request =>
 
       val predicate =
         ((Enrolment(vatDecEnrolmentKey) or Enrolment(vatVarEnrolmentKey)) and Enrolment(mtdVatEnrolmentKey))
           .or(Enrolment(mtdVatEnrolmentKey))
 
-      enrolmentsAuthService.authorised(predicate).retrieve(Retrievals.authorisedEnrolments) {
-        enrolments =>
-          block(request)(User(enrolments))
+      enrolmentsAuthService.authorised(predicate).retrieve(Retrievals.authorisedEnrolments and Retrievals.affinityGroup) {
+        case _ ~ Some(AffinityGroup.Agent) if allowAgentAccess => agentWithClientPredicate.authoriseAsAgent(block)
+        case enrolments ~ Some(_) => block(request)(User(enrolments, None))
       } recoverWith {
         case _: NoActiveSession => Future.successful(Unauthorized(views.html.errors.sessionTimeout()))
         case _: AuthorisationException => Future.successful(Forbidden(views.html.errors.unauthorised()))

@@ -68,6 +68,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     val mockVatReturnService: ReturnsService = mock[ReturnsService]
     val mockDateService: DateService = mock[DateService]
     val mockAuditService: AuditingService = mock[AuditingService]
+    val mockAuthorisedController: AuthorisedController = mock[AuthorisedController]
     val previousYear: Int = 2017
 
     def setup(): Any = {
@@ -105,6 +106,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         messages,
         mockEnrolmentsAuthService,
         mockVatReturnService,
+        mockAuthorisedController,
         mockDateService,
         mockConfig,
         mockAuditService)
@@ -211,6 +213,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     val mandationStatusCallResponse: String = "MTDfB"
     val mockDateService: DateService = mock[DateService]
     val mockAuditService: AuditingService = mock[AuditingService]
+    val mockAuthorisedController: AuthorisedController = mock[AuthorisedController]
     val previousYear: Int = 201
     val auditingExpected: Boolean = false
 
@@ -265,6 +268,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         messages,
         mockEnrolmentsAuthService,
         mockVatReturnService,
+        mockAuthorisedController,
         mockDateService,
         mockConfig,
         mockAuditService)
@@ -441,6 +445,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     val vatServiceThirdCallResult: Future[ServiceResponse[VatReturnObligations]]
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
     val mockVatReturnService: ReturnsService = mock[ReturnsService]
+    val mockAuthorisedController: AuthorisedController = mock[AuthorisedController]
     val mockDateService: DateService = mock[DateService]
     val mockEnrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
     val mockAuditService: AuditingService = mock[AuditingService]
@@ -482,6 +487,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
       new ReturnObligationsController(messages,
         mockEnrolmentsAuthService,
         mockVatReturnService,
+        mockAuthorisedController,
         mockDateService,
         mockConfig,
         mockAuditService)
@@ -769,6 +775,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
     val mockEnrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
     val mockVatReturnService: ReturnsService = mock[ReturnsService]
+    val mockAuthorisedController: AuthorisedController = mock[AuthorisedController]
     val mockDateService: DateService = mock[DateService]
     val mockAuditService: AuditingService = mock[AuditingService]
 
@@ -777,6 +784,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         messages,
         mockEnrolmentsAuthService,
         mockVatReturnService,
+        mockAuthorisedController,
         mockDateService,
         mockConfig,
         mockAuditService)

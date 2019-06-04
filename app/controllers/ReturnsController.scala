@@ -27,24 +27,26 @@ import models.errors.NotFoundError
 import models.payments.Payment
 import models.viewModels.VatReturnViewModel
 import play.api.Logger
-import play.api.i18n.MessagesApi
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc._
 import services.{DateService, EnrolmentsAuthService, ReturnsService, SubscriptionService}
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 
 import scala.concurrent.Future
 
 @Singleton
 class ReturnsController @Inject()(val messagesApi: MessagesApi,
-                                  val enrolmentsAuthService: EnrolmentsAuthService,
+                                  enrolmentsAuthService: EnrolmentsAuthService,
                                   returnsService: ReturnsService,
                                   subscriptionService: SubscriptionService,
                                   dateService: DateService,
+                                  authorisedController: AuthorisedController,
                                   implicit val appConfig: AppConfig,
                                   auditService: AuditingService)
-  extends AuthorisedController {
+  extends FrontendController with I18nSupport {
 
-  def vatReturn(year: Int, periodKey: String): Action[AnyContent] = authorisedAction {
+  def vatReturn(year: Int, periodKey: String): Action[AnyContent] = authorisedController.authorisedAction {
     implicit request =>
       implicit user =>
         if(validPeriodKey(periodKey)) {
@@ -72,7 +74,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
         }
   }
 
-  def vatReturnViaPayments(periodKey: String): Action[AnyContent] = authorisedAction {
+  def vatReturnViaPayments(periodKey: String): Action[AnyContent] = authorisedController.authorisedAction {
     implicit request =>
       implicit user =>
         if(validPeriodKey(periodKey)) {
