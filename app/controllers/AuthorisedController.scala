@@ -35,7 +35,7 @@ class AuthorisedController @Inject()(enrolmentsAuthService: EnrolmentsAuthServic
                                      val agentWithClientPredicate: AuthoriseAgentWithClient,
                                      implicit val appConfig: AppConfig) extends FrontendController with I18nSupport {
 
-  def authorisedAction(block: Request[AnyContent] => User => Future[Result], allowAgentAccess: Boolean = false): Action[AnyContent] = Action.async {
+  def authorisedAction(block: Request[AnyContent] => User => Future[Result], allowAgentAccess: Boolean = true): Action[AnyContent] = Action.async {
     implicit request =>
 
       val predicate =

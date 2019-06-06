@@ -64,9 +64,13 @@ class AuthoriseAgentWithClient @Inject()(enrolmentsAuthService: EnrolmentsAuthSe
                 }
             }
         case _ =>
+          if (appConfig.features.agentClientLookupEnabled()) {
             Logger.debug(s"[AuthoriseAsAgentWithClient][invokeBlock] - No Client VRN in session, redirecting to Select Client page")
             Future.successful(Redirect(appConfig.agentClientLookupUrl))
-
+          } else {
+            Logger.debug(s"[AuthoriseAsAgentWithClient][invokeBlock] - No Client VRN in session, redirecting to stub agent client lookup page")
+            Future.successful(Redirect(testOnly.controllers.routes.StubAgentClientLookupController.show(request.uri)))
+          }
       }
     } else {
       Future.successful(Unauthorized(views.html.errors.agent_journey_disabled()))

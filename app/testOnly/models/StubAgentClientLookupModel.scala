@@ -14,14 +14,6 @@
  * limitations under the License.
  */
 
-package models
+package testOnly.models
 
-case class FeatureSwitchModel(userResearchBannerEnabled: Boolean,
-                              staticDateEnabled: Boolean,
-                              enableVatReturnsService: Boolean,
-                              enableVatObligationsService: Boolean,
-                              future2020DateEnabled: Boolean,
-                              useLanguageSelector: Boolean,
-                              submitReturnFeatures: Boolean,
-                              agentAccessEnabled: Boolean,
-                              agentClientLookupEnabled: Boolean)
+case class StubAgentClientLookupModel(vrn: String, redirectUrl: String)

@@ -14,14 +14,19 @@
  * limitations under the License.
  */
 
-package models
+package testOnly.forms
 
-case class FeatureSwitchModel(userResearchBannerEnabled: Boolean,
-                              staticDateEnabled: Boolean,
-                              enableVatReturnsService: Boolean,
-                              enableVatObligationsService: Boolean,
-                              future2020DateEnabled: Boolean,
-                              useLanguageSelector: Boolean,
-                              submitReturnFeatures: Boolean,
-                              agentAccessEnabled: Boolean,
-                              agentClientLookupEnabled: Boolean)
+import play.api.data.Form
+import play.api.data.Forms._
+import testOnly.models.StubAgentClientLookupModel
+
+object StubAgentClientLookupForm {
+
+  val form: Form[StubAgentClientLookupModel] = Form(
+    mapping("vrn" -> text,
+      "redirectUrl" -> text
+    )
+    (StubAgentClientLookupModel.apply)(StubAgentClientLookupModel.unapply)
+  )
+
+}
