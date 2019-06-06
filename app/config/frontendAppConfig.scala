@@ -69,9 +69,8 @@ trait AppConfig extends ServicesConfig {
   val submitVatReturnUrl: String
   val submitVatReturnForm: String => String
   def feedbackUrl(redirect: String): String
-  val vatAgentClientLookupFrontendUrl: String
-  def agentClientLookupUrl: String
-  def agentClientUnauthorisedUrl: String
+  val agentClientLookupUrl: String => String
+  val agentClientUnauthorisedUrl: String => String
   val agentClientActionUrl: String
 }
 
@@ -161,19 +160,14 @@ class FrontendAppConfig @Inject()(val runModeConfiguration: Configuration, val e
   override def feedbackUrl(redirect: String): String = s"$contactHost/contact/beta-feedback?service=$contactFormServiceIdentifier" +
     s"&backUrl=${ContinueUrl(host + redirect).encodedUrl}"
 
-  override lazy val vatAgentClientLookupFrontendUrl: String =
+  private lazy val vatAgentClientLookupFrontendUrl: String =
     getString(Keys.vatAgentClientLookupFrontendHost) + getString(Keys.vatAgentClientLookupFrontendUrl)
 
-  def vatAgentClientLookupHandoff(redirectUrl: String): String =
-    vatAgentClientLookupFrontendUrl + s"/client-vat-number?redirectUrl=${ContinueUrl(getString(Keys.host) + redirectUrl).encodedUrl}"
+  override lazy val agentClientLookupUrl: String => String = uri =>
+    vatAgentClientLookupFrontendUrl + s"/client-vat-number?redirectUrl=${ContinueUrl(getString(Keys.host) + uri).encodedUrl}"
 
-  override lazy val agentClientLookupUrl: String = vatAgentClientLookupHandoff(controllers.routes.ReturnObligationsController.returnDeadlines().url)
-
-  def vatAgentClientLookupUnauthorised(redirectUrl: String): String =
-    vatAgentClientLookupFrontendUrl + s"/unauthorised-for-client?redirectUrl=${ContinueUrl(getString(Keys.host) + redirectUrl).encodedUrl}"
-
-  override lazy val agentClientUnauthorisedUrl: String =
-      vatAgentClientLookupUnauthorised(controllers.routes.ReturnObligationsController.returnDeadlines().url)
+  override lazy val agentClientUnauthorisedUrl: String => String  = uri =>
+    vatAgentClientLookupFrontendUrl + s"/unauthorised-for-client?redirectUrl=${ContinueUrl(getString(Keys.host) + uri).encodedUrl}"
 
   override lazy val agentClientActionUrl: String = getString(Keys.vatAgentClientLookupActionUrl)
 }

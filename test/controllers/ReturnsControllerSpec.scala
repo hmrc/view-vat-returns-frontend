@@ -64,6 +64,17 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     Some(Individual)
   ))
 
+  val missingInfinityGroup: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(new ~(
+    Enrolments(
+      Set(
+        Enrolment(
+          "HMRC-MTD-IT",
+          Seq(EnrolmentIdentifier("SAUTR", "999999999")),
+          "Active"))
+    ),
+    None
+  ))
+
   val exampleVatReturn: VatReturn = VatReturn(
     "#001",
     1297,
@@ -281,6 +292,31 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       }
     }
 
+    "a user is not authorised " should {
+
+      "return 401 (Unauthorised)" in new Test {
+        override val serviceCall = false
+        override val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = Future.failed(UnsupportedAuthProvider())
+        override val mandationStatusCall = false
+
+        val result: Future[Result] = target.vatReturn(2018, "#001")(fakeRequest)
+        status(result) shouldBe Status.FORBIDDEN
+      }
+    }
+
+    "the user is missing their affinity group" should {
+
+      "return 500 (Internal server error)" in new Test {
+        override val serviceCall = false
+        override val mandationStatusCall = false
+        override val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = missingInfinityGroup
+
+        val result: Future[Result] = target.vatReturn(2018, "#001")(fakeRequest)
+        status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+      }
+
+    }
+
     "the specified VAT return is not found" should {
 
       "return 404 (Not Found)" in new Test {
@@ -306,6 +342,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
       }
     }
+
   }
 
   "Calling the .vatReturnViaPayments action" when {

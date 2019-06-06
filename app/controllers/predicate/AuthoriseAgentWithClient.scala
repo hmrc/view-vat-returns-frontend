@@ -57,18 +57,27 @@ class AuthoriseAgentWithClient @Inject()(enrolmentsAuthService: EnrolmentsAuthSe
               } match {
                 case Some(arn) => checkMandationStatus(block, vrn, arn)
                 case None =>
+                  //$COVERAGE-OFF$ Disabling scoverage for Logger
                   Logger.debug("[AuthPredicate][authoriseAsAgent] - Agent with no HMRC-AS-AGENT enrolment. Rendering unauthorised view.")
+                  //$COVERAGE-ON$ Disabling scoverage for Logger
                   Future.successful(Forbidden(views.html.errors.unauthorised()))
               }
-          }
-      case _ =>
-        if (appConfig.features.agentClientLookupEnabled()) {
-          Logger.debug(s"[AuthoriseAsAgentWithClient][invokeBlock] - No Client VRN in session, redirecting to Select Client page")
-          Future.successful(Redirect(appConfig.agentClientLookupUrl))
-        } else {
-          Logger.debug(s"[AuthoriseAsAgentWithClient][invokeBlock] - No Client VRN in session, redirecting to stub agent client lookup page")
-          Future.successful(Redirect(testOnly.controllers.routes.StubAgentClientLookupController.show(request.uri)))
+          } recover {
+          case _: NoActiveSession =>
+            Logger.debug(s"AgentPredicate][authoriseAsAgent] - No active session. Redirecting to ${appConfig.signInUrl}")
+            Redirect(appConfig.signInUrl)
+          case _: AuthorisationException =>
+            //$COVERAGE-OFF$ Disabling scoverage for Logger
+            Logger.debug(s"[AgentPredicate][authoriseAsAgent] - Agent does not have delegated authority for Client. " +
+              s"Redirecting to ${appConfig.agentClientUnauthorisedUrl(request.uri)}")
+            //$COVERAGE-ON$
+            Redirect(appConfig.agentClientUnauthorisedUrl(request.uri))
         }
+      case None =>
+        //$COVERAGE-OFF$ Disabling scoverage for Logger
+        Logger.debug(s"[AuthoriseAsAgentWithClient][invokeBlock] - No Client VRN in session, redirecting to Select Client page")
+        //$COVERAGE-ON$ Disabling scoverage for Logger
+        Future.successful(Redirect(appConfig.agentClientLookupUrl(request.uri)))
     }
   }
 
@@ -81,10 +90,14 @@ class AuthoriseAgentWithClient @Inject()(enrolmentsAuthService: EnrolmentsAuthSe
         val user = User(vrn, arn = Some(arn))
         block(request)(user)
       case Right(_) =>
+        //$COVERAGE-OFF$ Disabling scoverage for Logger
         Logger.debug("[AuthPredicate][checkMandationStatus] - Agent acting for MTDfB client")
+        //$COVERAGE-ON$ Disabling scoverage for Logger
         Future.successful(Redirect(appConfig.agentClientActionUrl))
       case Left(error) =>
+        //$COVERAGE-OFF$ Disabling scoverage for Logger
         Logger.warn(s"[AuthPredicate][checkMandationStatus] - Error returned from mandationStatusService: $error")
+        //$COVERAGE-ON$ Disabling scoverage for Logger
         Future.successful(InternalServerError)
     }
   }

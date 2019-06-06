@@ -29,12 +29,16 @@ class StubAgentClientLookupController @Inject()(val messagesApi: MessagesApi,
   extends FrontendController with I18nSupport {
 
   def show(redirectUrl: String): Action[AnyContent] = Action { implicit request =>
-    Ok(testOnly.views.html.stubAgentClientLookup(StubAgentClientLookupForm.form, redirectUrl))
+    Ok(testOnly.views.html.agentClientLookup(StubAgentClientLookupForm.form, redirectUrl))
   }
 
   def unauth(redirectUrl: String): Action[AnyContent] = Action { implicit request =>
-    Ok(testOnly.views.html.stubAgentClientUnauth(redirectUrl))
+    Ok(testOnly.views.html.agentClientUnauth(redirectUrl))
       .removingFromSession(SessionKeys.clientVrn)
+  }
+
+  def agentAction: Action[AnyContent] = Action { implicit request =>
+    Ok(testOnly.views.html.agentAction())
   }
 
   def post: Action[AnyContent] = Action { implicit request =>

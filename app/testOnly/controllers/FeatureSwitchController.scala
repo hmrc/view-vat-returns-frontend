@@ -39,8 +39,7 @@ class FeatureSwitchController @Inject()(val messagesApi: MessagesApi,
         future2020DateEnabled = appConfig.features.future2020DateEnabled(),
         useLanguageSelector = appConfig.features.useLanguageSelector(),
         submitReturnFeatures = appConfig.features.submitReturnFeatures(),
-        agentAccessEnabled = appConfig.features.agentAccess(),
-        agentClientLookupEnabled = appConfig.features.agentClientLookupEnabled()
+        agentAccessEnabled = appConfig.features.agentAccess()
       )
     )))
   }
@@ -61,7 +60,6 @@ class FeatureSwitchController @Inject()(val messagesApi: MessagesApi,
     appConfig.features.useLanguageSelector(model.useLanguageSelector)
     appConfig.features.submitReturnFeatures(model.submitReturnFeatures)
     appConfig.features.agentAccess(model.agentAccessEnabled)
-    appConfig.features.agentClientLookupEnabled(model.agentClientLookupEnabled)
     Redirect(routes.FeatureSwitchController.featureSwitch())
   }
 }
