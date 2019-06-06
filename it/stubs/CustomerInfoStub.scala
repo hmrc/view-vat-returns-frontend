@@ -19,15 +19,15 @@ package stubs
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import helpers.WireMockMethods
 import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK}
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 
 object CustomerInfoStub extends WireMockMethods {
 
   private val customerInfoUri = "/vat-subscription/([0-9]+)/customer-details"
 
-  def stubCustomerInfo: StubMapping = {
+  def stubCustomerInfo(customerInfo: JsValue = customerInfo, returnStatus: Int = OK): StubMapping = {
     when(method = GET, uri = customerInfoUri)
-      .thenReturn(status = OK, body = customerInfo)
+      .thenReturn(status = returnStatus, body = customerInfo)
   }
 
   def stubErrorFromApi: StubMapping = {

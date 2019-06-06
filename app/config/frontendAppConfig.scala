@@ -72,6 +72,7 @@ trait AppConfig extends ServicesConfig {
   val vatAgentClientLookupFrontendUrl: String
   def agentClientLookupUrl: String
   def agentClientUnauthorisedUrl: String
+  val agentClientActionUrl: String
 }
 
 @Singleton
@@ -166,11 +167,13 @@ class FrontendAppConfig @Inject()(val runModeConfiguration: Configuration, val e
   def vatAgentClientLookupHandoff(redirectUrl: String): String =
     vatAgentClientLookupFrontendUrl + s"/client-vat-number?redirectUrl=${ContinueUrl(getString(Keys.host) + redirectUrl).encodedUrl}"
 
-  override def agentClientLookupUrl: String = vatAgentClientLookupHandoff(controllers.routes.ReturnObligationsController.returnDeadlines().url)
+  override lazy val agentClientLookupUrl: String = vatAgentClientLookupHandoff(controllers.routes.ReturnObligationsController.returnDeadlines().url)
 
   def vatAgentClientLookupUnauthorised(redirectUrl: String): String =
     vatAgentClientLookupFrontendUrl + s"/unauthorised-for-client?redirectUrl=${ContinueUrl(getString(Keys.host) + redirectUrl).encodedUrl}"
 
-  override def agentClientUnauthorisedUrl: String =
+  override lazy val agentClientUnauthorisedUrl: String =
       vatAgentClientLookupUnauthorised(controllers.routes.ReturnObligationsController.returnDeadlines().url)
+
+  override lazy val agentClientActionUrl: String = getString(Keys.vatAgentClientLookupActionUrl)
 }

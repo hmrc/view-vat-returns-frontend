@@ -16,7 +16,7 @@
 
 package models
 
-import uk.gov.hmrc.auth.core.{AuthorisationException, Enrolment, EnrolmentIdentifier, Enrolments}
+import uk.gov.hmrc.auth.core.{Enrolment, EnrolmentIdentifier, Enrolments}
 import uk.gov.hmrc.play.test.UnitSpec
 
 class UserSpec extends UnitSpec {
@@ -47,7 +47,61 @@ class UserSpec extends UnitSpec {
     }
   }
 
-  "A User with valid MTD-VAT, VATDEC and VATVAR enrolments" should {
+  "containsNonMtdVAT" when {
+
+    "a user with valid VATDEC and VATVAR enrolments" should {
+
+      val enrolments = Set(
+        Enrolment(
+          "HMCE-VATDEC-ORG",
+          Seq(EnrolmentIdentifier("VATRegNo", "123456789")),
+          "Activated"
+        ),
+        Enrolment(
+          "HMCE-VATVAR-ORG",
+          Seq(EnrolmentIdentifier("VATRegNo", "123456789")),
+          "Activated"
+        )
+      )
+
+      "return true" in {
+        User.containsNonMtdVat(enrolments) shouldBe true
+      }
+
+    }
+
+    "a user with only one 'old vat' enrolment" should {
+      val enrolments = Set(
+        Enrolment(
+          "HMCE-VATDEC-ORG",
+          Seq(EnrolmentIdentifier("VATRegNo", "123456789")),
+          "Activated"
+        )
+      )
+
+      "return true" in {
+        User.containsNonMtdVat(enrolments) shouldBe true
+      }
+    }
+
+    "a user with only a valid MTD-VAT enrolment" should {
+
+      val enrolments = Set(
+        Enrolment(
+          "HMRC-MTD-VAT",
+          Seq(EnrolmentIdentifier("VRN", "123456789")),
+          "Activated"
+        )
+      )
+
+      "return false" in {
+        User.containsNonMtdVat(enrolments) shouldBe false
+      }
+    }
+
+  }
+
+  "extractVatEnrolments" should {
 
     val enrolments = Enrolments(
       Set(
@@ -65,121 +119,36 @@ class UserSpec extends UnitSpec {
           "HMCE-VATVAR-ORG",
           Seq(EnrolmentIdentifier("VATRegNo", "123456789")),
           "Activated"
+        ),
+        Enrolment(
+          "HMRC-MTD-IT",
+          Seq(EnrolmentIdentifier("SAUTR", "123456789")),
+          "Activated"
         )
       )
     )
 
-    val user = User(enrolments, None)
-
-    "say that it has the VATDEC and VATVAR enrolments" in {
-      user.hasNonMtdVat shouldBe true
-    }
-
-  }
-
-  "A User with only a valid MTD-VAT enrolment" should {
-
-    val enrolments = Enrolments(
-      Set(Enrolment(
+    val expectedEnrolments = Set(
+      Enrolment(
         "HMRC-MTD-VAT",
         Seq(EnrolmentIdentifier("VRN", "123456789")),
         "Activated"
-      ))
+      ),
+      Enrolment(
+        "HMCE-VATDEC-ORG",
+        Seq(EnrolmentIdentifier("VATRegNo", "123456789")),
+        "Activated"
+      ),
+      Enrolment(
+        "HMCE-VATVAR-ORG",
+        Seq(EnrolmentIdentifier("VATRegNo", "123456789")),
+        "Activated"
+      )
     )
 
-    val user = User(enrolments, None)
-
-    "say that it doesn't have the VATDEC and VATVAR enrolments" in {
-      user.hasNonMtdVat shouldBe false
+    "only extract VAT enrolments" in {
+      User.extractVatEnrolments(enrolments) shouldBe expectedEnrolments
     }
 
-  }
-
-  "Creating a User with a valid, active VAT Enrolment" should {
-
-    val enrolments = Enrolments(
-      Set(Enrolment(
-          "HMRC-MTD-VAT",
-          Seq(EnrolmentIdentifier("VRN", "123456789")),
-          "Activated"
-        ))
-    )
-
-    val user = User(enrolments, None)
-
-    "have the VRN specified in the VAT Enrolment" in {
-      user.vrn shouldBe "123456789"
-    }
-
-    "have an active status" in {
-      user.active shouldBe true
-    }
-  }
-
-  "Creating a User with a valid, inactive VAT Enrolment" should {
-
-    val enrolments = Enrolments(
-      Set(Enrolment(
-          "HMRC-MTD-VAT",
-          Seq(EnrolmentIdentifier("VRN", "123456789")),
-          ""
-        ))
-    )
-
-    val user = User(enrolments, None)
-
-    "have the VRN specified in the VAT Enrolment" in {
-      user.vrn shouldBe "123456789"
-    }
-
-    "have an inactive status" in {
-      user.active shouldBe false
-    }
-  }
-
-  "Creating a User with an invalid VAT Identifier Name" should {
-
-    val enrolments = Enrolments(
-      Set(Enrolment(
-        "HMRC-MTD-VAT",
-        Seq(EnrolmentIdentifier("VATXXXXX", "123456789")),
-        ""
-      ))
-    )
-
-    "throw an exception" in {
-      intercept[AuthorisationException] {
-        User(enrolments, None)
-      }
-    }
-
-    "have the correct message in the exception" in {
-      the[AuthorisationException] thrownBy {
-        User(enrolments, None)
-      } should have message "VAT identifier invalid"
-    }
-  }
-
-  "Creating a User with an invalid VRN" should {
-
-    val enrolments = Enrolments(
-      Set(Enrolment(
-        "HMRC-MTD-VAT",
-        Seq(EnrolmentIdentifier("VRN", "")),
-        ""
-      ))
-    )
-
-    "throw an exception" in {
-      intercept[AuthorisationException] {
-        User(enrolments, None)
-      }
-    }
-
-    "have the correct message in the exception" in {
-      the[AuthorisationException] thrownBy {
-        User(enrolments, None)
-      } should have message "VRN is invalid"
-    }
   }
 }

@@ -21,6 +21,7 @@ import java.time.LocalDate
 import audit.AuditingService
 import audit.models.ExtendedAuditModel
 import common.SessionKeys
+import controllers.predicate.AuthoriseAgentWithClient
 import models._
 import models.errors.ObligationError
 import models.User
@@ -31,21 +32,28 @@ import play.api.http.Status
 import play.api.mvc.Result
 import play.api.test.Helpers._
 import services.{DateService, EnrolmentsAuthService, ReturnsService}
+import uk.gov.hmrc.auth.core.AffinityGroup.Individual
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.authorise.Predicate
-import uk.gov.hmrc.auth.core.retrieve.Retrieval
+import uk.gov.hmrc.auth.core.retrieve.{Retrieval, ~}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
-  private trait Test {
-    val goodEnrolments: Enrolments = Enrolments(
+  val goodEnrolments: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(new ~(
+    Enrolments(
       Set(
-        Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("VRN", "999999999")), "Active")
-      )
-    )
+        Enrolment(
+          "HMRC-MTD-VAT",
+          Seq(EnrolmentIdentifier("VRN", "999999999")),
+          "Active"))
+    ),
+    Some(Individual)
+  ))
+
+  private trait Test {
 
     val exampleObligations: Future[ServiceResponse[VatReturnObligations]] = Right(
       VatReturnObligations(
@@ -63,12 +71,27 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     )
     val serviceCall: Boolean = true
     val secondServiceCall: Boolean = true
-    val authResult: Future[_]
+    val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(goodEnrolments)
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
     val mockVatReturnService: ReturnsService = mock[ReturnsService]
     val mockDateService: DateService = mock[DateService]
     val mockAuditService: AuditingService = mock[AuditingService]
-    val mockAuthorisedController: AuthorisedController = mock[AuthorisedController]
+    val mockEnrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
+
+    val mockAuthorisedAgentWithClient: AuthoriseAgentWithClient = new AuthoriseAgentWithClient(
+      mockEnrolmentsAuthService,
+      mockVatReturnService,
+      messages,
+      mockConfig
+    )
+
+    val mockAuthorisedController: AuthorisedController = new AuthorisedController(
+      mockEnrolmentsAuthService,
+      messages,
+      mockAuthorisedAgentWithClient,
+      mockConfig
+    )
+
     val previousYear: Int = 2017
 
     def setup(): Any = {
@@ -98,8 +121,6 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
       }
     }
 
-    val mockEnrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
-
     def target: ReturnObligationsController = {
       setup()
       new ReturnObligationsController(
@@ -118,19 +139,16 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     "A user is logged in and enrolled to HMRC-MTD-VAT" should {
 
       "return 200" in new Test {
-        override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
         private val result = target.submittedReturns(previousYear)(fakeRequest)
         status(result) shouldBe Status.OK
       }
 
       "return HTML" in new Test {
-        override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
         private val result = target.submittedReturns(previousYear)(fakeRequest)
         contentType(result) shouldBe Some("text/html")
       }
 
       "return charset of utf-8" in new Test {
-        override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
         private val result = target.submittedReturns(previousYear)(fakeRequest)
         charset(result) shouldBe Some("utf-8")
       }
@@ -160,7 +178,6 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
       "return 404 (Not Found)" in new Test {
         override val serviceCall = false
-        override val authResult: Future[_] = Future.successful(goodEnrolments)
         private val result = target.submittedReturns(year = 2021)(fakeRequest)
         status(result) shouldBe Status.NOT_FOUND
       }
@@ -172,7 +189,6 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         override val serviceCall = true
         override val secondServiceCall: Boolean = false
         override val exampleObligations: Future[ServiceResponse[Nothing]] = Left(ObligationError)
-        override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
 
         val result: Result = await(target.submittedReturns(previousYear)(fakeRequest))
         val document: Document = Jsoup.parse(bodyOf(result))
@@ -183,11 +199,6 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
   }
 
   private trait ReturnDeadlinesTest {
-    val goodEnrolments: Enrolments = Enrolments(
-      Set(
-        Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("VRN", "999999999")), "Active")
-      )
-    )
 
     val exampleObligations: Future[ServiceResponse[VatReturnObligations]] = Right(
       VatReturnObligations(
@@ -203,19 +214,34 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         )
       )
     )
+
     val serviceCall: Boolean = true
     val openObsServiceCall = false
     val openObligations: Boolean = true
-    val authResult: Future[_]
+    val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(goodEnrolments)
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
     val mockVatReturnService: ReturnsService = mock[ReturnsService]
     val mandationStatusCall: Boolean = false
     val mandationStatusCallResponse: String = "MTDfB"
     val mockDateService: DateService = mock[DateService]
     val mockAuditService: AuditingService = mock[AuditingService]
-    val mockAuthorisedController: AuthorisedController = mock[AuthorisedController]
     val previousYear: Int = 201
     val auditingExpected: Boolean = false
+    val mockEnrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
+
+    val mockAuthorisedAgentWithClient: AuthoriseAgentWithClient = new AuthoriseAgentWithClient(
+      mockEnrolmentsAuthService,
+      mockVatReturnService,
+      messages,
+      mockConfig
+    )
+
+    val mockAuthorisedController: AuthorisedController = new AuthorisedController(
+      mockEnrolmentsAuthService,
+      messages,
+      mockAuthorisedAgentWithClient,
+      mockConfig
+    )
 
     def setup(): Any = {
       (mockDateService.now: () => LocalDate).stubs().returns(LocalDate.parse("2018-05-01"))
@@ -260,8 +286,6 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
       }
     }
 
-    val mockEnrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
-
     def target: ReturnObligationsController = {
       setup()
       new ReturnObligationsController(
@@ -280,7 +304,6 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     "A user is logged in and enrolled to HMRC-MTD-VAT" should {
 
       "return 200" in new ReturnDeadlinesTest {
-        override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
         override val serviceCall: Boolean = false
         override val openObsServiceCall: Boolean = true
         private val result = target.returnDeadlines()(fakeRequest)
@@ -288,7 +311,6 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
       }
 
       "return HTML" in new ReturnDeadlinesTest {
-        override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
         override val serviceCall: Boolean = false
         override val openObsServiceCall: Boolean = true
         private val result = target.returnDeadlines()(fakeRequest)
@@ -296,7 +318,6 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
       }
 
       "return charset of utf-8" in new ReturnDeadlinesTest {
-        override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
         override val serviceCall: Boolean = false
         override val openObsServiceCall: Boolean = true
         private val result = target.returnDeadlines()(fakeRequest)
@@ -310,7 +331,6 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
         "return the opt-out return deadlines page" in new ReturnDeadlinesTest {
           mockConfig.features.submitReturnFeatures(true)
-          override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
           override val serviceCall: Boolean = false
           override val mandationStatusCall: Boolean = false
           override val openObsServiceCall: Boolean = true
@@ -325,7 +345,6 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
         "return the opt-out return deadlines page" in new ReturnDeadlinesTest {
           mockConfig.features.submitReturnFeatures(true)
-          override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
           override val serviceCall: Boolean = false
           override val mandationStatusCall: Boolean = true
           override val mandationStatusCallResponse: String = "Non MTDfB"
@@ -347,7 +366,6 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
         "return the regular return deadlines page" in new ReturnDeadlinesTest {
           mockConfig.features.submitReturnFeatures(true)
-          override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
           override val serviceCall: Boolean = false
           override val mandationStatusCall: Boolean = false
           override val openObsServiceCall: Boolean = true
@@ -364,7 +382,6 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
         "return the regular return deadlines page" in new ReturnDeadlinesTest {
           mockConfig.features.submitReturnFeatures(true)
-          override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
           override val serviceCall: Boolean = false
           override val mandationStatusCall: Boolean = true
           override val mandationStatusCallResponse: String = "MTDfB Mandated"
@@ -387,7 +404,6 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         override val exampleObligations: Future[ServiceResponse[VatReturnObligations]] = Right(VatReturnObligations(Seq.empty))
         override val serviceCall: Boolean = false
         override val openObsServiceCall: Boolean = true
-        override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
         override val openObligations: Boolean = false
 
         val result: Result = await(target.returnDeadlines()(fakeRequest))
@@ -425,7 +441,6 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         override val exampleObligations: Future[ServiceResponse[Nothing]] = Left(ObligationError)
         override val serviceCall: Boolean = false
         override val openObsServiceCall: Boolean = true
-        override val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
 
         val result: Result = await(target.returnDeadlines()(fakeRequest))
         val document: Document = Jsoup.parse(bodyOf(result))
@@ -445,12 +460,25 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     val vatServiceThirdCallResult: Future[ServiceResponse[VatReturnObligations]]
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
     val mockVatReturnService: ReturnsService = mock[ReturnsService]
-    val mockAuthorisedController: AuthorisedController = mock[AuthorisedController]
     val mockDateService: DateService = mock[DateService]
     val mockEnrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
     val mockAuditService: AuditingService = mock[AuditingService]
     val testUser: User = User("999999999")
     implicit val hc: HeaderCarrier = HeaderCarrier()
+
+    val mockAuthorisedAgentWithClient: AuthoriseAgentWithClient = new AuthoriseAgentWithClient(
+      mockEnrolmentsAuthService,
+      mockVatReturnService,
+      messages,
+      mockConfig
+    )
+
+    val mockAuthorisedController: AuthorisedController = new AuthorisedController(
+      mockEnrolmentsAuthService,
+      messages,
+      mockAuthorisedAgentWithClient,
+      mockConfig
+    )
 
     def setup(): Any = {
       (mockDateService.now: () => LocalDate).stubs().returns(LocalDate.parse(mockedDate))
@@ -718,8 +746,6 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     "the year is on the upper search boundary" should {
 
       "return true" in new Test {
-        override val authResult: Future[_] = Future.successful("")
-
         override def setup(): Any = "" // Prevent the unused mocks causing trouble
         val result: Boolean = target.isValidSearchYear(2018, 2018)
         result shouldBe true
@@ -729,8 +755,6 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     "the year is above the upper search boundary" should {
 
       "return false" in new Test {
-        override val authResult: Future[_] = Future.successful("")
-
         override def setup(): Any = "" // Prevent the unused mocks causing trouble
         val result: Boolean = target.isValidSearchYear(2019, 2018)
         result shouldBe false
@@ -740,8 +764,6 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     "the year is on the lower boundary" should {
 
       "return true" in new Test {
-        override val authResult: Future[_] = Future.successful("")
-
         override def setup(): Any = "" // Prevent the unused mocks causing trouble
         val result: Boolean = target.isValidSearchYear(2017, 2019)
         result shouldBe true
@@ -751,8 +773,6 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     "the year is below the lower boundary" should {
 
       "return false" in new Test {
-        override val authResult: Future[_] = Future.successful("")
-
         override def setup(): Any = "" // Prevent the unused mocks causing trouble
         val result: Boolean = target.isValidSearchYear(2014, 2018)
         result shouldBe false
@@ -762,8 +782,6 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     "the year is between the upper and lower boundaries" should {
 
       "return true" in new Test {
-        override val authResult: Future[_] = Future.successful("")
-
         override def setup(): Any = "" // Prevent the unused mocks causing trouble
         val result: Boolean = target.isValidSearchYear(2017, 2018)
         result shouldBe true
@@ -775,9 +793,22 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
     val mockEnrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
     val mockVatReturnService: ReturnsService = mock[ReturnsService]
-    val mockAuthorisedController: AuthorisedController = mock[AuthorisedController]
     val mockDateService: DateService = mock[DateService]
     val mockAuditService: AuditingService = mock[AuditingService]
+
+    val mockAuthorisedAgentWithClient: AuthoriseAgentWithClient = new AuthoriseAgentWithClient(
+      mockEnrolmentsAuthService,
+      mockVatReturnService,
+      messages,
+      mockConfig
+    )
+
+    val mockAuthorisedController: AuthorisedController = new AuthorisedController(
+      mockEnrolmentsAuthService,
+      messages,
+      mockAuthorisedAgentWithClient,
+      mockConfig
+    )
 
     def target: ReturnObligationsController = {
       new ReturnObligationsController(

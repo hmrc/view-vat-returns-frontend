@@ -61,6 +61,7 @@ object ConfigKeys {
 
   val vatAgentClientLookupFrontendHost: String = "vat-agent-client-lookup-frontend.host"
   val vatAgentClientLookupFrontendUrl: String = "vat-agent-client-lookup-frontend.url"
+  val vatAgentClientLookupActionUrl: String = "vat-agent-client-lookup-frontend.actionUrl"
 
   val reportVatErrorUrl: String = "reportVatErrorUrl"
 

@@ -36,6 +36,7 @@ import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.{Retrieval, ~}
 import uk.gov.hmrc.http.HeaderCarrier
 import controllers.predicate.AuthoriseAgentWithClient
+import uk.gov.hmrc.auth.core.AffinityGroup.Individual
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -52,13 +53,16 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     mockAuditService
   )
 
-  val goodEnrolments: ~[Some[AffinityGroup.Individual.type], Enrolments] =
-    Future.successful(new ~(Some(AffinityGroup.Individual), Enrolments(Set(
+  val goodEnrolments: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(new ~(
+    Enrolments(
+      Set(
       Enrolment(
         "HMRC-MTD-VAT",
         Seq(EnrolmentIdentifier("VRN", "999999999")),
-        "Active")
-    ))))
+        "Active"))
+    ),
+    Some(Individual)
+  ))
 
   val exampleVatReturn: VatReturn = VatReturn(
     "#001",
@@ -106,10 +110,10 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
   val mockVatApiService: SubscriptionService = mock[SubscriptionService]
   val mockSubscriptionService: SubscriptionService = mock[SubscriptionService]
   val mockServiceErrorHandler: ServiceErrorHandler = mock[ServiceErrorHandler]
+
   val mockAuthorisedAgentWithClient: AuthoriseAgentWithClient = new AuthoriseAgentWithClient(
     mockEnrolmentsAuthService,
     mockVatReturnService,
-    mockServiceErrorHandler,
     messages,
     mockConfig
   )
@@ -126,7 +130,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     val serviceCall: Boolean = true
     val successReturn: Boolean = true
     val mandationStatusCall: Boolean = true
-    val authResult: Future[~[Some[AffinityGroup.Individual.type], Enrolments]] = Future.successful(goodEnrolments)
+    val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(goodEnrolments)
     val vatReturnResult: Future[ServiceResponse[VatReturn]] = Future.successful(Right(exampleVatReturn))
     val paymentResult: Future[Option[Payment]] = Future.successful(Some(examplePayment))
     val mandationStatusResult: Future[ServiceResponse[MandationStatus]] = Future.successful(Right(MandationStatus("Non MTDfB")))

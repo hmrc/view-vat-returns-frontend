@@ -17,7 +17,7 @@
 package controllers.predicate
 
 import common._
-import config.{AppConfig, ServiceErrorHandler}
+import config.AppConfig
 import javax.inject.{Inject, Singleton}
 import models.{MandationStatus, User}
 import play.api.Logger
@@ -34,8 +34,7 @@ import scala.concurrent.Future
 @Singleton
 class AuthoriseAgentWithClient @Inject()(enrolmentsAuthService: EnrolmentsAuthService,
                                          mandationStatusService: ReturnsService,
-                                         val serviceErrorHandler: ServiceErrorHandler,
-                                         implicit val messagesApi: MessagesApi,
+                                         val messagesApi: MessagesApi,
                                          implicit val appConfig: AppConfig
                                         ) extends FrontendController with I18nSupport {
 
@@ -47,51 +46,46 @@ class AuthoriseAgentWithClient @Inject()(enrolmentsAuthService: EnrolmentsAuthSe
         .withIdentifier(EnrolmentKeys.vatIdentifierId, vrn)
         .withDelegatedAuthRule(EnrolmentKeys.mtdVatDelegatedAuthRule)
 
-    if (appConfig.features.agentAccess()) {
-      request.session.get(SessionKeys.clientVrn) match {
-        case Some(vrn) =>
-          enrolmentsAuthService
-            .authorised(delegatedAuthRule(vrn))
-            .retrieve(allEnrolments) {
-              enrolments =>
-                enrolments.enrolments.collectFirst {
-                  case Enrolment(EnrolmentKeys.agentEnrolmentKey, EnrolmentIdentifier(_, arn) :: _, EnrolmentKeys.activated, _) => arn
-                } match {
-                  case Some(_) => checkMandationStatus(block, enrolments, vrn)
-                  case None =>
-                    Logger.debug("[AuthPredicate][authoriseAsAgent] - Agent with no HMRC-AS-AGENT enrolment. Rendering unauthorised view.")
-                    Future.successful(Forbidden(views.html.errors.unauthorised()))
-                }
-            }
-        case _ =>
-          if (appConfig.features.agentClientLookupEnabled()) {
-            Logger.debug(s"[AuthoriseAsAgentWithClient][invokeBlock] - No Client VRN in session, redirecting to Select Client page")
-            Future.successful(Redirect(appConfig.agentClientLookupUrl))
-          } else {
-            Logger.debug(s"[AuthoriseAsAgentWithClient][invokeBlock] - No Client VRN in session, redirecting to stub agent client lookup page")
-            Future.successful(Redirect(testOnly.controllers.routes.StubAgentClientLookupController.show(request.uri)))
+    request.session.get(SessionKeys.clientVrn) match {
+      case Some(vrn) =>
+        enrolmentsAuthService
+          .authorised(delegatedAuthRule(vrn))
+          .retrieve(allEnrolments) {
+            enrolments =>
+              enrolments.enrolments.collectFirst {
+                case Enrolment(EnrolmentKeys.agentEnrolmentKey, EnrolmentIdentifier(_, arn) :: _, EnrolmentKeys.activated, _) => arn
+              } match {
+                case Some(arn) => checkMandationStatus(block, vrn, arn)
+                case None =>
+                  Logger.debug("[AuthPredicate][authoriseAsAgent] - Agent with no HMRC-AS-AGENT enrolment. Rendering unauthorised view.")
+                  Future.successful(Forbidden(views.html.errors.unauthorised()))
+              }
           }
-      }
-    } else {
-      Future.successful(Unauthorized(views.html.errors.agent_journey_disabled()))
+      case _ =>
+        if (appConfig.features.agentClientLookupEnabled()) {
+          Logger.debug(s"[AuthoriseAsAgentWithClient][invokeBlock] - No Client VRN in session, redirecting to Select Client page")
+          Future.successful(Redirect(appConfig.agentClientLookupUrl))
+        } else {
+          Logger.debug(s"[AuthoriseAsAgentWithClient][invokeBlock] - No Client VRN in session, redirecting to stub agent client lookup page")
+          Future.successful(Redirect(testOnly.controllers.routes.StubAgentClientLookupController.show(request.uri)))
+        }
     }
   }
 
-  private def checkMandationStatus(block: Request[AnyContent] => User => Future[Result], enrolments: Enrolments, vrn: String)
+
+  private def checkMandationStatus(block: Request[AnyContent] => User => Future[Result], vrn: String, arn: String)
                                   (implicit request: Request[AnyContent], hc: HeaderCarrier): Future[Result] = {
 
     mandationStatusService.getMandationStatus(vrn) flatMap {
       case Right(MandationStatus(MandationStatuses.nonMTDfB)) =>
-        val user = User(enrolments, Some(vrn))
+        val user = User(vrn, arn = Some(arn))
         block(request)(user)
       case Right(_) =>
-        //TODO: add page content
         Logger.debug("[AuthPredicate][checkMandationStatus] - Agent acting for MTDfB client")
-        Future.successful(Forbidden)
+        Future.successful(Redirect(appConfig.agentClientActionUrl))
       case Left(error) =>
         Logger.warn(s"[AuthPredicate][checkMandationStatus] - Error returned from mandationStatusService: $error")
         Future.successful(InternalServerError)
     }
   }
-
 }

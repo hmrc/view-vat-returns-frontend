@@ -65,11 +65,13 @@ class MockAppConfig(val runModeConfiguration: Configuration, val mode: Mode = Mo
     "cymraeg" -> Lang("cy")
   )
   override val routeToSwitchLanguage: String => Call = (lang: String) => controllers.routes.LanguageController.switchLanguage(lang)
-  val submitVatReturnBase: String = "submitReturnBase"
-  val submitVatReturnUrl: String = submitVatReturnBase + "/submitUrl"
-  val submitVatReturnForm: String => String = periodKey => submitVatReturnUrl + s"$periodKey/submit-form"
+  override val submitVatReturnBase: String = "submitReturnBase"
+  override val submitVatReturnUrl: String = submitVatReturnBase + "/submitUrl"
+  override val submitVatReturnForm: String => String = periodKey => submitVatReturnUrl + s"$periodKey/submit-form"
   override val vatAgentClientLookupFrontendUrl: String = "/vaclf"
   override def agentClientLookupUrl: String = "/agent-client-lookup"
   override def agentClientUnauthorisedUrl: String = "agent-client-unauthorised"
+  override val agentClientActionUrl: String = "agent-client-agent-action"
+
 }
 

@@ -39,7 +39,7 @@ class VatSubscriptionConnectorISpec extends IntegrationBaseSpec {
     "the API returns a valid response" should {
 
       "provide a user's information" in new Test {
-        override def setupStubs(): StubMapping = CustomerInfoStub.stubCustomerInfo
+        override def setupStubs(): StubMapping = CustomerInfoStub.stubCustomerInfo()
 
         val hasFlatRateScheme: Boolean = true
 
