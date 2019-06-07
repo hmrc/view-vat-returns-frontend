@@ -17,6 +17,10 @@
   padding-top: 3px;
 }
 
+.column-one-quarter, .column-one-half {
+  margin-bottom: 5px;
+}
+
 a.in-selected-tab {
   color: #0B0C0C;
   text-decoration: none;
