@@ -27,7 +27,7 @@ class VatSubscriptionConnectorSpec extends ControllerBaseSpec {
   "VatSubscriptionConnector" should {
 
     "generate the correct customer information url" in {
-      connector.customerInfoUrl("123456789") shouldBe "/vat-subscription/123456789/customer-details"
+      connector.customerInfoUrl("123456789") shouldBe "/vat-subscription/123456789/full-information"
       connector.mandationStatusUrl("123456789") shouldBe "/vat-subscription/123456789/mandation-status"
     }
 

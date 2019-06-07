@@ -16,8 +16,9 @@
 
 package connectors.httpParsers
 
+import common.TestJson.customerInfoJsonMax
+import common.TestModels.customerInformationMax
 import connectors.httpParsers.CustomerInfoHttpParser.CustomerInfoReads
-import models.CustomerInformation
 import models.errors._
 import play.api.http.Status
 import play.api.libs.json.{JsObject, Json}
@@ -34,27 +35,11 @@ class CustomerInfoHttpParserSpec extends UnitSpec {
 
       val httpResponse = HttpResponse(
         Status.OK,
-        responseJson = Some(
-          Json.obj(
-            "organisationName" -> "Cheapo Clothing Ltd",
-            "firstName" -> "John",
-            "lastName" -> "Smith",
-            "tradingName" -> "Cheapo Clothing",
-            "hasFlatRateScheme" -> hasFlatRateSchemeYes,
-            "isPartialMigration" -> true
-          )
-        )
+        responseJson = Some(customerInfoJsonMax)
       )
 
-      val expected = Right(CustomerInformation(
-        Some("Cheapo Clothing Ltd"),
-        Some("John"),
-        Some("Smith"),
-        Some("Cheapo Clothing"),
-        hasFlatRateSchemeYes,
-        Some(true)
-      ))
       val result = CustomerInfoReads.read("", "", httpResponse)
+      val expected = Right(customerInformationMax)
 
       "return a Trading Name" in {
         result shouldBe expected

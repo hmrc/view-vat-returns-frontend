@@ -41,15 +41,13 @@ class VatSubscriptionConnectorISpec extends IntegrationBaseSpec {
       "provide a user's information" in new Test {
         override def setupStubs(): StubMapping = CustomerInfoStub.stubCustomerInfo
 
-        val hasFlatRateScheme: Boolean = true
-
         setupStubs()
         val expected = Right(CustomerInformation(
           Some("Cheapo Clothing Ltd"),
           Some("Vincent"),
           Some("Vatreturn"),
           Some("Cheapo Clothing"),
-          hasFlatRateScheme,
+          hasFlatRateScheme = true,
           Some(true)
         ))
         private val result = await(connector.getCustomerInfo("999999999"))

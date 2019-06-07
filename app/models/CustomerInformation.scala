@@ -26,16 +26,14 @@ case class CustomerInformation(organisationName: Option[String],
                                hasFlatRateScheme: Boolean,
                                isPartialMigration: Option[Boolean])
 
-
 object CustomerInformation {
-  implicit val customerInformationWrites: Writes[CustomerInformation] = Json.writes[CustomerInformation]
 
   implicit val customerInformationReads: Reads[CustomerInformation] = (
-    (JsPath \ "organisationName").readNullable[String] and
-      (JsPath \ "firstName").readNullable[String] and
-      (JsPath \ "lastName").readNullable[String] and
-      (JsPath \ "tradingName").readNullable[String] and
-      (JsPath \ "hasFlatRateScheme").read[Boolean] and
-      (JsPath \ "isPartialMigration").readNullable[Boolean]
-    ) (CustomerInformation.apply _)
+    (JsPath \ "customerDetails" \ "organisationName").readNullable[String].orElse(Reads.pure(None)) and
+    (JsPath \ "customerDetails" \ "firstName").readNullable[String].orElse(Reads.pure(None)) and
+    (JsPath \ "customerDetails" \ "lastName").readNullable[String].orElse(Reads.pure(None)) and
+    (JsPath \ "customerDetails" \ "tradingName").readNullable[String].orElse(Reads.pure(None)) and
+    (JsPath \ "flatRateScheme").readNullable[JsValue].orElse(Reads.pure(None)).map(_.isDefined) and
+    (JsPath \\ "isPartialMigration").readNullable[Boolean]
+  )(CustomerInformation.apply _)
 }
