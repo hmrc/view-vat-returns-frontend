@@ -14,34 +14,19 @@
  * limitations under the License.
  */
 
-package stubs
+package common
 
-import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import helpers.WireMockMethods
-import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK}
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 
-object CustomerInfoStub extends WireMockMethods {
+object TestJson {
 
-  private val customerInfoUri = "/vat-subscription/([0-9]+)/full-information"
-
-  def stubCustomerInfo: StubMapping = {
-    when(method = GET, uri = customerInfoUri)
-      .thenReturn(status = OK, body = customerInfo)
-  }
-
-  def stubErrorFromApi: StubMapping = {
-    when(method = GET, uri = customerInfoUri)
-      .thenReturn(status = INTERNAL_SERVER_ERROR, body = errorJson)
-  }
-
-  private val customerInfo = Json.obj(
+  val customerInfoJsonMax: JsValue = Json.obj(
     "customerDetails" -> Json.obj(
       "organisationName" -> "Cheapo Clothing Ltd",
-      "firstName" -> "Vincent",
-      "lastName" -> "Vatreturn",
+      "firstName" -> "Betty",
+      "lastName" -> "Jones",
       "tradingName" -> "Cheapo Clothing",
-      "isPartialMigration" -> true
+      "isPartialMigration" -> false
     ),
     "ppob" -> Json.obj(
       "address" -> Json.obj(
@@ -54,10 +39,5 @@ object CustomerInfoStub extends WireMockMethods {
       "limitedCostTrader" -> true
     ),
     "primaryMainCode" -> "10410"
-  )
-
-  private val errorJson = Json.obj(
-    "code" -> "500",
-    "message" -> "INTERNAL_SERVER_ERROR"
   )
 }

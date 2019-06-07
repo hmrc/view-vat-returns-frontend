@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package models
+package common
 
-import common.TestModels.customerInformationMax
-import common.TestJson.customerInfoJsonMax
-import uk.gov.hmrc.play.test.UnitSpec
+import models.CustomerInformation
 
-class CustomerInformationSpec extends UnitSpec {
+object TestModels {
 
-  "A CustomerInformation object" should {
-
-    "be parsed from appropriate JSON" in {
-      customerInfoJsonMax.as[CustomerInformation] shouldBe customerInformationMax
-    }
-  }
+  val customerInformationMax = CustomerInformation(
+    Some("Cheapo Clothing Ltd"),
+    Some("Betty"),
+    Some("Jones"),
+    Some("Cheapo Clothing"),
+    hasFlatRateScheme = true,
+    Some(false)
+  )
 }
