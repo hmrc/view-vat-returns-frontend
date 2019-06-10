@@ -379,7 +379,6 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     val previousYear: Int = 201
     val auditingExpected: Boolean = false
     val mockEnrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
-
     val mockAuthorisedAgentWithClient: AuthoriseAgentWithClient = new AuthoriseAgentWithClient(
       mockEnrolmentsAuthService,
       mockVatReturnService,
@@ -395,7 +394,8 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     )
 
     def setup(auth: Future[~[Enrolments, Option[AffinityGroup]]] = authResult): Any = {
-      (mockDateService.now: () => LocalDate).stubs().returns(LocalDate.parse("2018-05-01"))
+
+      (mockDateService.now: () => LocalDate).stubs().returns(LocalDate.parse("2018-05-01")).anyNumberOfTimes()
 
       (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
         .expects(*, *, *, *)

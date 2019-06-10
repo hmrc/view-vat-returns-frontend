@@ -17,8 +17,9 @@
 @import models.viewModels.ReturnDeadlineViewModel
 @import views.html.templates.formatters.breadcrumbs._
 @import views.html.templates.formatters.dates._
+@import java.time.LocalDate
 
-@(deadlines: Seq[ReturnDeadlineViewModel])(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig, lang: Lang)
+@(deadlines: Seq[ReturnDeadlineViewModel], currentDate: LocalDate)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig, lang: Lang)
 
     @views.html.main_template(title = messages("returnDeadlines.submitReturn.title"), bodyClasses = None, appConfig = appConfig) {
 
@@ -52,7 +53,11 @@
                                         @messages("returnDeadlines.periodEnding", displayDateRange(deadline.start, deadline.end))
                                     }
                                 </span>
-                                <a href="@{appConfig.submitVatReturnForm(deadline.periodKey)}" id="submit-return-link">@messages("returnDeadlines.submitReturn")</a>
+                                @if(currentDate.isAfter(deadline.end)) {
+                                    <a href="@{appConfig.submitVatReturnForm(deadline.periodKey)}" id="submit-return-link">@messages("returnDeadlines.submitReturn")</a>
+                                } else {
+                                    <span>@messages("returnDeadlines.submitReturn.futureReturn", displayDate(deadline.end.plusDays(1), showYear = false))</span>
+                                }
                             </p>
                         </li>
                     }

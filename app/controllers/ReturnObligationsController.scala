@@ -97,7 +97,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
                                    (implicit user: User, request: Request[AnyContent]): Future[Result] = {
 
     def view(mandationStatus: String) = mandationStatus match {
-      case NonMtdfb.mandationStatus => views.html.returns.optOutReturnDeadlines(obligations)
+      case NonMtdfb.mandationStatus => views.html.returns.optOutReturnDeadlines(obligations, dateService.now())
       case _ => views.html.returns.returnDeadlines(obligations)
     }
 
