@@ -20,6 +20,7 @@ import java.time.LocalDate
 
 import audit.AuditingService
 import audit.models.AuditModel
+import config.ServiceErrorHandler
 import models._
 import models.User
 import models.customer.CustomerDetail
@@ -32,8 +33,10 @@ import play.api.test.Helpers._
 import services.{DateService, EnrolmentsAuthService, ReturnsService, SubscriptionService}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.authorise.Predicate
-import uk.gov.hmrc.auth.core.retrieve.Retrieval
+import uk.gov.hmrc.auth.core.retrieve.{Retrieval, ~}
 import uk.gov.hmrc.http.HeaderCarrier
+import controllers.predicate.AuthoriseAgentWithClient
+import uk.gov.hmrc.auth.core.AffinityGroup.Individual
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -45,15 +48,33 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     mockVatReturnService,
     mockSubscriptionService,
     mockDateService,
+    mockAuthorisedController,
     mockConfig,
     mockAuditService
   )
 
-  val goodEnrolments: Enrolments = Enrolments(
-    Set(
-      Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("VRN", "999999999")), "Active")
-    )
-  )
+  val goodEnrolments: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(new ~(
+    Enrolments(
+      Set(
+      Enrolment(
+        "HMRC-MTD-VAT",
+        Seq(EnrolmentIdentifier("VRN", "999999999")),
+        "Active"))
+    ),
+    Some(Individual)
+  ))
+
+  val missingInfinityGroup: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(new ~(
+    Enrolments(
+      Set(
+        Enrolment(
+          "HMRC-MTD-IT",
+          Seq(EnrolmentIdentifier("SAUTR", "999999999")),
+          "Active"))
+    ),
+    None
+  ))
+
   val exampleVatReturn: VatReturn = VatReturn(
     "#001",
     1297,
@@ -99,13 +120,28 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
   val mockEnrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
   val mockVatApiService: SubscriptionService = mock[SubscriptionService]
   val mockSubscriptionService: SubscriptionService = mock[SubscriptionService]
+  val mockServiceErrorHandler: ServiceErrorHandler = mock[ServiceErrorHandler]
+
+  val mockAuthorisedAgentWithClient: AuthoriseAgentWithClient = new AuthoriseAgentWithClient(
+    mockEnrolmentsAuthService,
+    mockVatReturnService,
+    messages,
+    mockConfig
+  )
+
+  val mockAuthorisedController: AuthorisedController = new AuthorisedController(
+    mockEnrolmentsAuthService,
+    messages,
+    mockAuthorisedAgentWithClient,
+    mockConfig
+  )
 
   private trait Test {
     val submitReturnFeatureEnabled = true
     val serviceCall: Boolean = true
     val successReturn: Boolean = true
     val mandationStatusCall: Boolean = true
-    val authResult: Future[Enrolments] = Future.successful(goodEnrolments)
+    val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(goodEnrolments)
     val vatReturnResult: Future[ServiceResponse[VatReturn]] = Future.successful(Right(exampleVatReturn))
     val paymentResult: Future[Option[Payment]] = Future.successful(Some(examplePayment))
     val mandationStatusResult: Future[ServiceResponse[MandationStatus]] = Future.successful(Right(MandationStatus("Non MTDfB")))
@@ -148,7 +184,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         (mockDateService.now: () => LocalDate).stubs().returns(LocalDate.parse("2018-05-01"))
       }
 
-      if(mandationStatusCall) {
+      if (mandationStatusCall) {
         (mockVatReturnService.getMandationStatus(_: String)(_: HeaderCarrier, _: ExecutionContext))
           .expects("999999999", *, *)
           .returns(mandationStatusResult)
@@ -256,6 +292,31 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       }
     }
 
+    "a user is not authorised " should {
+
+      "return 401 (Unauthorised)" in new Test {
+        override val serviceCall = false
+        override val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = Future.failed(UnsupportedAuthProvider())
+        override val mandationStatusCall = false
+
+        val result: Future[Result] = target.vatReturn(2018, "#001")(fakeRequest)
+        status(result) shouldBe Status.FORBIDDEN
+      }
+    }
+
+    "the user is missing their affinity group" should {
+
+      "return 500 (Internal server error)" in new Test {
+        override val serviceCall = false
+        override val mandationStatusCall = false
+        override val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = missingInfinityGroup
+
+        val result: Future[Result] = target.vatReturn(2018, "#001")(fakeRequest)
+        status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+      }
+
+    }
+
     "the specified VAT return is not found" should {
 
       "return 404 (Not Found)" in new Test {
@@ -281,6 +342,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
       }
     }
+
   }
 
   "Calling the .vatReturnViaPayments action" when {
@@ -443,7 +505,9 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
           .stubs(*, *, *, *)
           .returns({})
       }
+
       val data = ReturnsControllerData(Right(exampleVatReturn), None, Some(examplePayment), Some(exampleObligation))
+
       def result: Result = controller.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
 
       "return an OK status" in {

@@ -16,38 +16,86 @@
 
 package controllers
 
-import common.EnrolmentKeys._
+import common.{EnrolmentKeys => Keys}
 import config.AppConfig
 import models.User
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Request, Result}
 import services.EnrolmentsAuthService
-import uk.gov.hmrc.auth.core.{AuthorisationException, Enrolment, NoActiveSession}
-import uk.gov.hmrc.auth.core.retrieve.Retrievals
+import uk.gov.hmrc.auth.core._
+import uk.gov.hmrc.auth.core.retrieve.{Retrievals, ~}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import controllers.predicate.AuthoriseAgentWithClient
+import javax.inject.Inject
+import play.api.Logger
 
 import scala.concurrent.Future
 
-abstract class AuthorisedController extends FrontendController with I18nSupport {
+class AuthorisedController @Inject()(enrolmentsAuthService: EnrolmentsAuthService,
+                                     val messagesApi: MessagesApi,
+                                     val agentWithClientPredicate: AuthoriseAgentWithClient,
+                                     implicit val appConfig: AppConfig) extends FrontendController with I18nSupport {
 
-  val messagesApi: MessagesApi
-  val enrolmentsAuthService: EnrolmentsAuthService
-  implicit val appConfig: AppConfig
-
-  def authorisedAction(block: Request[AnyContent] => User => Future[Result]): Action[AnyContent] = Action.async {
+  def authorisedAction(block: Request[AnyContent] => User => Future[Result], allowAgentAccess: Boolean = true): Action[AnyContent] = Action.async {
     implicit request =>
 
-      val predicate =
-        ((Enrolment(vatDecEnrolmentKey) or Enrolment(vatVarEnrolmentKey)) and Enrolment(mtdVatEnrolmentKey))
-          .or(Enrolment(mtdVatEnrolmentKey))
-
-      enrolmentsAuthService.authorised(predicate).retrieve(Retrievals.authorisedEnrolments) {
-        enrolments =>
-          block(request)(User(enrolments))
+      enrolmentsAuthService.authorised.retrieve(Retrievals.allEnrolments and Retrievals.affinityGroup) {
+        case _ ~ Some(AffinityGroup.Agent) =>
+          if (allowAgentAccess && appConfig.features.agentAccess()) {
+            agentWithClientPredicate.authoriseAsAgent(block)
+          } else {
+            //$COVERAGE-OFF$ Disabling scoverage for Logger
+            Logger.debug("[AuthorisedController][authorisedAction] User is agent and agent access is forbidden. Rendering unauthorised page.")
+            //$COVERAGE-ON Disabling scoverage for Logger
+            Future.successful(Forbidden(views.html.errors.unauthorised()))
+          }
+        case enrolments ~ Some(_) => authorisedAsNonAgent(block, enrolments)
+        case _ =>
+          //$COVERAGE-OFF$ Disabling scoverage for Logger
+          Logger.warn("[AuthorisedController][authorisedAction] - Missing affinity group")
+          //$COVERAGE-ON$ Disabling scoverage for Logger
+          Future.successful(InternalServerError)
       } recoverWith {
         case _: NoActiveSession => Future.successful(Unauthorized(views.html.errors.sessionTimeout()))
-        case _: AuthorisationException => Future.successful(Forbidden(views.html.errors.unauthorised()))
+        case _: InsufficientEnrolments =>
+          //$COVERAGE-OFF$ Disabling scoverage for Logger
+        Logger.warn(s"[AuthorisedController][authorisedAction] insufficient enrolment exception encountered")
+          //$COVERAGE-ON$ Disabling scoverage for Logger
+          Future.successful(Forbidden(views.html.errors.unauthorised()))
+        case _: AuthorisationException =>
+          //$COVERAGE-OFF$ Disabling scoverage for Logger
+        Logger.warn(s"[AuthorisedController][authorisedAction] encountered unauthorisation exception")
+          //$COVERAGE-ON$ Disabling scoverage for Logger
+          Future.successful(Forbidden(views.html.errors.unauthorised()))
       }
   }
 
+  private def authorisedAsNonAgent(block: Request[AnyContent] => User => Future[Result], enrolments: Enrolments)
+                                  (implicit request: Request[AnyContent]): Future[Result] = {
+
+    val vatEnrolments: Set[Enrolment] = User.extractVatEnrolments(enrolments)
+
+    if (vatEnrolments.exists(_.key == Keys.mtdVatEnrolmentKey)) {
+      val containsNonMtdVat: Boolean = User.containsNonMtdVat(vatEnrolments)
+
+      vatEnrolments.collectFirst {
+        case Enrolment(Keys.mtdVatEnrolmentKey, EnrolmentIdentifier(Keys.vatIdentifierId, vrn) :: _, status, _) =>
+
+          val user = User(vrn, status == Keys.activated, containsNonMtdVat)
+
+          block(request)(user)
+
+      } getOrElse {
+        //$COVERAGE-OFF$ Disabling scoverage for Logger
+        Logger.warn("[AuthPredicate][authoriseAsNonAgent] Non-agent with invalid VRN")
+        //$COVERAGE-ON$ Disabling scoverage for Logger
+        Future.successful(InternalServerError)
+      }
+    } else {
+      //$COVERAGE-OFF$ Disabling scoverage for Logger
+      Logger.debug("[AuthPredicate][authoriseAsNonAgent] Non-agent with no HMRC-MTD-VAT enrolment. Rendering unauthorised view.")
+      //$COVERAGE-ON$ Disabling scoverage for Logger
+      Future.successful(Forbidden(views.html.errors.unauthorised()))
+    }
+  }
 }

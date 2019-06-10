@@ -25,23 +25,25 @@ import models.viewModels.{ReturnDeadlineViewModel, ReturnObligationsViewModel, V
 import models._
 import models.errors.ServiceError
 import play.api.Logger
-import play.api.i18n.MessagesApi
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Request, Result}
 import services.{DateService, EnrolmentsAuthService, ReturnsService}
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 @Singleton
 class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
-                                            val enrolmentsAuthService: EnrolmentsAuthService,
+                                            enrolmentsAuthService: EnrolmentsAuthService,
                                             returnsService: ReturnsService,
+                                            authorisedController: AuthorisedController,
                                             dateService: DateService,
                                             implicit val appConfig: AppConfig,
                                             auditService: AuditingService)
-  extends AuthorisedController {
+  extends FrontendController with I18nSupport {
 
-  def submittedReturns(year: Int): Action[AnyContent] = authorisedAction { implicit request =>
+  def submittedReturns(year: Int): Action[AnyContent] = authorisedController.authorisedAction { implicit request =>
     implicit user =>
       if (isValidSearchYear(year)) {
         getReturnObligations(user, year, Obligation.Status.Fulfilled) map {
@@ -55,7 +57,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
       }
   }
 
-  def returnDeadlines(): Action[AnyContent] = authorisedAction { implicit request =>
+  def returnDeadlines(): Action[AnyContent] = authorisedController.authorisedAction { implicit request =>
 
     implicit user =>
       val currentDate = dateService.now()

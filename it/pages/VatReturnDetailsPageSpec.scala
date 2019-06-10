@@ -56,7 +56,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
       "return 200" in new ReturnRouteTest {
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
-          CustomerInfoStub.stubCustomerInfo
+          CustomerInfoStub.stubCustomerInfo()
           returnsStub.stubSuccessfulVatReturn
           obligationsStub.stubFulfilledObligations
           FinancialDataStub.stubVatReturnCreditCharge
@@ -74,7 +74,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
       "return 200" in new ReturnRouteTest {
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
-          CustomerInfoStub.stubCustomerInfo
+          CustomerInfoStub.stubCustomerInfo()
           returnsStub.stubSuccessfulVatReturn
           obligationsStub.stubFulfilledObligations
           FinancialDataStub.stubVatReturnDebitCharge(0)
@@ -92,7 +92,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
       "return 200" in new PaymentReturnRouteTest {
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
-          CustomerInfoStub.stubCustomerInfo
+          CustomerInfoStub.stubCustomerInfo()
           returnsStub.stubSuccessfulVatReturn
           obligationsStub.stubFulfilledObligations
           FinancialDataStub.stubAAReturnCreditChargeOutstandingPayment
@@ -110,7 +110,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
       "return 200" in new PaymentReturnRouteTest {
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
-          CustomerInfoStub.stubCustomerInfo
+          CustomerInfoStub.stubCustomerInfo()
           returnsStub.stubSuccessfulVatReturn
           obligationsStub.stubFulfilledObligations
           FinancialDataStub.stubAAReturnDebitChargeOutstandingPayment(0)
@@ -128,7 +128,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
       "return 200" in new PaymentReturnRouteTest {
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
-          CustomerInfoStub.stubCustomerInfo
+          CustomerInfoStub.stubCustomerInfo()
           returnsStub.stubSuccessfulVatReturn
           obligationsStub.stubFulfilledObligations
           FinancialDataStub.stubPOAReturnCreditCharge
@@ -145,7 +145,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
       "return 200" in new PaymentReturnRouteTest {
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
-          CustomerInfoStub.stubCustomerInfo
+          CustomerInfoStub.stubCustomerInfo()
           returnsStub.stubSuccessfulVatReturn
           obligationsStub.stubFulfilledObligations
           FinancialDataStub.stubPOAReturnDebitCharge(0)
@@ -162,7 +162,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
 
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
-          CustomerInfoStub.stubCustomerInfo
+          CustomerInfoStub.stubCustomerInfo()
           returnsStub.stubSuccessfulVatReturn
           obligationsStub.stubFulfilledObligations
           FinancialDataStub.stubNoPayments
@@ -183,7 +183,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
       "return 200" in new PaymentReturnRouteTest {
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
-          CustomerInfoStub.stubCustomerInfo
+          CustomerInfoStub.stubCustomerInfo()
           returnsStub.stubSuccessfulVatReturn
           obligationsStub.stubFulfilledObligations
           FinancialDataStub.stubVatReturnDebitCharge(4000)
@@ -201,7 +201,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
       "return 200" in new PaymentReturnRouteTest {
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
-          CustomerInfoStub.stubCustomerInfo
+          CustomerInfoStub.stubCustomerInfo()
           returnsStub.stubSuccessfulVatReturn
           obligationsStub.stubFulfilledObligations
           FinancialDataStub.stubAAReturnDebitChargeOutstandingPayment(5000)
@@ -219,7 +219,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
       "return 200" in new PaymentReturnRouteTest {
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
-          CustomerInfoStub.stubCustomerInfo
+          CustomerInfoStub.stubCustomerInfo()
           returnsStub.stubSuccessfulVatReturn
           obligationsStub.stubFulfilledObligations
           FinancialDataStub.stubPOAReturnDebitCharge(5000)
