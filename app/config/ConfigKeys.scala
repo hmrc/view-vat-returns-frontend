@@ -59,7 +59,7 @@ object ConfigKeys {
   val submitVatReturnForm: String = "submit-vat-return-frontend.submit-form"
 
   val vatAgentClientLookupFrontendHost: String = "vat-agent-client-lookup-frontend.host"
-  val vatAgentClientLookupFrontendUrl: String = "vat-agent-client-lookup-frontend.url"
+  val vatAgentClientLookupFrontendUrl: String = "vat-agent-client-lookup-frontend.startUrl"
   val vatAgentClientLookupActionUrl: String = "vat-agent-client-lookup-frontend.actionUrl"
 
   val reportVatErrorUrl: String = "reportVatErrorUrl"

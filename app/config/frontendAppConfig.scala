@@ -164,10 +164,10 @@ class FrontendAppConfig @Inject()(val runModeConfiguration: Configuration, val e
     getString(Keys.vatAgentClientLookupFrontendHost) + getString(Keys.vatAgentClientLookupFrontendUrl)
 
   override lazy val agentClientLookupUrl: String => String = uri =>
-    vatAgentClientLookupFrontendUrl + s"/client-vat-number?redirectUrl=${ContinueUrl(getString(Keys.host) + uri).encodedUrl}"
+    vatAgentClientLookupFrontendUrl + s"?redirectUrl=${ContinueUrl(getString(Keys.host) + uri).encodedUrl}"
 
   override lazy val agentClientUnauthorisedUrl: String => String  = uri =>
-    vatAgentClientLookupFrontendUrl + s"/unauthorised-for-client?redirectUrl=${ContinueUrl(getString(Keys.host) + uri).encodedUrl}"
+    vatAgentClientLookupFrontendUrl + s"?redirectUrl=${ContinueUrl(getString(Keys.host) + uri).encodedUrl}"
 
   override lazy val agentClientActionUrl: String = getString(Keys.vatAgentClientLookupActionUrl)
 }
