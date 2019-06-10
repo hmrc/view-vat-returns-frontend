@@ -29,10 +29,11 @@ import models.viewModels.{ReturnObligationsViewModel, VatReturnsViewModel}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.http.Status
-import play.api.mvc.Result
+import play.api.mvc.{AnyContentAsEmpty, Result}
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.{DateService, EnrolmentsAuthService, ReturnsService}
-import uk.gov.hmrc.auth.core.AffinityGroup.Individual
+import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.{Retrieval, ~}
@@ -69,23 +70,43 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         )
       )
     )
+
+    val agentEnrolments: Enrolments = Enrolments(
+      Set(
+        Enrolment(
+          "HMRC-AS-AGENT",
+          Seq(EnrolmentIdentifier("AgentReferenceNumber", "XARN1234567")),
+          "Activated")
+      )
+    )
+
+    val agentAuthResult: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(new ~(
+      agentEnrolments,
+      Some(Agent)
+    ))
+
     val serviceCall: Boolean = true
     val secondServiceCall: Boolean = true
+    val mandationStatusResult: String => Future[ServiceResponse[MandationStatus]]
+    = mandationStatus => Future.successful(Right(MandationStatus(mandationStatus)))
     val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(goodEnrolments)
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
     val mockVatReturnService: ReturnsService = mock[ReturnsService]
     val mockDateService: DateService = mock[DateService]
     val mockAuditService: AuditingService = mock[AuditingService]
     val mockEnrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
+    val callMandationService: Boolean = false
+    val callDateService: Boolean = true
+    val enabledAgentAccess: Boolean = true
 
-    val mockAuthorisedAgentWithClient: AuthoriseAgentWithClient = new AuthoriseAgentWithClient(
+    def mockAuthorisedAgentWithClient: AuthoriseAgentWithClient = new AuthoriseAgentWithClient(
       mockEnrolmentsAuthService,
       mockVatReturnService,
       messages,
       mockConfig
     )
 
-    val mockAuthorisedController: AuthorisedController = new AuthorisedController(
+    def mockAuthorisedController: AuthorisedController = new AuthorisedController(
       mockEnrolmentsAuthService,
       messages,
       mockAuthorisedAgentWithClient,
@@ -95,13 +116,25 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     val previousYear: Int = 2017
 
     def setup(): Any = {
-      (mockDateService.now: () => LocalDate).stubs().returns(LocalDate.parse("2018-05-01"))
 
-      (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
+      if (callDateService) {
+        (mockDateService.now: () => LocalDate).stubs().returns(LocalDate.parse("2018-05-01"))
+      }
+
+      (mockAuthConnector.authorise(_: Predicate, _: Retrieval[~[Enrolments, Option[AffinityGroup]]])(_: HeaderCarrier, _: ExecutionContext))
         .expects(*, *, *, *)
         .returns(authResult)
+        .noMoreThanOnce()
+
+      if (callMandationService) {
+
+        (mockVatReturnService.getMandationStatus(_: String)(_: HeaderCarrier, _: ExecutionContext))
+          .expects(*, *, *)
+          .returns(mandationStatusResult("Non MTDfB"))
+      }
 
       if (serviceCall) {
+
         (mockVatReturnService.getReturnObligationsForYear(_: User, _: Int, _: Obligation.Status.Value)
         (_: HeaderCarrier, _: ExecutionContext))
           .expects(*, *, *, *, *)
@@ -119,6 +152,8 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         }
 
       }
+
+      mockConfig.features.agentAccess(enabledAgentAccess)
     }
 
     def target: ReturnObligationsController = {
@@ -153,6 +188,105 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         charset(result) shouldBe Some("utf-8")
       }
     }
+
+    "an agent logs into the service" when {
+
+      "agent access is enabled" when {
+
+        "there is a clients vrn in session" when {
+
+          "the agent has the correct authorised delegation" should {
+
+            lazy val fakeRequestWithClientVrn: FakeRequest[AnyContentAsEmpty.type] = fakeRequest.withSession(
+              SessionKeys.clientVrn -> "999999999")
+
+            "return 200" in new Test {
+              override val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = agentAuthResult
+              override val callMandationService: Boolean = true
+
+              override def setup(): Any = {
+                super.setup()
+
+                (mockAuthConnector.authorise(_: Predicate, _: Retrieval[Enrolments])(_: HeaderCarrier, _: ExecutionContext))
+                  .expects(*, *, *, *)
+                  .returns(Future.successful(agentEnrolments))
+              }
+
+              private val result = target.submittedReturns(previousYear)(fakeRequestWithClientVrn)
+              status(result) shouldBe Status.OK
+            }
+
+            "return HTML" in new Test {
+              override val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = agentAuthResult
+              override val callMandationService: Boolean = true
+
+              override def setup(): Any = {
+                super.setup()
+
+                (mockAuthConnector.authorise(_: Predicate, _: Retrieval[Enrolments])(_: HeaderCarrier, _: ExecutionContext))
+                  .expects(*, *, *, *)
+                  .returns(Future.successful(agentEnrolments))
+              }
+
+              private val result = target.submittedReturns(previousYear)(fakeRequestWithClientVrn)
+              contentType(result) shouldBe Some("text/html")
+            }
+
+            "return charset of utf-8" in new Test {
+              override val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = agentAuthResult
+              override val callMandationService: Boolean = true
+
+              override def setup(): Any = {
+                super.setup()
+
+                (mockAuthConnector.authorise(_: Predicate, _: Retrieval[Enrolments])(_: HeaderCarrier, _: ExecutionContext))
+                  .expects(*, *, *, *)
+                  .returns(Future.successful(agentEnrolments))
+              }
+              private val result = target.submittedReturns(previousYear)(fakeRequestWithClientVrn)
+              charset(result) shouldBe Some("utf-8")
+            }
+          }
+        }
+      }
+
+      "agent access is disabled" should {
+
+        "return FORBIDDEN (403)" in new Test {
+
+          lazy val fakeRequestWithClientVrn: FakeRequest[AnyContentAsEmpty.type] = fakeRequest.withSession(
+            SessionKeys.clientVrn -> "999999999")
+
+          override val enabledAgentAccess: Boolean = false
+          override val serviceCall: Boolean = false
+          override val callDateService: Boolean = false
+          override val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = agentAuthResult
+
+          private val result = target.submittedReturns(previousYear)(fakeRequestWithClientVrn)
+          status(result) shouldBe Status.FORBIDDEN
+
+
+        }
+
+        "render the unauthorised page" in new Test {
+          lazy val fakeRequestWithClientVrn: FakeRequest[AnyContentAsEmpty.type] = fakeRequest.withSession(
+            SessionKeys.clientVrn -> "999999999")
+
+          override val enabledAgentAccess: Boolean = false
+          override val serviceCall: Boolean = false
+          override val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = agentAuthResult
+
+          private val result = target.submittedReturns(previousYear)(fakeRequestWithClientVrn)
+
+          val document: Document = Jsoup.parse(bodyOf(result))
+
+          document.title shouldBe "You are not authorised to use this service"
+
+        }
+
+      }
+    }
+
 
     "A user is not authorised" should {
 
@@ -250,7 +384,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         .expects(*, *, *, *)
         .returns(authResult)
 
-      if(mandationStatusCall) {
+      if (mandationStatusCall) {
         (mockVatReturnService.getMandationStatus(_: String)(_: HeaderCarrier, _: ExecutionContext))
           .expects("999999999", *, *)
           .returns(Future.successful(Right(MandationStatus(mandationStatusCallResponse))))
