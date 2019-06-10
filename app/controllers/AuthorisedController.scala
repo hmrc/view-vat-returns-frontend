@@ -41,23 +41,31 @@ class AuthorisedController @Inject()(enrolmentsAuthService: EnrolmentsAuthServic
 
       enrolmentsAuthService.authorised.retrieve(Retrievals.allEnrolments and Retrievals.affinityGroup) {
         case _ ~ Some(AffinityGroup.Agent) =>
-          if (allowAgentAccess) {
+          if (allowAgentAccess && appConfig.features.agentAccess()) {
             agentWithClientPredicate.authoriseAsAgent(block)
           } else {
+            //$COVERAGE-OFF$ Disabling scoverage for Logger
             Logger.debug("[AuthorisedController][authorisedAction] User is agent and agent access is forbidden. Rendering unauthorised page.")
+            //$COVERAGE-ON Disabling scoverage for Logger
             Future.successful(Forbidden(views.html.errors.unauthorised()))
           }
         case enrolments ~ Some(_) => authorisedAsNonAgent(block, enrolments)
         case _ =>
+          //$COVERAGE-OFF$ Disabling scoverage for Logger
           Logger.warn("[AuthorisedController][authorisedAction] - Missing affinity group")
+          //$COVERAGE-ON$ Disabling scoverage for Logger
           Future.successful(InternalServerError)
       } recoverWith {
         case _: NoActiveSession => Future.successful(Unauthorized(views.html.errors.sessionTimeout()))
         case _: InsufficientEnrolments =>
-          Logger.warn(s"[AuthorisedController][authorisedAction] insufficient enrolment exception encountered")
+          //$COVERAGE-OFF$ Disabling scoverage for Logger
+        Logger.warn(s"[AuthorisedController][authorisedAction] insufficient enrolment exception encountered")
+          //$COVERAGE-ON$ Disabling scoverage for Logger
           Future.successful(Forbidden(views.html.errors.unauthorised()))
         case _: AuthorisationException =>
-          Logger.warn(s"[AuthorisedController][authorisedAction] encountered unauthorisation exception")
+          //$COVERAGE-OFF$ Disabling scoverage for Logger
+        Logger.warn(s"[AuthorisedController][authorisedAction] encountered unauthorisation exception")
+          //$COVERAGE-ON$ Disabling scoverage for Logger
           Future.successful(Forbidden(views.html.errors.unauthorised()))
       }
   }
@@ -78,11 +86,15 @@ class AuthorisedController @Inject()(enrolmentsAuthService: EnrolmentsAuthServic
           block(request)(user)
 
       } getOrElse {
+        //$COVERAGE-OFF$ Disabling scoverage for Logger
         Logger.warn("[AuthPredicate][authoriseAsNonAgent] Non-agent with invalid VRN")
+        //$COVERAGE-ON$ Disabling scoverage for Logger
         Future.successful(InternalServerError)
       }
     } else {
+      //$COVERAGE-OFF$ Disabling scoverage for Logger
       Logger.debug("[AuthPredicate][authoriseAsNonAgent] Non-agent with no HMRC-MTD-VAT enrolment. Rendering unauthorised view.")
+      //$COVERAGE-ON$ Disabling scoverage for Logger
       Future.successful(Forbidden(views.html.errors.unauthorised()))
     }
   }
