@@ -36,7 +36,7 @@ import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.{Retrieval, ~}
 import uk.gov.hmrc.http.HeaderCarrier
 import controllers.predicate.AuthoriseAgentWithClient
-import uk.gov.hmrc.auth.core.AffinityGroup.Individual
+import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -62,6 +62,21 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         "Active"))
     ),
     Some(Individual)
+  ))
+
+  val agentEnrolment: Enrolments = Enrolments(
+    Set(
+      Enrolment(
+        "HMRC-AS-AGENT",
+        Seq(EnrolmentIdentifier("AgentReferenceNumber", "XARN1234567")),
+        "Activated"
+      )
+    )
+  )
+
+  val agentAuthResult: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(new ~(
+    agentEnrolment,
+    Some(Agent)
   ))
 
   val missingInfinityGroup: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(new ~(
@@ -138,6 +153,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
   private trait Test {
     val submitReturnFeatureEnabled = true
+    val agentAccessEnabled = true
     val serviceCall: Boolean = true
     val successReturn: Boolean = true
     val mandationStatusCall: Boolean = true
@@ -149,10 +165,12 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     def setup(): Any = {
 
       mockConfig.features.submitReturnFeatures(submitReturnFeatureEnabled)
+      mockConfig.features.agentAccess(agentAccessEnabled)
 
       (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
         .expects(*, *, *, *)
         .returns(authResult)
+        .noMoreThanOnce()
 
       if (serviceCall) {
         (mockVatReturnService.getVatReturn(_: User, _: String)(_: HeaderCarrier, _: ExecutionContext))
@@ -186,7 +204,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
       if (mandationStatusCall) {
         (mockVatReturnService.getMandationStatus(_: String)(_: HeaderCarrier, _: ExecutionContext))
-          .expects("999999999", *, *)
+          .expects(*, *, *)
           .returns(mandationStatusResult)
       }
     }
@@ -199,7 +217,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
   "Calling the .vatReturn action" when {
 
-    "a user is logged in and enrolled to HMRC-MTD-VAT" when {
+    "user is a non-agent and authorised" when {
 
       "mandation status is not in session" when {
 
@@ -262,6 +280,79 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
           private val result = target.vatReturn(2018, "#001")(fakeRequest)
 
           status(result) shouldBe Status.OK
+        }
+      }
+    }
+
+    "user is an agent" when {
+
+      "agentAccess feature switch is on" when {
+
+        "authorised" should {
+
+          "return 200" in new Test {
+
+            override val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(agentAuthResult)
+
+            override def setup(): Unit = {
+              super.setup()
+
+              (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
+                .expects(*, *, *, *)
+                .returns(Future.successful(agentEnrolment))
+                .noMoreThanOnce()
+
+              (mockVatReturnService.getMandationStatus(_: String)(_: HeaderCarrier, _: ExecutionContext))
+                .expects("123456789", *, *)
+                .returns(mandationStatusResult)
+            }
+
+            private val result = target.vatReturn(2019, "#001")(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
+
+            status(result) shouldBe Status.OK
+            contentType(result) shouldBe Some("text/html")
+          }
+        }
+
+        "not authorised" should {
+
+          "return 403" in new Test {
+
+            override val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(new ~(
+              Enrolments(Set(Enrolment("", Seq(EnrolmentIdentifier("", "")), ""))),
+              Some(Agent)
+            ))
+            override val serviceCall: Boolean = false
+            override val mandationStatusCall: Boolean = false
+
+            override def setup(): Unit = {
+              super.setup()
+
+              (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
+                .expects(*, *, *, *)
+                .returns(Future.successful(Enrolments(Set(Enrolment("", Seq(EnrolmentIdentifier("", "")), "")))))
+                .noMoreThanOnce()
+            }
+
+            private val result = target.vatReturn(2019, "#001")(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
+
+            status(result) shouldBe Status.FORBIDDEN
+          }
+        }
+      }
+
+      "agentAccess feature switch is off" should {
+
+        "return 403" in new Test {
+
+          override val agentAccessEnabled: Boolean = false
+          override val serviceCall: Boolean = false
+          override val mandationStatusCall: Boolean = false
+          override val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = agentAuthResult
+
+          private val result = target.vatReturn(2019, "#001")(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
+
+          status(result) shouldBe Status.FORBIDDEN
         }
       }
     }
@@ -347,7 +438,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
   "Calling the .vatReturnViaPayments action" when {
 
-    "a user is logged in and enrolled to HMRC-MTD-VAT" when {
+    "user is a non-agent and authorised" when {
 
       "mandation status is not in session" when {
 
@@ -399,6 +490,79 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
           private val result = target.vatReturnViaPayments("#001")(fakeRequest)
 
           status(result) shouldBe Status.OK
+        }
+      }
+    }
+
+    "user is an agent" when {
+
+      "agentAccess feature switch is on" when {
+
+        "authorised" should {
+
+          "return 200" in new Test {
+
+            override val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(agentAuthResult)
+
+            override def setup(): Unit = {
+              super.setup()
+
+              (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
+                .expects(*, *, *, *)
+                .returns(Future.successful(agentEnrolment))
+                .noMoreThanOnce()
+
+              (mockVatReturnService.getMandationStatus(_: String)(_: HeaderCarrier, _: ExecutionContext))
+                .expects("123456789", *, *)
+                .returns(mandationStatusResult)
+            }
+
+            private val result = target.vatReturnViaPayments("#001")(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
+
+            status(result) shouldBe Status.OK
+            contentType(result) shouldBe Some("text/html")
+          }
+        }
+
+        "not authorised" should {
+
+          "return 403" in new Test {
+
+            override val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(new ~(
+              Enrolments(Set(Enrolment("", Seq(EnrolmentIdentifier("", "")), ""))),
+              Some(Agent)
+            ))
+            override val serviceCall: Boolean = false
+            override val mandationStatusCall: Boolean = false
+
+            override def setup(): Unit = {
+              super.setup()
+
+              (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
+                .expects(*, *, *, *)
+                .returns(Future.successful(Enrolments(Set(Enrolment("", Seq(EnrolmentIdentifier("", "")), "")))))
+                .noMoreThanOnce()
+            }
+
+            private val result = target.vatReturnViaPayments("#001")(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
+
+            status(result) shouldBe Status.FORBIDDEN
+          }
+        }
+      }
+
+      "agentAccess feature switch is off" should {
+
+        "return 403" in new Test {
+
+          override val agentAccessEnabled: Boolean = false
+          override val serviceCall: Boolean = false
+          override val mandationStatusCall: Boolean = false
+          override val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = agentAuthResult
+
+          private val result = target.vatReturnViaPayments("#001")(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
+
+          status(result) shouldBe Status.FORBIDDEN
         }
       }
     }
