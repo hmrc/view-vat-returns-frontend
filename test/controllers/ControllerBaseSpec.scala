@@ -39,7 +39,7 @@ class ControllerBaseSpec extends UnitSpec with MockFactory with GuiceOneAppPerSu
 
   lazy val injector: Injector = app.injector
   lazy val messages: MessagesApi = injector.instanceOf[MessagesApi]
-  lazy val mockConfig: AppConfig = new MockAppConfig(app.configuration)
+  implicit val mockConfig: AppConfig = new MockAppConfig(app.configuration)
 
   implicit val system: ActorSystem = ActorSystem()
   implicit val materializer: Materializer = ActorMaterializer()
@@ -72,5 +72,10 @@ class ControllerBaseSpec extends UnitSpec with MockFactory with GuiceOneAppPerSu
     mockConfig.features.submitReturnFeatures(false)
     mockConfig.features.agentAccess(true)
     super.beforeEach()
+  }
+
+  override def afterEach(): Unit = {
+    super.afterEach()
+    mockConfig.features.agentAccess(true)
   }
 }
