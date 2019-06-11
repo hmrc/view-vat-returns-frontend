@@ -40,7 +40,7 @@ class AuthoriseAgentWithClient @Inject()(enrolmentsAuthService: EnrolmentsAuthSe
 
   def authoriseAsAgent(block: Request[AnyContent] => User => Future[Result])
                       (implicit request: Request[AnyContent]): Future[Result] = {
-
+    
     val delegatedAuthRule: String => Enrolment = vrn =>
       Enrolment(EnrolmentKeys.mtdVatEnrolmentKey)
         .withIdentifier(EnrolmentKeys.vatIdentifierId, vrn)

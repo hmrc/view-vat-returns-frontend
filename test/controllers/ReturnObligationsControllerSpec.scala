@@ -48,10 +48,26 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
       Set(
         Enrolment(
           "HMRC-MTD-VAT",
-          Seq(EnrolmentIdentifier("VRN", "999999999")),
+          Seq(EnrolmentIdentifier("VRN", vrn)),
           "Active"))
     ),
     Some(Individual)
+  ))
+
+  val agentEnrolment = Enrolments(
+    Set(
+      Enrolment(
+        "HMRC-AS-AGENT",
+        Seq(EnrolmentIdentifier("AgentReferenceNumber", "XAIT0000000000")),
+        "Activated",
+        Some("mtd-vat-auth")
+      )
+    )
+  )
+
+  val goodAgentEnrolments: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(new ~(
+    agentEnrolment,
+    Some(Agent)
   ))
 
   private trait Test {
@@ -353,6 +369,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     val openObsServiceCall = false
     val openObligations: Boolean = true
     val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(goodEnrolments)
+    val agentAuthResult: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(goodAgentEnrolments)
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
     val mockVatReturnService: ReturnsService = mock[ReturnsService]
     val mandationStatusCall: Boolean = false
@@ -377,12 +394,13 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
       mockConfig
     )
 
-    def setup(): Any = {
+    def setup(auth: Future[~[Enrolments, Option[AffinityGroup]]] = authResult): Any = {
       (mockDateService.now: () => LocalDate).stubs().returns(LocalDate.parse("2018-05-01"))
 
       (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
         .expects(*, *, *, *)
-        .returns(authResult)
+        .returns(auth)
+        .noMoreThanOnce()
 
       if (mandationStatusCall) {
         (mockVatReturnService.getMandationStatus(_: String)(_: HeaderCarrier, _: ExecutionContext))
@@ -422,6 +440,18 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
     def target: ReturnObligationsController = {
       setup()
+      new ReturnObligationsController(
+        messages,
+        mockEnrolmentsAuthService,
+        mockVatReturnService,
+        mockAuthorisedController,
+        mockDateService,
+        mockConfig,
+        mockAuditService)
+    }
+
+    def agentTarget: ReturnObligationsController = {
+      setup(agentAuthResult)
       new ReturnObligationsController(
         messages,
         mockEnrolmentsAuthService,
@@ -548,6 +578,107 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
             " accounting period."
       }
     }
+
+
+
+
+
+
+    "the user is an agent (with agentAccess enabled)" should {
+
+      mockConfig.features.agentAccess(true)
+
+      "return 200, HTML and a charset of utf-8" in new ReturnDeadlinesTest {
+
+        override def setup(auth: Future[~[Enrolments, Option[AffinityGroup]]] = agentAuthResult): Unit = {
+          super.setup(agentAuthResult)
+
+          (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
+            .expects(*, *, *, *)
+            .returns(Future.successful(agentEnrolment))
+            .noMoreThanOnce()
+
+          (mockVatReturnService.getMandationStatus(_: String)(_: HeaderCarrier, _: ExecutionContext))
+            .expects(vrn, *, *)
+            .returns(Future.successful(Right(MandationStatus("Non MTDfB"))))
+        }
+
+        override val serviceCall: Boolean = false
+        override val openObsServiceCall: Boolean = true
+        private val result = agentTarget.returnDeadlines()(fakeRequestWithClientsVRN)
+        status(result) shouldBe Status.OK
+        contentType(result) shouldBe Some("text/html")
+        charset(result) shouldBe Some("utf-8")
+      }
+
+      "if the client has no open obligations" should {
+
+        "return the no returns view" in new ReturnDeadlinesTest {
+
+          override def setup(auth: Future[~[Enrolments, Option[AffinityGroup]]] = agentAuthResult): Unit = {
+            super.setup(agentAuthResult)
+
+            (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
+              .expects(*, *, *, *)
+              .returns(Future.successful(agentEnrolment))
+              .noMoreThanOnce()
+
+            (mockVatReturnService.getMandationStatus(_: String)(_: HeaderCarrier, _: ExecutionContext))
+              .expects(vrn, *, *)
+              .returns(Future.successful(Right(MandationStatus("Non MTDfB"))))
+          }
+
+          override val exampleObligations: Future[ServiceResponse[VatReturnObligations]] = Right(VatReturnObligations(Seq.empty))
+          override val serviceCall: Boolean = false
+          override val openObsServiceCall: Boolean = true
+          override val openObligations: Boolean = false
+
+          val result: Result = await(agentTarget.returnDeadlines()(fakeRequestWithClientsVRN))
+          val document: Document = Jsoup.parse(bodyOf(result))
+
+          document.select("article > p:nth-child(3)").text() shouldBe
+            "You do not have any returns due right now. Your next deadline will show here on the first day of your next" +
+              " accounting period."
+        }
+      }
+
+      "if the openObligations call fails" should {
+
+        "return an ISE" in new ReturnDeadlinesTest {
+
+          override def setup(auth: Future[~[Enrolments, Option[AffinityGroup]]] = agentAuthResult): Unit = {
+            super.setup(agentAuthResult)
+
+            (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
+              .expects(*, *, *, *)
+              .returns(Future.successful(agentEnrolment))
+              .noMoreThanOnce()
+
+            (mockVatReturnService.getMandationStatus(_: String)(_: HeaderCarrier, _: ExecutionContext))
+              .expects(vrn, *, *)
+              .returns(Future.successful(Right(MandationStatus("Non MTDfB"))))
+
+            (mockVatReturnService.getOpenReturnObligations(_: User)
+            (_: HeaderCarrier, _: ExecutionContext))
+              .expects(*, *, *)
+              .returns(exampleObligations)
+          }
+
+          override val exampleObligations: Future[ServiceResponse[Nothing]] = Left(ObligationError)
+          override val serviceCall: Boolean = false
+
+          val result: Result = await(agentTarget.returnDeadlines()(fakeRequestWithClientsVRN))
+          val document: Document = Jsoup.parse(bodyOf(result))
+
+          document.select("h1").first().text() shouldBe "Sorry, there is a problem with the service"
+        }
+      }
+    }
+
+
+
+
+
 
     "A user is not authorised" should {
 

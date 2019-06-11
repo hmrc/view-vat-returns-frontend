@@ -19,6 +19,7 @@ package controllers
 import akka.actor.ActorSystem
 import akka.stream.{ActorMaterializer, Materializer}
 import config.AppConfig
+import common.SessionKeys.clientVrn
 import mocks.MockAppConfig
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.BeforeAndAfterEach
@@ -34,6 +35,8 @@ import uk.gov.hmrc.play.test.UnitSpec
 
 class ControllerBaseSpec extends UnitSpec with MockFactory with GuiceOneAppPerSuite with BeforeAndAfterEach{
 
+  val vrn = "999999999"
+
   lazy val injector: Injector = app.injector
   lazy val messages: MessagesApi = injector.instanceOf[MessagesApi]
   implicit val mockConfig: AppConfig = new MockAppConfig(app.configuration)
@@ -48,6 +51,9 @@ class ControllerBaseSpec extends UnitSpec with MockFactory with GuiceOneAppPerSu
     fakeRequestWithSession.withFormUrlEncodedBody(input: _*)
 
   implicit val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
+
+  lazy val fakeRequestWithClientsVRN: FakeRequest[AnyContentAsEmpty.type] =
+    FakeRequest().withSession(clientVrn -> vrn)
 
   implicit class CSRFTokenAdder[T](req: FakeRequest[T]) {
     def addToken(): FakeRequest[T] = {
