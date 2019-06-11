@@ -70,6 +70,7 @@ class ControllerBaseSpec extends UnitSpec with MockFactory with GuiceOneAppPerSu
 
   override def beforeEach(): Unit = {
     mockConfig.features.submitReturnFeatures(false)
+    mockConfig.features.agentAccess(true)
     super.beforeEach()
   }
 }
