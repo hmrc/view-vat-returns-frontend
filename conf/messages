@@ -4,6 +4,9 @@ common.overdue = overdue
 base.back = Back
 base.signOut = Sign out
 
+navTitle.nonAgent = Business tax account
+navTitle.agent = Client’s VAT details
+
 sessionTimeout.title = Your session has timed out
 sessionTimeout.helpOne = To view your VAT returns, you will have to
 sessionTimeout.helpTwo = sign in

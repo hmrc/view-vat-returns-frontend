@@ -17,6 +17,7 @@
 package views
 
 import mocks.MockAppConfig
+import models.User
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -35,6 +36,7 @@ class ViewBaseSpec extends UnitSpec with GuiceOneAppPerSuite {
   implicit lazy val messages: Messages = Messages(Lang("en-GB"), messagesApi)
   lazy val injector: Injector = app.injector
   lazy val messagesApi: MessagesApi = injector.instanceOf[MessagesApi]
+  implicit val user: User = User("999999999")
 
   def element(cssSelector: String)(implicit document: Document): Element = {
     val elements = document.select(cssSelector)

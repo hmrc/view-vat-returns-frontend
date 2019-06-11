@@ -16,7 +16,7 @@
 
 @(user: models.User)(implicit appConfig: config.AppConfig, request: Request[_], messages: Messages)
 
-@views.html.main_template(title = messages("technicalProblem.title"), bodyClasses = None, appConfig = appConfig) {
+@views.html.main_template(title = messages("technicalProblem.title"), bodyClasses = None, appConfig = appConfig, user = Some(user)) {
 
   <div class="grid-row">
     <div class="column-two-thirds">

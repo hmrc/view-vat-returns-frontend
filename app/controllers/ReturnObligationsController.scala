@@ -115,7 +115,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
   }
 
   private[controllers] def fulfilledObligationsAction(obligationsResult: ServiceResponse[VatReturnObligations])
-                                                     (implicit request: Request[AnyContent]): Result = {
+                                                     (implicit request: Request[AnyContent], user: User): Result = {
     obligationsResult match {
       case Right(VatReturnObligations(Seq())) => Ok(views.html.returns.noUpcomingReturnDeadlines(None))
       case Right(VatReturnObligations(obligations)) =>

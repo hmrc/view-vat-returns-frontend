@@ -32,7 +32,7 @@ class SubmittedReturnsErrorViewSpec extends ViewBaseSpec {
   }
 
   private val userWithNonMtdVat = User("111111111", hasNonMtdVat = true)
-  private val user = User("111111111")
+  override val user = User("111111111")
 
   "Rendering the submitted returns error view" should {
 
