@@ -105,6 +105,7 @@ returnDeadlines.finalReturn = for your final return
 returnDeadlines.submitReturn = Submit VAT Return
 returnDeadlines.submitReturn.title = Submit VAT Return
 returnDeadlines.submitReturn.returnDeadline = Return deadline
+returnDeadlines.submitReturn.futureReturn = You will be able to submit your return from the {0}.
 
 banner.newService = This is a new service – your
 banner.feedback = feedback

@@ -44,63 +44,119 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
     val returnDeadlinesBreadCrumb = "div.breadcrumbs li:nth-of-type(3)"
 
     val overdueLabel = ".task-overdue"
+    val cannotSubmitText = "li > p > span:nth-child(3)"
   }
 
-  "Rendering the Opted-Out Return deadlines page with a single deadline" should {
+  "Rendering the Opted-Out Return deadlines page with a single deadline" when {
 
-    val singleDeadline = Seq(
-      ReturnDeadlineViewModel(
-        LocalDate.parse("2018-02-02"),
-        LocalDate.parse("2018-01-01"),
-        LocalDate.parse("2018-01-01"),
-        periodKey = "18CC"
+    "end date has passed" should {
+
+      val singleDeadline = Seq(
+        ReturnDeadlineViewModel(
+          LocalDate.parse("2018-02-02"),
+          LocalDate.parse("2018-01-01"),
+          end = LocalDate.parse("2018-01-01"),
+          periodKey = "18CC"
+        )
       )
-    )
 
-    lazy val view = views.html.returns.optOutReturnDeadlines(singleDeadline)
-    lazy implicit val document: Document = Jsoup.parse(view.body)
+      val currentDate = LocalDate.parse("2018-01-02")
 
-    "render the breadcrumbs which" should {
+      lazy val view = views.html.returns.optOutReturnDeadlines(singleDeadline, currentDate)
+      lazy implicit val document: Document = Jsoup.parse(view.body)
 
-      "have the 'Business tax account' title" in {
-        elementText(Selectors.btaBreadcrumb) shouldBe "Business tax account"
+      "render the breadcrumbs which" should {
+
+        "have the 'Business tax account' title" in {
+          elementText(Selectors.btaBreadcrumb) shouldBe "Business tax account"
+        }
+
+        "and links to the BTA service" in {
+          element(Selectors.btaBreadCrumbLink).attr("href") shouldBe "bta-url"
+        }
+
+        "have the 'VAT' title" in {
+          elementText(Selectors.vatDetailsBreadCrumb) shouldBe "Your VAT details"
+        }
+
+        "and links to the VAT Summary service" in {
+          element(Selectors.vatDetailsBreadcrumbLink).attr("href") shouldBe "vat-details-url"
+        }
+
+        "have the 'Submit VAT Return' title" in {
+          elementText(Selectors.returnDeadlinesBreadCrumb) shouldBe "Submit VAT Return"
+        }
       }
 
-      "and links to the BTA service" in {
-        element(Selectors.btaBreadCrumbLink).attr("href") shouldBe "bta-url"
+      "have the correct document title" in {
+        document.title shouldBe "Submit VAT Return"
       }
 
-      "have the 'VAT' title" in {
-        elementText(Selectors.vatDetailsBreadCrumb) shouldBe "Your VAT details"
+      "have the correct page heading" in {
+        elementText(Selectors.pageHeading) shouldBe "Submit VAT Return"
       }
 
-      "and links to the VAT Summary service" in {
-        element(Selectors.vatDetailsBreadcrumbLink).attr("href") shouldBe "vat-details-url"
+      "have the correct obligation due date" in {
+        elementText(Selectors.firstDeadlineDueDate) should include ("2 February 2018")
       }
 
-      "have the 'Return deadlines' title" in {
-        elementText(Selectors.returnDeadlinesBreadCrumb) shouldBe "Submit VAT Return"
+      "have the correct obligation start and end date text" in {
+        elementText(Selectors.firstDeadlinePeriod) shouldBe "for the period 1 January to 1 January 2018"
+      }
+
+      "have a submit-your-return link" in {
+        document.getElementById("submit-return-link").text() shouldBe "Submit VAT Return"
       }
     }
 
-    "have the correct document title" in {
-      document.title shouldBe "Submit VAT Return"
+    "end date has not yet passed" should {
+
+      val singleDeadline = Seq(
+        ReturnDeadlineViewModel(
+          LocalDate.parse("2018-02-02"),
+          LocalDate.parse("2018-01-01"),
+          end = LocalDate.parse("2018-12-31"),
+          periodKey = "18CC"
+        )
+      )
+
+      val currentDate = LocalDate.parse("2018-12-30")
+
+      lazy val view = views.html.returns.optOutReturnDeadlines(singleDeadline, currentDate)
+      lazy implicit val document: Document = Jsoup.parse(view.body)
+
+      "show text regarding when return can be submitted" in {
+        document.select(Selectors.cannotSubmitText).text() shouldBe "You will be able to submit your return from the 1 January."
+      }
+
+      "not show a 'Submit VAT Return' link" in {
+        document.getElementById("submit-return-link") shouldBe null
+      }
     }
 
-    "have the correct page heading" in {
-      elementText(Selectors.pageHeading) shouldBe "Submit VAT Return"
-    }
+    "end date is today" should {
 
-    "have the correct obligation due date" in {
-      elementText(Selectors.firstDeadlineDueDate) should include ("2 February 2018")
-    }
+      val currentDate = LocalDate.parse("2018-12-31")
 
-    "have the correct obligation start and end date text" in {
-      elementText(Selectors.firstDeadlinePeriod) shouldBe "for the period 1 January to 1 January 2018"
-    }
+      val singleDeadline = Seq(
+        ReturnDeadlineViewModel(
+          LocalDate.parse("2018-02-02"),
+          LocalDate.parse("2018-01-01"),
+          end = currentDate,
+          periodKey = "18CC"
+        )
+      )
 
-    "have a submit-your-return link" in {
-      document.getElementById("submit-return-link").text() shouldBe "Submit VAT Return"
+      lazy val view = views.html.returns.optOutReturnDeadlines(singleDeadline, currentDate)
+      lazy implicit val document: Document = Jsoup.parse(view.body)
+
+      "show text regarding when return can be submitted" in {
+        document.select(Selectors.cannotSubmitText).text() shouldBe "You will be able to submit your return from the 1 January."
+      }
+
+      "not show a 'Submit VAT Return' link" in {
+        document.getElementById("submit-return-link") shouldBe null
+      }
     }
   }
 
@@ -122,7 +178,9 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
       )
     )
 
-    lazy val view = views.html.returns.optOutReturnDeadlines(multipleDeadlines)
+    val currentDate = LocalDate.parse("2018-01-02")
+
+    lazy val view = views.html.returns.optOutReturnDeadlines(multipleDeadlines, currentDate)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct obligation due date for the first deadline" in {
@@ -161,7 +219,9 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
       )
     )
 
-    lazy val view = views.html.returns.optOutReturnDeadlines(finalReturnDeadline)
+    val currentDate = LocalDate.parse("2018-01-02")
+
+    lazy val view = views.html.returns.optOutReturnDeadlines(finalReturnDeadline, currentDate)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct obligation due date for the deadline" in {
