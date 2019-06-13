@@ -33,6 +33,11 @@ breadcrumbs.bta = Business tax account
 breadcrumbs.vat = Your VAT details
 breadcrumbs.vatPayments = What you owe
 
+btaNavLinks.home = Home
+btaNavLinks.manageAccount = Manage account
+btaNavLinks.messages = Messages
+btaNavLinks.helpAndContact = Help and contact
+
 yourVatReturn.title = Submitted returns
 yourVatReturn.dateSubmitted = Date submitted:
 yourVatReturn.returnDueDate = Return due date:

@@ -21,6 +21,7 @@ import java.time.LocalDate
 import models.viewModels.ReturnDeadlineViewModel
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import play.twirl.api.Html
 
 class ReturnDeadlinesViewSpec extends ViewBaseSpec {
 
@@ -57,7 +58,7 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
       )
     )
 
-    lazy val view = views.html.returns.returnDeadlines(singleDeadline)
+    lazy val view = views.html.returns.returnDeadlines(singleDeadline, Html(""))
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "render the breadcrumbs which" should {
@@ -142,7 +143,7 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
       )
     )
 
-    lazy val view = views.html.returns.returnDeadlines(multipleDeadlines)
+    lazy val view = views.html.returns.returnDeadlines(multipleDeadlines, Html(""))
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct obligation due date for the first deadline" in {
@@ -177,7 +178,7 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
       )
     )
 
-    lazy val view = views.html.returns.returnDeadlines(finalReturnDeadline)
+    lazy val view = views.html.returns.returnDeadlines(finalReturnDeadline, Html(""))
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct obligation due date for the deadline" in {

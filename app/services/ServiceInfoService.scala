@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-package models
+package services
 
-import models.customer.CustomerDetail
-import models.payments.Payment
+import connectors.ServiceInfoConnector
+import javax.inject.Inject
+import play.api.mvc.Request
 import play.twirl.api.Html
 
-case class ReturnsControllerData(vatReturnResult: ServiceResponse[VatReturn],
-                                 customerInfo: Option[CustomerDetail],
-                                 payment: Option[Payment],
-                                 obligation: Option[VatReturnObligation],
-                                 serviceInfoContent: Html)
+import scala.concurrent.{ExecutionContext, Future}
+
+class ServiceInfoService @Inject()(serviceInfoConnector: ServiceInfoConnector) {
+
+  def getServiceInfoPartial(implicit request: Request[_], ec: ExecutionContext): Future[Html] =
+    serviceInfoConnector.getServiceInfoPartial
+}

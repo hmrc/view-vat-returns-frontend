@@ -27,7 +27,8 @@ import models.errors.ServiceError
 import play.api.Logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Request, Result}
-import services.{DateService, EnrolmentsAuthService, ReturnsService}
+import play.twirl.api.Html
+import services.{DateService, EnrolmentsAuthService, ReturnsService, ServiceInfoService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 
@@ -39,6 +40,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
                                             returnsService: ReturnsService,
                                             authorisedController: AuthorisedController,
                                             dateService: DateService,
+                                            serviceInfoService: ServiceInfoService,
                                             implicit val appConfig: AppConfig,
                                             auditService: AuditingService)
   extends FrontendController with I18nSupport {
@@ -46,11 +48,17 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
   def submittedReturns(year: Int): Action[AnyContent] = authorisedController.authorisedAction { implicit request =>
     implicit user =>
       if (isValidSearchYear(year)) {
-        getReturnObligations(user, year, Obligation.Status.Fulfilled) map {
-          case Right(model) => Ok(views.html.returns.submittedReturns(model))
-          case Left(error) =>
-            Logger.warn("[ReturnObligationsController][submittedReturns] error: " + error.toString)
-            InternalServerError(views.html.errors.submittedReturnsError(user))
+        for {
+          obligationsResult <- getReturnObligations(user, year, Obligation.Status.Fulfilled)
+          serviceInfoContent <- serviceInfoService.getServiceInfoPartial
+        } yield {
+         obligationsResult match {
+            case Right(model) =>
+              Ok(views.html.returns.submittedReturns(model, serviceInfoContent))
+            case Left(error) =>
+              Logger.warn("[ReturnObligationsController][submittedReturns] error: " + error.toString)
+              InternalServerError(views.html.errors.submittedReturnsError(user))
+          }
         }
       } else {
         Future.successful(NotFound(views.html.errors.notFound()))
@@ -61,44 +69,48 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
 
     implicit user =>
       val currentDate = dateService.now()
-      val openObligationsCall = returnsService.getOpenReturnObligations(user)
 
-      openObligationsCall.flatMap {
-        case Right(VatReturnObligations(obligations)) =>
-          auditService.extendedAudit(
-            ViewOpenVatObligationsAuditModel(user, obligations),
-            routes.ReturnObligationsController.returnDeadlines().url
-          )
-          if (obligations.isEmpty) {
-            returnsService.getFulfilledObligations(currentDate).map(fulfilledObligations => fulfilledObligationsAction(fulfilledObligations))
-          } else {
-            val deadlines = obligations.map(obligation =>
-              ReturnDeadlineViewModel(
-                obligation.due,
-                obligation.start,
-                obligation.end,
-                obligation.due.isBefore(currentDate),
-                obligation.periodKey
+        returnsService.getOpenReturnObligations(user).flatMap {
+          case Right(VatReturnObligations(obligations)) =>
+            serviceInfoService.getServiceInfoPartial.flatMap { serviceInfoContent =>
+              auditService.extendedAudit(
+                ViewOpenVatObligationsAuditModel(user, obligations),
+                routes.ReturnObligationsController.returnDeadlines().url
               )
-            )
-            if (appConfig.features.submitReturnFeatures()) {
-              handleMandationStatus(deadlines)
-            } else {
-              Future.successful(Ok(views.html.returns.returnDeadlines(deadlines)))
-            }
-          }
-        case Left(error) =>
-          Logger.warn("[ReturnObligationsController][returnDeadlines] error: " + error.toString)
-          Future.successful(InternalServerError(views.html.errors.technicalProblem()))
-      }
+              if (obligations.isEmpty) {
+                returnsService.getFulfilledObligations(currentDate).map { fulfilledObligations =>
+                  fulfilledObligationsAction(fulfilledObligations, serviceInfoContent)
+                }
+              } else {
+                val deadlines = obligations.map(obligation =>
+                  ReturnDeadlineViewModel(
+                    obligation.due,
+                    obligation.start,
+                    obligation.end,
+                    obligation.due.isBefore(currentDate),
+                    obligation.periodKey
+                  )
+                )
+                if (appConfig.features.submitReturnFeatures()) {
+                  handleMandationStatus(deadlines, serviceInfoContent)
+                } else {
+                  Future.successful(Ok(views.html.returns.returnDeadlines(deadlines, serviceInfoContent)))
+                }
+              }
+        }
+          case Left(error) =>
+            Logger.warn("[ReturnObligationsController][returnDeadlines] error: " + error.toString)
+            Future.successful(InternalServerError(views.html.errors.technicalProblem()))
+        }
   }
 
-  private def handleMandationStatus(obligations: Seq[ReturnDeadlineViewModel])
+  private def handleMandationStatus(obligations: Seq[ReturnDeadlineViewModel],
+                                    serviceInfoContent: Html)
                                    (implicit user: User, request: Request[AnyContent]): Future[Result] = {
 
     def view(mandationStatus: String) = mandationStatus match {
-      case NonMtdfb.mandationStatus => views.html.returns.optOutReturnDeadlines(obligations, dateService.now())
-      case _ => views.html.returns.returnDeadlines(obligations)
+      case NonMtdfb.mandationStatus => views.html.returns.optOutReturnDeadlines(obligations, dateService.now(), serviceInfoContent)
+      case _ => views.html.returns.returnDeadlines(obligations, serviceInfoContent)
     }
 
     request.session.get(SessionKeys.mtdVatMandationStatus) match {
@@ -114,10 +126,12 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
     }
   }
 
-  private[controllers] def fulfilledObligationsAction(obligationsResult: ServiceResponse[VatReturnObligations])
-                                                     (implicit request: Request[AnyContent], user: User): Result = {
+  private[controllers] def fulfilledObligationsAction(obligationsResult: ServiceResponse[VatReturnObligations],
+                                                      serviceInfoContent: Html)
+                                                     (implicit request: Request[AnyContent],
+                                                      user: User): Result = {
     obligationsResult match {
-      case Right(VatReturnObligations(Seq())) => Ok(views.html.returns.noUpcomingReturnDeadlines(None))
+      case Right(VatReturnObligations(Seq())) => Ok(views.html.returns.noUpcomingReturnDeadlines(None, serviceInfoContent))
       case Right(VatReturnObligations(obligations)) =>
         val lastFulfilledObligation: VatReturnObligation = returnsService.getLastObligation(obligations)
         Ok(views.html.returns.noUpcomingReturnDeadlines(Some(ReturnDeadlineViewModel(
@@ -125,7 +139,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
           start = lastFulfilledObligation.start,
           end = lastFulfilledObligation.end,
           periodKey = lastFulfilledObligation.periodKey
-        ))))
+        )), serviceInfoContent))
       case Left(error) =>
         Logger.warn("[ReturnObligationsController][fulfilledObligationsAction] error: " + error.toString)
         InternalServerError(views.html.errors.technicalProblem())

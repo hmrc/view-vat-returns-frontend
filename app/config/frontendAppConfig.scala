@@ -47,6 +47,9 @@ trait AppConfig extends ServicesConfig {
   val vatSubscriptionBaseUrl: String
   val financialDataBaseUrl: String
   val btaHomeUrl: String
+  val btaMessagesUrl: String
+  val btaManageAccountUrl: String
+  val btaHelpAndContactUrl: String
   val vatDetailsUrl: String
   val reportVatErrorUrl: String
   val feedbackFormPartialUrl: String
@@ -113,7 +116,12 @@ class FrontendAppConfig @Inject()(val runModeConfiguration: Configuration, val e
   override val vatSubscriptionBaseUrl: String = baseUrl("vat-subscription")
   override val financialDataBaseUrl: String = baseUrl("financial-transactions")
 
+  private lazy val helpAndContactFrontendUrl: String = getString(Keys.helpAndContactFrontendBase)
+
   override lazy val btaHomeUrl: String = getString(Keys.businessTaxAccountBase) + getString(Keys.businessTaxAccountUrl)
+  override lazy val btaMessagesUrl: String = btaHomeUrl + getString(Keys.businessTaxAccountMessagesUrl)
+  override lazy val btaManageAccountUrl: String = btaHomeUrl + getString(Keys.businessTaxAccountManageAccountUrl)
+  override lazy val btaHelpAndContactUrl: String = helpAndContactFrontendUrl + getString(Keys.helpAndContactHelpUrl)
 
   private lazy val vatSummaryBase: String = getString(Keys.vatSummaryBase)
   override lazy val vatDetailsUrl: String = vatSummaryBase + getString(Keys.vatDetailsUrl)

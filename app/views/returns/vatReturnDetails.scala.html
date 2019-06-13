@@ -22,7 +22,7 @@
 @import java.time.LocalDate
 @import uk.gov.hmrc.play.views.html.helpers.form
 
-@(vatReturnViewModel: VatReturnViewModel)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig, lang: Lang, user: User)
+@(vatReturnViewModel: VatReturnViewModel, serviceInfoContent: Html)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig, lang: Lang, user: User)
 
 @hiddenHelpTextContent = {
  @if(vatReturnViewModel.isOptOutMtdVatUser) {
@@ -45,7 +45,12 @@
   }
 }
 
-@views.html.main_template(title = messages("yourVatReturn.title"), bodyClasses = None, appConfig = appConfig, user = Some(user)) {
+@views.html.main_template(
+  title = messages("yourVatReturn.title"),
+  appConfig = appConfig,
+  serviceInfoContent = serviceInfoContent,
+  user = Some(user)
+) {
 
   @navigationBreadcrumb(
     links = Map(

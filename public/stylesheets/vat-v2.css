@@ -25,3 +25,27 @@ a.in-selected-tab {
   color: #0B0C0C;
   text-decoration: none;
 }
+
+.bta-navigation ul{
+    margin-top: 0;
+}
+
+.bta-navigation li{
+    display: inline-block;
+    margin: 0 0.5em;
+}
+
+.bta-navigation a{
+    font-size: 16px;
+}
+
+@media(max-width: 768px) {
+    .bta-navigation li{
+        display: block;
+        margin: 0.5em 0 0.5em 0.5em;
+    }
+}
+
+.bta-navigation {
+    padding: 10px 0 8px 0;
+}

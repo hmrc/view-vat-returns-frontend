@@ -29,7 +29,8 @@ import models.viewModels.VatReturnViewModel
 import play.api.Logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc._
-import services.{DateService, EnrolmentsAuthService, ReturnsService, SubscriptionService}
+import play.twirl.api.Html
+import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 
@@ -41,6 +42,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
                                   returnsService: ReturnsService,
                                   subscriptionService: SubscriptionService,
                                   dateService: DateService,
+                                  serviceInfoService: ServiceInfoService,
                                   authorisedController: AuthorisedController,
                                   implicit val appConfig: AppConfig,
                                   auditService: AuditingService)
@@ -65,7 +67,8 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
             customerInfo <- entityNameCall
             payment <- financialDataCall(customerInfo)
             obligation <- obligationCall
-          } yield ReturnsControllerData(vatReturn, customerInfo, payment, obligation))
+            serviceInfoContent <- serviceInfoService.getServiceInfoPartial
+          } yield ReturnsControllerData(vatReturn, customerInfo, payment, obligation, serviceInfoContent))
             .flatMap(pageData => renderResult(pageData, isReturnsPageRequest))
 
         } else {
@@ -94,7 +97,8 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
             customerInfo <- entityNameCall
             payment <- financialDataCall
             obligation <- obligationCall(payment)
-          } yield ReturnsControllerData(vatReturnResult, customerInfo, payment, obligation))
+            serviceInfoContent <- serviceInfoService.getServiceInfoPartial
+          } yield ReturnsControllerData(vatReturnResult, customerInfo, payment, obligation, serviceInfoContent))
             .flatMap(pageData => renderResult(pageData, isReturnsPageRequest))
 
         } else {
@@ -106,7 +110,8 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
   private def handleMandationStatus(customerDetail: Option[CustomerDetail],
                                     obligation: VatReturnObligation,
                                     returnDetails: VatReturnDetails,
-                                    isReturnsPageRequest: Boolean)
+                                    isReturnsPageRequest: Boolean,
+                                    serviceInfoContent: Html)
                                    (implicit user: User, request: Request[AnyContent]): Future[Result] = {
 
     def viewModel(isOptedOutUser: Boolean) = constructViewModel(
@@ -122,13 +127,13 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
         case Some(status) =>
           val model = viewModel(status == NonMtdfb.mandationStatus)
           auditEvent(isReturnsPageRequest, model)
-          Future.successful(Ok(views.html.returns.vatReturnDetails(model)))
+          Future.successful(Ok(views.html.returns.vatReturnDetails(model, serviceInfoContent)))
         case None =>
           returnsService.getMandationStatus(user.vrn) map {
             case Right(MandationStatus(status)) =>
               val model = viewModel(status == NonMtdfb.mandationStatus)
               auditEvent(isReturnsPageRequest, model)
-              Ok(views.html.returns.vatReturnDetails(model)).addingToSession(SessionKeys.mtdVatMandationStatus -> status)
+              Ok(views.html.returns.vatReturnDetails(model, serviceInfoContent)).addingToSession(SessionKeys.mtdVatMandationStatus -> status)
             case error =>
               Logger.warn(s"[ReturnsController][handleMandationStatus] - getMandationStatus returned an Error: $error")
               InternalServerError(views.html.errors.technicalProblem())
@@ -137,7 +142,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
     } else {
       val model = viewModel(false)
       auditEvent(isReturnsPageRequest, model)
-      Future.successful(Ok(views.html.returns.vatReturnDetails(model)))
+      Future.successful(Ok(views.html.returns.vatReturnDetails(model, serviceInfoContent)))
     }
   }
 
@@ -146,7 +151,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
     (pageData.vatReturnResult, pageData.obligation, pageData.payment) match {
       case (Right(vatReturn), Some(ob), payment) =>
         val returnDetails = returnsService.constructReturnDetailsModel(vatReturn, payment)
-        handleMandationStatus(pageData.customerInfo, ob, returnDetails, isReturnsPageRequest)
+        handleMandationStatus(pageData.customerInfo, ob, returnDetails, isReturnsPageRequest, pageData.serviceInfoContent)
       case (Left(NotFoundError), _, _) =>
         Future.successful(NotFound(views.html.errors.notFound()))
       case (Right(_), None, _) =>

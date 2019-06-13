@@ -29,10 +29,11 @@ import models.viewModels.{ReturnObligationsViewModel, VatReturnsViewModel}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.http.Status
-import play.api.mvc.{AnyContentAsEmpty, Result}
+import play.api.mvc.{AnyContentAsEmpty, Request, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import services.{DateService, EnrolmentsAuthService, ReturnsService}
+import play.twirl.api.Html
+import services.{DateService, EnrolmentsAuthService, ReturnsService, ServiceInfoService}
 import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.authorise.Predicate
@@ -110,6 +111,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     val mockVatReturnService: ReturnsService = mock[ReturnsService]
     val mockDateService: DateService = mock[DateService]
     val mockAuditService: AuditingService = mock[AuditingService]
+    val mockServiceInfoService: ServiceInfoService = mock[ServiceInfoService]
     val mockEnrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
     val callMandationService: Boolean = false
     val callDateService: Boolean = true
@@ -167,6 +169,9 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
             .returns({})
         }
 
+        (mockServiceInfoService.getServiceInfoPartial(_: Request[_], _: ExecutionContext))
+          .expects(*, *)
+          .returns(Future.successful(Html("")))
       }
 
       mockConfig.features.agentAccess(enabledAgentAccess)
@@ -180,6 +185,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         mockVatReturnService,
         mockAuthorisedController,
         mockDateService,
+        mockServiceInfoService,
         mockConfig,
         mockAuditService)
     }
@@ -365,13 +371,14 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
       )
     )
 
-    val serviceCall: Boolean = true
-    val openObsServiceCall = false
+    val openObsServiceCall = true
+    val serviceInfoCall = true
     val openObligations: Boolean = true
     val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(goodEnrolments)
     val agentAuthResult: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(goodAgentEnrolments)
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
     val mockVatReturnService: ReturnsService = mock[ReturnsService]
+    val mockServiceInfoService: ServiceInfoService = mock[ServiceInfoService]
     val mandationStatusCall: Boolean = false
     val mandationStatusCallResponse: String = "MTDfB"
     val mockDateService: DateService = mock[DateService]
@@ -408,17 +415,6 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
           .returns(Future.successful(Right(MandationStatus(mandationStatusCallResponse))))
       }
 
-      if (serviceCall) {
-        (mockVatReturnService.getReturnObligationsForYear(_: User, _: Int, _: Obligation.Status.Value)
-        (_: HeaderCarrier, _: ExecutionContext))
-          .expects(*, *, *, *, *)
-          .returns(exampleObligations)
-
-        (mockAuditService.extendedAudit(_: ExtendedAuditModel, _: String)(_: HeaderCarrier, _: ExecutionContext))
-          .stubs(*, *, *, *)
-          .returns({})
-      }
-
       if (openObsServiceCall) {
         (mockVatReturnService.getOpenReturnObligations(_: User)
         (_: HeaderCarrier, _: ExecutionContext))
@@ -428,6 +424,12 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         (mockAuditService.extendedAudit(_: ExtendedAuditModel, _: String)(_: HeaderCarrier, _: ExecutionContext))
           .stubs(*, *, *, *)
           .returns({})
+
+        if(serviceInfoCall) {
+          (mockServiceInfoService.getServiceInfoPartial(_: Request[_], _: ExecutionContext))
+            .expects(*, *)
+            .returns(Future.successful(Html("")))
+        }
       }
 
       if (!openObligations) {
@@ -446,6 +448,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         mockVatReturnService,
         mockAuthorisedController,
         mockDateService,
+        mockServiceInfoService,
         mockConfig,
         mockAuditService)
     }
@@ -458,6 +461,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         mockVatReturnService,
         mockAuthorisedController,
         mockDateService,
+        mockServiceInfoService,
         mockConfig,
         mockAuditService)
     }
@@ -468,22 +472,16 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     "A user is logged in and enrolled to HMRC-MTD-VAT" should {
 
       "return 200" in new ReturnDeadlinesTest {
-        override val serviceCall: Boolean = false
-        override val openObsServiceCall: Boolean = true
         private val result = target.returnDeadlines()(fakeRequest)
         status(result) shouldBe Status.OK
       }
 
       "return HTML" in new ReturnDeadlinesTest {
-        override val serviceCall: Boolean = false
-        override val openObsServiceCall: Boolean = true
         private val result = target.returnDeadlines()(fakeRequest)
         contentType(result) shouldBe Some("text/html")
       }
 
       "return charset of utf-8" in new ReturnDeadlinesTest {
-        override val serviceCall: Boolean = false
-        override val openObsServiceCall: Boolean = true
         private val result = target.returnDeadlines()(fakeRequest)
         charset(result) shouldBe Some("utf-8")
       }
@@ -495,9 +493,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
         "return the opt-out return deadlines page" in new ReturnDeadlinesTest {
           mockConfig.features.submitReturnFeatures(true)
-          override val serviceCall: Boolean = false
           override val mandationStatusCall: Boolean = false
-          override val openObsServiceCall: Boolean = true
           private val result = target.returnDeadlines()(fakeRequest.withSession("mtdVatMandationStatus" -> "Non MTDfB"))
           status(result) shouldBe Status.OK
           val document: Document = Jsoup.parse(bodyOf(result))
@@ -509,10 +505,8 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
         "return the opt-out return deadlines page" in new ReturnDeadlinesTest {
           mockConfig.features.submitReturnFeatures(true)
-          override val serviceCall: Boolean = false
           override val mandationStatusCall: Boolean = true
           override val mandationStatusCallResponse: String = "Non MTDfB"
-          override val openObsServiceCall: Boolean = true
 
           private val result = target.returnDeadlines()(fakeRequest)
 
@@ -530,9 +524,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
         "return the regular return deadlines page" in new ReturnDeadlinesTest {
           mockConfig.features.submitReturnFeatures(true)
-          override val serviceCall: Boolean = false
           override val mandationStatusCall: Boolean = false
-          override val openObsServiceCall: Boolean = true
 
           private val result = target.returnDeadlines()(fakeRequest.withSession("mtdVatMandationStatus" -> "MTDfB Mandated"))
 
@@ -546,10 +538,8 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
         "return the regular return deadlines page" in new ReturnDeadlinesTest {
           mockConfig.features.submitReturnFeatures(true)
-          override val serviceCall: Boolean = false
           override val mandationStatusCall: Boolean = true
           override val mandationStatusCallResponse: String = "MTDfB Mandated"
-          override val openObsServiceCall: Boolean = true
 
           private val result = target.returnDeadlines()(fakeRequest)
 
@@ -566,8 +556,6 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
       "return the no returns view" in new ReturnDeadlinesTest {
         override val exampleObligations: Future[ServiceResponse[VatReturnObligations]] = Right(VatReturnObligations(Seq.empty))
-        override val serviceCall: Boolean = false
-        override val openObsServiceCall: Boolean = true
         override val openObligations: Boolean = false
 
         val result: Result = await(target.returnDeadlines()(fakeRequest))
@@ -578,11 +566,6 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
             " accounting period."
       }
     }
-
-
-
-
-
 
     "the user is an agent (with agentAccess enabled)" should {
 
@@ -603,8 +586,6 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
             .returns(Future.successful(Right(MandationStatus("Non MTDfB"))))
         }
 
-        override val serviceCall: Boolean = false
-        override val openObsServiceCall: Boolean = true
         private val result = agentTarget.returnDeadlines()(fakeRequestWithClientsVRN)
         status(result) shouldBe Status.OK
         contentType(result) shouldBe Some("text/html")
@@ -629,8 +610,6 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
           }
 
           override val exampleObligations: Future[ServiceResponse[VatReturnObligations]] = Right(VatReturnObligations(Seq.empty))
-          override val serviceCall: Boolean = false
-          override val openObsServiceCall: Boolean = true
           override val openObligations: Boolean = false
 
           val result: Result = await(agentTarget.returnDeadlines()(fakeRequestWithClientsVRN))
@@ -664,8 +643,8 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
               .returns(exampleObligations)
           }
 
+          override val openObsServiceCall: Boolean = false
           override val exampleObligations: Future[ServiceResponse[Nothing]] = Left(ObligationError)
-          override val serviceCall: Boolean = false
 
           val result: Result = await(agentTarget.returnDeadlines()(fakeRequestWithClientsVRN))
           val document: Document = Jsoup.parse(bodyOf(result))
@@ -678,7 +657,8 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     "A user is not authorised" should {
 
       "return 403 (Forbidden)" in new ReturnDeadlinesTest {
-        override val serviceCall = false
+        override val openObsServiceCall: Boolean = false
+        override val serviceInfoCall: Boolean = false
         override val authResult: Future[Nothing] = Future.failed(InsufficientEnrolments())
         private val result = target.returnDeadlines()(fakeRequest)
         status(result) shouldBe Status.FORBIDDEN
@@ -688,7 +668,8 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     "A user is not authenticated" should {
 
       "return 401 (Unauthorised)" in new ReturnDeadlinesTest {
-        override val serviceCall = false
+        override val openObsServiceCall: Boolean = false
+        override val serviceInfoCall: Boolean = false
         override val authResult: Future[Nothing] = Future.failed(MissingBearerToken())
         private val result = target.returnDeadlines()(fakeRequest)
         status(result) shouldBe Status.UNAUTHORIZED
@@ -698,9 +679,8 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     "the Obligations API call fails" should {
 
       "return the technical problem view" in new ReturnDeadlinesTest {
+        override val serviceInfoCall: Boolean = false
         override val exampleObligations: Future[ServiceResponse[Nothing]] = Left(ObligationError)
-        override val serviceCall: Boolean = false
-        override val openObsServiceCall: Boolean = true
 
         val result: Result = await(target.returnDeadlines()(fakeRequest))
         val document: Document = Jsoup.parse(bodyOf(result))
@@ -721,6 +701,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
     val mockVatReturnService: ReturnsService = mock[ReturnsService]
     val mockDateService: DateService = mock[DateService]
+    val mockServiceInfoService: ServiceInfoService = mock[ServiceInfoService]
     val mockEnrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
     val mockAuditService: AuditingService = mock[AuditingService]
     val testUser: User = User("999999999")
@@ -777,6 +758,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         mockVatReturnService,
         mockAuthorisedController,
         mockDateService,
+        mockServiceInfoService,
         mockConfig,
         mockAuditService)
     }
@@ -1055,6 +1037,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     val mockVatReturnService: ReturnsService = mock[ReturnsService]
     val mockDateService: DateService = mock[DateService]
     val mockAuditService: AuditingService = mock[AuditingService]
+    val mockServiceInfoService: ServiceInfoService = mock[ServiceInfoService]
 
     val mockAuthorisedAgentWithClient: AuthoriseAgentWithClient = new AuthoriseAgentWithClient(
       mockEnrolmentsAuthService,
@@ -1077,6 +1060,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
         mockVatReturnService,
         mockAuthorisedController,
         mockDateService,
+        mockServiceInfoService,
         mockConfig,
         mockAuditService)
     }
@@ -1089,7 +1073,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
       val obligationsResult: ServiceResponse[VatReturnObligations] = Right(VatReturnObligations(Seq()))
 
       "return noUpcomingReturnDeadlines view with no obligation" in new FulfilledObligationsTest {
-        val result: Result = target.fulfilledObligationsAction(obligationsResult)
+        val result: Result = target.fulfilledObligationsAction(obligationsResult, Html(""))
         val document: Document = Jsoup.parse(bodyOf(result))
         document.select("article > p:nth-child(3)").text() shouldBe
           "You do not have any returns due right now. Your next deadline will show here on the first day of your next" +
@@ -1115,7 +1099,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
           .expects(*)
           .returns(obligation)
         override val mockVatReturnService: ReturnsService = mockReturnsService
-        val result: Result = target.fulfilledObligationsAction(obligationsResult)
+        val result: Result = target.fulfilledObligationsAction(obligationsResult, Html(""))
         val document: Document = Jsoup.parse(bodyOf(result))
 
         document.select("p.lede").text() shouldBe
@@ -1128,7 +1112,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
       val obligationsResult: ServiceResponse[Nothing] = Left(ObligationError)
 
       "return the technical problem view" in new FulfilledObligationsTest {
-        val result: Result = target.fulfilledObligationsAction(obligationsResult)
+        val result: Result = target.fulfilledObligationsAction(obligationsResult, Html(""))
         val document: Document = Jsoup.parse(bodyOf(result))
         document.title shouldBe "There is a problem with the service - VAT reporting through software - GOV.UK"
       }

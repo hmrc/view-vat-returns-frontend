@@ -21,6 +21,7 @@ import java.time.LocalDate
 import models.viewModels.ReturnDeadlineViewModel
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import play.twirl.api.Html
 
 class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
 
@@ -62,7 +63,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
 
       val currentDate = LocalDate.parse("2018-01-02")
 
-      lazy val view = views.html.returns.optOutReturnDeadlines(singleDeadline, currentDate)
+      lazy val view = views.html.returns.optOutReturnDeadlines(singleDeadline, currentDate, Html(""))
       lazy implicit val document: Document = Jsoup.parse(view.body)
 
       "render the breadcrumbs which" should {
@@ -122,7 +123,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
 
       val currentDate = LocalDate.parse("2018-12-30")
 
-      lazy val view = views.html.returns.optOutReturnDeadlines(singleDeadline, currentDate)
+      lazy val view = views.html.returns.optOutReturnDeadlines(singleDeadline, currentDate, Html(""))
       lazy implicit val document: Document = Jsoup.parse(view.body)
 
       "show text regarding when return can be submitted" in {
@@ -147,7 +148,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
         )
       )
 
-      lazy val view = views.html.returns.optOutReturnDeadlines(singleDeadline, currentDate)
+      lazy val view = views.html.returns.optOutReturnDeadlines(singleDeadline, currentDate, Html(""))
       lazy implicit val document: Document = Jsoup.parse(view.body)
 
       "show text regarding when return can be submitted" in {
@@ -180,7 +181,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
 
     val currentDate = LocalDate.parse("2018-01-02")
 
-    lazy val view = views.html.returns.optOutReturnDeadlines(multipleDeadlines, currentDate)
+    lazy val view = views.html.returns.optOutReturnDeadlines(multipleDeadlines, currentDate, Html(""))
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct obligation due date for the first deadline" in {
@@ -221,7 +222,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
 
     val currentDate = LocalDate.parse("2018-01-02")
 
-    lazy val view = views.html.returns.optOutReturnDeadlines(finalReturnDeadline, currentDate)
+    lazy val view = views.html.returns.optOutReturnDeadlines(finalReturnDeadline, currentDate, Html(""))
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct obligation due date for the deadline" in {
