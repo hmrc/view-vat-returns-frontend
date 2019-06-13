@@ -22,7 +22,8 @@
   appConfig: config.AppConfig,
   showLogout: Boolean = true,
   feedbackOnSignOut: Boolean = true,
-  user: Option[User] = None)(mainContent: Html)(implicit request: Request[_], messages: Messages)
+  serviceInfoContent: Html = HtmlFormat.empty,
+  user: Option[User] = None)(mainContent: Html)(implicit request : Request[_], messages: Messages)
 
 @import uk.gov.hmrc.play.views.html.layouts
 
@@ -31,8 +32,6 @@
         @layouts.sidebar(sidebarLinks.get, Some("sidebar"))
     }
 }
-
-@serviceInfoContent = {}
 
 @govuk_wrapper(appConfig = appConfig,
                title = title,

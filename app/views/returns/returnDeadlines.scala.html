@@ -18,13 +18,14 @@
 @import views.html.templates.formatters.breadcrumbs._
 @import views.html.templates.formatters.dates._
 
-@(deadlines: Seq[ReturnDeadlineViewModel])(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig, lang: Lang, user: User)
+@(deadlines: Seq[ReturnDeadlineViewModel], serviceInfoContent: Html)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig, lang: Lang, user: User)
 
 @views.html.main_template(
     title = messages("returnDeadlines.title"),
-    bodyClasses = None,
+    serviceInfoContent = serviceInfoContent,
     appConfig = appConfig,
-    user = Some(user)) {
+    user = Some(user)
+) {
 
   @navigationBreadcrumb(Map(
     appConfig.btaHomeUrl -> messages("breadcrumbs.bta"),

@@ -56,6 +56,11 @@ breadcrumbs.bta = Cyfrif Treth Busnes
 breadcrumbs.vat = Eich manylion TAW
 breadcrumbs.vatPayments = Yr hyn sydd arnoch
 
+btaNavLinks.home = Hafan
+btaNavLinks.manageAccount = Rheoli''r cyfrif
+btaNavLinks.messages = Negeseuon
+btaNavLinks.helpAndContact = Cymorth a chysylltu
+
 yourVatReturn.title = Ffurflenni TAW wedi’u cyflwyno
 yourVatReturn.dateSubmitted = Dyddiad cyflwyno:
 yourVatReturn.returnDueDate = Dyddiad cau ar gyfer cyflwyno’r Ffurflen TAW:

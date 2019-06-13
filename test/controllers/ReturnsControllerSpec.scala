@@ -28,14 +28,15 @@ import models.errors.{MandationStatusError, NotFoundError, VatReturnError}
 import models.payments.Payment
 import models.viewModels.VatReturnViewModel
 import play.api.http.Status
-import play.api.mvc.Result
+import play.api.mvc.{Request, Result}
 import play.api.test.Helpers._
-import services.{DateService, EnrolmentsAuthService, ReturnsService, SubscriptionService}
+import services._
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.{Retrieval, ~}
 import uk.gov.hmrc.http.HeaderCarrier
 import controllers.predicate.AuthoriseAgentWithClient
+import play.twirl.api.Html
 import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -48,6 +49,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     mockVatReturnService,
     mockSubscriptionService,
     mockDateService,
+    mockServiceInfoService,
     mockAuthorisedController,
     mockConfig,
     mockAuditService
@@ -132,6 +134,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
   val mockDateService: DateService = mock[DateService]
   val mockAuthConnector: AuthConnector = mock[AuthConnector]
   val mockVatReturnService: ReturnsService = mock[ReturnsService]
+  val mockServiceInfoService: ServiceInfoService = mock[ServiceInfoService]
   val mockEnrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
   val mockVatApiService: SubscriptionService = mock[SubscriptionService]
   val mockSubscriptionService: SubscriptionService = mock[SubscriptionService]
@@ -200,6 +203,10 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
           .returns({})
 
         (mockDateService.now: () => LocalDate).stubs().returns(LocalDate.parse("2018-05-01"))
+
+        (mockServiceInfoService.getServiceInfoPartial(_: Request[_], _: ExecutionContext))
+          .expects(*, *)
+          .returns(Future.successful(Html("")))
       }
 
       if (mandationStatusCall) {
@@ -249,7 +256,8 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         "mandation status call returns an error" should {
 
           "return 500" in new Test {
-            override val mandationStatusResult = Future.successful(Left(MandationStatusError))
+            override val mandationStatusResult: Future[Left[MandationStatusError.type, Nothing]] =
+              Future.successful(Left(MandationStatusError))
 
             private val result = target.vatReturn(2018, "#001")(fakeRequest)
 
@@ -670,7 +678,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
           .returns({})
       }
 
-      val data = ReturnsControllerData(Right(exampleVatReturn), None, Some(examplePayment), Some(exampleObligation))
+      val data = ReturnsControllerData(Right(exampleVatReturn), None, Some(examplePayment), Some(exampleObligation), Html(""))
 
       def result: Result = controller.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
 
@@ -683,7 +691,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     "the VAT return is not found" should {
 
       "return a Not Found status" in {
-        val data = ReturnsControllerData(Left(NotFoundError), None, None, None)
+        val data = ReturnsControllerData(Left(NotFoundError), None, None, None, Html(""))
         val result = controller.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
         result.header.status shouldBe Status.NOT_FOUND
       }
@@ -692,7 +700,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     "there is a VAT return but no obligation" should {
 
       "return an Internal Server Error status" in {
-        val data = ReturnsControllerData(Right(exampleVatReturn), None, None, None)
+        val data = ReturnsControllerData(Right(exampleVatReturn), None, None, None, Html(""))
         val result = controller.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
         result.header.status shouldBe Status.INTERNAL_SERVER_ERROR
       }
@@ -701,7 +709,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     "there is any other combination" should {
 
       "return an Internal Server Error status" in {
-        val data = ReturnsControllerData(Left(VatReturnError), None, None, None)
+        val data = ReturnsControllerData(Left(VatReturnError), None, None, None, Html(""))
         val result = controller.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
         result.header.status shouldBe Status.INTERNAL_SERVER_ERROR
       }
