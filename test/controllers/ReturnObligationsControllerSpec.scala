@@ -675,11 +675,6 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
       }
     }
 
-
-
-
-
-
     "A user is not authorised" should {
 
       "return 403 (Forbidden)" in new ReturnDeadlinesTest {

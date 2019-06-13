@@ -16,6 +16,7 @@
 
 package views.errors
 
+import models.User
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import views.ViewBaseSpec
@@ -29,7 +30,7 @@ class NotFoundViewSpec extends ViewBaseSpec {
       val instructions = "#content > p"
     }
 
-    lazy val view = views.html.errors.notFound()
+    lazy val view = views.html.errors.notFound()(mockConfig, request, messages, user = Some(User("999999999")))
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct document title" in {

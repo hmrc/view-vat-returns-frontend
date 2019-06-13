@@ -21,6 +21,7 @@ import akka.stream.{ActorMaterializer, Materializer}
 import config.AppConfig
 import common.SessionKeys.clientVrn
 import mocks.MockAppConfig
+import models.User
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -51,6 +52,7 @@ class ControllerBaseSpec extends UnitSpec with MockFactory with GuiceOneAppPerSu
     fakeRequestWithSession.withFormUrlEncodedBody(input: _*)
 
   implicit val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
+  implicit val user: User = User(vrn)
 
   lazy val fakeRequestWithClientsVRN: FakeRequest[AnyContentAsEmpty.type] =
     FakeRequest().withSession(clientVrn -> vrn)

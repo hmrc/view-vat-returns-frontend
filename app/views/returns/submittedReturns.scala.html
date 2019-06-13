@@ -20,9 +20,13 @@
 @import views.html.templates.returns.submittedReturnsTabs
 @import models.viewModels._
 
-@(model: VatReturnsViewModel)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig, lang: Lang)
+@(model: VatReturnsViewModel)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig, lang: Lang, user: User)
 
-  @views.html.main_template(title = messages("submittedReturns.title"), bodyClasses = None, appConfig = appConfig) {
+  @views.html.main_template(
+  title = messages("submittedReturns.title"),
+  bodyClasses = None,
+  appConfig = appConfig,
+  user = Some(user)) {
 
     @navigationBreadcrumb(
       links = Map(

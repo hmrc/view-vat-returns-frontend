@@ -26,7 +26,8 @@
   mainContent: Html = HtmlFormat.empty,
   serviceInfoContent: Html = HtmlFormat.empty,
   showLogout: Boolean = true,
-  feedbackOnSignOut: Boolean = true)(implicit request: Request[_], messages: Messages)
+  feedbackOnSignOut: Boolean = true,
+  user: Option[User] = None)(implicit request: Request[_], messages: Messages)
 
 @import layouts.{govuk_template => hmrcGovUkTemplate}
 @import uk.gov.hmrc.play.views.html.{layouts => uiLayouts}
@@ -79,7 +80,7 @@
 @insideHeader = {
     @googleTagManager
     @uiLayouts.header_nav(
-      navTitle = Some("Business tax account"),
+      navTitle = user.map(u => if(u.isAgent) messages("navTitle.agent") else messages("navTitle.nonAgent")),
       navTitleLink = None,
       showBetaLink = false,
       navLinks = Some(headerNavLinks))
