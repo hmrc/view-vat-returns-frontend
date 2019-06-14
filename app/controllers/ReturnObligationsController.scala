@@ -27,7 +27,7 @@ import models.errors.ServiceError
 import play.api.Logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Request, Result}
-import play.twirl.api.Html
+import play.twirl.api.{Html, HtmlFormat}
 import services.{DateService, EnrolmentsAuthService, ReturnsService, ServiceInfoService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
@@ -50,7 +50,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
       if (isValidSearchYear(year)) {
         for {
           obligationsResult <- getReturnObligations(user, year, Obligation.Status.Fulfilled)
-          serviceInfoContent <- serviceInfoService.getServiceInfoPartial
+          serviceInfoContent <- if(user.isAgent) Future.successful(HtmlFormat.empty) else serviceInfoService.getServiceInfoPartial
         } yield {
          obligationsResult match {
             case Right(model) =>
@@ -72,7 +72,8 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
 
         returnsService.getOpenReturnObligations(user).flatMap {
           case Right(VatReturnObligations(obligations)) =>
-            serviceInfoService.getServiceInfoPartial.flatMap { serviceInfoContent =>
+            val serviceInfoCall = if(user.isAgent) Future.successful(HtmlFormat.empty) else serviceInfoService.getServiceInfoPartial
+            serviceInfoCall.flatMap { serviceInfoContent =>
               auditService.extendedAudit(
                 ViewOpenVatObligationsAuditModel(user, obligations),
                 routes.ReturnObligationsController.returnDeadlines().url

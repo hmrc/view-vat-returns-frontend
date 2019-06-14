@@ -58,7 +58,7 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
       )
     )
 
-    lazy val view = views.html.returns.returnDeadlines(singleDeadline, Html(""))
+    lazy val view = views.html.returns.returnDeadlines(singleDeadline)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "render the breadcrumbs which" should {
@@ -143,7 +143,7 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
       )
     )
 
-    lazy val view = views.html.returns.returnDeadlines(multipleDeadlines, Html(""))
+    lazy val view = views.html.returns.returnDeadlines(multipleDeadlines)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct obligation due date for the first deadline" in {
@@ -178,7 +178,7 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
       )
     )
 
-    lazy val view = views.html.returns.returnDeadlines(finalReturnDeadline, Html(""))
+    lazy val view = views.html.returns.returnDeadlines(finalReturnDeadline)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct obligation due date for the deadline" in {

@@ -80,8 +80,7 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
             obligations = exampleReturns,
             hasNonMtdVatEnrolment = false,
             vrn = "999999999"
-          ),
-          Html("")
+          )
         )
 
         lazy implicit val document: Document = Jsoup.parse(view.body)
@@ -171,8 +170,7 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
             obligations = exampleReturn,
             hasNonMtdVatEnrolment = false,
             vrn = "999999999"
-          ),
-          Html("")
+          )
         )
 
         lazy implicit val document: Document = Jsoup.parse(view.body)
@@ -215,7 +213,7 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
         )
 
       lazy val view = views.html.returns.submittedReturns(
-        VatReturnsViewModel(returnYears, 2020, exampleReturns, hasNonMtdVatEnrolment = false, "999999999"), Html("")
+        VatReturnsViewModel(returnYears, 2020, exampleReturns, hasNonMtdVatEnrolment = false, "999999999")
       )
 
       lazy implicit val document: Document = Jsoup.parse(view.body)
@@ -294,7 +292,7 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
         )
 
       lazy val view = views.html.returns.submittedReturns(
-        VatReturnsViewModel(returnYears, 2020, exampleReturns, hasNonMtdVatEnrolment = false, "999999999"), Html("")
+        VatReturnsViewModel(returnYears, 2020, exampleReturns, hasNonMtdVatEnrolment = false, "999999999")
       )
 
       lazy implicit val document: Document = Jsoup.parse(view.body)
@@ -354,7 +352,7 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
     "there are no returns for the year retrieved" should {
 
       lazy val view = views.html.returns.submittedReturns(
-        VatReturnsViewModel(Seq(2018), 2018, Seq(), hasNonMtdVatEnrolment = false, "999999999"), Html("")
+        VatReturnsViewModel(Seq(2018), 2018, Seq(), hasNonMtdVatEnrolment = false, "999999999")
       )
 
       lazy implicit val document: Document = Jsoup.parse(view.body)
@@ -395,7 +393,7 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
       "the 2018 tab is selected" should {
 
         lazy val view = views.html.returns.submittedReturns(
-          VatReturnsViewModel(returnYears, 2018, exampleReturns, hasNonMtdVatEnrolment = true, "999999999"), Html("")
+          VatReturnsViewModel(returnYears, 2018, exampleReturns, hasNonMtdVatEnrolment = true, "999999999")
         )
 
         lazy implicit val document: Document = Jsoup.parse(view.body)
@@ -428,7 +426,7 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
       "the Previous returns tab is selected" should {
 
         lazy val view = views.html.returns.submittedReturns(
-          VatReturnsViewModel(returnYears, 2017, exampleReturns, hasNonMtdVatEnrolment = true, "999999999"), Html("")
+          VatReturnsViewModel(returnYears, 2017, exampleReturns, hasNonMtdVatEnrolment = true, "999999999")
         )
 
         lazy implicit val document: Document = Jsoup.parse(view.body)
@@ -504,7 +502,7 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
         )
 
       lazy val view = views.html.returns.submittedReturns(
-        VatReturnsViewModel(returnYears, 2020, exampleReturns, hasNonMtdVatEnrolment = true, "999999999"), Html("")
+        VatReturnsViewModel(returnYears, 2020, exampleReturns, hasNonMtdVatEnrolment = true, "999999999")
       )
 
       lazy implicit val document: Document = Jsoup.parse(view.body)
@@ -585,7 +583,7 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
         )
 
       lazy val view = views.html.returns.submittedReturns(
-        VatReturnsViewModel(returnYears, 2020, exampleReturns, hasNonMtdVatEnrolment = true, "999999999"), Html("")
+        VatReturnsViewModel(returnYears, 2020, exampleReturns, hasNonMtdVatEnrolment = true, "999999999")
       )
 
       lazy implicit val document: Document = Jsoup.parse(view.body)

@@ -101,7 +101,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
 
   "Rendering the vat return details page from the returns route with flat rate scheme" should {
 
-    lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel, Html(""))
+    lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct document title" in {
@@ -221,7 +221,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
 
     val vatReturnViewModelWithoutFlatRate = vatReturnViewModel.copy(hasFlatRateScheme = false)
 
-    lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModelWithoutFlatRate, Html(""))
+    lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModelWithoutFlatRate)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct box 6 description in the table" in {
@@ -264,7 +264,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       isHybridUser = false
     )
 
-    lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel, Html(""))
+    lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "render a breadcrumb for the payments page" should {
@@ -320,7 +320,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       isHybridUser = false
     )
 
-    lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel, Html(""))
+    lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct subheading" in {
@@ -381,7 +381,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       isHybridUser = false
     )
 
-    lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel, Html(""))
+    lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct subheading" in {
@@ -438,7 +438,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       isHybridUser = false
     )
 
-    lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel, Html(""))
+    lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct subheading" in {
@@ -483,7 +483,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       isHybridUser = false
     )
 
-    lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel, Html(""))
+    lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct subheading" in {
@@ -525,7 +525,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       isHybridUser = false
     )
 
-    lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel, Html(""))
+    lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "not show the entity name heading" in {
@@ -570,7 +570,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       isHybridUser = false
     )
 
-    lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel, Html(""))
+    lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the pageHeading of 'Final return'" in {
@@ -614,7 +614,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
         isOptOutMtdVatUser = true,
         isHybridUser = false
       )
-      lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel, Html(""))
+      lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
       lazy implicit val document: Document = Jsoup.parse(view.body)
 
 
