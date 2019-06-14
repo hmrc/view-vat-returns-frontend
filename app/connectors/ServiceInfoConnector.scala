@@ -35,7 +35,7 @@ class ServiceInfoConnector @Inject()(http: HttpClient,
 
   import hcForPartials._
 
-  lazy val btaUrl: String = appConfig.btaHomeUrl + "/partial/service-info"
+  lazy val btaUrl: String = appConfig.btaBaseUrl + "/business-account/partial/service-info"
 
   def getServiceInfoPartial(implicit request: Request[_], ec: ExecutionContext): Future[Html] =
     http.GET[HtmlPartial](btaUrl) recover connectionExceptionsAsHtmlPartialFailure map { p =>
