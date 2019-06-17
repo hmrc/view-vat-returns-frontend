@@ -169,9 +169,11 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
             .returns({})
         }
 
-        (mockServiceInfoService.getServiceInfoPartial(_: Request[_], _: ExecutionContext))
-          .expects(*, *)
-          .returns(Future.successful(Html("")))
+        if (authResult != agentAuthResult) {
+          (mockServiceInfoService.getServiceInfoPartial(_: Request[_], _: ExecutionContext))
+            .expects(*, *)
+            .returns(Future.successful(Html("")))
+        }
       }
 
       mockConfig.features.agentAccess(enabledAgentAccess)
@@ -400,13 +402,13 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
       mockConfig
     )
 
-    def setup(auth: Future[~[Enrolments, Option[AffinityGroup]]] = authResult): Any = {
+    def setup(): Any = {
 
       (mockDateService.now: () => LocalDate).stubs().returns(LocalDate.parse("2018-05-01")).anyNumberOfTimes()
 
       (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
         .expects(*, *, *, *)
-        .returns(auth)
+        .returns(authResult)
         .noMoreThanOnce()
 
       if (mandationStatusCall) {
@@ -425,7 +427,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
           .stubs(*, *, *, *)
           .returns({})
 
-        if(serviceInfoCall) {
+        if (authResult != agentAuthResult && serviceInfoCall) {
           (mockServiceInfoService.getServiceInfoPartial(_: Request[_], _: ExecutionContext))
             .expects(*, *)
             .returns(Future.successful(Html("")))
@@ -454,7 +456,7 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
     }
 
     def agentTarget: ReturnObligationsController = {
-      setup(agentAuthResult)
+      setup()
       new ReturnObligationsController(
         messages,
         mockEnrolmentsAuthService,
@@ -573,8 +575,10 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
       "return 200, HTML and a charset of utf-8" in new ReturnDeadlinesTest {
 
-        override def setup(auth: Future[~[Enrolments, Option[AffinityGroup]]] = agentAuthResult): Unit = {
-          super.setup(agentAuthResult)
+        override val authResult: Future[Enrolments ~ Option[AffinityGroup]] = agentAuthResult
+
+        override def setup(): Unit = {
+          super.setup()
 
           (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
             .expects(*, *, *, *)
@@ -596,8 +600,10 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
         "return the no returns view" in new ReturnDeadlinesTest {
 
-          override def setup(auth: Future[~[Enrolments, Option[AffinityGroup]]] = agentAuthResult): Unit = {
-            super.setup(agentAuthResult)
+          override val authResult: Future[Enrolments ~ Option[AffinityGroup]] = agentAuthResult
+
+          override def setup(): Unit = {
+            super.setup()
 
             (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
               .expects(*, *, *, *)
@@ -625,8 +631,10 @@ class ReturnObligationsControllerSpec extends ControllerBaseSpec {
 
         "return an ISE" in new ReturnDeadlinesTest {
 
-          override def setup(auth: Future[~[Enrolments, Option[AffinityGroup]]] = agentAuthResult): Unit = {
-            super.setup(agentAuthResult)
+          override val authResult: Future[Enrolments ~ Option[AffinityGroup]] = agentAuthResult
+
+          override def setup(): Unit = {
+            super.setup()
 
             (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
               .expects(*, *, *, *)

@@ -166,7 +166,6 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     val mandationStatusResult: Future[ServiceResponse[MandationStatus]] = Future.successful(Right(MandationStatus("Non MTDfB")))
 
     def setup(): Any = {
-
       mockConfig.features.submitReturnFeatures(submitReturnFeatureEnabled)
       mockConfig.features.agentAccess(agentAccessEnabled)
 
@@ -204,9 +203,11 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
         (mockDateService.now: () => LocalDate).stubs().returns(LocalDate.parse("2018-05-01"))
 
-        (mockServiceInfoService.getServiceInfoPartial(_: Request[_], _: ExecutionContext))
-          .expects(*, *)
-          .returns(Future.successful(Html("")))
+        if (authResult != agentAuthResult) {
+          (mockServiceInfoService.getServiceInfoPartial(_: Request[_], _: ExecutionContext))
+            .expects(*, *)
+            .returns(Future.successful(Html("")))
+        }
       }
 
       if (mandationStatusCall) {
@@ -300,7 +301,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
           "return 200" in new Test {
 
-            override val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(agentAuthResult)
+            override val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = agentAuthResult
 
             override def setup(): Unit = {
               super.setup()
@@ -510,7 +511,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
           "return 200" in new Test {
 
-            override val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(agentAuthResult)
+            override val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = agentAuthResult
 
             override def setup(): Unit = {
               super.setup()

@@ -29,7 +29,7 @@ import models.viewModels.VatReturnViewModel
 import play.api.Logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc._
-import play.twirl.api.Html
+import play.twirl.api.{Html, HtmlFormat}
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
@@ -67,7 +67,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
             customerInfo <- entityNameCall
             payment <- financialDataCall(customerInfo)
             obligation <- obligationCall
-            serviceInfoContent <- serviceInfoService.getServiceInfoPartial
+            serviceInfoContent <- if(user.isAgent) Future.successful(HtmlFormat.empty) else serviceInfoService.getServiceInfoPartial
           } yield ReturnsControllerData(vatReturn, customerInfo, payment, obligation, serviceInfoContent))
             .flatMap(pageData => renderResult(pageData, isReturnsPageRequest))
 
@@ -97,7 +97,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
             customerInfo <- entityNameCall
             payment <- financialDataCall
             obligation <- obligationCall(payment)
-            serviceInfoContent <- serviceInfoService.getServiceInfoPartial
+            serviceInfoContent <- if(user.isAgent) Future.successful(HtmlFormat.empty) else serviceInfoService.getServiceInfoPartial
           } yield ReturnsControllerData(vatReturnResult, customerInfo, payment, obligation, serviceInfoContent))
             .flatMap(pageData => renderResult(pageData, isReturnsPageRequest))
 

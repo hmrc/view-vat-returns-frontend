@@ -42,7 +42,7 @@ class NoUpcomingReturnDeadlinesViewSpec extends ViewBaseSpec {
   "Rendering the Return deadlines page with no fulfilled obligations" should {
 
     val noFulfilledObligation = None
-    lazy val view = views.html.returns.noUpcomingReturnDeadlines(noFulfilledObligation, Html(""))
+    lazy val view = views.html.returns.noUpcomingReturnDeadlines(noFulfilledObligation)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "render the breadcrumbs which" should {
@@ -83,7 +83,7 @@ class NoUpcomingReturnDeadlinesViewSpec extends ViewBaseSpec {
       due = LocalDate.parse("2018-05-01"),
       periodKey = "18CC"
     ))
-    lazy val view = views.html.returns.noUpcomingReturnDeadlines(fulfilledObligation, Html(""))
+    lazy val view = views.html.returns.noUpcomingReturnDeadlines(fulfilledObligation)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct text for no deadlines" in {
