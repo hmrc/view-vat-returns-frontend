@@ -4,6 +4,8 @@ common.overdue = hwyr
 base.back = Yn ôl
 base.signOut = Allgofnodi
 
+navTitle.nonAgent = Cyfrif Treth Busnes
+
 month.1 = Ionawr
 month.2 = Chwefror
 month.3 = Mawrth
@@ -53,7 +55,7 @@ userResearch.close = Dim diolch
 userResearch.close.context = Nid wyf eisiau cymryd rhan yn yr arolwg
 
 breadcrumbs.bta = Cyfrif Treth Busnes
-breadcrumbs.vat = Eich manylion TAW
+breadcrumbs.vat = Eich cyfrif TAW
 breadcrumbs.vatPayments = Yr hyn sydd arnoch
 
 btaNavLinks.home = Hafan

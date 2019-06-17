@@ -30,7 +30,7 @@ userResearch.close = No thanks
 userResearch.close.context = I do not want to enter the survey
 
 breadcrumbs.bta = Business tax account
-breadcrumbs.vat = Your VAT details
+breadcrumbs.vat = Your VAT account
 breadcrumbs.vatPayments = What you owe
 
 btaNavLinks.home = Home

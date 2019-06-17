@@ -72,7 +72,7 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
       }
 
       "have the 'VAT' title" in {
-        elementText(Selectors.vatDetailsBreadCrumb) shouldBe "Your VAT details"
+        elementText(Selectors.vatDetailsBreadCrumb) shouldBe "Your VAT account"
       }
 
       "and links to the VAT Summary service" in {
