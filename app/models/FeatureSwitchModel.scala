@@ -23,4 +23,5 @@ case class FeatureSwitchModel(userResearchBannerEnabled: Boolean,
                               future2020DateEnabled: Boolean,
                               useLanguageSelector: Boolean,
                               submitReturnFeatures: Boolean,
-                              agentAccessEnabled: Boolean)
+                              agentAccessEnabled: Boolean,
+                              changeClientEnabled: Boolean)

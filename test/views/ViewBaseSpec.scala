@@ -26,6 +26,7 @@ import play.api.inject.Injector
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import uk.gov.hmrc.play.test.UnitSpec
+import common.SessionKeys
 
 import scala.collection.JavaConversions._
 
@@ -36,7 +37,14 @@ class ViewBaseSpec extends UnitSpec with GuiceOneAppPerSuite {
   implicit lazy val messages: Messages = Messages(Lang("en-GB"), messagesApi)
   lazy val injector: Injector = app.injector
   lazy val messagesApi: MessagesApi = injector.instanceOf[MessagesApi]
-  implicit val user: User = User("999999999")
+  lazy val vrn = "999999999"
+  lazy val arn = "XAIT00000000000"
+  lazy val fakeRequestWithClientsVRN: FakeRequest[AnyContentAsEmpty.type] =
+    FakeRequest().withSession(SessionKeys.clientVrn -> vrn)
+  implicit val user: User = User(vrn)
+  lazy val agentUser: User = User(vrn, active = true, hasNonMtdVat = true, Some(arn))
+
+
 
   def element(cssSelector: String)(implicit document: Document): Element = {
     val elements = document.select(cssSelector)

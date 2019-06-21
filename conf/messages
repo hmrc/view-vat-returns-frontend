@@ -96,6 +96,8 @@ submittedReturns.activePrevious = Currently viewing previous returns
 submittedReturns.inactivePrevious = View previous returns
 submittedReturns.previousReturns = Previous returns
 submittedReturns.finalReturn = Final return
+submittedReturns.changeClient = Change client
+submittedReturns.finish = Finish
 
 returnDeadlines.title = Return deadlines
 returnDeadlines.submitBy = Use your accounting software to submit a return by:

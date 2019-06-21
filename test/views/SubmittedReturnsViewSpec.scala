@@ -21,6 +21,7 @@ import java.time.LocalDate
 import models.viewModels.{ReturnObligationsViewModel, VatReturnsViewModel}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import play.api.i18n.Lang
 import play.twirl.api.Html
 
 class SubmittedReturnsViewSpec extends ViewBaseSpec {
@@ -626,6 +627,124 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
 
       "not display the previous returns tab" in {
         document.select(Selectors.tabFour).size shouldBe 0
+      }
+
+    }
+
+  }
+
+  "Rendering the submitted returns page for an agent with the changeClient feature enabled" when {
+
+    mockConfig.features.changeClient(true)
+
+    "multiple years are returned" should {
+
+      val returnYears = Seq(2020, 2019, 2018)
+
+      lazy val exampleReturns: Seq[ReturnObligationsViewModel] =
+        Seq(
+          ReturnObligationsViewModel(
+            LocalDate.parse("2020-01-01"),
+            LocalDate.parse("2020-03-31"),
+            "#001"
+          ),
+          ReturnObligationsViewModel(
+            LocalDate.parse("2020-04-01"),
+            LocalDate.parse("2020-06-30"),
+            "#002"
+          ),
+          ReturnObligationsViewModel(
+            LocalDate.parse("2019-01-01"),
+            LocalDate.parse("2019-03-31"),
+            "#001"
+          ),
+          ReturnObligationsViewModel(
+            LocalDate.parse("2019-04-01"),
+            LocalDate.parse("2019-06-30"),
+            "#002"
+          ),
+          ReturnObligationsViewModel(
+            LocalDate.parse("2018-01-01"),
+            LocalDate.parse("2018-03-31"),
+            "#001"
+          ),
+          ReturnObligationsViewModel(
+            LocalDate.parse("2018-04-01"),
+            LocalDate.parse("2018-06-30"),
+            "#002"
+          )
+        )
+
+      lazy val view = views.html.returns.submittedReturns(
+        VatReturnsViewModel(returnYears, 2020, exampleReturns, hasNonMtdVatEnrolment = true, "999999999")
+      )(fakeRequestWithClientsVRN, messages, mockConfig, Lang("en-GB"), agentUser)
+
+      lazy implicit val document: Document = Jsoup.parse(view.body)
+
+      "have a tab for 2020" should {
+
+        "have the text '2020'" in {
+          elementText(Selectors.tabOne) should include("2020")
+        }
+
+        "contain visually hidden text" in {
+          elementText(Selectors.tabOneHiddenText) shouldBe "Currently viewing returns from 2020"
+        }
+
+        "display a 'change client' link" in {
+          document.getElementById("changeClient").text() shouldBe "Change client"
+          document.getElementById("changeClient").attr("href") shouldBe mockConfig.agentClientLookupUrl(mockConfig.agentClientActionUrl)
+        }
+
+        "display a 'finish' button" in {
+          document.getElementById("finish").text() shouldBe "Finish"
+          document.getElementById("finish").attr("href") shouldBe mockConfig.agentClientActionUrl
+        }
+
+      }
+
+      "have a tab for 2019" should {
+
+        "have the text '2019'" in {
+          elementText(Selectors.tabTwo) should include("2019")
+        }
+
+        "contain visually hidden text" in {
+          elementText(Selectors.tabTwoHiddenText) shouldBe "View returns from 2019"
+        }
+
+      }
+
+      "have a tab for 2018" should {
+
+        "have the text '2018'" in {
+          elementText(Selectors.tabThree) should include("2018")
+        }
+
+        "contain visually hidden text" in {
+          elementText(Selectors.tabThreeHiddenText) shouldBe "View returns from 2018"
+        }
+
+      }
+
+      "not display the previous returns tab" in {
+        document.select(Selectors.tabFour).size shouldBe 0
+      }
+
+      "when the active tab is not the latest year returned" should {
+        lazy val view19 = views.html.returns.submittedReturns(
+          VatReturnsViewModel(returnYears, 2019, exampleReturns, hasNonMtdVatEnrolment = true, "999999999")
+        )(fakeRequestWithClientsVRN, messages, mockConfig, Lang("en-GB"), agentUser)
+
+        lazy val document19: Document = Jsoup.parse(view19.body)
+
+        "not display the 'changeClient' link" in {
+          document19.getElementById("changeClient") shouldBe null
+        }
+
+        "not display the 'finish' button" in {
+          document19.getElementById("finish") shouldBe null
+        }
       }
 
     }
