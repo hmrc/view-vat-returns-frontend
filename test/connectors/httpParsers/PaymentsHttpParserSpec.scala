@@ -112,7 +112,6 @@ class PaymentsHttpParserSpec extends UnitSpec {
           end = LocalDate.parse("2017-01-01"),
           due = LocalDate.parse("2017-10-25"),
           outstandingAmount = BigDecimal(1000.00),
-          clearedAmount = BigDecimal(0),
           periodKey = "#003"
         ),
         Payment(
@@ -121,7 +120,6 @@ class PaymentsHttpParserSpec extends UnitSpec {
           end = LocalDate.parse("2018-01-01"),
           due = LocalDate.parse("2018-10-25"),
           outstandingAmount = BigDecimal(-1000.00),
-          clearedAmount = BigDecimal(0),
           periodKey = "#004"
         ),
         Payment(
@@ -130,7 +128,6 @@ class PaymentsHttpParserSpec extends UnitSpec {
           end = LocalDate.parse("2019-01-01"),
           due = LocalDate.parse("2019-10-25"),
           outstandingAmount = BigDecimal(1000.00),
-          clearedAmount = BigDecimal(0),
           periodKey = "#005"
         ),
         Payment(
@@ -139,7 +136,6 @@ class PaymentsHttpParserSpec extends UnitSpec {
           end = LocalDate.parse("2020-01-01"),
           due = LocalDate.parse("2020-10-25"),
           outstandingAmount = BigDecimal(-1000.00),
-          clearedAmount = BigDecimal(0),
           periodKey = "#006"
         ),
         Payment(
@@ -148,7 +144,6 @@ class PaymentsHttpParserSpec extends UnitSpec {
           end = LocalDate.parse("2021-01-01"),
           due = LocalDate.parse("2021-10-25"),
           outstandingAmount = BigDecimal(1000.00),
-          clearedAmount = BigDecimal(0),
           periodKey = "#007"
         ),
         Payment(
@@ -157,7 +152,6 @@ class PaymentsHttpParserSpec extends UnitSpec {
           end = LocalDate.parse("2022-01-01"),
           due = LocalDate.parse("2022-10-25"),
           outstandingAmount = BigDecimal(-1000.00),
-          clearedAmount = BigDecimal(0),
           periodKey = "#008"
         )
       )))

@@ -59,7 +59,6 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
       LocalDate.parse("2017-02-01"),
       LocalDate.parse("2017-02-02"),
       5000,
-      0,
       "#003"
     )
 

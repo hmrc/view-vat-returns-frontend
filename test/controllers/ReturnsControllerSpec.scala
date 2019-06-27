@@ -114,7 +114,6 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     LocalDate.parse("2017-02-01"),
     LocalDate.parse("2017-02-02"),
     1320.00,
-    0,
     "#001"
   )
 

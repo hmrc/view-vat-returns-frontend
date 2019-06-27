@@ -23,7 +23,6 @@ import models.{VatReturn, VatReturnDetails}
 import models.viewModels.VatReturnViewModel
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import play.twirl.api.Html
 
 class VatReturnDetailsViewSpec extends ViewBaseSpec {
 
@@ -90,7 +89,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       moneyOwed = true,
       oweHmrc = Some(true),
       Some(Payment("VAT Return Debit Charge", LocalDate.parse("2017-01-01"), LocalDate.parse("2017-03-31"),
-        LocalDate.parse("2017-04-05"), 1000.00, 0, "#001"))
+        LocalDate.parse("2017-04-05"), 1000.00, "#001"))
     ),
     showReturnsBreadcrumb = true,
     currentYear,
@@ -309,7 +308,6 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
           end = LocalDate.parse("2017-03-31"),
           due = LocalDate.parse("2017-04-06"),
           outstandingAmount = 1000.00,
-          clearedAmount = 0,
           periodKey = "#001"
         ))
       ),
@@ -328,11 +326,13 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     }
 
     "have the correct information text under the heading" in {
-      elementText(Selectors.mainInformationText) shouldBe "We have worked out what you owe based on any payments you might have made on your account."
+      elementText(Selectors.mainInformationText) shouldBe
+        "We have worked out what you owe based on any payments you might have made on your account."
     }
 
     "have the correct extra information text under the main information text" in {
-      elementText(Selectors.extraInformationText) shouldBe "You need to pay this bill by 6 April 2017. It can take up to 7 days to show that you have made a payment."
+      elementText(Selectors.extraInformationText) shouldBe
+        "You need to pay this bill by 6 April 2017. It can take up to 7 days to show that you have made a payment."
     }
 
     "have the correct box 5 description in the table" in {
@@ -370,7 +370,6 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
           end = LocalDate.parse("2017-03-31"),
           due = LocalDate.parse("2017-04-06"),
           outstandingAmount = 1000.00,
-          clearedAmount = 0,
           periodKey = "#001"
         ))
       ),
@@ -427,7 +426,6 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
           end = LocalDate.parse("2017-03-31"),
           due = LocalDate.parse("2017-04-06"),
           outstandingAmount = 0,
-          clearedAmount = 0,
           periodKey = "#001"
         ))
       ),
