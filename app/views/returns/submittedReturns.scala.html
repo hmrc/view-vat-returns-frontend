@@ -111,8 +111,20 @@
             </ul>
           }
             @if(model.returnYears.max == model.selectedYear && user.isAgent && appConfig.features.agentAccess()){
-                <p><a id="changeClient" href="@{appConfig.agentClientLookupUrl(appConfig.agentClientActionUrl)}">@messages("submittedReturns.changeClient")</a></p>
-                <p><a id="finish" class="btn button" role="button" href="@appConfig.agentClientActionUrl">@messages("submittedReturns.finish")</a></p>
+              <p>
+                <a id="changeClient"
+                  href="@{appConfig.agentClientLookupUrl(appConfig.agentClientActionUrl)}"
+                  data-journey-click="agent_returns:click:change-client">@messages("submittedReturns.changeClient")
+                </a>
+              </p>
+              <p>
+                <a id="finish"
+                   class="btn button"
+                   role="button"
+                   href="@appConfig.agentClientActionUrl"
+                   data-journey-click="agent_returns:click:finish">@messages("submittedReturns.finish")
+                </a>
+              </p>
             }
         }
       </div>
