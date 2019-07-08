@@ -21,6 +21,8 @@
 
 @(deadlines: Seq[ReturnDeadlineViewModel], currentDate: LocalDate, serviceInfoContent: Html = HtmlFormat.empty)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig, lang: Lang, user: User)
 
+    @gaPrefix = @{if(user.isAgent) "agent_" else ""}
+
     @views.html.main_template(
         title = messages("returnDeadlines.submitReturn.title"),
         serviceInfoContent = serviceInfoContent,
@@ -36,7 +38,8 @@
 
         <div class="grid-row">
             <div class="column-two-thirds">
-                <h1 class="heading-xlarge">@messages("returnDeadlines.submitReturn.title")</h1>
+                <h1 class="heading-xlarge"
+                    data-metrics="@{gaPrefix + "opted-out:view:return-deadlines"}">@messages("returnDeadlines.submitReturn.title")</h1>
                 <div class="form-group">
                     <ul class="list">
                     @for(deadline <- deadlines){
@@ -58,8 +61,13 @@
                                         @messages("returnDeadlines.periodEnding", displayDateRange(deadline.start, deadline.end))
                                     }
                                 </span>
+
+
                                 @if(currentDate.isAfter(deadline.end)) {
-                                    <a href="@{appConfig.submitVatReturnForm(deadline.periodKey)}" id="submit-return-link">@messages("returnDeadlines.submitReturn")</a>
+                                    <a href="@{appConfig.submitVatReturnForm(deadline.periodKey)}"
+                                        id="submit-return-link"
+                                        data-journey-click="@{gaPrefix + "submit-return:click:return-deadlines"}">@messages("returnDeadlines.submitReturn")
+                                    </a>
                                 } else {
                                     <span>@messages("returnDeadlines.submitReturn.futureReturn", displayDate(deadline.end.plusDays(1), showYear = false))</span>
                                 }
