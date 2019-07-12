@@ -21,6 +21,7 @@ import java.time.LocalDate
 import models.viewModels.{ReturnObligationsViewModel, VatReturnsViewModel}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.scalatest.exceptions.TestFailedException
 import play.api.i18n.Lang
 import play.twirl.api.Html
 
@@ -369,6 +370,92 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
 
     }
 
+  }
+
+  "Rendering the Submitted Returns page with a HMRC-MTD-VAT enrolment assigned to an agent" when {
+
+    "there is a single return year retrieved" when {
+
+      "there are multiple returns for the year retrieved" should {
+
+        lazy val exampleReturns: Seq[ReturnObligationsViewModel] =
+          Seq(
+            ReturnObligationsViewModel(
+              LocalDate.parse("2018-01-01"),
+              LocalDate.parse("2018-03-31"),
+              "#001"
+            ),
+            ReturnObligationsViewModel(
+              LocalDate.parse("2018-04-01"),
+              LocalDate.parse("2018-06-30"),
+              "#002"
+            )
+          )
+
+        lazy val view: Html = views.html.returns.submittedReturns(
+          VatReturnsViewModel(
+            returnYears = Seq(2018),
+            selectedYear = 2018,
+            obligations = exampleReturns,
+            hasNonMtdVatEnrolment = false,
+            vrn = "999999999"
+          )
+        )(fakeRequestWithClientsVRN, messages, mockConfig, Lang.apply("en"), agentUser)
+
+        lazy implicit val document: Document = Jsoup.parse(view.body)
+
+        "have the correct document title" in {
+          document.title shouldBe "Submitted returns"
+        }
+
+        "have the correct page heading" in {
+          elementText(Selectors.pageHeading) shouldBe "Submitted returns"
+        }
+
+        "render breadcrumbs which" in {
+          an[TestFailedException] should be thrownBy elementText(Selectors.btaBreadcrumb)
+          an[TestFailedException] should be thrownBy element(Selectors.btaBreadcrumbLink)
+          an[TestFailedException] should be thrownBy elementText(Selectors.vatBreadcrumb)
+          an[TestFailedException] should be thrownBy element(Selectors.vatBreadcrumbLink)
+          an[TestFailedException] should be thrownBy elementText(Selectors.submittedReturnsBreadcrumb)
+        }
+
+        "have the correct return heading" in {
+          elementText(Selectors.returnsHeading) shouldBe "2018 returns"
+        }
+
+        "have the correct period text" in {
+          elementText(Selectors.period) shouldBe "For the period:"
+        }
+
+        "contain the first return which" should {
+
+          "contains the correct obligation period text" in {
+            elementText(Selectors.obligation(1)) shouldBe "View return for the period 1 January to 31 March 2018"
+          }
+
+          "contains the correct link to view a specific return" in {
+            element(Selectors.obligationLink(1)).attr("href") shouldBe controllers.routes.ReturnsController.vatReturn(2018, "#001").url
+          }
+        }
+
+        "contain the second return which" should {
+
+          "contains the correct obligation period text" in {
+            elementText(Selectors.obligation(2)) shouldBe "View return for the period 1 April to 30 June 2018"
+          }
+
+          "contains the correct link to view a specific return" in {
+            element(Selectors.obligationLink(2)).attr("href") shouldBe controllers.routes.ReturnsController.vatReturn(2018, "#002").url
+          }
+        }
+
+        "not contain any tabs" in {
+          document.select(Selectors.tabOne) shouldBe empty
+        }
+
+      }
+    }
   }
 
   "Rendering the Submitted Returns page with a HMRC-MTD-VAT enrolment and a HMCE-VATDEC-ORG / HMCE-VATVAT-ORG enrolment" when {

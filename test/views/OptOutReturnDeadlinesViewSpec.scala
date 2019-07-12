@@ -22,6 +22,8 @@ import models.User
 import models.viewModels.ReturnDeadlineViewModel
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.scalatest.exceptions.TestFailedException
+import play.api.i18n.Lang
 import play.twirl.api.Html
 
 class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
@@ -99,7 +101,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
       }
 
       "have the correct obligation due date" in {
-        elementText(Selectors.firstDeadlineDueDate) should include ("2 February 2018")
+        elementText(Selectors.firstDeadlineDueDate) should include("2 February 2018")
       }
 
       "have the correct obligation start and end date text" in {
@@ -116,6 +118,145 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
 
       "have the correct GA event tag for a page view" in {
         document.getElementsByTag("h1").attr("data-metrics") shouldBe "opted-out:view:return-deadlines"
+      }
+    }
+
+    "end date has not yet passed" should {
+
+      val singleDeadline = Seq(
+        ReturnDeadlineViewModel(
+          LocalDate.parse("2018-02-02"),
+          LocalDate.parse("2018-01-01"),
+          end = LocalDate.parse("2018-12-31"),
+          periodKey = "18CC"
+        )
+      )
+
+      val currentDate = LocalDate.parse("2018-12-30")
+
+      lazy val view = views.html.returns.optOutReturnDeadlines(singleDeadline, currentDate)
+      lazy implicit val document: Document = Jsoup.parse(view.body)
+
+      "show text regarding when return can be submitted" in {
+        document.select(Selectors.cannotSubmitText).text() shouldBe "You will be able to submit your return from the 1 January."
+      }
+
+      "not show a 'Submit VAT Return' link" in {
+        document.getElementById("submit-return-link") shouldBe null
+      }
+    }
+
+    "end date is today" should {
+
+      val currentDate = LocalDate.parse("2018-12-31")
+
+      val singleDeadline = Seq(
+        ReturnDeadlineViewModel(
+          LocalDate.parse("2018-02-02"),
+          LocalDate.parse("2018-01-01"),
+          end = currentDate,
+          periodKey = "18CC"
+        )
+      )
+
+      lazy val view = views.html.returns.optOutReturnDeadlines(singleDeadline, currentDate)
+      lazy implicit val document: Document = Jsoup.parse(view.body)
+
+      "show text regarding when return can be submitted" in {
+        document.select(Selectors.cannotSubmitText).text() shouldBe "You will be able to submit your return from the 1 January."
+      }
+
+      "not show a 'Submit VAT Return' link" in {
+        document.getElementById("submit-return-link") shouldBe null
+      }
+    }
+
+    "user is an agent" should {
+
+      val singleDeadline = Seq(
+        ReturnDeadlineViewModel(
+          LocalDate.parse("2018-02-02"),
+          LocalDate.parse("2018-01-01"),
+          end = LocalDate.parse("2018-01-01"),
+          periodKey = "18CC"
+        )
+      )
+
+      val currentDate = LocalDate.parse("2018-01-02")
+
+      lazy val view = views.html.returns.optOutReturnDeadlines(singleDeadline, currentDate)(request,
+        messages,
+        mockConfig,
+        messages.lang,
+        User("", arn = Some(""))
+      )
+
+      lazy implicit val document: Document = Jsoup.parse(view.body)
+
+      "have the correct GA event tag for submitting a return" in {
+        document.getElementById("submit-return-link").attr("data-journey-click") shouldBe "agent_submit-return:click:return-deadlines"
+      }
+
+      "have the correct GA event tag for a page view" in {
+        document.getElementsByTag("h1").attr("data-metrics") shouldBe "agent_opted-out:view:return-deadlines"
+      }
+    }
+  }
+
+  "Rendering the Opted-Out Return deadlines page with a single deadline for an agent" when {
+
+    "end date has passed" should {
+
+      val singleDeadline = Seq(
+        ReturnDeadlineViewModel(
+          LocalDate.parse("2018-02-02"),
+          LocalDate.parse("2018-01-01"),
+          end = LocalDate.parse("2018-01-01"),
+          periodKey = "18CC"
+        )
+      )
+
+      val currentDate = LocalDate.parse("2018-01-02")
+
+      lazy val view = views.html.returns.optOutReturnDeadlines(singleDeadline, currentDate)(
+        fakeRequestWithClientsVRN, messages, mockConfig, Lang.apply("en"), agentUser
+      )
+      lazy implicit val document: Document = Jsoup.parse(view.body)
+
+      "do not render the breadcrumbs which" in {
+        an[TestFailedException] should be thrownBy elementText(Selectors.btaBreadcrumb)
+        an[TestFailedException] should be thrownBy element(Selectors.btaBreadCrumbLink)
+        an[TestFailedException] should be thrownBy elementText(Selectors.vatDetailsBreadCrumb)
+        an[TestFailedException] should be thrownBy element(Selectors.vatDetailsBreadcrumbLink)
+        an[TestFailedException] should be thrownBy element(Selectors.returnDeadlinesBreadCrumb)
+      }
+
+      "have the correct document title" in {
+        document.title shouldBe "Submit VAT Return"
+      }
+
+      "have the correct page heading" in {
+        elementText(Selectors.pageHeading) shouldBe "Submit VAT Return"
+      }
+
+      "have the correct obligation due date" in {
+        elementText(Selectors.firstDeadlineDueDate) should include("2 February 2018")
+      }
+
+      "have the correct obligation start and end date text" in {
+        elementText(Selectors.firstDeadlinePeriod) shouldBe "for the period 1 January to 1 January 2018"
+      }
+
+      "have a submit-your-return link" in {
+        document.getElementById("submit-return-link").text() shouldBe "Submit VAT Return"
+      }
+
+      "have the correct GA event tag for submitting a return" in {
+        document.getElementById("submit-return-link").attr("data-journey-click") shouldBe "agent_submit-return:click:return-deadlines"
+      }
+
+      "have the correct GA event tag for a page view" in {
+        document.getElementsByTag("h1").attr("data-metrics") shouldBe "agent_opted-out:view:return-deadlines"
       }
     }
 

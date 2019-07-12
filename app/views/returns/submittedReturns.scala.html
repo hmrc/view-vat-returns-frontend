@@ -29,12 +29,14 @@
   user = Some(user)
 ) {
 
-    @navigationBreadcrumb(
-      links = Map(
-        appConfig.btaHomeUrl -> messages("breadcrumbs.bta"),
-        appConfig.vatDetailsUrl -> messages("breadcrumbs.vat")),
-      currentPage = messages("submittedReturns.title")
-    )
+    @if(!user.isAgent) {
+        @navigationBreadcrumb(
+            links = Map(
+                appConfig.btaHomeUrl -> messages("breadcrumbs.bta"),
+                appConfig.vatDetailsUrl -> messages("breadcrumbs.vat")),
+            currentPage = messages("submittedReturns.title")
+        )
+    }
 
     <div class="grid-row">
       <div class="column-two-thirds">
