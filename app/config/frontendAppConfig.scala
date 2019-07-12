@@ -16,6 +16,7 @@
 
 package config
 
+import java.net.URLEncoder
 import java.util.Base64
 
 import javax.inject.{Inject, Singleton}
@@ -131,7 +132,10 @@ class FrontendAppConfig @Inject()(val runModeConfiguration: Configuration, val e
 
   override lazy val submitVatReturnBase: String = getString(Keys.submitVatReturnBase)
   override lazy val submitVatReturnUrl: String = submitVatReturnBase + getString(Keys.submitVatReturnUrl)
-  override lazy val submitVatReturnForm: String => String = periodKey => submitVatReturnUrl + s"/$periodKey" + getString(Keys.submitVatReturnForm)
+  override lazy val submitVatReturnForm: String => String = periodKey =>
+    submitVatReturnUrl +
+    s"/${URLEncoder.encode(periodKey, "utf-8")}" +
+    getString(Keys.submitVatReturnForm)
 
   override lazy val reportVatErrorUrl: String = getString(Keys.reportVatErrorUrl)
 

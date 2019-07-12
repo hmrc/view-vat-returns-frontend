@@ -100,11 +100,12 @@ class ReturnDeadlinesPageSpec extends IntegrationBaseSpec {
         val response: WSResponse = await(request().get())
         lazy implicit val document: Document = Jsoup.parse(response.body)
         val deadlineSelector = ".list li.divider--bottom"
+
         document.select(deadlineSelector).size() shouldBe 1
         document.getElementById("submit-return-link").text() shouldBe "Submit VAT Return"
-        document.getElementById("submit-return-link").attr("href") shouldBe mockAppConfig.submitVatReturnForm("#004")
+        document.getElementById("submit-return-link").attr("href") shouldBe
+          "http://localhost:9147/vat-through-software/submit-vat-return/%23004/submit-form"
       }
-
     }
 
     "the user is signed up to MTDfB" should {
