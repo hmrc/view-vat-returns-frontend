@@ -404,14 +404,6 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
 
         lazy implicit val document: Document = Jsoup.parse(view.body)
 
-        "have the correct document title" in {
-          document.title shouldBe "Submitted returns"
-        }
-
-        "have the correct page heading" in {
-          elementText(Selectors.pageHeading) shouldBe "Submitted returns"
-        }
-
         "render breadcrumbs which" in {
           an[TestFailedException] should be thrownBy elementText(Selectors.btaBreadcrumb)
           an[TestFailedException] should be thrownBy element(Selectors.btaBreadcrumbLink)

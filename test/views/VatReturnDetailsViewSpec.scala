@@ -19,7 +19,7 @@ package views
 import java.time.LocalDate
 
 import models.payments.Payment
-import models.{User, VatReturn, VatReturnDetails}
+import models.{VatReturn, VatReturnDetails}
 import models.viewModels.VatReturnViewModel
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -222,14 +222,6 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)(fakeRequestWithClientsVRN, messages, mockConfig, Lang.forCode("en"), agentUser)
 
     lazy implicit val document: Document = Jsoup.parse(view.body)
-
-    "have the correct document title" in {
-      document.title shouldBe "Submitted returns"
-    }
-
-    "have the correct page heading" in {
-      elementText(Selectors.pageHeading) should include("Submitted returns")
-    }
 
     "not render breadcrumbs which" in {
       an[TestFailedException] should be thrownBy element(Selectors.btaBreadcrumb)

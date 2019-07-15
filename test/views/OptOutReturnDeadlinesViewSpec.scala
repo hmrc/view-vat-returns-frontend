@@ -24,7 +24,6 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.scalatest.exceptions.TestFailedException
 import play.api.i18n.Lang
-import play.twirl.api.Html
 
 class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
 
@@ -228,15 +227,6 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
         an[TestFailedException] should be thrownBy element(Selectors.btaBreadCrumbLink)
         an[TestFailedException] should be thrownBy elementText(Selectors.vatDetailsBreadCrumb)
         an[TestFailedException] should be thrownBy element(Selectors.vatDetailsBreadcrumbLink)
-        an[TestFailedException] should be thrownBy element(Selectors.returnDeadlinesBreadCrumb)
-      }
-
-      "have the correct document title" in {
-        document.title shouldBe "Submit VAT Return"
-      }
-
-      "have the correct page heading" in {
-        elementText(Selectors.pageHeading) shouldBe "Submit VAT Return"
       }
 
       "have the correct obligation due date" in {
@@ -330,15 +320,6 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
         User("", arn = Some(""))
       )
 
-      lazy implicit val document: Document = Jsoup.parse(view.body)
-
-      "have the correct GA event tag for submitting a return" in {
-        document.getElementById("submit-return-link").attr("data-journey-click") shouldBe "agent_submit-return:click:return-deadlines"
-      }
-
-      "have the correct GA event tag for a page view" in {
-        document.getElementsByTag("h1").attr("data-metrics") shouldBe "agent_opted-out:view:return-deadlines"
-      }
     }
   }
 
@@ -363,6 +344,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
     val currentDate = LocalDate.parse("2018-01-02")
 
     lazy val view = views.html.returns.optOutReturnDeadlines(multipleDeadlines, currentDate)
+
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct obligation due date for the first deadline" in {
