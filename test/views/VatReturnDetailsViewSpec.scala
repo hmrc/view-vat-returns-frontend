@@ -23,6 +23,8 @@ import models.{VatReturn, VatReturnDetails}
 import models.viewModels.VatReturnViewModel
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.scalatest.exceptions.TestFailedException
+import play.i18n.Lang
 
 class VatReturnDetailsViewSpec extends ViewBaseSpec {
 
@@ -212,6 +214,23 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
 
     "render the correct help section second bullet point text" in {
       elementText(Selectors.helpBullet2) shouldBe "1% or less of your box 6 figure and below £50,000"
+    }
+  }
+
+  "Rendering the vat return details page from the returns route with flat rate scheme for an agent" should {
+
+    lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)(fakeRequestWithClientsVRN, messages, mockConfig, Lang.forCode("en"), agentUser)
+
+    lazy implicit val document: Document = Jsoup.parse(view.body)
+
+    "not render breadcrumbs which" in {
+      an[TestFailedException] should be thrownBy element(Selectors.btaBreadcrumb)
+      an[TestFailedException] should be thrownBy element(Selectors.btaBreadcrumbLink)
+      an[TestFailedException] should be thrownBy element(Selectors.vatBreadcrumb)
+      an[TestFailedException] should be thrownBy element(Selectors.vatBreadcrumbLink)
+      an[TestFailedException] should be thrownBy element(Selectors.previousPageBreadcrumb)
+      an[TestFailedException] should be thrownBy element(Selectors.previousPageBreadcrumbLink)
+      an[TestFailedException] should be thrownBy element(Selectors.currentPage)
     }
   }
 
@@ -580,46 +599,46 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     }
   }
 
-    "Rendering the VAT return details page when the user is opted out" should {
+  "Rendering the VAT return details page when the user is opted out" should {
 
-      val vatReturnViewModel = VatReturnViewModel(
-        None,
-        LocalDate.parse("2017-01-01"),
-        LocalDate.parse("2017-03-31"),
-        LocalDate.parse("2017-04-06"),
-        1000.00,
-        LocalDate.parse("2017-04-08"),
-        VatReturnDetails(
-          VatReturn(
-            "9999",
-            1297,
-            5755,
-            7052,
-            5732,
-            1000,
-            77656,
-            765765,
-            55454,
-            545645
-          ),
-          moneyOwed = true,
-          oweHmrc = Some(true),
-          None
+    val vatReturnViewModel = VatReturnViewModel(
+      None,
+      LocalDate.parse("2017-01-01"),
+      LocalDate.parse("2017-03-31"),
+      LocalDate.parse("2017-04-06"),
+      1000.00,
+      LocalDate.parse("2017-04-08"),
+      VatReturnDetails(
+        VatReturn(
+          "9999",
+          1297,
+          5755,
+          7052,
+          5732,
+          1000,
+          77656,
+          765765,
+          55454,
+          545645
         ),
-        showReturnsBreadcrumb = true,
-        currentYear,
-        hasFlatRateScheme = true,
-        isOptOutMtdVatUser = true,
-        isHybridUser = false
-      )
-      lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
-      lazy implicit val document: Document = Jsoup.parse(view.body)
+        moneyOwed = true,
+        oweHmrc = Some(true),
+        None
+      ),
+      showReturnsBreadcrumb = true,
+      currentYear,
+      hasFlatRateScheme = true,
+      isOptOutMtdVatUser = true,
+      isHybridUser = false
+    )
+    lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
+    lazy implicit val document: Document = Jsoup.parse(view.body)
 
 
-      "render the correct text for the help section for opted out user" in {
-        elementText(Selectors.helpLine1) shouldBe
-          "You can correct some errors in your next return. " +
-            "The error must have happened in an accounting period that ended in the last 4 years and be either:"
-      }
+    "render the correct text for the help section for opted out user" in {
+      elementText(Selectors.helpLine1) shouldBe
+        "You can correct some errors in your next return. " +
+          "The error must have happened in an accounting period that ended in the last 4 years and be either:"
     }
+  }
 }

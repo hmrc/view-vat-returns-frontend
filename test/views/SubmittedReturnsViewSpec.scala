@@ -21,6 +21,7 @@ import java.time.LocalDate
 import models.viewModels.{ReturnObligationsViewModel, VatReturnsViewModel}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.scalatest.exceptions.TestFailedException
 import play.api.i18n.Lang
 import play.twirl.api.Html
 
@@ -369,6 +370,49 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
 
     }
 
+  }
+
+  "Rendering the Submitted Returns page with a HMRC-MTD-VAT enrolment assigned to an agent" when {
+
+    "there is a single return year retrieved" when {
+
+      "there are multiple returns for the year retrieved" should {
+
+        lazy val exampleReturns: Seq[ReturnObligationsViewModel] =
+          Seq(
+            ReturnObligationsViewModel(
+              LocalDate.parse("2018-01-01"),
+              LocalDate.parse("2018-03-31"),
+              "#001"
+            ),
+            ReturnObligationsViewModel(
+              LocalDate.parse("2018-04-01"),
+              LocalDate.parse("2018-06-30"),
+              "#002"
+            )
+          )
+
+        lazy val view: Html = views.html.returns.submittedReturns(
+          VatReturnsViewModel(
+            returnYears = Seq(2018),
+            selectedYear = 2018,
+            obligations = exampleReturns,
+            hasNonMtdVatEnrolment = false,
+            vrn = "999999999"
+          )
+        )(fakeRequestWithClientsVRN, messages, mockConfig, Lang.apply("en"), agentUser)
+
+        lazy implicit val document: Document = Jsoup.parse(view.body)
+
+        "render breadcrumbs which" in {
+          an[TestFailedException] should be thrownBy elementText(Selectors.btaBreadcrumb)
+          an[TestFailedException] should be thrownBy element(Selectors.btaBreadcrumbLink)
+          an[TestFailedException] should be thrownBy elementText(Selectors.vatBreadcrumb)
+          an[TestFailedException] should be thrownBy element(Selectors.vatBreadcrumbLink)
+          an[TestFailedException] should be thrownBy elementText(Selectors.submittedReturnsBreadcrumb)
+        }
+      }
+    }
   }
 
   "Rendering the Submitted Returns page with a HMRC-MTD-VAT enrolment and a HMCE-VATDEC-ORG / HMCE-VATVAT-ORG enrolment" when {
