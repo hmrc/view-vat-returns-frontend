@@ -411,41 +411,6 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
           an[TestFailedException] should be thrownBy element(Selectors.vatBreadcrumbLink)
           an[TestFailedException] should be thrownBy elementText(Selectors.submittedReturnsBreadcrumb)
         }
-
-        "have the correct return heading" in {
-          elementText(Selectors.returnsHeading) shouldBe "2018 returns"
-        }
-
-        "have the correct period text" in {
-          elementText(Selectors.period) shouldBe "For the period:"
-        }
-
-        "contain the first return which" should {
-
-          "contains the correct obligation period text" in {
-            elementText(Selectors.obligation(1)) shouldBe "View return for the period 1 January to 31 March 2018"
-          }
-
-          "contains the correct link to view a specific return" in {
-            element(Selectors.obligationLink(1)).attr("href") shouldBe controllers.routes.ReturnsController.vatReturn(2018, "#001").url
-          }
-        }
-
-        "contain the second return which" should {
-
-          "contains the correct obligation period text" in {
-            elementText(Selectors.obligation(2)) shouldBe "View return for the period 1 April to 30 June 2018"
-          }
-
-          "contains the correct link to view a specific return" in {
-            element(Selectors.obligationLink(2)).attr("href") shouldBe controllers.routes.ReturnsController.vatReturn(2018, "#002").url
-          }
-        }
-
-        "not contain any tabs" in {
-          document.select(Selectors.tabOne) shouldBe empty
-        }
-
       }
     }
   }
