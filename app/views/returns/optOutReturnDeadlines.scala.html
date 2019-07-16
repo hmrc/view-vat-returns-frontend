@@ -40,6 +40,11 @@
 
         <div class="grid-row">
             <div class="column-two-thirds">
+
+                @if(user.isAgent) {
+                    <a id="link-back" class="link-back" href='@appConfig.agentClientActionUrl'>@messages("base.back")</a>
+                }
+
                 <h1 class="heading-xlarge"
                     data-metrics="@{gaPrefix + "opted-out:view:return-deadlines"}">@messages("returnDeadlines.submitReturn.title")</h1>
                 <div class="form-group">
