@@ -46,6 +46,7 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
     val tabFour = ".tabs-nav li:nth-of-type(4)"
     val returnsHeading = "h2"
     val period = ".column-two-thirds p"
+    val backLink = "#link-back"
 
     def obligation(number: Int): String = s".list-bullet li:nth-of-type($number)"
 
@@ -116,6 +117,10 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
           "have the text 'Submitted returns'" in {
             elementText(Selectors.submittedReturnsBreadcrumb) shouldBe "Submitted returns"
           }
+        }
+
+        "not render back button" in {
+          an[TestFailedException] should be thrownBy element(Selectors.backLink)
         }
 
         "have the correct return heading" in {
@@ -404,12 +409,16 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
 
         lazy implicit val document: Document = Jsoup.parse(view.body)
 
-        "render breadcrumbs which" in {
+        "not render breadcrumbs which" in {
           an[TestFailedException] should be thrownBy elementText(Selectors.btaBreadcrumb)
           an[TestFailedException] should be thrownBy element(Selectors.btaBreadcrumbLink)
           an[TestFailedException] should be thrownBy elementText(Selectors.vatBreadcrumb)
           an[TestFailedException] should be thrownBy element(Selectors.vatBreadcrumbLink)
           an[TestFailedException] should be thrownBy elementText(Selectors.submittedReturnsBreadcrumb)
+        }
+
+        "render back link" in {
+          elementText(Selectors.backLink) shouldBe "Back"
         }
       }
     }

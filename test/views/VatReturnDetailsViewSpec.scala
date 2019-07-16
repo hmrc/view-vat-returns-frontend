@@ -58,6 +58,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     val previousPageBreadcrumbLink = "div.breadcrumbs li:nth-of-type(3) a"
     val currentPage = "div.breadcrumbs li:nth-of-type(4)"
 
+    val backLink = "#link-back"
+
     val gaTagElement = "#content ul"
     val minusSymbol = "#box-four > div.column-one-quarter.form-hint.text--right > span"
   }
@@ -232,6 +234,10 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       an[TestFailedException] should be thrownBy element(Selectors.previousPageBreadcrumbLink)
       an[TestFailedException] should be thrownBy element(Selectors.currentPage)
     }
+
+    "render a back link" in {
+      elementText(Selectors.backLink) shouldBe "Back"
+    }
   }
 
 
@@ -294,6 +300,10 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       s"link to 'vat-payments-url'" in {
         element(Selectors.previousPageBreadcrumbLink).attr("href") shouldBe "vat-payments-url"
       }
+    }
+
+    "not render back button" in {
+      an[TestFailedException] should be thrownBy element(Selectors.backLink)
     }
   }
 

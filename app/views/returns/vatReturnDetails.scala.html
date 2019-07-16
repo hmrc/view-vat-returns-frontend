@@ -64,8 +64,10 @@
       )
     }
 
-
 <section class="grid-row column-two-thirds">
+    @if(user.isAgent) {
+        <a id="link-back" class="link-back" href='@controllers.routes.ReturnObligationsController.submittedReturns(vatReturnViewModel.currentYear)'>@messages("base.back")</a>
+    }
 
     <h1 class="heading-xlarge">
       <span class="heading-secondary">@messages("yourVatReturn.title")</span>

@@ -46,6 +46,8 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
     val vatDetailsBreadcrumbLink = "div.breadcrumbs li:nth-of-type(2) a"
     val returnDeadlinesBreadCrumb = "div.breadcrumbs li:nth-of-type(3)"
 
+    val backLink = "#link-back"
+
     val overdueLabel = ".task-overdue"
     val cannotSubmitText = "li > p > span:nth-child(3)"
   }
@@ -89,6 +91,10 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
         "have the 'Submit VAT Return' title" in {
           elementText(Selectors.returnDeadlinesBreadCrumb) shouldBe "Submit VAT Return"
         }
+      }
+
+      "not render the back link" in {
+        an[TestFailedException] should be thrownBy element(Selectors.backLink)
       }
 
       "have the correct document title" in {
@@ -227,6 +233,10 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
         an[TestFailedException] should be thrownBy element(Selectors.btaBreadCrumbLink)
         an[TestFailedException] should be thrownBy elementText(Selectors.vatDetailsBreadCrumb)
         an[TestFailedException] should be thrownBy element(Selectors.vatDetailsBreadcrumbLink)
+      }
+
+      "render back link" in {
+        elementText(Selectors.backLink) shouldBe "Back"
       }
 
       "have the correct obligation due date" in {
