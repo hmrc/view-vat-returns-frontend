@@ -30,10 +30,10 @@ month.short.10 = Hyd
 month.short.11 = Tach
 month.short.12 = Rhag
 
-sessionTimeout.title = Mae’ch sesiwn wedi’i therfynu
-sessionTimeout.helpOne = I fwrw golwg dros eich Ffurflenni TAW, bydd angen i chi
-sessionTimeout.helpTwo = fewngofnodi
-sessionTimeout.helpThree = gan ddefnyddio’ch Dynodydd Defnyddiwr (ID) ar gyfer Porth y Llywodraeth.
+sessionTimeout.title = Sesiwn wedi dod i ben
+sessionTimeout.subHeading = Mae’n flin gennym, mae’ch sesiwn wedi dod i ben o ganlyniad i anweithgarwch.
+sessionTimeout.helpOne = I ddefnyddio’r gwasanaeth hwn, rhaid i chi
+sessionTimeout.helpTwo = fewngofnodi.
 
 unauthorised.title = Nid ydych wedi’ch awdurdodi i ddefnyddio’r gwasanaeth hwn
 unauthorised.signUpWithSoftware = Mae angen i chi gofrestru i ddefnyddio meddalwedd er mwyn cyflwyno’ch Ffurflenni TAW.

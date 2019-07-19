@@ -26,6 +26,7 @@ class SessionTimeoutViewSpec extends ViewBaseSpec {
 
     object Selectors {
       val pageHeading = "#content h1"
+      val subHeading = "#content h2"
       val instructions = "#content > article > p"
     }
 
@@ -33,15 +34,19 @@ class SessionTimeoutViewSpec extends ViewBaseSpec {
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct document title" in {
-      document.title shouldBe "Your session has timed out"
+      document.title shouldBe "Session timed out"
     }
 
     "have a the correct page heading" in {
-      elementText(Selectors.pageHeading) shouldBe "Your session has timed out"
+      elementText(Selectors.pageHeading) shouldBe "Session timed out"
+    }
+
+    "have a the correct subheading" in {
+      elementText(Selectors.subHeading) shouldBe "Sorry, your session has timed out due to inactivity."
     }
 
     "have the correct instructions on the page" in {
-      elementText(Selectors.instructions) shouldBe "To view your VAT returns, you will have to sign in using your Government Gateway ID."
+      elementText(Selectors.instructions) shouldBe "To use this service you need to sign in."
     }
   }
 }

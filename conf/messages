@@ -7,10 +7,10 @@ base.signOut = Sign out
 navTitle.nonAgent = Business tax account
 navTitle.agent = Client’s VAT details
 
-sessionTimeout.title = Your session has timed out
-sessionTimeout.helpOne = To view your VAT returns, you will have to
-sessionTimeout.helpTwo = sign in
-sessionTimeout.helpThree = using your Government Gateway ID.
+sessionTimeout.title = Session timed out
+sessionTimeout.subHeading = Sorry, your session has timed out due to inactivity.
+sessionTimeout.helpOne = To use this service you need to
+sessionTimeout.helpTwo = sign in.
 
 unauthorised.title = You are not authorised to use this service
 unauthorised.signUpWithSoftware = You need to sign up to use software to submit your VAT Returns.
