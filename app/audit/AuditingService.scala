@@ -16,8 +16,10 @@
 
 package audit
 
-import audit.models.{AuditModel, ExtendedAuditModel}
+import models._
+
 import config.{AppConfig, FrontendAuditConnector}
+import controllers.routes
 import javax.inject.{Inject, Singleton}
 import play.api.Logger
 import play.api.libs.json.{JsObject, JsValue, Json, Writes}
@@ -78,5 +80,12 @@ class AuditingService @Inject()(appConfig: AppConfig, auditConnector: FrontendAu
     case Disabled =>
       Logger.debug(s"Auditing Disabled")
     //$COVERAGE-ON$
+  }
+
+  def openObligationsAudit(auditModel: ViewOpenVatObligationsAuditModel)(implicit hc: HeaderCarrier, ec: ExecutionContext): Unit = {
+    extendedAudit(
+      auditModel,
+      routes.ReturnDeadlinesController.returnDeadlines().url
+    )
   }
 }

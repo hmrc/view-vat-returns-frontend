@@ -24,6 +24,7 @@ import models.Obligation.Status
 import models.payments.{Payment, Payments}
 import models._
 import models.errors._
+import models.viewModels.ReturnDeadlineViewModel
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -39,6 +40,31 @@ class ReturnsService @Inject()(vatObligationsConnector: VatObligationsConnector,
       case Left(UnexpectedStatusError("404", _)) => Left(NotFoundError)
       case Left(_) => Left(VatReturnError)
     }
+
+  def getLastFullfilledObligation(obligationsResult: VatReturnObligations): Option[ReturnDeadlineViewModel]
+
+
+  /*
+    private[controllers] def fulfilledObligationsAction(obligationsResult: ServiceResponse[VatReturnObligations],
+                                                      serviceInfoContent: Html)
+                                                     (implicit request: Request[AnyContent],
+                                                      user: User): Result = {
+    obligationsResult match {
+      case Right(VatReturnObligations(Seq())) => Ok(views.html.returns.noUpcomingReturnDeadlines(None, serviceInfoContent))
+      case Right(VatReturnObligations(obligations)) =>
+        val lastFulfilledObligation: VatReturnObligation = returnsService.getLastObligation(obligations)
+        Ok(views.html.returns.noUpcomingReturnDeadlines(Some(ReturnDeadlineViewModel(
+          due = lastFulfilledObligation.due,
+          start = lastFulfilledObligation.start,
+          end = lastFulfilledObligation.end,
+          periodKey = lastFulfilledObligation.periodKey
+        )), serviceInfoContent))
+      case Left(error) =>
+        Logger.warn("[ReturnObligationsController][fulfilledObligationsAction] error: " + error.toString)
+        InternalServerError(views.html.errors.technicalProblem())
+    }
+  }
+   */
 
   def getReturnObligationsForYear(user: User, searchYear: Int, status: Status.Value)
                                  (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ServiceResponse[VatReturnObligations]] = {
@@ -58,6 +84,8 @@ class ReturnsService @Inject()(vatObligationsConnector: VatObligationsConnector,
       case Right(obligations) => Right(obligations)
       case Left(_) => Left(ObligationError)
     }
+
+
 
   def getFulfilledObligations(currentDate: LocalDate)
                              (implicit user: User, hc: HeaderCarrier, ec: ExecutionContext): Future[ServiceResponse[VatReturnObligations]] = {

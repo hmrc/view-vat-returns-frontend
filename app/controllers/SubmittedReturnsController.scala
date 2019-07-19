@@ -35,14 +35,14 @@ import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import scala.concurrent.Future
 
 @Singleton
-class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
-                                            enrolmentsAuthService: EnrolmentsAuthService,
-                                            returnsService: ReturnsService,
-                                            authorisedController: AuthorisedController,
-                                            dateService: DateService,
-                                            serviceInfoService: ServiceInfoService,
-                                            implicit val appConfig: AppConfig,
-                                            auditService: AuditingService)
+class SubmittedReturnsController @Inject()(val messagesApi: MessagesApi,
+                                           enrolmentsAuthService: EnrolmentsAuthService,
+                                           returnsService: ReturnsService,
+                                           authorisedController: AuthorisedController,
+                                           dateService: DateService,
+                                           serviceInfoService: ServiceInfoService,
+                                           implicit val appConfig: AppConfig,
+                                           auditService: AuditingService)
   extends FrontendController with I18nSupport {
 
   def submittedReturns(year: Int): Action[AnyContent] = authorisedController.authorisedAction { implicit request =>
@@ -65,87 +65,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
       }
   }
 
-  def returnDeadlines(): Action[AnyContent] = authorisedController.authorisedAction { implicit request =>
 
-    implicit user =>
-      val currentDate = dateService.now()
-
-        returnsService.getOpenReturnObligations(user).flatMap {
-          case Right(VatReturnObligations(obligations)) =>
-            val serviceInfoCall = if(user.isAgent) Future.successful(HtmlFormat.empty) else serviceInfoService.getServiceInfoPartial
-            serviceInfoCall.flatMap { serviceInfoContent =>
-              auditService.extendedAudit(
-                ViewOpenVatObligationsAuditModel(user, obligations),
-                routes.ReturnObligationsController.returnDeadlines().url
-              )
-              if (obligations.isEmpty) {
-                returnsService.getFulfilledObligations(currentDate).map { fulfilledObligations =>
-                  fulfilledObligationsAction(fulfilledObligations, serviceInfoContent)
-                }
-              } else {
-                val deadlines = obligations.map(obligation =>
-                  ReturnDeadlineViewModel(
-                    obligation.due,
-                    obligation.start,
-                    obligation.end,
-                    obligation.due.isBefore(currentDate),
-                    obligation.periodKey
-                  )
-                )
-                if (appConfig.features.submitReturnFeatures()) {
-                  handleMandationStatus(deadlines, serviceInfoContent)
-                } else {
-                  Future.successful(Ok(views.html.returns.returnDeadlines(deadlines, serviceInfoContent)))
-                }
-              }
-        }
-          case Left(error) =>
-            Logger.warn("[ReturnObligationsController][returnDeadlines] error: " + error.toString)
-            Future.successful(InternalServerError(views.html.errors.technicalProblem()))
-        }
-  }
-
-  private def handleMandationStatus(obligations: Seq[ReturnDeadlineViewModel],
-                                    serviceInfoContent: Html)
-                                   (implicit user: User, request: Request[AnyContent]): Future[Result] = {
-
-    def view(mandationStatus: String) = mandationStatus match {
-      case NonMtdfb.mandationStatus => views.html.returns.optOutReturnDeadlines(obligations, dateService.now(), serviceInfoContent)
-      case _ => views.html.returns.returnDeadlines(obligations, serviceInfoContent)
-    }
-
-    request.session.get(SessionKeys.mtdVatMandationStatus) match {
-      case Some(status) => Future.successful(Ok(view(status)))
-      case None =>
-        returnsService.getMandationStatus(user.vrn) map {
-          case Right(MandationStatus(status)) =>
-            Ok(view(status)).addingToSession(SessionKeys.mtdVatMandationStatus -> status)
-          case error =>
-            Logger.warn(s"[ReturnObligationsController][handleMandationStatus] - getMandationStatus returned an Error: $error")
-            InternalServerError(views.html.errors.technicalProblem())
-        }
-    }
-  }
-
-  private[controllers] def fulfilledObligationsAction(obligationsResult: ServiceResponse[VatReturnObligations],
-                                                      serviceInfoContent: Html)
-                                                     (implicit request: Request[AnyContent],
-                                                      user: User): Result = {
-    obligationsResult match {
-      case Right(VatReturnObligations(Seq())) => Ok(views.html.returns.noUpcomingReturnDeadlines(None, serviceInfoContent))
-      case Right(VatReturnObligations(obligations)) =>
-        val lastFulfilledObligation: VatReturnObligation = returnsService.getLastObligation(obligations)
-        Ok(views.html.returns.noUpcomingReturnDeadlines(Some(ReturnDeadlineViewModel(
-          due = lastFulfilledObligation.due,
-          start = lastFulfilledObligation.start,
-          end = lastFulfilledObligation.end,
-          periodKey = lastFulfilledObligation.periodKey
-        )), serviceInfoContent))
-      case Left(error) =>
-        Logger.warn("[ReturnObligationsController][fulfilledObligationsAction] error: " + error.toString)
-        InternalServerError(views.html.errors.technicalProblem())
-    }
-  }
 
   private[controllers] def isValidSearchYear(year: Int, upperBound: Int = dateService.now().getYear) = {
     year <= upperBound && year >= upperBound - 2
@@ -204,7 +124,7 @@ class ReturnObligationsController @Inject()(val messagesApi: MessagesApi,
             case Right(VatReturnObligations(obligations)) =>
               auditService.extendedAudit(
                 ViewSubmittedVatObligationsAuditModel(user, obligations),
-                routes.ReturnObligationsController.submittedReturns(selectedYear).url
+                routes.SubmittedReturnsController.submittedReturns(selectedYear).url
               )
 
               Right(VatReturnsViewModel(

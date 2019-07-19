@@ -247,9 +247,9 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
           elementText(Selectors.tabTwoHiddenText) shouldBe "View returns from 2019"
         }
 
-        s"contain the correct link to ${controllers.routes.ReturnObligationsController.submittedReturns(2019)}" in {
+        s"contain the correct link to ${controllers.routes.SubmittedReturnsController.submittedReturns(2019)}" in {
           element(Selectors.tabTwo).select("a").attr("href") shouldBe
-            controllers.routes.ReturnObligationsController.submittedReturns(2019).url
+            controllers.routes.SubmittedReturnsController.submittedReturns(2019).url
         }
 
       }
@@ -326,9 +326,9 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
           elementText(Selectors.tabTwoHiddenText) shouldBe "View returns from 2019"
         }
 
-        s"contain the correct link to ${controllers.routes.ReturnObligationsController.submittedReturns(2019)}" in {
+        s"contain the correct link to ${controllers.routes.SubmittedReturnsController.submittedReturns(2019)}" in {
           element(Selectors.tabTwo).select("a").attr("href") shouldBe
-            controllers.routes.ReturnObligationsController.submittedReturns(2019).url
+            controllers.routes.SubmittedReturnsController.submittedReturns(2019).url
         }
 
       }
@@ -343,9 +343,9 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
           elementText(Selectors.tabThreeHiddenText) shouldBe "View returns from 2018"
         }
 
-        s"contain the correct link to ${controllers.routes.ReturnObligationsController.submittedReturns(2018)}" in {
+        s"contain the correct link to ${controllers.routes.SubmittedReturnsController.submittedReturns(2018)}" in {
           element(Selectors.tabThree).select("a").attr("href") shouldBe
-            controllers.routes.ReturnObligationsController.submittedReturns(2018).url
+            controllers.routes.SubmittedReturnsController.submittedReturns(2018).url
         }
 
       }
@@ -470,9 +470,9 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
             elementText(Selectors.tabTwo) should include("Previous returns")
           }
 
-          s"contain the correct link to ${controllers.routes.ReturnObligationsController.submittedReturns(2017)}" in {
+          s"contain the correct link to ${controllers.routes.SubmittedReturnsController.submittedReturns(2017)}" in {
             element(Selectors.tabTwo).select("a").attr("href") shouldBe
-              controllers.routes.ReturnObligationsController.submittedReturns(2017).url
+              controllers.routes.SubmittedReturnsController.submittedReturns(2017).url
           }
         }
       }
@@ -591,9 +591,9 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
           elementText(Selectors.tabThree) should include("Previous returns")
         }
 
-        s"contain the correct link to ${controllers.routes.ReturnObligationsController.submittedReturns(2018)}" in {
+        s"contain the correct link to ${controllers.routes.SubmittedReturnsController.submittedReturns(2018)}" in {
           element(Selectors.tabThree).select("a").attr("href") shouldBe
-            controllers.routes.ReturnObligationsController.submittedReturns(2018).url
+            controllers.routes.SubmittedReturnsController.submittedReturns(2018).url
         }
       }
     }
