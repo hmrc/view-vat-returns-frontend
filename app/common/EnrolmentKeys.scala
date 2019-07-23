@@ -25,6 +25,7 @@ object EnrolmentKeys {
   val mtdVatDelegatedAuthRule: String = "mtd-vat-auth"
   val agentAffinityGroup: String = "Agent"
   val vatIdentifierId: String = "VRN"
+  val agentIdentifierId: String = "AgentReferenceNumber"
   val activated: String = "Activated"
 
 }

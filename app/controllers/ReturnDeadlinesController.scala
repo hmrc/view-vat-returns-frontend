@@ -32,7 +32,7 @@ import play.twirl.api.{Html, HtmlFormat}
 import services.{DateService, EnrolmentsAuthService, ReturnsService, ServiceInfoService}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 @Singleton
 class ReturnDeadlinesController @Inject()(val messagesApi: MessagesApi,
@@ -46,7 +46,7 @@ class ReturnDeadlinesController @Inject()(val messagesApi: MessagesApi,
   extends FrontendController with I18nSupport {
 
 
-  private[controllers] def serviceInfoCall()(implicit user: User, req: Request[_], ec: ExecutionContext): Future[Html] = {
+  private[controllers] def serviceInfoCall()(implicit user: User, req: Request[_]): Future[Html] = {
     if (user.isAgent) Future.successful(HtmlFormat.empty) else serviceInfoService.getServiceInfoPartial
   }
 
@@ -69,8 +69,10 @@ class ReturnDeadlinesController @Inject()(val messagesApi: MessagesApi,
       openObligations.flatMap {
         case Right(VatReturnObligations(obligations)) =>
           serviceInfoCall().flatMap { serviceInfoContent =>
-            auditService.openObligationsAudit(ViewOpenVatObligationsAuditModel(user, obligations))
-
+            auditService.extendedAudit(
+              ViewOpenVatObligationsAuditModel(user, obligations),
+              routes.ReturnDeadlinesController.returnDeadlines().url
+            )
             if (obligations.isEmpty) {
               noUpcomingObligationsAction(serviceInfoContent, currentDate)
             } else {
@@ -122,5 +124,4 @@ class ReturnDeadlinesController @Inject()(val messagesApi: MessagesApi,
       Future.successful(Ok(views.html.returns.returnDeadlines(obligations, serviceInfoContent)))
     }
   }
-
 }

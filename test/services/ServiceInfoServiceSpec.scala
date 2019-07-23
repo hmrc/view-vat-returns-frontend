@@ -27,7 +27,7 @@ class ServiceInfoServiceSpec extends ControllerBaseSpec {
 
   val mockConnector: ServiceInfoConnector = mock[ServiceInfoConnector]
   val service: ServiceInfoService = new ServiceInfoService(mockConnector)
-  implicit val ec: ExecutionContext = injector.instanceOf[ExecutionContext]
+  implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
 
   val validHtml = Html("<nav>BTA LINK</nav>")
 

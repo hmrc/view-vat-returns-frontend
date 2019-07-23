@@ -18,35 +18,32 @@ package controllers
 
 import akka.actor.ActorSystem
 import akka.stream.{ActorMaterializer, Materializer}
-import config.AppConfig
+import common.EnrolmentKeys._
 import common.SessionKeys.clientVrn
-import mocks.MockAppConfig
+import mocks.MockAuth
 import models.User
-import org.scalamock.scalatest.MockFactory
-import org.scalatest.BeforeAndAfterEach
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.i18n.MessagesApi
-import play.api.inject.Injector
 import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded}
 import play.api.test.FakeRequest
 import play.filters.csrf.CSRF.Token
 import play.filters.csrf.{CSRFConfigProvider, CSRFFilter}
-import uk.gov.hmrc.http.SessionKeys
-import uk.gov.hmrc.play.test.UnitSpec
+import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual}
+import uk.gov.hmrc.auth.core.retrieve.~
+import uk.gov.hmrc.auth.core.{AffinityGroup, Enrolment, EnrolmentIdentifier, Enrolments}
+import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys => GovUkSessionKeys}
 
-class ControllerBaseSpec extends UnitSpec with MockFactory with GuiceOneAppPerSuite with BeforeAndAfterEach{
+import scala.concurrent.Future
+
+class ControllerBaseSpec extends MockAuth {
 
   val vrn = "999999999"
-
-  lazy val injector: Injector = app.injector
-  lazy val messages: MessagesApi = injector.instanceOf[MessagesApi]
-  implicit val mockConfig: AppConfig = new MockAppConfig(app.configuration)
+  val arn = "XARN1234567"
 
   implicit val system: ActorSystem = ActorSystem()
   implicit val materializer: Materializer = ActorMaterializer()
+  implicit val hc: HeaderCarrier = HeaderCarrier()
 
   lazy val fakeRequestWithSession: FakeRequest[AnyContentAsEmpty.type] = fakeRequest.withSession(
-    SessionKeys.lastRequestTimestamp -> "1498236506662", SessionKeys.authToken -> "Bearer Token")
+    GovUkSessionKeys.lastRequestTimestamp -> "1498236506662", GovUkSessionKeys.authToken -> "Bearer Token")
 
   def fakeRequestToPOSTWithSession(input: (String, String)*): FakeRequest[AnyContentAsFormUrlEncoded] =
     fakeRequestWithSession.withFormUrlEncodedBody(input: _*)
@@ -54,8 +51,7 @@ class ControllerBaseSpec extends UnitSpec with MockFactory with GuiceOneAppPerSu
   implicit val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
   implicit val user: User = User(vrn)
 
-  lazy val fakeRequestWithClientsVRN: FakeRequest[AnyContentAsEmpty.type] =
-    FakeRequest().withSession(clientVrn -> vrn)
+  lazy val fakeRequestWithClientsVRN: FakeRequest[AnyContentAsEmpty.type] = fakeRequest.withSession(clientVrn -> vrn)
 
   implicit class CSRFTokenAdder[T](req: FakeRequest[T]) {
     def addToken(): FakeRequest[T] = {
@@ -70,14 +66,29 @@ class ControllerBaseSpec extends UnitSpec with MockFactory with GuiceOneAppPerSu
     }
   }
 
+  val mtdVatEnrolment: Set[Enrolment] = Set(Enrolment(
+    mtdVatEnrolmentKey,
+    Seq(EnrolmentIdentifier(vatIdentifierId, vrn)),
+    activated
+  ))
+
+  val agentEnrolment: Set[Enrolment] = Set(Enrolment(
+    agentEnrolmentKey,
+    Seq(EnrolmentIdentifier(agentIdentifierId, arn)),
+    activated,
+    Some(mtdVatDelegatedAuthRule)
+  ))
+
+  val individualAuthResult: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(new ~(
+    Enrolments(mtdVatEnrolment), Some(Individual)
+  ))
+
+  val agentAuthResult: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(new ~(
+    Enrolments(agentEnrolment), Some(Agent)
+  ))
+
   override def beforeEach(): Unit = {
     mockConfig.features.submitReturnFeatures(false)
-    mockConfig.features.agentAccess(true)
-    super.beforeEach()
-  }
-
-  override def afterEach(): Unit = {
-    super.afterEach()
     mockConfig.features.agentAccess(true)
   }
 }

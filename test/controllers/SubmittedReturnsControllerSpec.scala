@@ -18,197 +18,72 @@ package controllers
 
 import java.time.LocalDate
 
-import audit.AuditingService
-import audit.models.ExtendedAuditModel
-import common.SessionKeys
-import controllers.predicate.AuthoriseAgentWithClient
 import models._
 import models.errors.ObligationError
-import models.User
 import models.viewModels.{ReturnObligationsViewModel, VatReturnsViewModel}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.http.Status
-import play.api.mvc.{AnyContentAsEmpty, Request, Result}
-import play.api.test.FakeRequest
+import play.api.mvc.Result
 import play.api.test.Helpers._
-import play.twirl.api.Html
-import services.{DateService, EnrolmentsAuthService, ReturnsService, ServiceInfoService}
-import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual}
 import uk.gov.hmrc.auth.core._
-import uk.gov.hmrc.auth.core.authorise.Predicate
-import uk.gov.hmrc.auth.core.retrieve.{Retrieval, ~}
-import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
 
-  val goodEnrolments: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(new ~(
-    Enrolments(
-      Set(
-        Enrolment(
-          "HMRC-MTD-VAT",
-          Seq(EnrolmentIdentifier("VRN", vrn)),
-          "Active"))
-    ),
-    Some(Individual)
-  ))
-
-  val agentEnrolment = Enrolments(
-    Set(
-      Enrolment(
-        "HMRC-AS-AGENT",
-        Seq(EnrolmentIdentifier("AgentReferenceNumber", "XAIT0000000000")),
-        "Activated",
-        Some("mtd-vat-auth")
-      )
-    )
-  )
-
-  val goodAgentEnrolments: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(new ~(
-    agentEnrolment,
-    Some(Agent)
-  ))
-
-  private trait Test {
-
-    val exampleObligations: Future[ServiceResponse[VatReturnObligations]] = Right(
-      VatReturnObligations(
-        Seq(
-          VatReturnObligation(
-            LocalDate.parse("2017-01-01"),
-            LocalDate.parse("2017-12-31"),
-            LocalDate.parse("2018-01-31"),
-            "O",
-            None,
-            "#001"
-          )
+  val exampleObligations: Future[ServiceResponse[VatReturnObligations]] = Right(
+    VatReturnObligations(
+      Seq(
+        VatReturnObligation(
+          LocalDate.parse("2222-01-01"),
+          LocalDate.parse("2222-12-31"),
+          LocalDate.parse("2222-01-31"),
+          "O",
+          None,
+          "#001"
         )
       )
     )
+  )
+  val emptyObligations: ServiceResponse[VatReturnObligations] = Right(VatReturnObligations(Seq.empty))
 
-    val agentEnrolments: Enrolments = Enrolments(
-      Set(
-        Enrolment(
-          "HMRC-AS-AGENT",
-          Seq(EnrolmentIdentifier("AgentReferenceNumber", "XARN1234567")),
-          "Activated")
-      )
-    )
+  val previousYear: Int = 2017
 
-    val agentAuthResult: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(new ~(
-      agentEnrolments,
-      Some(Agent)
-    ))
-
-    val serviceCall: Boolean = true
-    val secondServiceCall: Boolean = true
-    val mandationStatusResult: String => Future[ServiceResponse[MandationStatus]]
-    = mandationStatus => Future.successful(Right(MandationStatus(mandationStatus)))
-    val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(goodEnrolments)
-    val mockAuthConnector: AuthConnector = mock[AuthConnector]
-    val mockVatReturnService: ReturnsService = mock[ReturnsService]
-    val mockDateService: DateService = mock[DateService]
-    val mockAuditService: AuditingService = mock[AuditingService]
-    val mockServiceInfoService: ServiceInfoService = mock[ServiceInfoService]
-    val mockEnrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
-    val callMandationService: Boolean = false
-    val callDateService: Boolean = true
-    val enabledAgentAccess: Boolean = true
-
-    def mockAuthorisedAgentWithClient: AuthoriseAgentWithClient = new AuthoriseAgentWithClient(
-      mockEnrolmentsAuthService,
-      mockVatReturnService,
-      messages,
-      mockConfig
-    )
-
-    def mockAuthorisedController: AuthorisedController = new AuthorisedController(
-      mockEnrolmentsAuthService,
-      messages,
-      mockAuthorisedAgentWithClient,
-      mockConfig
-    )
-
-    val previousYear: Int = 2017
-
-    def setup(): Any = {
-
-      if (callDateService) {
-        (mockDateService.now: () => LocalDate).stubs().returns(LocalDate.parse("2018-05-01"))
-      }
-
-      (mockAuthConnector.authorise(_: Predicate, _: Retrieval[~[Enrolments, Option[AffinityGroup]]])(_: HeaderCarrier, _: ExecutionContext))
-        .expects(*, *, *, *)
-        .returns(authResult)
-        .noMoreThanOnce()
-
-      if (callMandationService) {
-
-        (mockVatReturnService.getMandationStatus(_: String)(_: HeaderCarrier, _: ExecutionContext))
-          .expects(*, *, *)
-          .returns(mandationStatusResult("Non MTDfB"))
-      }
-
-      if (serviceCall) {
-
-        (mockVatReturnService.getReturnObligationsForYear(_: User, _: Int, _: Obligation.Status.Value)
-        (_: HeaderCarrier, _: ExecutionContext))
-          .expects(*, *, *, *, *)
-          .returns(exampleObligations)
-
-        if (secondServiceCall) {
-          (mockVatReturnService.getReturnObligationsForYear(_: User, _: Int, _: Obligation.Status.Value)
-          (_: HeaderCarrier, _: ExecutionContext))
-            .expects(*, *, *, *, *)
-            .returns(exampleObligations)
-
-          (mockAuditService.extendedAudit(_: ExtendedAuditModel, _: String)(_: HeaderCarrier, _: ExecutionContext))
-            .stubs(*, *, *, *)
-            .returns({})
-        }
-
-        if (authResult != agentAuthResult) {
-          (mockServiceInfoService.getServiceInfoPartial(_: Request[_], _: ExecutionContext))
-            .expects(*, *)
-            .returns(Future.successful(Html("")))
-        }
-      }
-
-      mockConfig.features.agentAccess(enabledAgentAccess)
-    }
-
-    def target: SubmittedReturnsController = {
-      setup()
-      new SubmittedReturnsController(
-        messages,
-        mockEnrolmentsAuthService,
-        mockVatReturnService,
-        mockAuthorisedController,
-        mockDateService,
-        mockServiceInfoService,
-        mockConfig,
-        mockAuditService)
-    }
-  }
+  def controller: SubmittedReturnsController = new SubmittedReturnsController(
+    messages,
+    enrolmentsAuthService,
+    mockVatReturnService,
+    mockAuthorisedController,
+    mockDateService,
+    mockServiceInfoService,
+    mockConfig,
+    mockAuditService
+  )
 
   "Calling the .submittedReturns action" when {
 
     "A user is logged in and enrolled to HMRC-MTD-VAT" should {
 
-      "return 200" in new Test {
-        private val result = target.submittedReturns(previousYear)(fakeRequest)
+      lazy val result = {
+        callDateService()
+        callExtendedAudit
+        callAuthService(individualAuthResult)
+        callOpenObligationsForYear(exampleObligations)
+        callOpenObligationsForYear(exampleObligations)
+        callServiceInfoPartialService
+        controller.submittedReturns(previousYear)(fakeRequest)
+      }
+
+      "return 200" in {
         status(result) shouldBe Status.OK
       }
 
-      "return HTML" in new Test {
-        private val result = target.submittedReturns(previousYear)(fakeRequest)
+      "return HTML" in {
         contentType(result) shouldBe Some("text/html")
       }
 
-      "return charset of utf-8" in new Test {
-        private val result = target.submittedReturns(previousYear)(fakeRequest)
+      "return charset of utf-8" in {
         charset(result) shouldBe Some("utf-8")
       }
     }
@@ -221,53 +96,26 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
 
           "the agent has the correct authorised delegation" should {
 
-            lazy val fakeRequestWithClientVrn: FakeRequest[AnyContentAsEmpty.type] = fakeRequest.withSession(
-              SessionKeys.clientVrn -> "999999999")
+            lazy val result = {
+              callDateService()
+              callExtendedAudit
+              callAuthService(agentAuthResult)
+              callAuthServiceEnrolmentsOnly(Enrolments(agentEnrolment))
+              callMandationService(Right(MandationStatus("Non MTDfB")))
+              callOpenObligationsForYear(exampleObligations)
+              callOpenObligationsForYear(exampleObligations)
+              controller.submittedReturns(previousYear)(fakeRequestWithClientsVRN)
+            }
 
-            "return 200" in new Test {
-              override val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = agentAuthResult
-              override val callMandationService: Boolean = true
-
-              override def setup(): Any = {
-                super.setup()
-
-                (mockAuthConnector.authorise(_: Predicate, _: Retrieval[Enrolments])(_: HeaderCarrier, _: ExecutionContext))
-                  .expects(*, *, *, *)
-                  .returns(Future.successful(agentEnrolments))
-              }
-
-              private val result = target.submittedReturns(previousYear)(fakeRequestWithClientVrn)
+            "return 200" in {
               status(result) shouldBe Status.OK
             }
 
-            "return HTML" in new Test {
-              override val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = agentAuthResult
-              override val callMandationService: Boolean = true
-
-              override def setup(): Any = {
-                super.setup()
-
-                (mockAuthConnector.authorise(_: Predicate, _: Retrieval[Enrolments])(_: HeaderCarrier, _: ExecutionContext))
-                  .expects(*, *, *, *)
-                  .returns(Future.successful(agentEnrolments))
-              }
-
-              private val result = target.submittedReturns(previousYear)(fakeRequestWithClientVrn)
+            "return HTML" in {
               contentType(result) shouldBe Some("text/html")
             }
 
-            "return charset of utf-8" in new Test {
-              override val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = agentAuthResult
-              override val callMandationService: Boolean = true
-
-              override def setup(): Any = {
-                super.setup()
-
-                (mockAuthConnector.authorise(_: Predicate, _: Retrieval[Enrolments])(_: HeaderCarrier, _: ExecutionContext))
-                  .expects(*, *, *, *)
-                  .returns(Future.successful(agentEnrolments))
-              }
-              private val result = target.submittedReturns(previousYear)(fakeRequestWithClientVrn)
+            "return charset of utf-8" in {
               charset(result) shouldBe Some("utf-8")
             }
           }
@@ -276,272 +124,78 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
 
       "agent access is disabled" should {
 
-        "return FORBIDDEN (403)" in new Test {
+        lazy val result = {
+          mockConfig.features.agentAccess(false)
+          callAuthService(agentAuthResult)
+          controller.submittedReturns(previousYear)(fakeRequestWithClientsVRN)
+        }
 
-          lazy val fakeRequestWithClientVrn: FakeRequest[AnyContentAsEmpty.type] = fakeRequest.withSession(
-            SessionKeys.clientVrn -> "999999999")
-
-          override val enabledAgentAccess: Boolean = false
-          override val serviceCall: Boolean = false
-          override val callDateService: Boolean = false
-          override val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = agentAuthResult
-
-          private val result = target.submittedReturns(previousYear)(fakeRequestWithClientVrn)
+        "return 403 (Forbidden)" in {
           status(result) shouldBe Status.FORBIDDEN
-
-
         }
 
-        "render the unauthorised page" in new Test {
-          lazy val fakeRequestWithClientVrn: FakeRequest[AnyContentAsEmpty.type] = fakeRequest.withSession(
-            SessionKeys.clientVrn -> "999999999")
-
-          override val enabledAgentAccess: Boolean = false
-          override val serviceCall: Boolean = false
-          override val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = agentAuthResult
-
-          private val result = target.submittedReturns(previousYear)(fakeRequestWithClientVrn)
-
+        "render the unauthorised page" in {
           val document: Document = Jsoup.parse(bodyOf(result))
-
           document.title shouldBe "You are not authorised to use this service"
-
         }
-
       }
     }
 
-
     "A user is not authorised" should {
 
-      "return 403 (Forbidden)" in new Test {
-        override val serviceCall = false
-        override val authResult: Future[Nothing] = Future.failed(InsufficientEnrolments())
-        private val result = target.submittedReturns(previousYear)(fakeRequest)
+      lazy val result = {
+        callAuthService(Future.failed(InsufficientEnrolments()))
+        controller.submittedReturns(previousYear)(fakeRequest)
+      }
+
+      "return 403 (Forbidden)" in {
         status(result) shouldBe Status.FORBIDDEN
       }
     }
 
     "A user is not authenticated" should {
 
-      "return 401 (Unauthorised)" in new Test {
-        override val serviceCall = false
-        override val authResult: Future[Nothing] = Future.failed(MissingBearerToken())
-        private val result = target.submittedReturns(previousYear)(fakeRequest)
+      lazy val result = {
+        callAuthService(Future.failed(MissingBearerToken()))
+        controller.submittedReturns(previousYear)(fakeRequest)
+      }
+
+      "return 401 (Unauthorised)" in {
         status(result) shouldBe Status.UNAUTHORIZED
       }
     }
 
     "A user enters an invalid search year for their submitted returns" should {
 
-      "return 404 (Not Found)" in new Test {
-        override val serviceCall = false
-        private val result = target.submittedReturns(year = 2021)(fakeRequest)
+      lazy val result = {
+        callAuthService(individualAuthResult)
+        callDateService()
+        controller.submittedReturns(year = 2021)(fakeRequest)
+      }
+
+      "return 404 (Not Found)" in {
         status(result) shouldBe Status.NOT_FOUND
       }
     }
 
     "An error occurs upstream" should {
 
-      "return the submitted returns error view" in new Test {
-        override val serviceCall = true
-        override val secondServiceCall: Boolean = false
-        override val exampleObligations: Future[ServiceResponse[Nothing]] = Left(ObligationError)
+      lazy val result: Result = {
+        callAuthService(individualAuthResult)
+        callDateService()
+        callServiceInfoPartialService
+        callOpenObligationsForYear(Left(ObligationError))
+        controller.submittedReturns(previousYear)(fakeRequest)
+      }
 
-        val result: Result = await(target.submittedReturns(previousYear)(fakeRequest))
+      "return 500" in {
+        status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+      }
+
+      "return the submitted returns error view" in {
         val document: Document = Jsoup.parse(bodyOf(result))
-
         document.select("h1").first().text() shouldBe "Sorry, there is a problem with the service"
       }
-    }
-  }
-
-  private trait ReturnDeadlinesTest {
-
-    val exampleObligations: Future[ServiceResponse[VatReturnObligations]] = Right(
-      VatReturnObligations(
-        Seq(
-          VatReturnObligation(
-            LocalDate.parse("2017-01-01"),
-            LocalDate.parse("2017-12-31"),
-            LocalDate.parse("2018-01-31"),
-            "O",
-            None,
-            "#001"
-          )
-        )
-      )
-    )
-
-    val openObsServiceCall = true
-    val serviceInfoCall = true
-    val openObligations: Boolean = true
-    val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(goodEnrolments)
-    val agentAuthResult: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(goodAgentEnrolments)
-    val mockAuthConnector: AuthConnector = mock[AuthConnector]
-    val mockVatReturnService: ReturnsService = mock[ReturnsService]
-    val mockServiceInfoService: ServiceInfoService = mock[ServiceInfoService]
-    val mandationStatusCall: Boolean = false
-    val mandationStatusCallResponse: String = "MTDfB"
-    val mockDateService: DateService = mock[DateService]
-    val mockAuditService: AuditingService = mock[AuditingService]
-    val previousYear: Int = 201
-    val auditingExpected: Boolean = false
-    val mockEnrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
-    val mockAuthorisedAgentWithClient: AuthoriseAgentWithClient = new AuthoriseAgentWithClient(
-      mockEnrolmentsAuthService,
-      mockVatReturnService,
-      messages,
-      mockConfig
-    )
-
-    val mockAuthorisedController: AuthorisedController = new AuthorisedController(
-      mockEnrolmentsAuthService,
-      messages,
-      mockAuthorisedAgentWithClient,
-      mockConfig
-    )
-
-    def setup(): Any = {
-
-      (mockDateService.now: () => LocalDate).stubs().returns(LocalDate.parse("2018-05-01")).anyNumberOfTimes()
-
-      (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
-        .expects(*, *, *, *)
-        .returns(authResult)
-        .noMoreThanOnce()
-
-      if (mandationStatusCall) {
-        (mockVatReturnService.getMandationStatus(_: String)(_: HeaderCarrier, _: ExecutionContext))
-          .expects("999999999", *, *)
-          .returns(Future.successful(Right(MandationStatus(mandationStatusCallResponse))))
-      }
-
-      if (openObsServiceCall) {
-        (mockVatReturnService.getOpenReturnObligations(_: User)
-        (_: HeaderCarrier, _: ExecutionContext))
-          .expects(*, *, *)
-          .returns(exampleObligations)
-
-        (mockAuditService.extendedAudit(_: ExtendedAuditModel, _: String)(_: HeaderCarrier, _: ExecutionContext))
-          .stubs(*, *, *, *)
-          .returns({})
-
-        if (authResult != agentAuthResult && serviceInfoCall) {
-          (mockServiceInfoService.getServiceInfoPartial(_: Request[_], _: ExecutionContext))
-            .expects(*, *)
-            .returns(Future.successful(Html("")))
-        }
-      }
-
-      if (!openObligations) {
-        (mockVatReturnService.getFulfilledObligations(_: LocalDate)
-        (_: User, _: HeaderCarrier, _: ExecutionContext))
-          .expects(*, *, *, *)
-          .returns(Right(VatReturnObligations(Seq.empty)))
-      }
-    }
-
-    def target: SubmittedReturnsController = {
-      setup()
-      new SubmittedReturnsController(
-        messages,
-        mockEnrolmentsAuthService,
-        mockVatReturnService,
-        mockAuthorisedController,
-        mockDateService,
-        mockServiceInfoService,
-        mockConfig,
-        mockAuditService)
-    }
-
-    def agentTarget: SubmittedReturnsController = {
-      setup()
-      new SubmittedReturnsController(
-        messages,
-        mockEnrolmentsAuthService,
-        mockVatReturnService,
-        mockAuthorisedController,
-        mockDateService,
-        mockServiceInfoService,
-        mockConfig,
-        mockAuditService)
-    }
-  }
-
-
-
-  private trait GetReturnObligationsTest {
-    val mockedDate: String = "2018-05-01"
-    val callSecondMock: Boolean = true //used to prevent mocks for services
-    val callThirdMock: Boolean = true //used to prevent mocks for services
-    val auditMockRequired: Boolean = true //used to prevent mocks for services
-    val vatServiceResult: Future[ServiceResponse[VatReturnObligations]]
-    val vatServicePre2020CallResult: Future[ServiceResponse[VatReturnObligations]]
-    val vatServiceThirdCallResult: Future[ServiceResponse[VatReturnObligations]]
-    val mockAuthConnector: AuthConnector = mock[AuthConnector]
-    val mockVatReturnService: ReturnsService = mock[ReturnsService]
-    val mockDateService: DateService = mock[DateService]
-    val mockServiceInfoService: ServiceInfoService = mock[ServiceInfoService]
-    val mockEnrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
-    val mockAuditService: AuditingService = mock[AuditingService]
-    val testUser: User = User("999999999")
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-
-    val mockAuthorisedAgentWithClient: AuthoriseAgentWithClient = new AuthoriseAgentWithClient(
-      mockEnrolmentsAuthService,
-      mockVatReturnService,
-      messages,
-      mockConfig
-    )
-
-    val mockAuthorisedController: AuthorisedController = new AuthorisedController(
-      mockEnrolmentsAuthService,
-      messages,
-      mockAuthorisedAgentWithClient,
-      mockConfig
-    )
-
-    def setup(): Any = {
-      (mockDateService.now: () => LocalDate).stubs().returns(LocalDate.parse(mockedDate))
-
-      (mockVatReturnService.getReturnObligationsForYear(_: User, _: Int, _: Obligation.Status.Value)
-      (_: HeaderCarrier, _: ExecutionContext))
-        .expects(*, *, *, *, *)
-        .returns(vatServiceResult)
-
-      if (callSecondMock) {
-        (mockVatReturnService.getReturnObligationsForYear(_: User, _: Int, _: Obligation.Status.Value)
-        (_: HeaderCarrier, _: ExecutionContext))
-          .expects(*, *, *, *, *)
-          .returns(vatServicePre2020CallResult)
-      }
-
-      if (callThirdMock) {
-        (mockVatReturnService.getReturnObligationsForYear(_: User, _: Int, _: Obligation.Status.Value)
-        (_: HeaderCarrier, _: ExecutionContext))
-          .expects(*, *, *, *, *)
-          .returns(vatServiceThirdCallResult)
-      }
-
-
-      if (auditMockRequired) {
-        (mockAuditService.extendedAudit(_: ExtendedAuditModel, _: String)(_: HeaderCarrier, _: ExecutionContext))
-          .stubs(*, *, *, *)
-          .returns({})
-      }
-    }
-
-    def target: SubmittedReturnsController = {
-      setup()
-      new SubmittedReturnsController(messages,
-        mockEnrolmentsAuthService,
-        mockVatReturnService,
-        mockAuthorisedController,
-        mockDateService,
-        mockServiceInfoService,
-        mockConfig,
-        mockAuditService)
     }
   }
 
@@ -551,215 +205,116 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
 
       "the mocked date is 2020 or above" should {
 
-        "return a VatReturnsViewModel with valid obligations" in new GetReturnObligationsTest {
-          override val mockedDate: String = "2020-05-05"
-          override val callThirdMock: Boolean = false
-          override val vatServiceResult: Future[ServiceResponse[VatReturnObligations]] =
-            Right(
-              VatReturnObligations(Seq(VatReturnObligation(
-                LocalDate.parse("2020-01-01"),
-                LocalDate.parse("2020-01-01"),
-                LocalDate.parse("2020-01-01"),
-                "O",
-                None,
-                "#001"
-              )))
-            )
+        "return a VatReturnsViewModel with valid obligations" in {
 
-          override val vatServicePre2020CallResult: Future[ServiceResponse[VatReturnObligations]] =
-            Right(
-              VatReturnObligations(Seq(VatReturnObligation(
-                LocalDate.parse("2018-01-01"),
-                LocalDate.parse("2018-01-01"),
-                LocalDate.parse("2018-01-01"),
-                "O",
-                None,
-                "#001"
-              )))
-            )
-
-          override val vatServiceThirdCallResult: Future[ServiceResponse[VatReturnObligations]] = Right(VatReturnObligations(Seq.empty))
+          lazy val result = {
+            callDateService(LocalDate.parse("2020-05-05"))
+            callOpenObligationsForYear(exampleObligations)
+            callOpenObligationsForYear(exampleObligations)
+            callExtendedAudit
+            controller.getReturnObligations(user, 2020, Obligation.Status.All)
+          }
 
           val expectedResult = Right(VatReturnsViewModel(
             Seq(2020, 2019, 2018),
             2020,
-            Seq(
-              ReturnObligationsViewModel(
-                LocalDate.parse("2018-01-01"),
-                LocalDate.parse("2018-01-01"),
-                "#001"
-              )
-            ),
+            Seq(ReturnObligationsViewModel(
+              LocalDate.parse("2222-01-01"),
+              LocalDate.parse("2222-12-31"),
+              "#001"
+            )),
             hasNonMtdVatEnrolment = false,
-            "999999999"
+            vrn
           ))
-          private val result = await(target.getReturnObligations(testUser, 2020, Obligation.Status.All))
 
-          result shouldBe expectedResult
+          await(result) shouldBe expectedResult
         }
 
-        "return a VatReturnsViewModel with valid but empty list of obligations" in new GetReturnObligationsTest {
-          override val mockedDate: String = "2020-05-05"
-          override val vatServiceResult: Future[ServiceResponse[VatReturnObligations]] = Right(VatReturnObligations(Seq.empty))
-          override val vatServicePre2020CallResult: Future[ServiceResponse[VatReturnObligations]] = Right(VatReturnObligations(Seq.empty))
-          override val vatServiceThirdCallResult: Future[ServiceResponse[VatReturnObligations]] = Right(VatReturnObligations(Seq.empty))
+        "return a VatReturnsViewModel with empty obligations" in {
+
+          lazy val result = {
+            callDateService(LocalDate.parse("2020-05-05"))
+            callOpenObligationsForYear(emptyObligations)
+            callOpenObligationsForYear(emptyObligations)
+            callOpenObligationsForYear(emptyObligations)
+            callExtendedAudit
+            controller.getReturnObligations(user, 2020, Obligation.Status.All)
+          }
 
           val expectedResult = Right(VatReturnsViewModel(
             Seq(2020),
             2020,
             List(),
             hasNonMtdVatEnrolment = false,
-            "999999999"
+            vrn
           ))
-          private val result = await(target.getReturnObligations(testUser, 2020, Obligation.Status.All))
 
-          result shouldBe expectedResult
+          await(result) shouldBe expectedResult
         }
-
       }
 
       "the mocked date is below 2020" should {
 
-        "return a VatReturnsViewModel with valid obligations" in new GetReturnObligationsTest {
-          override val mockedDate: String = "2018-12-12"
-          override val callThirdMock: Boolean = false
-          override val vatServiceThirdCallResult: Future[ServiceResponse[VatReturnObligations]] = Right(VatReturnObligations(Seq.empty))
-          override val vatServiceResult: Future[ServiceResponse[VatReturnObligations]] =
-            Right(
-              VatReturnObligations(
-                Seq(
-                  VatReturnObligation(
-                    LocalDate.parse("2020-01-01"),
-                    LocalDate.parse("2020-01-01"),
-                    LocalDate.parse("2020-01-01"),
-                    "O",
-                    None,
-                    "#001"
-                  ),
-                  VatReturnObligation(
-                    LocalDate.parse("2020-01-01"),
-                    LocalDate.parse("2020-01-01"),
-                    LocalDate.parse("2020-01-01"),
-                    "O",
-                    None,
-                    "#001"
-                  )
-                )
-              )
-            )
+        "return a VatReturnsViewModel with valid obligations" in {
 
-          override val vatServicePre2020CallResult: Future[ServiceResponse[VatReturnObligations]] =
-            Right(
-              VatReturnObligations(
-                Seq(
-                  VatReturnObligation(
-                    LocalDate.parse("2017-01-01"),
-                    LocalDate.parse("2017-01-01"),
-                    LocalDate.parse("2017-01-01"),
-                    "O",
-                    None,
-                    "#001"
-                  )
-                )
-              )
-            )
-
+          lazy val result = {
+            callDateService()
+            callOpenObligationsForYear(exampleObligations)
+            callOpenObligationsForYear(exampleObligations)
+            callExtendedAudit
+            controller.getReturnObligations(user, 2017, Obligation.Status.All)
+          }
 
           val expectedResult = Right(VatReturnsViewModel(
             Seq(2018, 2017),
             2017,
             Seq(
               ReturnObligationsViewModel(
-                LocalDate.parse("2017-01-01"),
-                LocalDate.parse("2017-01-01"),
+                LocalDate.parse("2222-01-01"),
+                LocalDate.parse("2222-12-31"),
                 "#001"
               )
             ),
             hasNonMtdVatEnrolment = false,
-            "999999999"
+            vrn
           ))
-          private val result = await(target.getReturnObligations(testUser, 2017, Obligation.Status.All))
 
-          result shouldBe expectedResult
+          await(result) shouldBe expectedResult
         }
 
-      }
+        "return a VatReturnsViewModel with empty obligations" in {
 
-    }
+          lazy val result = {
+            callDateService()
+            callOpenObligationsForYear(emptyObligations)
+            callExtendedAudit
+            controller.getReturnObligations(user, 2017, Obligation.Status.All)
+          }
 
-    "the vatReturnsService retrieves an empty list of VatReturnObligations" should {
-
-      "return a VatReturnsViewModel with empty obligations" in new GetReturnObligationsTest {
-        override val vatServiceResult: Future[ServiceResponse[VatReturnObligations]] = Right(VatReturnObligations(Seq.empty))
-        override val vatServicePre2020CallResult: Future[ServiceResponse[VatReturnObligations]] = Right(VatReturnObligations(Seq.empty))
-        override val vatServiceThirdCallResult: Future[ServiceResponse[VatReturnObligations]] = Right(VatReturnObligations(Seq.empty))
-        override val callSecondMock = false
-        override val callThirdMock: Boolean = false
-
-        val expectedResult = Right(
-          VatReturnsViewModel(
+          val expectedResult = Right(VatReturnsViewModel(
             Seq(2018),
             2017,
             Seq(),
             hasNonMtdVatEnrolment = false,
-            "999999999"
-          )
-        )
-        private val result = await(target.getReturnObligations(testUser, 2017, Obligation.Status.All))
+            vrn
+          ))
 
-        result shouldBe expectedResult
+          await(result) shouldBe expectedResult
+        }
       }
     }
 
     "the vatReturnsService retrieves an error" should {
 
-      "return None" in new GetReturnObligationsTest {
-        override val mockedDate: String = "2020-01-01"
-        override val vatServiceResult: Future[ServiceResponse[Nothing]] = Left(ObligationError)
-        override val vatServiceThirdCallResult: Future[ServiceResponse[VatReturnObligations]] = Right(VatReturnObligations(Seq.empty))
-        override val callSecondMock: Boolean = false
-        override val callThirdMock: Boolean = false
+      "return None" in {
 
-        override val vatServicePre2020CallResult: Future[ServiceResponse[VatReturnObligations]] =
-          Right(
-            VatReturnObligations(Seq(VatReturnObligation(
-              LocalDate.parse("2018-01-01"),
-              LocalDate.parse("2018-01-01"),
-              LocalDate.parse("2018-01-01"),
-              "O",
-              None,
-              "#001"
-            )))
-          )
+        lazy val result = {
+          callDateService()
+          callOpenObligationsForYear(Left(ObligationError))
+          await(controller.getReturnObligations(user, 2017, Obligation.Status.All))
+        }
 
-        private val expectedResult = Left(ObligationError)
-        private val result = await(target.getReturnObligations(testUser, 2017, Obligation.Status.All))
-
-        result shouldBe expectedResult
-      }
-    }
-
-    "the Pre2020 vatReturnsService retrieves an error" should {
-
-      "return None" in new GetReturnObligationsTest {
-        override val callThirdMock: Boolean = false
-        override val vatServiceResult: Future[ServiceResponse[VatReturnObligations]] =
-          Right(VatReturnObligations(Seq(VatReturnObligation(
-            LocalDate.parse("2018-01-01"),
-            LocalDate.parse("2018-01-01"),
-            LocalDate.parse("2018-01-01"),
-            "O",
-            None,
-            "#001"
-          )))
-          )
-
-        override val vatServicePre2020CallResult: Future[ServiceResponse[Nothing]] = Left(ObligationError)
-        override val vatServiceThirdCallResult: Future[ServiceResponse[VatReturnObligations]] = Right(VatReturnObligations(Seq.empty))
-        private val expectedResult = Left(ObligationError)
-        private val result = await(target.getReturnObligations(testUser, 2017, Obligation.Status.All))
-
-        result shouldBe expectedResult
+        result shouldBe Left(ObligationError)
       }
     }
   }
@@ -768,82 +323,42 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
 
     "the year is on the upper search boundary" should {
 
-      "return true" in new Test {
-        override def setup(): Any = "" // Prevent the unused mocks causing trouble
-        val result: Boolean = target.isValidSearchYear(2018, 2018)
+      "return true" in {
+        val result: Boolean = controller.isValidSearchYear(2018, 2018)
         result shouldBe true
       }
     }
 
     "the year is above the upper search boundary" should {
 
-      "return false" in new Test {
-        override def setup(): Any = "" // Prevent the unused mocks causing trouble
-        val result: Boolean = target.isValidSearchYear(2019, 2018)
+      "return false" in {
+        val result: Boolean = controller.isValidSearchYear(2019, 2018)
         result shouldBe false
       }
     }
 
     "the year is on the lower boundary" should {
 
-      "return true" in new Test {
-        override def setup(): Any = "" // Prevent the unused mocks causing trouble
-        val result: Boolean = target.isValidSearchYear(2017, 2019)
+      "return true" in {
+        val result: Boolean = controller.isValidSearchYear(2017, 2019)
         result shouldBe true
       }
     }
 
     "the year is below the lower boundary" should {
 
-      "return false" in new Test {
-        override def setup(): Any = "" // Prevent the unused mocks causing trouble
-        val result: Boolean = target.isValidSearchYear(2014, 2018)
+      "return false" in {
+        val result: Boolean = controller.isValidSearchYear(2014, 2018)
         result shouldBe false
       }
     }
 
     "the year is between the upper and lower boundaries" should {
 
-      "return true" in new Test {
-        override def setup(): Any = "" // Prevent the unused mocks causing trouble
-        val result: Boolean = target.isValidSearchYear(2017, 2018)
+      "return true" in {
+        val result: Boolean = controller.isValidSearchYear(2017, 2018)
         result shouldBe true
       }
-    }
-  }
-
-  private trait FulfilledObligationsTest {
-    val mockAuthConnector: AuthConnector = mock[AuthConnector]
-    val mockEnrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
-    val mockVatReturnService: ReturnsService = mock[ReturnsService]
-    val mockDateService: DateService = mock[DateService]
-    val mockAuditService: AuditingService = mock[AuditingService]
-    val mockServiceInfoService: ServiceInfoService = mock[ServiceInfoService]
-
-    val mockAuthorisedAgentWithClient: AuthoriseAgentWithClient = new AuthoriseAgentWithClient(
-      mockEnrolmentsAuthService,
-      mockVatReturnService,
-      messages,
-      mockConfig
-    )
-
-    val mockAuthorisedController: AuthorisedController = new AuthorisedController(
-      mockEnrolmentsAuthService,
-      messages,
-      mockAuthorisedAgentWithClient,
-      mockConfig
-    )
-
-    def target: SubmittedReturnsController = {
-      new SubmittedReturnsController(
-        messages,
-        mockEnrolmentsAuthService,
-        mockVatReturnService,
-        mockAuthorisedController,
-        mockDateService,
-        mockServiceInfoService,
-        mockConfig,
-        mockAuditService)
     }
   }
 }

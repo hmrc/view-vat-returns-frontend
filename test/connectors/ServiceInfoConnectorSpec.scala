@@ -30,8 +30,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ServiceInfoConnectorSpec extends ControllerBaseSpec {
 
-  val hcForPartials: VatHeaderCarrierForPartialsConverter = injector.instanceOf[VatHeaderCarrierForPartialsConverter]
-  implicit val ec: ExecutionContext = injector.instanceOf[ExecutionContext]
+  val hcForPartials: VatHeaderCarrierForPartialsConverter = app.injector.instanceOf[VatHeaderCarrierForPartialsConverter]
+  implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
   implicit val messagesImpl: Messages = Messages(Lang("en-GB"), messages)
   val validHtml = Html("<nav>BTA LINK</nav>")
 
