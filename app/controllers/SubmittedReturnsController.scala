@@ -17,18 +17,17 @@
 package controllers
 
 import audit.AuditingService
-import audit.models.{ViewOpenVatObligationsAuditModel, ViewSubmittedVatObligationsAuditModel}
+import audit.models.ViewSubmittedVatObligationsAuditModel
 import common.SessionKeys
 import config.AppConfig
 import javax.inject.{Inject, Singleton}
-import models.viewModels.{ReturnDeadlineViewModel, ReturnObligationsViewModel, VatReturnsViewModel}
+import models.viewModels.{ReturnObligationsViewModel, VatReturnsViewModel}
 import models._
-import models.errors.ServiceError
 import play.api.Logger
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, Request, Result}
-import play.twirl.api.{Html, HtmlFormat}
-import services.{DateService, EnrolmentsAuthService, ReturnsService, ServiceInfoService}
+import play.api.mvc.{Action, AnyContent}
+import play.twirl.api.HtmlFormat
+import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 
@@ -41,12 +40,16 @@ class SubmittedReturnsController @Inject()(val messagesApi: MessagesApi,
                                            authorisedController: AuthorisedController,
                                            dateService: DateService,
                                            serviceInfoService: ServiceInfoService,
+                                           subscriptionService: SubscriptionService,
                                            implicit val appConfig: AppConfig,
                                            auditService: AuditingService)
   extends FrontendController with I18nSupport {
 
   def submittedReturns(year: Int): Action[AnyContent] = authorisedController.authorisedAction { implicit request =>
     implicit user =>
+
+      implicit val migrationDate: Option[String] = request.session.get(SessionKeys.customerMigratedToETMPDate)
+
       if (isValidSearchYear(year)) {
         for {
           obligationsResult <- getReturnObligations(user, year, Obligation.Status.Fulfilled)
@@ -71,8 +74,11 @@ class SubmittedReturnsController @Inject()(val messagesApi: MessagesApi,
     year <= upperBound && year >= upperBound - 2
   }
 
-  private[controllers] def getPreviousReturnYears(user: User, status: Obligation.Status.Value, currentYear: Int)
-                                                 (implicit hc: HeaderCarrier): Future[ServiceResponse[Seq[Int]]] = {
+  private[controllers] def getPreviousReturnYears(user: User,
+                                                  status: Obligation.Status.Value,
+                                                  currentYear: Int)
+                                                 (implicit hc: HeaderCarrier,
+                                                  migrationDate: Option[String]): Future[ServiceResponse[Seq[Int]]] = {
 
     val currentYearMinusOne = currentYear - 1
 
@@ -90,7 +96,10 @@ class SubmittedReturnsController @Inject()(val messagesApi: MessagesApi,
     }
   }
 
-  private[controllers] def getReturnYears(user: User, status: Obligation.Status.Value)(implicit hc: HeaderCarrier): Future[ServiceResponse[Seq[Int]]] = {
+  private[controllers] def getReturnYears(user: User,
+                                          status: Obligation.Status.Value)
+                                         (implicit hc: HeaderCarrier,
+                                          migrationDate: Option[String]): Future[ServiceResponse[Seq[Int]]] = {
 
     val currentYear = dateService.now().getYear
     val currentYearMinusTwo = currentYear - 2
@@ -113,8 +122,11 @@ class SubmittedReturnsController @Inject()(val messagesApi: MessagesApi,
     }
   }
 
-  private[controllers] def getReturnObligations(user: User, selectedYear: Int, status: Obligation.Status.Value)
-                                               (implicit hc: HeaderCarrier): Future[Either[ServiceError, VatReturnsViewModel]] = {
+  private[controllers] def getReturnObligations(user: User,
+                                                selectedYear: Int,
+                                                status: Obligation.Status.Value)
+                                               (implicit hc: HeaderCarrier,
+                                                migrationDate: Option[String]): Future[ServiceResponse[VatReturnsViewModel]] =
 
     getReturnYears(user, status) flatMap {
       case Right(years) =>
@@ -122,6 +134,7 @@ class SubmittedReturnsController @Inject()(val messagesApi: MessagesApi,
         if (years.contains(selectedYear)) {
           returnsService.getReturnObligationsForYear(user, selectedYear, status) map {
             case Right(VatReturnObligations(obligations)) =>
+
               auditService.extendedAudit(
                 ViewSubmittedVatObligationsAuditModel(user, obligations),
                 routes.SubmittedReturnsController.submittedReturns(selectedYear).url
@@ -158,6 +171,4 @@ class SubmittedReturnsController @Inject()(val messagesApi: MessagesApi,
         Logger.warn(s"[ReturnObligationsController][getReturnObligations] error: ${error.toString}")
         Future.successful(Left(error))
     }
-  }
-
 }

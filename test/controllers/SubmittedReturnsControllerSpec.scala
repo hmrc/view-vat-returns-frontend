@@ -47,8 +47,8 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
     )
   )
   val emptyObligations: ServiceResponse[VatReturnObligations] = Right(VatReturnObligations(Seq.empty))
-
   val previousYear: Int = 2017
+  implicit val migrationDate: Option[String] = None
 
   def controller: SubmittedReturnsController = new SubmittedReturnsController(
     messages,
@@ -57,6 +57,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
     mockAuthorisedController,
     mockDateService,
     mockServiceInfoService,
+    mockSubscriptionService,
     mockConfig,
     mockAuditService
   )

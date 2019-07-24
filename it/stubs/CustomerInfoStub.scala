@@ -41,7 +41,8 @@ object CustomerInfoStub extends WireMockMethods {
       "firstName" -> "Vincent",
       "lastName" -> "Vatreturn",
       "tradingName" -> "Cheapo Clothing",
-      "isPartialMigration" -> true
+      "isPartialMigration" -> true,
+      "customerMigratedToETMPDate" -> "2018-01-01"
     ),
     "ppob" -> Json.obj(
       "address" -> Json.obj(
