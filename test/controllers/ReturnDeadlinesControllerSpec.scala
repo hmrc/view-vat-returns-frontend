@@ -25,22 +25,23 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.http.Status
 import play.api.test.Helpers.{charset, contentType, _}
+import play.twirl.api.Html
 import uk.gov.hmrc.auth.core.{User => _, _}
 
 import scala.concurrent.Future
 
 class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
 
-  val exampleObligations: Future[ServiceResponse[VatReturnObligations]] = Right(VatReturnObligations(Seq(
-    VatReturnObligation(
-      LocalDate.parse("2017-01-01"),
-      LocalDate.parse("2017-12-31"),
-      LocalDate.parse("2018-01-31"),
-      "O",
-      None,
-      "#001"
-    )
-  )))
+  val obligation = VatReturnObligation(
+    LocalDate.parse("2017-01-01"),
+    LocalDate.parse("2017-12-31"),
+    LocalDate.parse("2018-01-31"),
+    "O",
+    None,
+    "#001"
+  )
+
+  val exampleObligations: ServiceResponse[VatReturnObligations] = Right(VatReturnObligations(Seq(obligation)))
 
   val emptyObligations: ServiceResponse[VatReturnObligations] = Right(VatReturnObligations(Seq.empty))
 
@@ -327,6 +328,34 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
       "return the technical problem view" in {
         val document: Document = Jsoup.parse(bodyOf(result))
         document.title shouldBe "There is a problem with the service - VAT reporting through software - GOV.UK"
+      }
+    }
+  }
+
+  "The .noUpcomingObligationsAction function" when {
+
+    "the Returns service returns some fulfilled obligations" should {
+
+      lazy val result = {
+        (mockVatReturnService.getLastObligation(_: Seq[VatReturnObligation])).expects(*).returns(obligation)
+        callFulfilledObligations(exampleObligations)
+        controller.noUpcomingObligationsAction(Html(""), LocalDate.parse("2018-01-01"))(fakeRequest, user)
+      }
+
+      "return 200" in {
+        status(result) shouldBe Status.OK
+      }
+    }
+
+    "the Returns service returns an error" should {
+
+      lazy val result = {
+        callFulfilledObligations(Left(ObligationError))
+        controller.noUpcomingObligationsAction(Html(""), LocalDate.parse("2018-01-01"))(fakeRequest, user)
+      }
+
+      "return 500" in {
+        status(result) shouldBe Status.INTERNAL_SERVER_ERROR
       }
     }
   }
