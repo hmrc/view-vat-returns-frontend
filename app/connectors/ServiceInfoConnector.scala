@@ -18,13 +18,13 @@ package connectors
 
 import config.{AppConfig, VatHeaderCarrierForPartialsConverter}
 import javax.inject.Inject
-import play.api.Logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.Request
 import play.twirl.api.Html
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.play.partials.HtmlPartial
 import uk.gov.hmrc.play.partials.HtmlPartial.{HtmlPartialHttpReads, connectionExceptionsAsHtmlPartialFailure}
+import utils.LoggerUtil.logWarn
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -42,7 +42,7 @@ class ServiceInfoConnector @Inject()(http: HttpClient,
       p.successfulContentOrElse(views.html.templates.btaNavigationLinks())
     } recover {
       case _ =>
-        Logger.warn("[ServiceInfoConnector][getServiceInfoPartial] - Unexpected error retrieving service info partial")
+        logWarn("[ServiceInfoConnector][getServiceInfoPartial] - Unexpected error retrieving service info partial")
         views.html.templates.btaNavigationLinks()
     }
 }

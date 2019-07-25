@@ -23,13 +23,14 @@ import config.AppConfig
 import javax.inject.{Inject, Singleton}
 import models.viewModels.{ReturnObligationsViewModel, VatReturnsViewModel}
 import models._
-import play.api.Logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent}
 import play.twirl.api.HtmlFormat
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import utils.LoggerUtil.logWarn
+
 
 import scala.concurrent.Future
 
@@ -59,7 +60,7 @@ class SubmittedReturnsController @Inject()(val messagesApi: MessagesApi,
             case Right(model) =>
               Ok(views.html.returns.submittedReturns(model, serviceInfoContent))
             case Left(error) =>
-              Logger.warn("[ReturnObligationsController][submittedReturns] error: " + error.toString)
+              logWarn("[ReturnObligationsController][submittedReturns] error: " + error.toString)
               InternalServerError(views.html.errors.submittedReturnsError(user))
           }
         }
@@ -91,7 +92,7 @@ class SubmittedReturnsController @Inject()(val messagesApi: MessagesApi,
           Right(Seq[Int](currentYear))
         }
       case Left(error) =>
-        Logger.warn("[ReturnObligationsController][getPreviousReturnYears] error: " + error.toString)
+        logWarn("[ReturnObligationsController][getPreviousReturnYears] error: " + error.toString)
         Left(error)
     }
   }
@@ -113,7 +114,7 @@ class SubmittedReturnsController @Inject()(val messagesApi: MessagesApi,
             getPreviousReturnYears(user, status, currentYear)
           }
         case Left(error) =>
-          Logger.warn("[ReturnObligationsController][getReturnYears] error: " + error.toString)
+          logWarn("[ReturnObligationsController][getReturnYears] error: " + error.toString)
           Future.successful(Left(error))
       }
     }
@@ -154,7 +155,7 @@ class SubmittedReturnsController @Inject()(val messagesApi: MessagesApi,
                 user.vrn
               ))
             case Left(error) =>
-              Logger.warn(s"[ReturnObligationsController][getReturnObligations] error: ${error.toString}")
+              logWarn(s"[ReturnObligationsController][getReturnObligations] error: ${error.toString}")
               Left(error)
           }
         }
@@ -168,7 +169,7 @@ class SubmittedReturnsController @Inject()(val messagesApi: MessagesApi,
           )))
         }
       case Left(error) =>
-        Logger.warn(s"[ReturnObligationsController][getReturnObligations] error: ${error.toString}")
+        logWarn(s"[ReturnObligationsController][getReturnObligations] error: ${error.toString}")
         Future.successful(Left(error))
     }
 }

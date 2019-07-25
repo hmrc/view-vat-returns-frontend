@@ -27,7 +27,7 @@ import uk.gov.hmrc.auth.core.retrieve.{Retrievals, ~}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import controllers.predicate.AuthoriseAgentWithClient
 import javax.inject.Inject
-import play.api.Logger
+import utils.LoggerUtil._
 
 import scala.concurrent.Future
 
@@ -44,28 +44,20 @@ class AuthorisedController @Inject()(enrolmentsAuthService: EnrolmentsAuthServic
           if (allowAgentAccess && appConfig.features.agentAccess()) {
             agentWithClientPredicate.authoriseAsAgent(block)
           } else {
-            //$COVERAGE-OFF$ Disabling scoverage for Logger
-            Logger.debug("[AuthorisedController][authorisedAction] User is agent and agent access is forbidden. Rendering unauthorised page.")
-            //$COVERAGE-ON Disabling scoverage for Logger
+            logDebug("[AuthorisedController][authorisedAction] User is agent and agent access is forbidden. Rendering unauthorised page.")
             Future.successful(Forbidden(views.html.errors.unauthorised()))
           }
         case enrolments ~ Some(_) => authorisedAsNonAgent(block, enrolments)
         case _ =>
-          //$COVERAGE-OFF$ Disabling scoverage for Logger
-          Logger.warn("[AuthorisedController][authorisedAction] - Missing affinity group")
-          //$COVERAGE-ON$ Disabling scoverage for Logger
+          logWarn("[AuthorisedController][authorisedAction] - Missing affinity group")
           Future.successful(InternalServerError)
       } recoverWith {
         case _: NoActiveSession => Future.successful(Unauthorized(views.html.errors.sessionTimeout()))
         case _: InsufficientEnrolments =>
-          //$COVERAGE-OFF$ Disabling scoverage for Logger
-        Logger.warn(s"[AuthorisedController][authorisedAction] insufficient enrolment exception encountered")
-          //$COVERAGE-ON$ Disabling scoverage for Logger
+          logWarn(s"[AuthorisedController][authorisedAction] insufficient enrolment exception encountered")
           Future.successful(Forbidden(views.html.errors.unauthorised()))
         case _: AuthorisationException =>
-          //$COVERAGE-OFF$ Disabling scoverage for Logger
-        Logger.warn(s"[AuthorisedController][authorisedAction] encountered unauthorisation exception")
-          //$COVERAGE-ON$ Disabling scoverage for Logger
+          logWarn(s"[AuthorisedController][authorisedAction] encountered unauthorisation exception")
           Future.successful(Forbidden(views.html.errors.unauthorised()))
       }
   }
@@ -86,15 +78,11 @@ class AuthorisedController @Inject()(enrolmentsAuthService: EnrolmentsAuthServic
           block(request)(user)
 
       } getOrElse {
-        //$COVERAGE-OFF$ Disabling scoverage for Logger
-        Logger.warn("[AuthPredicate][authoriseAsNonAgent] Non-agent with invalid VRN")
-        //$COVERAGE-ON$ Disabling scoverage for Logger
+        logWarn("[AuthPredicate][authoriseAsNonAgent] Non-agent with invalid VRN")
         Future.successful(InternalServerError)
       }
     } else {
-      //$COVERAGE-OFF$ Disabling scoverage for Logger
-      Logger.debug("[AuthPredicate][authoriseAsNonAgent] Non-agent with no HMRC-MTD-VAT enrolment. Rendering unauthorised view.")
-      //$COVERAGE-ON$ Disabling scoverage for Logger
+      logDebug("[AuthPredicate][authoriseAsNonAgent] Non-agent with no HMRC-MTD-VAT enrolment. Rendering unauthorised view.")
       Future.successful(Forbidden(views.html.errors.unauthorised()))
     }
   }

@@ -26,13 +26,13 @@ import models.customer.CustomerDetail
 import models.errors.NotFoundError
 import models.payments.Payment
 import models.viewModels.VatReturnViewModel
-import play.api.Logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc._
 import play.twirl.api.{Html, HtmlFormat}
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import utils.LoggerUtil.logWarn
 
 import scala.concurrent.Future
 
@@ -73,7 +73,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
             .flatMap(pageData => renderResult(pageData, isReturnsPageRequest))
 
         } else {
-          Logger.warn(s"[ReturnsController][vatReturn] - The given period key was invalid - `$periodKey`")
+          logWarn(s"[ReturnsController][vatReturn] - The given period key was invalid - `$periodKey`")
           Future.successful(NotFound(views.html.errors.notFound()))
         }
   }
@@ -104,7 +104,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
             .flatMap(pageData => renderResult(pageData, isReturnsPageRequest))
 
         } else {
-          Logger.warn(s"[ReturnsController][vatReturnViaPayments] - The given period key was invalid - `$periodKey`")
+          logWarn(s"[ReturnsController][vatReturnViaPayments] - The given period key was invalid - `$periodKey`")
           Future.successful(NotFound(views.html.errors.notFound()))
         }
   }
@@ -137,7 +137,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
               auditEvent(isReturnsPageRequest, model)
               Ok(views.html.returns.vatReturnDetails(model, serviceInfoContent)).addingToSession(SessionKeys.mtdVatMandationStatus -> status)
             case error =>
-              Logger.warn(s"[ReturnsController][handleMandationStatus] - getMandationStatus returned an Error: $error")
+              logWarn(s"[ReturnsController][handleMandationStatus] - getMandationStatus returned an Error: $error")
               InternalServerError(views.html.errors.technicalProblem())
         }
       }
@@ -157,10 +157,10 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
       case (Left(NotFoundError), _, _) =>
         Future.successful(NotFound(views.html.errors.notFound()))
       case (Right(_), None, _) =>
-        Logger.warn("[ReturnsController][renderResult] error: render required a valid obligation but none was returned")
+        logWarn("[ReturnsController][renderResult] error: render required a valid obligation but none was returned")
         Future.successful(InternalServerError(views.html.errors.technicalProblem()))
       case _ =>
-        Logger.warn("[ReturnsController][renderResult] error: Unknown error")
+        logWarn("[ReturnsController][renderResult] error: Unknown error")
         Future.successful(InternalServerError(views.html.errors.technicalProblem()))
     }
   }

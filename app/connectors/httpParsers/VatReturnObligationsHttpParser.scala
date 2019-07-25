@@ -19,9 +19,9 @@ package connectors.httpParsers
 import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
 import models.VatReturnObligations
 import models.errors.{ApiSingleError, ServerSideError, UnexpectedJsonFormat, UnexpectedStatusError}
-import play.api.Logger
 import play.api.http.Status.{BAD_REQUEST, NOT_FOUND, OK}
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
+import utils.LoggerUtil._
 
 import scala.util.{Failure, Success, Try}
 
@@ -33,8 +33,8 @@ object VatReturnObligationsHttpParser extends ResponseHttpParsers {
         case OK => Try(response.json.as[VatReturnObligations]) match {
           case Success(model) => Right(model)
           case Failure(_) =>
-            Logger.debug(s"[VatReturnObligationsReads][read] Could not parse JSON. Received: ${response.json}")
-            Logger.warn("[VatReturnObligationsReads][read] Unexpected JSON received.")
+            logDebug(s"[VatReturnObligationsReads][read] Could not parse JSON. Received: ${response.json}")
+            logWarn("[VatReturnObligationsReads][read] Unexpected JSON received.")
             Left(UnexpectedJsonFormat)
         }
         case NOT_FOUND => Right(VatReturnObligations(Seq.empty))

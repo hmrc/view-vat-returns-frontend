@@ -30,7 +30,7 @@ object VatReturnHttpParser extends ResponseHttpParsers {
         case OK => Right(response.json.as[VatReturn])
         case BAD_REQUEST => handleBadRequest(response.json)(ApiSingleError.apiSingleErrorReads)
         case status if status >= 500 && status < 600 => Left(ServerSideError(response.status.toString, response.body))
-        case status => Left(UnexpectedStatusError(response.status.toString, response.body))
+        case _ => Left(UnexpectedStatusError(response.status.toString, response.body))
       }
     }
   }

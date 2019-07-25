@@ -25,12 +25,12 @@ import config.AppConfig
 import javax.inject.{Inject, Singleton}
 import models.viewModels.ReturnDeadlineViewModel
 import models._
-import play.api.Logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Request, Result}
 import play.twirl.api.{Html, HtmlFormat}
 import services.{DateService, EnrolmentsAuthService, ReturnsService, ServiceInfoService}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import utils.LoggerUtil.logWarn
 
 import scala.concurrent.Future
 
@@ -80,7 +80,7 @@ class ReturnDeadlinesController @Inject()(val messagesApi: MessagesApi,
             }
           }
         case Left(error) =>
-          Logger.warn("[ReturnObligationsController][returnDeadlines] error: " + error.toString)
+          logWarn("[ReturnObligationsController][returnDeadlines] error: " + error.toString)
           Future.successful(InternalServerError(views.html.errors.technicalProblem()))
       }
   }
@@ -94,7 +94,7 @@ class ReturnDeadlinesController @Inject()(val messagesApi: MessagesApi,
         val lastFulfilledObligation: VatReturnObligation = returnsService.getLastObligation(obligations)
         Ok(views.html.returns.noUpcomingReturnDeadlines(Some(toReturnDeadlineViewModel(lastFulfilledObligation, currentDate)), serviceInfoContent))
       case Left(error) =>
-        Logger.warn("[ReturnObligationsController][fulfilledObligationsAction] error: " + error.toString)
+        logWarn("[ReturnObligationsController][fulfilledObligationsAction] error: " + error.toString)
         InternalServerError(views.html.errors.technicalProblem())
     }
   }
@@ -116,7 +116,7 @@ class ReturnDeadlinesController @Inject()(val messagesApi: MessagesApi,
             case Right(MandationStatus(status)) =>
               Ok(view(status)).addingToSession(SessionKeys.mtdVatMandationStatus -> status)
             case error =>
-              Logger.warn(s"[ReturnObligationsController][handleMandationStatus] - getMandationStatus returned an Error: $error")
+              logWarn(s"[ReturnObligationsController][handleMandationStatus] - getMandationStatus returned an Error: $error")
               InternalServerError(views.html.errors.technicalProblem())
           }
       }
