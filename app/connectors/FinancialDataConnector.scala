@@ -20,8 +20,8 @@ import config.AppConfig
 import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
 import javax.inject.{Inject, Singleton}
 import models.payments.Payments
-import play.api.Logger
 import services.{DateService, MetricsService}
+import utils.LoggerUtil.logWarn
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
@@ -64,7 +64,7 @@ class FinancialDataConnector @Inject()(http: HttpClient,
         payments
       case httpError@Left(error) =>
         metrics.getPaymentsCallFailureCounter.inc()
-        Logger.warn("FinancialDataConnector received error: " + error.message)
+        logWarn("FinancialDataConnector received error: " + error.message)
         httpError
     }
   }

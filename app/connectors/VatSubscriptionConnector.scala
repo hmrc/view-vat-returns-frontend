@@ -22,10 +22,10 @@ import config.AppConfig
 import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
 import models.CustomerInformation
 import models.MandationStatus
-import play.api.Logger
 import services.MetricsService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import utils.LoggerUtil.logWarn
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -51,7 +51,7 @@ class VatSubscriptionConnector @Inject()(http: HttpClient,
         customerInfo
       case httpError@Left(error) =>
         metrics.getCustomerInfoCallFailureCounter.inc()
-        Logger.warn("VatSubscriptionConnector received error: " + error.message)
+        logWarn("VatSubscriptionConnector received error: " + error.message)
         httpError
     }
   }
@@ -67,7 +67,7 @@ class VatSubscriptionConnector @Inject()(http: HttpClient,
         timer.stop()
         mandationInfo
       case httpError@Left(error) =>
-        Logger.warn("VatSubscriptionConnector received error: " + error.message)
+        logWarn("VatSubscriptionConnector received error: " + error.message)
         httpError
     }
   }

@@ -22,11 +22,11 @@ import config.AppConfig
 import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
 import javax.inject.{Inject, Singleton}
 import models.VatReturn
-import play.api.Logger
 import play.api.http.HeaderNames
 import services.MetricsService
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import utils.LoggerUtil.logWarn
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -69,7 +69,7 @@ class VatReturnsConnector @Inject()(http: HttpClient,
         nineBox
       case httpError@Left(error) =>
         metrics.getVatReturnCallFailureCounter.inc()
-        Logger.warn("VatReturnsConnector received error: " + error.message)
+        logWarn("VatReturnsConnector received error: " + error.message)
         httpError
     }
   }
