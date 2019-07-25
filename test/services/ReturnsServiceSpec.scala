@@ -18,13 +18,13 @@ package services
 
 import java.time.LocalDate
 
-import connectors.{FinancialDataConnector, VatObligationsConnector, VatReturnsConnector, VatSubscriptionConnector}
+import common.TestModels.customerInformationMax
+import connectors.{FinancialDataConnector, VatReturnsConnector}
 import controllers.ControllerBaseSpec
-import models._
+import models.{User, _}
 import models.Obligation.Status
 import models.payments.{Payment, Payments}
-import models.User
-import models.errors.{MandationStatusError, ServerSideError}
+import models.errors.{MandationStatusError, ObligationError, ServerSideError, VatSubscriptionError}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits._
@@ -33,12 +33,16 @@ import scala.concurrent.{ExecutionContext, Future}
 class ReturnsServiceSpec extends ControllerBaseSpec {
 
   private trait Test {
-    val mockVatObligationsConnector: VatObligationsConnector = mock[VatObligationsConnector]
     val mockVatReturnsConnector: VatReturnsConnector = mock[VatReturnsConnector]
     val mockFinancialDataApiConnector: FinancialDataConnector = mock[FinancialDataConnector]
-    val mockVatSubscriptionApiConnector: VatSubscriptionConnector = mock[VatSubscriptionConnector]
-    val service = new ReturnsService(mockVatObligationsConnector, mockFinancialDataApiConnector, mockVatReturnsConnector,mockVatSubscriptionApiConnector)
+    val service = new ReturnsService(
+      mockVatObligationsConnector,
+      mockFinancialDataApiConnector,
+      mockVatReturnsConnector,
+      mockVatSubscriptionConnector
+    )
     implicit val hc: HeaderCarrier = HeaderCarrier()
+    implicit val migrationDate: Option[String] = Some("2018-01-01")
 
     val exampleVatReturn: VatReturn = VatReturn(
       "#001",
@@ -89,18 +93,45 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
     }
   }
 
-  "Calling .getReturnObligationsForYear" should {
+  "Calling .getReturnObligationsForYear" when {
 
-    "return all of a user's VAT return obligations" in new Test {
-      (mockVatObligationsConnector.getVatReturnObligations(_: String, _: Option[LocalDate], _: Option[LocalDate], _: Status.Value)
-                                                          (_: HeaderCarrier, _: ExecutionContext))
-        .expects(*, *, *, *, *, *)
-        .returns(Future.successful(Right(exampleObligations)))
+    "the obligations connector returns a successful response and the Status is Fulfilled" should {
 
-      lazy val result: ServiceResponse[VatReturnObligations] =
-        await(service.getReturnObligationsForYear(User("999999999"), 2018, Status.All))
+      "return a user's VAT return obligations with a start date after they migrated to ETMP" in new Test {
 
-      result shouldBe Right(exampleObligations)
+        lazy val result: ServiceResponse[VatReturnObligations] = {
+          callObligationsConnector(Right(exampleObligations))
+          await(service.getReturnObligationsForYear(User(vrn), 2018, Status.Fulfilled))
+        }
+
+        result shouldBe Right(VatReturnObligations(Seq.empty))
+      }
+    }
+
+    "the obligations connector returns a successful response and the Status is not Fulfilled" should {
+
+      "return all of a user's VAT return obligations" in new Test {
+
+        lazy val result: ServiceResponse[VatReturnObligations] = {
+          callObligationsConnector(Right(exampleObligations))
+          await(service.getReturnObligationsForYear(User(vrn), 2018, Status.All))
+        }
+
+        result shouldBe Right(exampleObligations)
+      }
+    }
+
+    "the obligations connector returns an error" should {
+
+      "return an ObligationError" in new Test {
+
+        lazy val result: ServiceResponse[VatReturnObligations] = {
+          callObligationsConnector(Left(ServerSideError("ERROR", "ERROR")))
+          await(service.getReturnObligationsForYear(User(vrn), 2018, Status.All))
+        }
+
+        result shouldBe Left(ObligationError)
+      }
     }
   }
 
@@ -196,6 +227,7 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
     )
 
     "return the obligation with the matching period key" in new Test {
+      override implicit val migrationDate: Option[String] = Some("2016-01-01")
       val expected = VatReturnObligation(
         LocalDate.parse("2017-01-01"),
         LocalDate.parse("2018-12-31"),
@@ -205,22 +237,19 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
         "#001"
       )
 
-      (mockVatObligationsConnector.getVatReturnObligations(_: String, _: Option[LocalDate], _: Option[LocalDate], _: Status.Value)
-                                                          (_: HeaderCarrier, _: ExecutionContext))
-        .expects(*, *, *, *, *, *)
-        .returns(Future.successful(Right(obligations)))
-
-      val result: Option[VatReturnObligation] = await(service.getObligationWithMatchingPeriodKey(User("111111111"), 2018, "#001"))
+      val result: Option[VatReturnObligation] = {
+        callObligationsConnector(Right(obligations))
+        await(service.getObligationWithMatchingPeriodKey(User("111111111"), 2018, "#001"))
+      }
       result shouldBe Some(expected)
     }
 
     "return None" in new Test {
-      (mockVatObligationsConnector.getVatReturnObligations(_: String, _: Option[LocalDate], _: Option[LocalDate], _: Status.Value)
-                                                          (_: HeaderCarrier, _: ExecutionContext))
-        .expects(*, *, *, *, *, *)
-        .returns(Future.successful(Right(obligations)))
 
-      val result: Option[VatReturnObligation] = await(service.getObligationWithMatchingPeriodKey(User("111111111"), 2018, "#004"))
+      val result: Option[VatReturnObligation] = {
+        callObligationsConnector(Right(obligations))
+        await(service.getObligationWithMatchingPeriodKey(User("111111111"), 2018, "#004"))
+      }
       result shouldBe None
     }
   }
@@ -283,12 +312,10 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
     "return obligations" in new Test {
       implicit val user: User = User("999999999")
 
-      (mockVatObligationsConnector.getVatReturnObligations(_: String, _: Option[LocalDate], _: Option[LocalDate], _: Status.Value)
-                                                          (_: HeaderCarrier, _: ExecutionContext))
-        .expects(*, *, *, *, *, *)
-        .returns(Future.successful(Right(exampleObligations)))
-
-      lazy val result: ServiceResponse[VatReturnObligations] = service.getFulfilledObligations(LocalDate.parse("2018-01-01"))
+      lazy val result: ServiceResponse[VatReturnObligations] = {
+        callObligationsConnector(Right(exampleObligations))
+        service.getFulfilledObligations(LocalDate.parse("2018-01-01"))
+      }
 
       await(result) shouldBe Right(exampleObligations)
     }
@@ -302,7 +329,7 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
     "the user is not mandated" should {
 
       "return a status" in new Test {
-        (mockVatSubscriptionApiConnector.getMandationStatusInfo(_: String)
+        (mockVatSubscriptionConnector.getMandationStatusInfo(_: String)
         (_: HeaderCarrier, _: ExecutionContext))
           .expects(*, *, *)
           .returns(Future.successful(Right(mandationStatusReturned)))
@@ -314,13 +341,53 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
     "the connector call fails" should {
 
       "return None" in new Test {
-        (mockVatSubscriptionApiConnector.getMandationStatusInfo(_: String)
+        (mockVatSubscriptionConnector.getMandationStatusInfo(_: String)
         (_: HeaderCarrier, _: ExecutionContext))
           .expects(*, *, *)
           .returns(Future.successful(Left(ServerSideError("", ""))))
         val mandationStatusResponse: ServiceResponse[MandationStatus] = await(service.getMandationStatus("123456789"))
 
         mandationStatusResponse shouldBe Left(MandationStatusError)
+      }
+    }
+  }
+
+  "Calling .filterPreETMPObligations" when {
+
+    "migrationDate is defined" should {
+
+      "filter the obligations based on the migration date" in new Test {
+
+        val result: Option[VatReturnObligations] =
+          await(service.filterPreETMPObligations(exampleObligations, migrationDate, user))
+        result shouldBe Some(VatReturnObligations(Seq.empty))
+      }
+    }
+
+    "migrationDate is not defined" when {
+
+      "the call to the VatSubscription connector is successful" should {
+
+        "filter the obligations based on the migration date" in new Test {
+
+          val result: Option[VatReturnObligations] = {
+            callSubscriptionConnector(Right(customerInformationMax))
+            await(service.filterPreETMPObligations(exampleObligations, None, user))
+          }
+          result shouldBe Some(VatReturnObligations(Seq.empty))
+        }
+      }
+
+      "the call to VatSubscription connector is not successful" should {
+
+        "return None" in new Test {
+
+          val result: Option[VatReturnObligations] = {
+            callSubscriptionConnector(Left(ServerSideError("ERROR", "ERROR")))
+            await(service.filterPreETMPObligations(exampleObligations, None, user))
+          }
+          result shouldBe None
+        }
       }
     }
   }

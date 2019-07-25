@@ -51,6 +51,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
   def vatReturn(year: Int, periodKey: String): Action[AnyContent] = authorisedController.authorisedAction {
     implicit request =>
       implicit user =>
+        implicit val migrationDate: Option[String] = request.session.get(SessionKeys.customerMigratedToETMPDate)
         if(validPeriodKey(periodKey)) {
           val isReturnsPageRequest = true
           val vatReturnCall = returnsService.getVatReturn(user, periodKey)
@@ -80,6 +81,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
   def vatReturnViaPayments(periodKey: String): Action[AnyContent] = authorisedController.authorisedAction {
     implicit request =>
       implicit user =>
+        implicit val migrationDate: Option[String] = request.session.get(SessionKeys.customerMigratedToETMPDate)
         if(validPeriodKey(periodKey)) {
           val isReturnsPageRequest = false
           val vatReturnCall = returnsService.getVatReturn(user, periodKey)

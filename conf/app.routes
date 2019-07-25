@@ -1,10 +1,10 @@
 # microservice specific routes
 
 # Get return deadlines
-GET        /return-deadlines            controllers.ReturnObligationsController.returnDeadlines
+GET        /return-deadlines            controllers.ReturnDeadlinesController.returnDeadlines
 
 # Get submitted returns for a year
-GET        /submitted/:year             controllers.ReturnObligationsController.submittedReturns(year: Int)
+GET        /submitted/:year             controllers.SubmittedReturnsController.submittedReturns(year: Int)
 
 # Get a return via the submitted returns page
 GET        /submitted/:year/:periodKey  controllers.ReturnsController.vatReturn(year: Int, periodKey: String)

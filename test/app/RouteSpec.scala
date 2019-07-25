@@ -37,13 +37,13 @@ class RouteSpec extends UnitSpec with GuiceOneAppPerSuite {
 
   "The route for the list of returns" should {
     "be /vat-through-software/vat-returns/submitted/2017" in {
-      controllers.routes.ReturnObligationsController.submittedReturns(2017).url shouldBe "/vat-through-software/vat-returns/submitted/2017"
+      controllers.routes.SubmittedReturnsController.submittedReturns(2017).url shouldBe "/vat-through-software/vat-returns/submitted/2017"
     }
   }
 
   "The route for the return deadlines" should {
     "be /vat-through-software/vat-returns/return-deadlines" in {
-      controllers.routes.ReturnObligationsController.returnDeadlines().url shouldBe "/vat-through-software/vat-returns/return-deadlines"
+      controllers.routes.ReturnDeadlinesController.returnDeadlines().url shouldBe "/vat-through-software/vat-returns/return-deadlines"
     }
   }
 }

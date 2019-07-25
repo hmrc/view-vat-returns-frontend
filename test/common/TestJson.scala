@@ -26,7 +26,8 @@ object TestJson {
       "firstName" -> "Betty",
       "lastName" -> "Jones",
       "tradingName" -> "Cheapo Clothing",
-      "isPartialMigration" -> false
+      "isPartialMigration" -> false,
+      "customerMigratedToETMPDate" -> "2018-01-01"
     ),
     "ppob" -> Json.obj(
       "address" -> Json.obj(

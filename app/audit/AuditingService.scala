@@ -16,7 +16,8 @@
 
 package audit
 
-import audit.models.{AuditModel, ExtendedAuditModel}
+import models._
+
 import config.{AppConfig, FrontendAuditConnector}
 import javax.inject.{Inject, Singleton}
 import play.api.Logger

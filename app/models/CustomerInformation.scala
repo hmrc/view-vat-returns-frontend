@@ -24,7 +24,8 @@ case class CustomerInformation(organisationName: Option[String],
                                lastName: Option[String],
                                tradingName: Option[String],
                                hasFlatRateScheme: Boolean,
-                               isPartialMigration: Option[Boolean])
+                               isPartialMigration: Option[Boolean],
+                               customerMigratedToETMPDate: Option[String])
 
 object CustomerInformation {
 
@@ -34,6 +35,7 @@ object CustomerInformation {
     (JsPath \ "customerDetails" \ "lastName").readNullable[String].orElse(Reads.pure(None)) and
     (JsPath \ "customerDetails" \ "tradingName").readNullable[String].orElse(Reads.pure(None)) and
     (JsPath \ "flatRateScheme").readNullable[JsValue].orElse(Reads.pure(None)).map(_.isDefined) and
-    (JsPath \\ "isPartialMigration").readNullable[Boolean]
+    (JsPath \\ "isPartialMigration").readNullable[Boolean] and
+    (JsPath \\ "customerMigratedToETMPDate").readNullable[String]
   )(CustomerInformation.apply _)
 }

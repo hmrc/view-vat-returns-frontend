@@ -20,7 +20,7 @@ import connectors.VatSubscriptionConnector
 import controllers.ControllerBaseSpec
 import models.customer.CustomerDetail
 import models.errors.BadRequestError
-import models.{CustomerInformation, User, customer}
+import models.{CustomerInformation, User}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits._
@@ -48,7 +48,8 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           Some("Smith"),
           Some("My trading name"),
           hasFlatRateSchemeYes,
-          Some(true)
+          Some(true),
+          Some("2018-01-01")
         )
 
         (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
@@ -70,7 +71,8 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           Some("Smith"),
           None,
           hasFlatRateSchemeNo,
-          Some(false)
+          Some(false),
+          Some("2018-01-01")
         )
 
         (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
@@ -92,7 +94,8 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           Some("Smith"),
           None,
           hasFlatRateSchemeNo,
-          Some(false)
+          Some(false),
+          Some("2018-01-01")
         )
 
         (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
@@ -114,7 +117,8 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           None,
           None,
           hasFlatRateSchemeNo,
-          Some(true)
+          Some(true),
+          Some("2018-01-01")
         )
 
         (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
@@ -137,6 +141,7 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           Some("Smith"),
           None,
           hasFlatRateSchemeNo,
+          None,
           None
         )
 

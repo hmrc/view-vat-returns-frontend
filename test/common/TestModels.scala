@@ -26,6 +26,7 @@ object TestModels {
     Some("Jones"),
     Some("Cheapo Clothing"),
     hasFlatRateScheme = true,
-    Some(false)
+    Some(false),
+    Some("2018-01-01")
   )
 }

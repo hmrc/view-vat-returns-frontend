@@ -18,34 +18,28 @@ package controllers
 
 import java.time.LocalDate
 
-import audit.AuditingService
-import audit.models.AuditModel
-import config.ServiceErrorHandler
 import models._
-import models.User
 import models.customer.CustomerDetail
 import models.errors.{MandationStatusError, NotFoundError, VatReturnError}
 import models.payments.Payment
 import models.viewModels.VatReturnViewModel
 import play.api.http.Status
-import play.api.mvc.{Request, Result}
 import play.api.test.Helpers._
-import services._
-import uk.gov.hmrc.auth.core._
-import uk.gov.hmrc.auth.core.authorise.Predicate
-import uk.gov.hmrc.auth.core.retrieve.{Retrieval, ~}
-import uk.gov.hmrc.http.HeaderCarrier
-import controllers.predicate.AuthoriseAgentWithClient
 import play.twirl.api.Html
-import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual}
+import uk.gov.hmrc.auth.core.{Enrolments, InsufficientEnrolments, MissingBearerToken}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class ReturnsControllerSpec extends ControllerBaseSpec {
 
+  override def beforeEach(): Unit = {
+    super.beforeEach()
+    mockConfig.features.submitReturnFeatures(true)
+  }
+
   def controller: ReturnsController = new ReturnsController(
     messages,
-    mockEnrolmentsAuthService,
+    enrolmentsAuthService,
     mockVatReturnService,
     mockSubscriptionService,
     mockDateService,
@@ -54,43 +48,14 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     mockConfig,
     mockAuditService
   )
-
-  val goodEnrolments: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(new ~(
-    Enrolments(
-      Set(
-      Enrolment(
-        "HMRC-MTD-VAT",
-        Seq(EnrolmentIdentifier("VRN", "999999999")),
-        "Active"))
-    ),
-    Some(Individual)
-  ))
-
-  val agentEnrolment: Enrolments = Enrolments(
-    Set(
-      Enrolment(
-        "HMRC-AS-AGENT",
-        Seq(EnrolmentIdentifier("AgentReferenceNumber", "XARN1234567")),
-        "Activated"
-      )
-    )
-  )
-
-  val agentAuthResult: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(new ~(
-    agentEnrolment,
-    Some(Agent)
-  ))
-
-  val missingInfinityGroup: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(new ~(
-    Enrolments(
-      Set(
-        Enrolment(
-          "HMRC-MTD-IT",
-          Seq(EnrolmentIdentifier("SAUTR", "999999999")),
-          "Active"))
-    ),
-    None
-  ))
+  
+  def setupCommonSuccessMocks(): Any = {
+    callObligationWithMatchingPeriodKey(Some(exampleObligation))
+    callVatReturnPayment(Some(examplePayment))
+    callSubscriptionService(exampleCustomerDetail)
+    callAudit
+    callDateService()
+  }
 
   val exampleVatReturn: VatReturn = VatReturn(
     "#001",
@@ -105,8 +70,8 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     545645
   )
 
-  val exampleEntityName: Option[String] = Some("Cheapo Clothing")
-  val exampleCustomerDetail: Option[CustomerDetail] = Some(CustomerDetail("Cheapo Clothing", hasFlatRateScheme = true, isPartialMigration = false))
+  val exampleCustomerDetail: Option[CustomerDetail] =
+    Some(CustomerDetail("Cheapo Clothing", hasFlatRateScheme = true, isPartialMigration = false))
 
   val examplePayment: Payment = Payment(
     "VAT",
@@ -129,98 +94,6 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
   val exampleVatReturnDetails =
     VatReturnDetails(exampleVatReturn, moneyOwed = true, oweHmrc = Some(true), Some(examplePayment))
 
-  val mockAuditService: AuditingService = mock[AuditingService]
-  val mockDateService: DateService = mock[DateService]
-  val mockAuthConnector: AuthConnector = mock[AuthConnector]
-  val mockVatReturnService: ReturnsService = mock[ReturnsService]
-  val mockServiceInfoService: ServiceInfoService = mock[ServiceInfoService]
-  val mockEnrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
-  val mockVatApiService: SubscriptionService = mock[SubscriptionService]
-  val mockSubscriptionService: SubscriptionService = mock[SubscriptionService]
-  val mockServiceErrorHandler: ServiceErrorHandler = mock[ServiceErrorHandler]
-
-  val mockAuthorisedAgentWithClient: AuthoriseAgentWithClient = new AuthoriseAgentWithClient(
-    mockEnrolmentsAuthService,
-    mockVatReturnService,
-    messages,
-    mockConfig
-  )
-
-  val mockAuthorisedController: AuthorisedController = new AuthorisedController(
-    mockEnrolmentsAuthService,
-    messages,
-    mockAuthorisedAgentWithClient,
-    mockConfig
-  )
-
-  private trait Test {
-    val submitReturnFeatureEnabled = true
-    val agentAccessEnabled = true
-    val serviceCall: Boolean = true
-    val successReturn: Boolean = true
-    val mandationStatusCall: Boolean = true
-    val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(goodEnrolments)
-    val vatReturnResult: Future[ServiceResponse[VatReturn]] = Future.successful(Right(exampleVatReturn))
-    val paymentResult: Future[Option[Payment]] = Future.successful(Some(examplePayment))
-    val mandationStatusResult: Future[ServiceResponse[MandationStatus]] = Future.successful(Right(MandationStatus("Non MTDfB")))
-
-    def setup(): Any = {
-      mockConfig.features.submitReturnFeatures(submitReturnFeatureEnabled)
-      mockConfig.features.agentAccess(agentAccessEnabled)
-
-      (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
-        .expects(*, *, *, *)
-        .returns(authResult)
-        .noMoreThanOnce()
-
-      if (serviceCall) {
-        (mockVatReturnService.getVatReturn(_: User, _: String)(_: HeaderCarrier, _: ExecutionContext))
-          .expects(*, *, *, *)
-          .returns(vatReturnResult)
-
-        (mockVatReturnService.getObligationWithMatchingPeriodKey(_: User, _: Int, _: String)(_: HeaderCarrier, _: ExecutionContext))
-          .expects(*, *, *, *, *)
-          .returns(Some(exampleObligation))
-
-        (mockVatReturnService.getPayment(_: User, _: String, _: Option[Int])(_: HeaderCarrier, _: ExecutionContext))
-          .expects(*, *, *, *, *)
-          .returns(paymentResult)
-
-        (mockSubscriptionService.getUserDetails(_: User)(_: HeaderCarrier, _: ExecutionContext))
-          .expects(*, *, *)
-          .returns(Future.successful(exampleCustomerDetail))
-
-        if (successReturn) {
-          (mockVatReturnService.constructReturnDetailsModel(_: VatReturn, _: Option[Payment]))
-            .expects(*, *)
-            .returns(exampleVatReturnDetails)
-        }
-
-        (mockAuditService.audit(_: AuditModel, _: String)(_: HeaderCarrier, _: ExecutionContext))
-          .stubs(*, *, *, *)
-          .returns({})
-
-        (mockDateService.now: () => LocalDate).stubs().returns(LocalDate.parse("2018-05-01"))
-
-        if (authResult != agentAuthResult) {
-          (mockServiceInfoService.getServiceInfoPartial(_: Request[_], _: ExecutionContext))
-            .expects(*, *)
-            .returns(Future.successful(Html("")))
-        }
-      }
-
-      if (mandationStatusCall) {
-        (mockVatReturnService.getMandationStatus(_: String)(_: HeaderCarrier, _: ExecutionContext))
-          .expects(*, *, *)
-          .returns(mandationStatusResult)
-      }
-    }
-
-    def target: ReturnsController = {
-      setup()
-      controller
-    }
-  }
 
   "Calling the .vatReturn action" when {
 
@@ -230,37 +103,62 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
         "a valid period key is provided" should {
 
-          "return 200" in new Test {
-            private val result = target.vatReturn(2018, "#001")(fakeRequest)
+          lazy val result = {
+            callAuthService(individualAuthResult)
+            callVatReturn(Right(exampleVatReturn))
+            setupCommonSuccessMocks()
+            callServiceInfoPartialService
+            callConstructReturnDetailsModel(exampleVatReturnDetails)
+            callMandationService(Right(MandationStatus("Non MTDfB")))
+            controller.vatReturn(2018, "#001")(fakeRequest)
+          }
 
+          "return 200" in {
             status(result) shouldBe Status.OK
+          }
+
+          "return HTML" in {
             contentType(result) shouldBe Some("text/html")
+          }
+
+          "return charset utf-8" in {
             charset(result) shouldBe Some("utf-8")
           }
         }
 
         "an invalid period key is provided" should {
 
-          "return 404" in new Test {
-            override val serviceCall = false
-            override val mandationStatusCall = false
+          lazy val result = {
+            callAuthService(individualAuthResult)
+            controller.vatReturn(2018, "form-label")(fakeRequest)
+          }
 
-            private val result = target.vatReturn(2018, "form-label")(fakeRequest)
-
+          "return 404" in {
             status(result) shouldBe Status.NOT_FOUND
+          }
+
+          "return HTML" in {
             contentType(result) shouldBe Some("text/html")
+          }
+
+          "return charset utf-8" in {
             charset(result) shouldBe Some("utf-8")
           }
         }
 
         "mandation status call returns an error" should {
 
-          "return 500" in new Test {
-            override val mandationStatusResult: Future[Left[MandationStatusError.type, Nothing]] =
-              Future.successful(Left(MandationStatusError))
+          lazy val result = {
+            callAuthService(individualAuthResult)
+            callVatReturn(Right(exampleVatReturn))
+            setupCommonSuccessMocks()
+            callServiceInfoPartialService
+            callConstructReturnDetailsModel(exampleVatReturnDetails)
+            callMandationService(Left(MandationStatusError))
+            controller.vatReturn(2018, "#001")(fakeRequest)
+          }
 
-            private val result = target.vatReturn(2018, "#001")(fakeRequest)
-
+          "return 500" in {
             status(result) shouldBe Status.INTERNAL_SERVER_ERROR
           }
         }
@@ -268,25 +166,33 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
       "mandation status is in session" should {
 
-        lazy val request = fakeRequest.withSession("mtdVatMandationStatus" -> "Non MTDfB")
+        lazy val result = {
+          callAuthService(individualAuthResult)
+          callVatReturn(Right(exampleVatReturn))
+          setupCommonSuccessMocks()
+          callServiceInfoPartialService
+          callConstructReturnDetailsModel(exampleVatReturnDetails)
+          controller.vatReturn(2018, "#001")(fakeRequest.withSession("mtdVatMandationStatus" -> "Non MTDfB"))
+        }
 
-        "not make a call to retrieve mandation status" in new Test {
-          override val mandationStatusCall: Boolean = false
-
-          private val result = target.vatReturn(2018, "#001")(request)
-
+        "not make a call to retrieve mandation status" in {
           status(result) shouldBe Status.OK
         }
       }
 
       "submit return feature switch is off" should {
 
-        "not make a call to retrieve mandation status" in new Test {
-          override val submitReturnFeatureEnabled = false
-          override val mandationStatusCall: Boolean = false
+        lazy val result = {
+          mockConfig.features.submitReturnFeatures(false)
+          callAuthService(individualAuthResult)
+          callVatReturn(Right(exampleVatReturn))
+          setupCommonSuccessMocks()
+          callServiceInfoPartialService
+          callConstructReturnDetailsModel(exampleVatReturnDetails)
+          controller.vatReturn(2018, "#001")(fakeRequest)
+        }
 
-          private val result = target.vatReturn(2018, "#001")(fakeRequest)
-
+        "not make a call to retrieve mandation status" in {
           status(result) shouldBe Status.OK
         }
       }
@@ -298,51 +204,31 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
         "authorised" should {
 
-          "return 200" in new Test {
+          lazy val result = {
+            callAuthService(agentAuthResult)
+            callAuthServiceEnrolmentsOnly(Enrolments(agentEnrolment))
+            callVatReturn(Right(exampleVatReturn))
+            setupCommonSuccessMocks()
+            callConstructReturnDetailsModel(exampleVatReturnDetails)
+            callMandationService(Right(MandationStatus("Non MTDfB")))
+            callMandationService(Right(MandationStatus("Non MTDfB")))
+            controller.vatReturn(2018, "#001")(fakeRequestWithClientsVRN)
+          }
 
-            override val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = agentAuthResult
-
-            override def setup(): Unit = {
-              super.setup()
-
-              (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
-                .expects(*, *, *, *)
-                .returns(Future.successful(agentEnrolment))
-                .noMoreThanOnce()
-
-              (mockVatReturnService.getMandationStatus(_: String)(_: HeaderCarrier, _: ExecutionContext))
-                .expects("123456789", *, *)
-                .returns(mandationStatusResult)
-            }
-
-            private val result = target.vatReturn(2019, "#001")(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
-
+          "return 200" in {
             status(result) shouldBe Status.OK
-            contentType(result) shouldBe Some("text/html")
           }
         }
 
         "not authorised" should {
 
-          "return 403" in new Test {
+          "return 403" in {
 
-            override val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(new ~(
-              Enrolments(Set(Enrolment("", Seq(EnrolmentIdentifier("", "")), ""))),
-              Some(Agent)
-            ))
-            override val serviceCall: Boolean = false
-            override val mandationStatusCall: Boolean = false
-
-            override def setup(): Unit = {
-              super.setup()
-
-              (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
-                .expects(*, *, *, *)
-                .returns(Future.successful(Enrolments(Set(Enrolment("", Seq(EnrolmentIdentifier("", "")), "")))))
-                .noMoreThanOnce()
+            lazy val result = {
+              callAuthService(agentAuthResult)
+              callAuthServiceEnrolmentsOnly(Enrolments(mtdVatEnrolment))
+              controller.vatReturn(2018, "#001")(fakeRequestWithClientsVRN)
             }
-
-            private val result = target.vatReturn(2019, "#001")(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
 
             status(result) shouldBe Status.FORBIDDEN
           }
@@ -351,14 +237,13 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
       "agentAccess feature switch is off" should {
 
-        "return 403" in new Test {
+        "return 403" in {
 
-          override val agentAccessEnabled: Boolean = false
-          override val serviceCall: Boolean = false
-          override val mandationStatusCall: Boolean = false
-          override val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = agentAuthResult
-
-          private val result = target.vatReturn(2019, "#001")(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
+          lazy val result = {
+            mockConfig.features.agentAccess(false)
+            callAuthService(agentAuthResult)
+            controller.vatReturn(2018, "#001")(fakeRequestWithClientsVRN)
+          }
 
           status(result) shouldBe Status.FORBIDDEN
         }
@@ -367,77 +252,54 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
     "a user is not authorised" should {
 
-      "return 403 (Forbidden)" in new Test {
-        override val serviceCall = false
-        override val mandationStatusCall = false
-        override val authResult: Future[Nothing] = Future.failed(InsufficientEnrolments())
+      lazy val result = {
+        callAuthService(Future.failed(InsufficientEnrolments()))
+        controller.vatReturn(2018, "#001")(fakeRequest)
+      }
 
-        private val result = target.vatReturn(2018, "#001")(fakeRequest)
-
+      "return 403 (Forbidden)" in {
         status(result) shouldBe Status.FORBIDDEN
       }
     }
 
     "a user is not authenticated" should {
 
-      "return 401 (Unauthorised)" in new Test {
-        override val serviceCall = false
-        override val authResult: Future[Nothing] = Future.failed(MissingBearerToken())
-        override val mandationStatusCall = false
+      lazy val result = {
+        callAuthService(Future.failed(MissingBearerToken()))
+        controller.vatReturn(2018, "#001")(fakeRequest)
+      }
 
-        private val result = target.vatReturn(2018, "#001")(fakeRequest)
-
+      "return 401 (Unauthorised)" in {
         status(result) shouldBe Status.UNAUTHORIZED
       }
     }
 
-    "a user is not authorised " should {
-
-      "return 401 (Unauthorised)" in new Test {
-        override val serviceCall = false
-        override val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = Future.failed(UnsupportedAuthProvider())
-        override val mandationStatusCall = false
-
-        val result: Future[Result] = target.vatReturn(2018, "#001")(fakeRequest)
-        status(result) shouldBe Status.FORBIDDEN
-      }
-    }
-
-    "the user is missing their affinity group" should {
-
-      "return 500 (Internal server error)" in new Test {
-        override val serviceCall = false
-        override val mandationStatusCall = false
-        override val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = missingInfinityGroup
-
-        val result: Future[Result] = target.vatReturn(2018, "#001")(fakeRequest)
-        status(result) shouldBe Status.INTERNAL_SERVER_ERROR
-      }
-
-    }
-
     "the specified VAT return is not found" should {
 
-      "return 404 (Not Found)" in new Test {
-        override val successReturn = false
-        override val mandationStatusCall = false
-        override val vatReturnResult: Future[ServiceResponse[Nothing]] = Left(NotFoundError)
+      lazy val result = {
+        callAuthService(individualAuthResult)
+        callVatReturn(Left(NotFoundError))
+        setupCommonSuccessMocks()
+        callServiceInfoPartialService
+        controller.vatReturn(2018, "#001")(fakeRequest)
+      }
 
-        private val result = target.vatReturn(2018, "#001")(fakeRequest)
-
+      "return 404 (Not Found)" in {
         status(result) shouldBe Status.NOT_FOUND
       }
     }
 
     "a different error is retrieved" should {
 
-      "return 500 (Internal Server Error)" in new Test {
-        override val successReturn = false
-        override val mandationStatusCall = false
-        override val vatReturnResult: Future[ServiceResponse[Nothing]] = Left(VatReturnError)
+      lazy val result = {
+        callAuthService(individualAuthResult)
+        callVatReturn(Left(VatReturnError))
+        setupCommonSuccessMocks()
+        callServiceInfoPartialService
+        controller.vatReturn(2018, "#001")(fakeRequest)
+      }
 
-        private val result = target.vatReturn(2018, "#001")(fakeRequest)
-
+      "return 500 (Internal Server Error)" in {
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
       }
     }
@@ -452,25 +314,45 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
         "a valid period key is provided" should {
 
-          "return 200" in new Test {
-            private val result = target.vatReturnViaPayments("#001")(fakeRequest)
+          lazy val result = {
+            callAuthService(individualAuthResult)
+            callVatReturn(Right(exampleVatReturn))
+            setupCommonSuccessMocks()
+            callServiceInfoPartialService
+            callConstructReturnDetailsModel(exampleVatReturnDetails)
+            callMandationService(Right(MandationStatus("Non MTDfB")))
+            controller.vatReturnViaPayments("#001")(fakeRequest)
+          }
 
+          "return 200" in {
             status(result) shouldBe Status.OK
+          }
+
+          "return HTML" in {
             contentType(result) shouldBe Some("text/html")
+          }
+
+          "return charset utf-8" in {
             charset(result) shouldBe Some("utf-8")
           }
         }
 
         "an invalid period key is provided" should {
 
-          "return 404" in new Test {
-            override val serviceCall = false
-            override val mandationStatusCall = false
+          lazy val result = {
+            callAuthService(individualAuthResult)
+            controller.vatReturnViaPayments("form-label")(fakeRequest)
+          }
 
-            private val result = target.vatReturnViaPayments("form-label")(fakeRequest)
-
+          "return 404" in {
             status(result) shouldBe Status.NOT_FOUND
+          }
+
+          "return HTML" in {
             contentType(result) shouldBe Some("text/html")
+          }
+
+          "return charset utf-8" in {
             charset(result) shouldBe Some("utf-8")
           }
         }
@@ -478,25 +360,33 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
       "mandation status is in session" should {
 
-        lazy val request = fakeRequest.withSession("mtdVatMandationStatus" -> "Non MTDfB")
+        lazy val result = {
+          callAuthService(individualAuthResult)
+          callVatReturn(Right(exampleVatReturn))
+          setupCommonSuccessMocks()
+          callServiceInfoPartialService
+          callConstructReturnDetailsModel(exampleVatReturnDetails)
+          controller.vatReturnViaPayments("#001")(fakeRequest.withSession("mtdVatMandationStatus" -> "Non MTDfB"))
+        }
 
-        "not make a call to retrieve mandation status" in new Test {
-          override val mandationStatusCall: Boolean = false
-
-          private val result = target.vatReturnViaPayments("#001")(request)
-
+        "not make a call to retrieve mandation status" in {
           status(result) shouldBe Status.OK
         }
       }
 
       "submit return feature switch is off" should {
 
-        "not make a call to retrieve mandation status" in new Test {
-          override val submitReturnFeatureEnabled = false
-          override val mandationStatusCall: Boolean = false
+        lazy val result = {
+          mockConfig.features.submitReturnFeatures(false)
+          callAuthService(individualAuthResult)
+          callVatReturn(Right(exampleVatReturn))
+          setupCommonSuccessMocks()
+          callServiceInfoPartialService
+          callConstructReturnDetailsModel(exampleVatReturnDetails)
+          controller.vatReturnViaPayments("#001")(fakeRequest)
+        }
 
-          private val result = target.vatReturnViaPayments("#001")(fakeRequest)
-
+        "not make a call to retrieve mandation status" in {
           status(result) shouldBe Status.OK
         }
       }
@@ -508,52 +398,31 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
         "authorised" should {
 
-          "return 200" in new Test {
+          lazy val result = {
+            callAuthService(agentAuthResult)
+            callAuthServiceEnrolmentsOnly(Enrolments(agentEnrolment))
+            callVatReturn(Right(exampleVatReturn))
+            setupCommonSuccessMocks()
+            callConstructReturnDetailsModel(exampleVatReturnDetails)
+            callMandationService(Right(MandationStatus("Non MTDfB")))
+            callMandationService(Right(MandationStatus("Non MTDfB")))
+            controller.vatReturnViaPayments("#001")(fakeRequestWithClientsVRN)
+          }
 
-            override val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = agentAuthResult
-
-            override def setup(): Unit = {
-              super.setup()
-
-              (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
-                .expects(*, *, *, *)
-                .returns(Future.successful(agentEnrolment))
-                .noMoreThanOnce()
-
-              (mockVatReturnService.getMandationStatus(_: String)(_: HeaderCarrier, _: ExecutionContext))
-                .expects("123456789", *, *)
-                .returns(mandationStatusResult)
-            }
-
-            private val result = target.vatReturnViaPayments("#001")(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
-
+          "return 200" in {
             status(result) shouldBe Status.OK
-            contentType(result) shouldBe Some("text/html")
           }
         }
 
         "not authorised" should {
 
-          "return 403" in new Test {
+          lazy val result = {
+            callAuthService(agentAuthResult)
+            callAuthServiceEnrolmentsOnly(Enrolments(mtdVatEnrolment))
+            controller.vatReturnViaPayments("#001")(fakeRequestWithClientsVRN)
+          }
 
-            override val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(new ~(
-              Enrolments(Set(Enrolment("", Seq(EnrolmentIdentifier("", "")), ""))),
-              Some(Agent)
-            ))
-            override val serviceCall: Boolean = false
-            override val mandationStatusCall: Boolean = false
-
-            override def setup(): Unit = {
-              super.setup()
-
-              (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
-                .expects(*, *, *, *)
-                .returns(Future.successful(Enrolments(Set(Enrolment("", Seq(EnrolmentIdentifier("", "")), "")))))
-                .noMoreThanOnce()
-            }
-
-            private val result = target.vatReturnViaPayments("#001")(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
-
+          "return 403" in {
             status(result) shouldBe Status.FORBIDDEN
           }
         }
@@ -561,15 +430,13 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
       "agentAccess feature switch is off" should {
 
-        "return 403" in new Test {
+        lazy val result = {
+          mockConfig.features.agentAccess(false)
+          callAuthService(agentAuthResult)
+          controller.vatReturnViaPayments("#001")(fakeRequestWithClientsVRN)
+        }
 
-          override val agentAccessEnabled: Boolean = false
-          override val serviceCall: Boolean = false
-          override val mandationStatusCall: Boolean = false
-          override val authResult: Future[~[Enrolments, Option[AffinityGroup]]] = agentAuthResult
-
-          private val result = target.vatReturnViaPayments("#001")(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
-
+        "return 403" in {
           status(result) shouldBe Status.FORBIDDEN
         }
       }
@@ -577,52 +444,54 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
     "a user is not authorised" should {
 
-      "return 403 (Forbidden)" in new Test {
-        override val serviceCall = false
-        override val mandationStatusCall = false
-        override val authResult: Future[Nothing] = Future.failed(InsufficientEnrolments())
+      lazy val result = {
+        callAuthService(Future.failed(InsufficientEnrolments()))
+        controller.vatReturnViaPayments("#001")(fakeRequestWithClientsVRN)
+      }
 
-        private val result = target.vatReturnViaPayments("#001")(fakeRequest)
-
+      "return 403 (Forbidden)" in {
         status(result) shouldBe Status.FORBIDDEN
       }
     }
 
     "a user is not authenticated" should {
 
-      "return 401 (Unauthorised)" in new Test {
-        override val serviceCall = false
-        override val mandationStatusCall = false
-        override val authResult: Future[Nothing] = Future.failed(MissingBearerToken())
+      lazy val result = {
+        callAuthService(Future.failed(MissingBearerToken()))
+        controller.vatReturnViaPayments("#001")(fakeRequestWithClientsVRN)
+      }
 
-        private val result = target.vatReturnViaPayments("#001")(fakeRequest)
-
+      "return 401 (Unauthorised)" in {
         status(result) shouldBe Status.UNAUTHORIZED
       }
     }
 
     "the specified VAT return is not found" should {
 
-      "return 404 (Not Found)" in new Test {
-        override val successReturn = false
-        override val mandationStatusCall = false
-        override val vatReturnResult: Future[ServiceResponse[Nothing]] = Left(NotFoundError)
+      lazy val result = {
+        callAuthService(individualAuthResult)
+        callVatReturn(Left(NotFoundError))
+        setupCommonSuccessMocks()
+        callServiceInfoPartialService
+        controller.vatReturnViaPayments("#001")(fakeRequest)
+      }
 
-        private val result = target.vatReturnViaPayments("#001")(fakeRequest)
-
+      "return 404 (Not Found)" in {
         status(result) shouldBe Status.NOT_FOUND
       }
     }
 
     "a different error is retrieved" should {
 
-      "return 500 (Internal Server Error)" in new Test {
-        override val successReturn = false
-        override val mandationStatusCall = false
-        override val vatReturnResult: Future[ServiceResponse[Nothing]] = Left(VatReturnError)
+      lazy val result = {
+        callAuthService(individualAuthResult)
+        callVatReturn(Left(VatReturnError))
+        setupCommonSuccessMocks()
+        callServiceInfoPartialService
+        controller.vatReturn(2018, "#001")(fakeRequest)
+      }
 
-        private val result = target.vatReturnViaPayments("#001")(fakeRequest)
-
+      "return 500 (Internal Server Error)" in {
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
       }
     }
@@ -649,7 +518,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
       (mockDateService.now: () => LocalDate).stubs().returns(LocalDate.parse("2018-05-01"))
 
-      val result: VatReturnViewModel = controller.constructViewModel(
+      lazy val result: VatReturnViewModel = controller.constructViewModel(
         exampleCustomerDetail,
         exampleObligation,
         exampleVatReturnDetails,
@@ -662,28 +531,19 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
   "Calling .renderResult" when {
 
-    val user = models.User("123456789", hasNonMtdVat = true)
-
     "there is a VAT return, obligation and payment" when {
-
-      def successSetup(): Any = {
-        (mockVatReturnService.constructReturnDetailsModel(_: VatReturn, _: Option[Payment]))
-          .expects(*, *)
-          .returns(exampleVatReturnDetails)
-
-        (mockDateService.now: () => LocalDate).stubs().returns(LocalDate.parse("2018-05-01"))
-
-        (mockAuditService.audit(_: AuditModel, _: String)(_: HeaderCarrier, _: ExecutionContext))
-          .stubs(*, *, *, *)
-          .returns({})
-      }
 
       val data = ReturnsControllerData(Right(exampleVatReturn), None, Some(examplePayment), Some(exampleObligation), Html(""))
 
-      def result: Result = controller.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
+      lazy val result = {
+        callConstructReturnDetailsModel(exampleVatReturnDetails)
+        callDateService()
+        callAudit
+        callMandationService(Right(MandationStatus("Non MTDfB")))
+        controller.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
+      }
 
       "return an OK status" in {
-        successSetup()
         result.header.status shouldBe Status.OK
       }
     }
@@ -692,7 +552,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
       "return a Not Found status" in {
         val data = ReturnsControllerData(Left(NotFoundError), None, None, None, Html(""))
-        val result = controller.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
+        lazy val result = controller.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
         result.header.status shouldBe Status.NOT_FOUND
       }
     }
@@ -701,7 +561,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
       "return an Internal Server Error status" in {
         val data = ReturnsControllerData(Right(exampleVatReturn), None, None, None, Html(""))
-        val result = controller.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
+        lazy val result = controller.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
         result.header.status shouldBe Status.INTERNAL_SERVER_ERROR
       }
     }
@@ -710,7 +570,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
       "return an Internal Server Error status" in {
         val data = ReturnsControllerData(Left(VatReturnError), None, None, None, Html(""))
-        val result = controller.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
+        lazy val result = controller.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
         result.header.status shouldBe Status.INTERNAL_SERVER_ERROR
       }
     }
