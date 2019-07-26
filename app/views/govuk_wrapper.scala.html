@@ -39,7 +39,6 @@
 
 @scriptElement = {
 <script type="text/javascript" src='@routes.Assets.at("javascript/vat-v1.js")'></script>
-<script type="text/javascript" src='@routes.Assets.at("javascript/ga-tag-manager.js")'></script>
 
 <script>
     @if(showLogout) {
@@ -68,17 +67,11 @@
          data-journey-click="primary-navigation:Click:Signout">@messages("base.signOut")</a></li>}
 }
 
-@googleTagManager = {
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TSFTCWZ"
-                  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-}
-
 @afterHeader = {
   @views.html.templates.userResearchBanner(appConfig)
 }
 
 @insideHeader = {
-    @googleTagManager
     @uiLayouts.header_nav(
       navTitle = user.map(u => if(u.isAgent) messages("navTitle.agent") else messages("navTitle.nonAgent")),
       navTitleLink = None,
