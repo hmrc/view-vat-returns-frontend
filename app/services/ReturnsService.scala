@@ -63,7 +63,7 @@ class ReturnsService @Inject()(vatObligationsConnector: VatObligationsConnector,
   def filterPreETMPObligations(obligations: VatReturnObligations, migrationDate: Option[String], user: User)
                               (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[VatReturnObligations]] =
     migrationDate match {
-      case Some(date) =>
+      case Some(date) if date.nonEmpty =>
         Future.successful(Some(
           VatReturnObligations(obligations.obligations.filterNot(_.start.isBefore(LocalDate.parse(date))))
         ))
