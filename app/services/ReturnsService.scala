@@ -65,14 +65,14 @@ class ReturnsService @Inject()(vatObligationsConnector: VatObligationsConnector,
     migrationDate match {
       case Some(date) if date.nonEmpty =>
         Future.successful(Some(
-          VatReturnObligations(obligations.obligations.filterNot(_.start.isBefore(LocalDate.parse(date))))
+          VatReturnObligations(obligations.obligations.filterNot(_.end.isBefore(LocalDate.parse(date))))
         ))
       case _ =>
         vatSubscriptionConnector.getCustomerInfo(user.vrn).map {
           case Right(customerInfo) =>
             customerInfo.customerMigratedToETMPDate match {
               case Some(date) =>
-                Some(VatReturnObligations(obligations.obligations.filterNot(_.start.isBefore(LocalDate.parse(date)))))
+                Some(VatReturnObligations(obligations.obligations.filterNot(_.end.isBefore(LocalDate.parse(date)))))
               case _ =>
                 None
             }

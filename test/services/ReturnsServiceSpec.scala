@@ -24,7 +24,7 @@ import controllers.ControllerBaseSpec
 import models.{User, _}
 import models.Obligation.Status
 import models.payments.{Payment, Payments}
-import models.errors.{MandationStatusError, ObligationError, ServerSideError, VatSubscriptionError}
+import models.errors.{MandationStatusError, ObligationError, ServerSideError}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits._
@@ -70,7 +70,7 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
       Seq(
         VatReturnObligation(
           LocalDate.parse("2017-01-01"),
-          LocalDate.parse("2018-12-31"),
+          LocalDate.parse("2017-12-31"),
           LocalDate.parse("2018-01-31"),
           "O",
           None,
@@ -97,7 +97,7 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
 
     "the obligations connector returns a successful response and the Status is Fulfilled" should {
 
-      "return a user's VAT return obligations with a start date after they migrated to ETMP" in new Test {
+      "return a user's VAT return obligations with an end date after they migrated to ETMP" in new Test {
 
         lazy val result: ServiceResponse[VatReturnObligations] = {
           callObligationsConnector(Right(exampleObligations))
@@ -114,7 +114,7 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
 
         lazy val result: ServiceResponse[VatReturnObligations] = {
           callObligationsConnector(Right(exampleObligations))
-          await(service.getReturnObligationsForYear(User(vrn), 2018, Status.All))
+          await(service.getReturnObligationsForYear(User(vrn), 2017, Status.All))
         }
 
         result shouldBe Right(exampleObligations)
