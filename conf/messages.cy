@@ -5,6 +5,7 @@ base.back = Yn ôl
 base.signOut = Allgofnodi
 
 navTitle.nonAgent = Cyfrif Treth Busnes
+navTitle.agent = Manylion TAW y cleient
 
 month.1 = Ionawr
 month.2 = Chwefror
@@ -90,6 +91,7 @@ yourVatReturn.boxNine = Blwch 9
 yourVatReturn.boxNineDescription = Cyfanswm gwerth y nwyddau a brynwyd o wledydd y GE ac y daethpwyd â nhw i mewn i’r DU, yn ogystal ag unrhyw gostau perthynol (ac eithrio TAW)
 yourVatReturn.helpTitle = Mae gwall ar fy Ffurflen TAW
 yourVatReturn.helpLine = Gallwch gywiro rhai gwallau yn eich Ffurflen TAW nesaf, gan ddefnyddio’ch meddalwedd cyfrifyddu. I wneud hyn, rhaid bod y gwall wedi digwydd mewn cyfnod cyfrifyddu a ddaeth i ben yn ystod y 4 blynedd diwethaf, a rhaid ei fod naill ai:
+yourVatReturn.helpLineOptOut = Gallwch gywiro rhai gwallau yn eich Ffurflen TAW nesaf. Mae’n rhaid bod y gwall wedi digwydd mewn cyfnod cyfrifyddu a ddaeth i ben yn ystod y 4 blynedd diwethaf, a rhaid ei fod naill ai:
 yourVatReturn.reportLink1 = Mae’n rhaid i chi
 yourVatReturn.reportLink2 = roi gwybod am unrhyw wallau eraill (yn agor mewn tab newydd)
 yourVatReturn.reportLink3 = i CThEM.
@@ -120,6 +122,8 @@ submittedReturns.activePrevious = Yn edrych ar hyn o bryd ar Ffurflenni TAW blae
 submittedReturns.inactivePrevious = Bwrw golwg dros Ffurflenni TAW blaenorol
 submittedReturns.previousReturns = Ffurflenni TAW blaenorol
 submittedReturns.finalReturn = Ffurflen TAW derfynol
+submittedReturns.changeClient = Newid cleient
+submittedReturns.finish = Gorffen
 
 returnDeadlines.title = Dyddiadau cau ar gyfer cyflwyno
 returnDeadlines.submitBy = Defnyddiwch eich meddalwedd cyfrifyddu i gyflwyno Ffurflen TAW erbyn:
@@ -133,6 +137,11 @@ returnDeadlines.nextDeadline = Bydd eich dyddiad cau nesaf yn ymddangos yma ar d
 returnDeadlines.noReturns = Nid oes gennych unrhyw Ffurflenni TAW heb eu cyflwyno ar hyn o bryd.
 returnDeadlines.receivedReturn = Cawsom eich Ffurflen TAW ar gyfer y cyfnod {0}.
 returnDeadlines.finalReturn = ar gyfer eich Ffurflen TAW derfynol
+
+returnDeadlines.submitReturn = Cyflwyno Ffurflen TAW
+returnDeadlines.submitReturn.title = Cyflwyno Ffurflen TAW
+returnDeadlines.submitReturn.returnDeadline = Dyddiad cau ar gyfer cyflwyno
+returnDeadlines.submitReturn.futureReturn = Byddwch yn gallu cyflwyno’ch Ffurflen TAW o {0} ymlaen.
 
 banner.newService = Gwasanaeth newydd yw hwn – bydd eich
 banner.feedback = adborth
