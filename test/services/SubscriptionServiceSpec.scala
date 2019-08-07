@@ -48,8 +48,7 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           Some("Smith"),
           Some("My trading name"),
           hasFlatRateSchemeYes,
-          Some(true),
-          Some("2018-01-01")
+          Some(true)
         )
 
         (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
@@ -71,8 +70,7 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           Some("Smith"),
           None,
           hasFlatRateSchemeNo,
-          Some(false),
-          Some("2018-01-01")
+          Some(false)
         )
 
         (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
@@ -94,8 +92,7 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           Some("Smith"),
           None,
           hasFlatRateSchemeNo,
-          Some(false),
-          Some("2018-01-01")
+          Some(false)
         )
 
         (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
@@ -117,8 +114,7 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           None,
           None,
           hasFlatRateSchemeNo,
-          Some(true),
-          Some("2018-01-01")
+          Some(true)
         )
 
         (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
@@ -141,7 +137,6 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           Some("Smith"),
           None,
           hasFlatRateSchemeNo,
-          None,
           None
         )
 

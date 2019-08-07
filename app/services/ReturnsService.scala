@@ -44,41 +44,15 @@ class ReturnsService @Inject()(vatObligationsConnector: VatObligationsConnector,
                                   searchYear: Int,
                                   status: Status.Value)
                                  (implicit hc: HeaderCarrier,
-                                  ec: ExecutionContext,
-                                  migrationDate: Option[String]): Future[ServiceResponse[VatReturnObligations]] = {
+                                  ec: ExecutionContext): Future[ServiceResponse[VatReturnObligations]] = {
     val from: LocalDate = LocalDate.parse(s"$searchYear-01-01")
     val to: LocalDate = LocalDate.parse(s"$searchYear-12-31")
 
-    vatObligationsConnector.getVatReturnObligations(user.vrn, Some(from), Some(to), status).flatMap {
-      case Right(obligations) if status == Status.Fulfilled =>
-        filterPreETMPObligations(obligations, migrationDate, user).map {
-          case Some(filteredObligations) => Right(filterObligationsByDueDate(filteredObligations, searchYear))
-          case _ => Left(VatSubscriptionError)
-        }
-      case Right(obligations) => Future.successful(Right(filterObligationsByDueDate(obligations, searchYear)))
-      case Left(_) => Future.successful(Left(ObligationError))
+    vatObligationsConnector.getVatReturnObligations(user.vrn, Some(from), Some(to), status).map {
+      case Right(obligations) => Right(filterObligationsByDueDate(obligations, searchYear))
+      case Left(_) => Left(ObligationError)
     }
   }
-
-  def filterPreETMPObligations(obligations: VatReturnObligations, migrationDate: Option[String], user: User)
-                              (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[VatReturnObligations]] =
-    migrationDate match {
-      case Some(date) if date.nonEmpty =>
-        Future.successful(Some(
-          VatReturnObligations(obligations.obligations.filterNot(_.end.isBefore(LocalDate.parse(date))))
-        ))
-      case _ =>
-        vatSubscriptionConnector.getCustomerInfo(user.vrn).map {
-          case Right(customerInfo) =>
-            customerInfo.customerMigratedToETMPDate match {
-              case Some(date) =>
-                Some(VatReturnObligations(obligations.obligations.filterNot(_.end.isBefore(LocalDate.parse(date)))))
-              case _ =>
-                None
-            }
-          case Left(_) => None
-        }
-    }
 
   def getOpenReturnObligations(user: User)
                               (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ServiceResponse[VatReturnObligations]] =
@@ -102,8 +76,7 @@ class ReturnsService @Inject()(vatObligationsConnector: VatObligationsConnector,
                                          year: Int,
                                          periodKey: String)
                                         (implicit hc: HeaderCarrier,
-                                         ec: ExecutionContext,
-                                         migrationDate: Option[String]): Future[Option[VatReturnObligation]] =
+                                         ec: ExecutionContext): Future[Option[VatReturnObligation]] =
     getReturnObligationsForYear(user, year, Status.Fulfilled).map {
       case Right(VatReturnObligations(obligations)) => obligations.find(_.periodKey == periodKey)
       case Left(_) => None
