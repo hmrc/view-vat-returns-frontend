@@ -269,8 +269,12 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         controller.vatReturn(2018, "#001")(fakeRequest)
       }
 
-      "return 401 (Unauthorised)" in {
-        status(result) shouldBe Status.UNAUTHORIZED
+      "return 303 (SEE_OTHER)" in {
+        status(result) shouldBe Status.SEE_OTHER
+      }
+
+      "redirect to sign in" in {
+        redirectLocation(result) shouldBe Some(mockConfig.signInUrl)
       }
     }
 
@@ -461,8 +465,12 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         controller.vatReturnViaPayments("#001")(fakeRequestWithClientsVRN)
       }
 
-      "return 401 (Unauthorised)" in {
-        status(result) shouldBe Status.UNAUTHORIZED
+      "return 303 (SEE_OTHER)" in {
+        status(result) shouldBe Status.SEE_OTHER
+      }
+
+      "redirect to sign in" in {
+        redirectLocation(result) shouldBe Some(mockConfig.signInUrl)
       }
     }
 

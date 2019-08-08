@@ -159,8 +159,12 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
         controller.submittedReturns(previousYear)(fakeRequest)
       }
 
-      "return 401 (Unauthorised)" in {
-        status(result) shouldBe Status.UNAUTHORIZED
+      "return 303 (SEE_OTHER)" in {
+        status(result) shouldBe Status.SEE_OTHER
+      }
+
+      "redirect to sign in" in {
+        redirectLocation(result) shouldBe Some(mockConfig.signInUrl)
       }
     }
 

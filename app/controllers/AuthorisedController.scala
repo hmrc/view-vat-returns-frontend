@@ -52,7 +52,7 @@ class AuthorisedController @Inject()(enrolmentsAuthService: EnrolmentsAuthServic
           logWarn("[AuthorisedController][authorisedAction] - Missing affinity group")
           Future.successful(InternalServerError)
       } recoverWith {
-        case _: NoActiveSession => Future.successful(Unauthorized(views.html.errors.sessionTimeout()))
+        case _: NoActiveSession => Future.successful(Redirect(appConfig.signInUrl))
         case _: InsufficientEnrolments =>
           logWarn(s"[AuthorisedController][authorisedAction] insufficient enrolment exception encountered")
           Future.successful(Forbidden(views.html.errors.unauthorised()))
