@@ -44,15 +44,15 @@ class AuthorisedController @Inject()(enrolmentsAuthService: EnrolmentsAuthServic
           if (allowAgentAccess && appConfig.features.agentAccess()) {
             agentWithClientPredicate.authoriseAsAgent(block)
           } else {
-            logDebug("[AuthorisedController][authorisedAction] User is agent and agent access is forbidden. Rendering unauthorised page.")
-            Future.successful(Forbidden(views.html.errors.unauthorised()))
+            logDebug("[AuthorisedController][authorisedAction] User is agent and agent access is forbidden. Redirecting to Agent Action page.")
+            Future.successful(Redirect(appConfig.agentClientActionUrl))
           }
         case enrolments ~ Some(_) => authorisedAsNonAgent(block, enrolments)
         case _ =>
           logWarn("[AuthorisedController][authorisedAction] - Missing affinity group")
           Future.successful(InternalServerError)
       } recoverWith {
-        case _: NoActiveSession => Future.successful(Unauthorized(views.html.errors.sessionTimeout()))
+        case _: NoActiveSession => Future.successful(Redirect(appConfig.signInUrl))
         case _: InsufficientEnrolments =>
           logWarn(s"[AuthorisedController][authorisedAction] insufficient enrolment exception encountered")
           Future.successful(Forbidden(views.html.errors.unauthorised()))

@@ -129,13 +129,12 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
           controller.submittedReturns(previousYear)(fakeRequestWithClientsVRN)
         }
 
-        "return 403 (Forbidden)" in {
-          status(result) shouldBe Status.FORBIDDEN
+        "return 303 (SEE_OTHER)" in {
+          status(result) shouldBe Status.SEE_OTHER
         }
 
-        "render the unauthorised page" in {
-          val document: Document = Jsoup.parse(bodyOf(result))
-          document.title shouldBe "You are not authorised to use this service"
+        "redirect to Agent Action page" in {
+          redirectLocation(result) shouldBe Some(mockConfig.agentClientActionUrl)
         }
       }
     }
@@ -159,8 +158,12 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
         controller.submittedReturns(previousYear)(fakeRequest)
       }
 
-      "return 401 (Unauthorised)" in {
-        status(result) shouldBe Status.UNAUTHORIZED
+      "return 303 (SEE_OTHER)" in {
+        status(result) shouldBe Status.SEE_OTHER
+      }
+
+      "redirect to sign in" in {
+        redirectLocation(result) shouldBe Some(mockConfig.signInUrl)
       }
     }
 
