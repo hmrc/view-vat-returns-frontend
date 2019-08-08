@@ -86,8 +86,8 @@ trait MockAuth extends UnitSpec with GuiceOneAppPerSuite with BeforeAndAfterEach
 
   def callOpenObligationsForYear(response: ServiceResponse[VatReturnObligations]): Any =
     (mockVatReturnService.getReturnObligationsForYear(_: User, _: Int, _: Obligation.Status.Value)
-    (_: HeaderCarrier, _: ExecutionContext, _: Option[String]))
-      .expects(*, *, *, *, *, *)
+    (_: HeaderCarrier, _: ExecutionContext))
+      .expects(*, *, *, *, *)
       .returns(Future.successful(response))
 
   def callOpenObligations(response: ServiceResponse[VatReturnObligations]): Any =
@@ -106,8 +106,8 @@ trait MockAuth extends UnitSpec with GuiceOneAppPerSuite with BeforeAndAfterEach
       .returns(Future.successful(response))
 
   def callObligationWithMatchingPeriodKey(response: Option[VatReturnObligation]): Any =
-    (mockVatReturnService.getObligationWithMatchingPeriodKey(_: User, _: Int, _: String)(_: HeaderCarrier, _: ExecutionContext, _: Option[String]))
-      .expects(*, *, *, *, *, *)
+    (mockVatReturnService.getObligationWithMatchingPeriodKey(_: User, _: Int, _: String)(_: HeaderCarrier, _: ExecutionContext))
+      .expects(*, *, *, *, *)
       .returns(Future.successful(response))
 
   def callVatReturnPayment(response: Option[Payment]): Any =
@@ -142,11 +142,6 @@ trait MockAuth extends UnitSpec with GuiceOneAppPerSuite with BeforeAndAfterEach
 
   def callSubscriptionService(response: Option[CustomerDetail]): Any =
     (mockSubscriptionService.getUserDetails(_: User)(_: HeaderCarrier, _: ExecutionContext))
-      .expects(*, *, *)
-      .returns(Future.successful(response))
-
-  def callSubscriptionConnector(response: HttpGetResult[CustomerInformation]): Any =
-    (mockVatSubscriptionConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
       .expects(*, *, *)
       .returns(Future.successful(response))
 

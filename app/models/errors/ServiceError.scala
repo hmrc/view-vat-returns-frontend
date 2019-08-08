@@ -23,5 +23,3 @@ case object NotFoundError extends ServiceError
 case object VatReturnError extends ServiceError
 case object ObligationError extends ServiceError
 case object MandationStatusError extends ServiceError
-case object VatSubscriptionError extends ServiceError
-

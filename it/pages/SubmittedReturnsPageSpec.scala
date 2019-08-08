@@ -22,7 +22,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.http.Status
 import play.api.libs.ws.{WSRequest, WSResponse}
-import stubs.{AuthStub, CustomerInfoStub, VatObligationsStub}
+import stubs.{AuthStub, VatObligationsStub}
 
 class SubmittedReturnsPageSpec extends IntegrationBaseSpec {
 
@@ -48,7 +48,6 @@ class SubmittedReturnsPageSpec extends IntegrationBaseSpec {
         "return 200" in new Test {
           override def setupStubs(): StubMapping = {
             AuthStub.authorised()
-            CustomerInfoStub.stubCustomerInfo()
             obligationsStub.stub2018Obligations
           }
 
@@ -65,7 +64,6 @@ class SubmittedReturnsPageSpec extends IntegrationBaseSpec {
 
           override def setupStubs(): StubMapping = {
             AuthStub.authorised()
-            CustomerInfoStub.stubCustomerInfo()
             obligationsStub.stub2018Obligations
           }
 
