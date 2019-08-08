@@ -237,7 +237,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
       "agentAccess feature switch is off" should {
 
-        "return 403" in {
+        "return 303" in {
 
           lazy val result = {
             mockConfig.features.agentAccess(false)
@@ -245,7 +245,8 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
             controller.vatReturn(2018, "#001")(fakeRequestWithClientsVRN)
           }
 
-          status(result) shouldBe Status.FORBIDDEN
+          status(result) shouldBe Status.SEE_OTHER
+          redirectLocation(result) shouldBe Some(mockConfig.agentClientActionUrl)
         }
       }
     }
@@ -440,8 +441,9 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
           controller.vatReturnViaPayments("#001")(fakeRequestWithClientsVRN)
         }
 
-        "return 403" in {
-          status(result) shouldBe Status.FORBIDDEN
+        "return 303" in {
+          status(result) shouldBe Status.SEE_OTHER
+          redirectLocation(result) shouldBe Some(mockConfig.agentClientActionUrl)
         }
       }
     }

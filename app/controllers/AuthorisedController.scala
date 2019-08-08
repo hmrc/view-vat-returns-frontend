@@ -44,8 +44,8 @@ class AuthorisedController @Inject()(enrolmentsAuthService: EnrolmentsAuthServic
           if (allowAgentAccess && appConfig.features.agentAccess()) {
             agentWithClientPredicate.authoriseAsAgent(block)
           } else {
-            logDebug("[AuthorisedController][authorisedAction] User is agent and agent access is forbidden. Rendering unauthorised page.")
-            Future.successful(Forbidden(views.html.errors.unauthorised()))
+            logDebug("[AuthorisedController][authorisedAction] User is agent and agent access is forbidden. Redirecting to Agent Action page.")
+            Future.successful(Redirect(appConfig.agentClientActionUrl))
           }
         case enrolments ~ Some(_) => authorisedAsNonAgent(block, enrolments)
         case _ =>
