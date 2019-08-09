@@ -59,8 +59,8 @@ trait AppConfig extends ServicesConfig {
   val staticDateValue: String
   val future2020DateValue: String
   val finalReturnPeriodKey: String
-  val surveyUrl: String
-  val signOutUrl: String
+  def surveyUrl(identifier: String): String
+  def signOutUrl(identifier: String): String
   val mtdVatSignUpUrl: String
   val unauthorisedSignOutUrl: String
   val vatPaymentsUrl: String
@@ -88,8 +88,10 @@ class FrontendAppConfig @Inject()(val runModeConfiguration: Configuration, val e
   private lazy val contactHost: String = getString(Keys.contactFrontendHost)
   override lazy val contactFormServiceIdentifier: String = "VATVC"
   private lazy val contactFrontendService = baseUrl(Keys.contactFrontendService)
-  override lazy val reportAProblemPartialUrl: String = s"$contactHost/contact/problem_reports_ajax?service=$contactFormServiceIdentifier"
-  override lazy val reportAProblemNonJSUrl: String = s"$contactHost/contact/problem_reports_nonjs?service=$contactFormServiceIdentifier"
+  override lazy val reportAProblemPartialUrl: String =
+    s"$contactHost/contact/problem_reports_ajax?service=$contactFormServiceIdentifier"
+  override lazy val reportAProblemNonJSUrl: String =
+    s"$contactHost/contact/problem_reports_nonjs?service=$contactFormServiceIdentifier"
   override lazy val feedbackFormPartialUrl: String = s"$contactFrontendService/contact/beta-feedback/form"
 
   override lazy val analyticsToken: String = getString(Keys.googleAnalyticsToken)
@@ -101,7 +103,8 @@ class FrontendAppConfig @Inject()(val runModeConfiguration: Configuration, val e
 
   override lazy val whitelistEnabled: Boolean = runModeConfiguration.getBoolean(Keys.whitelistEnabled).getOrElse(true)
   override lazy val whitelistedIps: Seq[String] = whitelistConfig(Keys.whitelistedIps)
-  override lazy val whitelistExcludedPaths: Seq[Call] = whitelistConfig(Keys.whitelistExcludedPaths).map(path => Call("GET", path))
+  override lazy val whitelistExcludedPaths: Seq[Call]
+  = whitelistConfig(Keys.whitelistExcludedPaths).map(path => Call("GET", path))
   override lazy val shutterPage: String = getString(Keys.whitelistShutterPage)
 
   private lazy val signInBaseUrl: String = getString(Keys.signInBaseUrl)
@@ -145,11 +148,12 @@ class FrontendAppConfig @Inject()(val runModeConfiguration: Configuration, val e
   override lazy val finalReturnPeriodKey: String = getString(Keys.finalReturnPeriodKey)
 
   private lazy val surveyBaseUrl: String = getString(Keys.surveyHost) + getString(Keys.surveyUrl)
-  override lazy val surveyUrl: String = s"$surveyBaseUrl/$contactFormServiceIdentifier"
+  override def surveyUrl(identifier: String): String = s"$surveyBaseUrl/$identifier"
 
   private lazy val governmentGatewayHost: String = getString(Keys.governmentGatewayHost)
 
-  override lazy val signOutUrl: String = s"$governmentGatewayHost/gg/sign-out?continue=$surveyUrl"
+  override def signOutUrl(identifier: String): String
+  = s"$governmentGatewayHost/gg/sign-out?continue=${surveyUrl(identifier)}"
   override lazy val unauthorisedSignOutUrl: String = s"$governmentGatewayHost/gg/sign-out?continue=$signInContinueUrl"
 
   private val mtdVatSignUpBaseUrl: String = getString(Keys.mtdVatSignUpBaseUrl)
@@ -167,12 +171,13 @@ class FrontendAppConfig @Inject()(val runModeConfiguration: Configuration, val e
     "cymraeg" -> Lang("cy")
   )
 
-  override val routeToSwitchLanguage: String => Call = (lang: String) => controllers.routes.LanguageController.switchLanguage(lang)
+  override val routeToSwitchLanguage: String => Call =
+    (lang: String) => controllers.routes.LanguageController.switchLanguage(lang)
 
   private val host: String = getString(Keys.host)
 
-  override def feedbackUrl(redirect: String): String = s"$contactHost/contact/beta-feedback?service=$contactFormServiceIdentifier" +
-    s"&backUrl=${ContinueUrl(host + redirect).encodedUrl}"
+  override def feedbackUrl(redirect: String): String = s"$contactHost/contact/beta-feedback" +
+    s"?service=$contactFormServiceIdentifier&backUrl=${ContinueUrl(host + redirect).encodedUrl}"
 
   private lazy val vatAgentClientLookupFrontendUrl: String =
     getString(Keys.vatAgentClientLookupFrontendHost) + getString(Keys.vatAgentClientLookupFrontendUrl)
@@ -184,5 +189,6 @@ class FrontendAppConfig @Inject()(val runModeConfiguration: Configuration, val e
     getString(Keys.vatAgentClientLookupFrontendHost) + getString(Keys.vatAgentClientLookupUnauthorisedUrl) +
       s"?redirectUrl=${ContinueUrl(getString(Keys.host) + uri).encodedUrl}"
 
-  override lazy val agentClientActionUrl: String = getString(Keys.vatAgentClientLookupFrontendHost) + getString(Keys.vatAgentClientLookupActionUrl)
+  override lazy val agentClientActionUrl: String =
+    getString(Keys.vatAgentClientLookupFrontendHost) + getString(Keys.vatAgentClientLookupActionUrl)
 }

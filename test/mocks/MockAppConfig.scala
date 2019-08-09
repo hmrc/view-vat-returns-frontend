@@ -55,20 +55,22 @@ class MockAppConfig(val runModeConfiguration: Configuration, val mode: Mode = Mo
   override val staticDateValue: String = "2018-05-01"
   override val future2020DateValue: String = "2020-05-01"
   override val finalReturnPeriodKey: String = "9999"
-  override val surveyUrl: String = "/some-survey-url"
-  override val signOutUrl: String = "/some-gg-signout-url"
+  override def surveyUrl(identifier: String): String = s"/some-survey-url/$identifier"
+  override def signOutUrl(identifier: String): String = s"/some-gg-signout-url/$identifier"
   override val mtdVatSignUpUrl: String = "mtd-sign-up"
   override val unauthorisedSignOutUrl: String = ""
   override val vatSubscriptionBaseUrl: String = ""
   override val selfHost: String = "www.app.com"
   override val timeoutPeriod: Int = 1800
   override val timeoutCountdown: Int = 20
-  override val govUkCommercialSoftwareUrl: String = "https://www.gov.uk/guidance/software-for-sending-income-tax-updates"
+  override val govUkCommercialSoftwareUrl: String =
+    "https://www.gov.uk/guidance/software-for-sending-income-tax-updates"
   override val languageMap: Map[String, Lang] = Map(
     "english" -> Lang("en"),
     "cymraeg" -> Lang("cy")
   )
-  override val routeToSwitchLanguage: String => Call = (lang: String) => controllers.routes.LanguageController.switchLanguage(lang)
+  override val routeToSwitchLanguage: String => Call =
+    (lang: String) => controllers.routes.LanguageController.switchLanguage(lang)
   override val submitVatReturnBase: String = "submitReturnBase"
   override val submitVatReturnUrl: String = submitVatReturnBase + "/submitUrl"
   override val submitVatReturnForm: String => String = periodKey => submitVatReturnUrl + s"$periodKey/submit-form"
