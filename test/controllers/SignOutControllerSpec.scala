@@ -21,7 +21,7 @@ import play.api.mvc.Result
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.Retrieval
-import uk.gov.hmrc.auth.core.AffinityGroup
+import uk.gov.hmrc.auth.core.{AffinityGroup, MissingBearerToken}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -31,10 +31,10 @@ class SignOutControllerSpec extends ControllerBaseSpec {
   implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
   val controller: SignOutController = new SignOutController(messages, enrolmentsAuthService)
 
-  def mockAuth(authResult: Option[AffinityGroup]): Any =
+  def mockAuth(authResult: Future[Option[AffinityGroup]]): Any =
     (mockAuthConnector.authorise(_: Predicate, _: Retrieval[Option[AffinityGroup]])(_: HeaderCarrier, _: ExecutionContext))
       .expects(*, *, *, *)
-      .returns(Future.successful(authResult))
+      .returns(authResult)
 
   "The .signOut action" when {
 
@@ -43,7 +43,7 @@ class SignOutControllerSpec extends ControllerBaseSpec {
       "the user is an agent" should {
 
         lazy val result: Future[Result] = {
-          mockAuth(Some(AffinityGroup.Agent))
+          mockAuth(Future.successful(Some(AffinityGroup.Agent)))
           controller.signOut(authorised = true)(fakeRequestWithSession)
         }
 
@@ -59,7 +59,7 @@ class SignOutControllerSpec extends ControllerBaseSpec {
       "the user is a principal entity" should {
 
         lazy val result: Future[Result] = {
-          mockAuth(Some(AffinityGroup.Individual))
+          mockAuth(Future.successful(Some(AffinityGroup.Individual)))
           controller.signOut(authorised = true)(fakeRequestWithSession)
         }
 
@@ -69,6 +69,23 @@ class SignOutControllerSpec extends ControllerBaseSpec {
 
         "redirect to the correct survey url" in {
           redirectLocation(result) shouldBe Some(mockConfig.signOutUrl("VATC"))
+        }
+      }
+
+
+      "there is an authorisation exception" should {
+
+        lazy val result: Future[Result] = {
+          mockAuth(Future.failed(MissingBearerToken()))
+          controller.signOut(authorised = true)(fakeRequestWithSession)
+        }
+
+        "return 303" in {
+          status(result) shouldBe Status.SEE_OTHER
+        }
+
+        "redirect to the unauthorised sign out URL" in {
+          redirectLocation(result) shouldBe Some(mockConfig.unauthorisedSignOutUrl)
         }
       }
     }
