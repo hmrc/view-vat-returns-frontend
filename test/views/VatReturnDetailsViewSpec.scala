@@ -194,8 +194,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
 
     "render the correct text for the help section first paragraph" in {
       elementText(Selectors.helpLine1) shouldBe
-        "You can correct certain errors in your next return, using your accounting software. To do this, " +
-          "the error must have happened in an accounting period that ended in the last 4 years and be either:"
+        "You can correct some errors in your next return. The error must have " +
+          "happened in an accounting period that ended in the last 4 years and be either:"
     }
 
     "render the correct help section report any other errors text" in {
