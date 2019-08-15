@@ -43,7 +43,8 @@ lazy val coverageSettings: Seq[Setting[_]] = {
     "config.*",
     "testOnly.*",
     "testOnlyDoNotUseInAppConf.*",
-    ".*feedback*.*")
+    ".*feedback*.*"
+  )
 
   Seq(
     ScoverageKeys.coverageExcludedPackages := excludedPackages.mkString(";"),
@@ -55,7 +56,7 @@ lazy val coverageSettings: Seq[Setting[_]] = {
 
 val compile = Seq(
   ws,
-  "uk.gov.hmrc" %% "bootstrap-play-25" % "4.13.0",
+  "uk.gov.hmrc" %% "bootstrap-play-25" % "4.14.0",
   "uk.gov.hmrc" %% "govuk-template" % "5.36.0-play-25",
   "uk.gov.hmrc" %% "play-ui" % "7.40.0-play-25",
   "uk.gov.hmrc" %% "play-partials" % "6.9.0-play-25",
