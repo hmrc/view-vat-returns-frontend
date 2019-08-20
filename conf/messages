@@ -3,6 +3,7 @@ common.overdue = overdue
 
 base.back = Back
 base.signOut = Sign out
+base.pageTitle = {0} - {1} - GOV.UK
 
 navTitle.nonAgent = Business tax account
 navTitle.agent = Client’s VAT details
@@ -20,7 +21,7 @@ notFound.title = Page not found
 notFound.heading = This page cannot be found
 notFound.message = Please check that you have entered the correct web address.
 
-technicalProblem.title = There is a problem with the service - VAT reporting through software - GOV.UK
+technicalProblem.title = There is a problem with the service
 technicalProblem.heading = Sorry, there is a problem with the service
 technicalProblem.message = Try again later.
 

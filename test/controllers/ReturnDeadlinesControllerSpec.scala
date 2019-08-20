@@ -281,7 +281,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
 
         "return the technical problem view" in {
           val document: Document = Jsoup.parse(bodyOf(result))
-          document.title shouldBe "There is a problem with the service - VAT reporting through software - GOV.UK"
+          document.title shouldBe "There is a problem with the service - Business tax account - GOV.UK"
         }
       }
     }
@@ -331,7 +331,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
 
       "return the technical problem view" in {
         val document: Document = Jsoup.parse(bodyOf(result))
-        document.title shouldBe "There is a problem with the service - VAT reporting through software - GOV.UK"
+        document.title shouldBe "There is a problem with the service - Business tax account - GOV.UK"
       }
     }
   }

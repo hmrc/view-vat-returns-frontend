@@ -98,7 +98,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
       }
 
       "have the correct document title" in {
-        document.title shouldBe "Submit VAT Return"
+        document.title shouldBe "Submit VAT Return - Business tax account - GOV.UK"
       }
 
       "have the correct page heading" in {
@@ -245,6 +245,10 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
 
       "have the correct obligation start and end date text" in {
         elementText(Selectors.firstDeadlinePeriod) shouldBe "for the period 1 January to 1 January 2018"
+      }
+
+      "have the correct document title" in {
+        document.title shouldBe "Submit VAT Return - Client’s VAT details - GOV.UK"
       }
 
       "have a submit-your-return link" in {
