@@ -85,7 +85,7 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
     }
 
     "have the correct document title" in {
-      document.title shouldBe "Return deadlines"
+      document.title shouldBe "Return deadlines - Business tax account - GOV.UK"
     }
 
     "have the correct page heading" in {

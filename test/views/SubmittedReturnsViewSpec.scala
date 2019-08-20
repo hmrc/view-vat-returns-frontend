@@ -89,7 +89,7 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
         lazy implicit val document: Document = Jsoup.parse(view.body)
 
         "have the correct document title" in {
-          document.title shouldBe "Submitted returns"
+          document.title shouldBe "Submitted returns - Business tax account - GOV.UK"
         }
 
         "have the correct page heading" in {
@@ -408,6 +408,10 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
         )(fakeRequestWithClientsVRN, messages, mockConfig, Lang.apply("en"), agentUser)
 
         lazy implicit val document: Document = Jsoup.parse(view.body)
+
+        "have the correct document title" in {
+          document.title shouldBe "Submitted returns - Client’s VAT details - GOV.UK"
+        }
 
         "not render breadcrumbs which" in {
           an[TestFailedException] should be thrownBy elementText(Selectors.btaBreadcrumb)

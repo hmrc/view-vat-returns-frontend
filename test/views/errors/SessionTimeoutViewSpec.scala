@@ -33,7 +33,7 @@ class SessionTimeoutViewSpec extends ViewBaseSpec {
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct document title" in {
-      document.title shouldBe "Your session has timed out"
+      document.title shouldBe "Your session has timed out - Business tax account - GOV.UK"
     }
 
     "have a the correct page heading" in {

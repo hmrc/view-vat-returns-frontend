@@ -3,6 +3,7 @@ common.overdue = hwyr
 
 base.back = Yn ôl
 base.signOut = Allgofnodi
+base.pageTitle = {0} - {1} - GOV.UK
 
 navTitle.nonAgent = Cyfrif Treth Busnes
 navTitle.agent = Manylion TAW y cleient
@@ -46,7 +47,7 @@ notFound.title = Heb ddod o hyd i’r dudalen
 notFound.heading = Ni ellir dod o hyd i’r dudalen hon
 notFound.message = Gwiriwch eich bod wedi nodi’r cyfeiriad gwe cywir.
 
-technicalProblem.title = Mae problem gyda’r gwasanaeth – Rhoi gwybod am TAW drwy feddalwedd – GOV.UK
+technicalProblem.title = Mae problem gyda’r gwasanaeth
 technicalProblem.heading = Mae’n ddrwg gennym – mae problem gyda’r gwasanaeth
 technicalProblem.message = Rhowch gynnig arall arni yn nes ymlaen.
 
