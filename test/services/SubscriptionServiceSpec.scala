@@ -20,7 +20,7 @@ import connectors.VatSubscriptionConnector
 import controllers.ControllerBaseSpec
 import models.customer.CustomerDetail
 import models.errors.BadRequestError
-import models.{CustomerInformation, User}
+import models.CustomerInformation
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits._
@@ -55,7 +55,7 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           .expects(*, *, *)
           .returns(Future.successful(Right(exampleCustomerInfo)))
 
-        lazy val result: Option[CustomerDetail] = await(service.getUserDetails(User("999999999")))
+        lazy val result: Option[CustomerDetail] = await(service.getUserDetails(vrn))
 
         result shouldBe Some(CustomerDetail("My trading name", hasFlatRateSchemeYes, isPartialMigration = true))
       }
@@ -77,7 +77,7 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           .expects(*, *, *)
           .returns(Future.successful(Right(exampleCustomerInfo)))
 
-        val result: Option[CustomerDetail] = await(service.getUserDetails(User("999999999")))
+        val result: Option[CustomerDetail] = await(service.getUserDetails(vrn))
 
         result shouldBe Some(CustomerDetail("John Smith", hasFlatRateSchemeNo, isPartialMigration = false))
       }
@@ -99,7 +99,7 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           .expects(*, *, *)
           .returns(Future.successful(Right(exampleCustomerInfo)))
 
-        val result: Option[CustomerDetail] = await(service.getUserDetails(User("999999999")))
+        val result: Option[CustomerDetail] = await(service.getUserDetails(vrn))
 
         result shouldBe Some(CustomerDetail("My organisation name", hasFlatRateSchemeNo, isPartialMigration = false))
       }
@@ -121,7 +121,7 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           .expects(*, *, *)
           .returns(Future.successful(Right(exampleCustomerInfo)))
 
-        val result: Option[CustomerDetail] = await(service.getUserDetails(User("999999999")))
+        val result: Option[CustomerDetail] = await(service.getUserDetails(vrn))
 
         result shouldBe Some(CustomerDetail("My organisation name", hasFlatRateSchemeNo, isPartialMigration = true))
       }
@@ -144,7 +144,7 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           .expects(*, *, *)
           .returns(Future.successful(Right(exampleCustomerInfo)))
 
-        val result: Option[CustomerDetail] = await(service.getUserDetails(User("999999999")))
+        val result: Option[CustomerDetail] = await(service.getUserDetails(vrn))
 
         result shouldBe Some(CustomerDetail("John Smith", hasFlatRateSchemeNo, isPartialMigration = false))
       }
@@ -157,7 +157,7 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           .expects(*, *, *)
           .returns(Future.successful(Left(BadRequestError("", ""))))
 
-        val result: Option[CustomerDetail] = await(service.getUserDetails(User("999999999")))
+        val result: Option[CustomerDetail] = await(service.getUserDetails(vrn))
 
         result shouldBe None
       }

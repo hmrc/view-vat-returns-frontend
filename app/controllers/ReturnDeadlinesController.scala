@@ -63,7 +63,7 @@ class ReturnDeadlinesController @Inject()(val messagesApi: MessagesApi,
   def returnDeadlines(): Action[AnyContent] = authorisedController.authorisedAction { implicit request =>
 
     implicit user =>
-      val openObligations = returnsService.getOpenReturnObligations(user)
+      val openObligations = returnsService.getOpenReturnObligations(user.vrn)
       val currentDate = dateService.now()
 
       openObligations.flatMap {
@@ -88,7 +88,7 @@ class ReturnDeadlinesController @Inject()(val messagesApi: MessagesApi,
   private[controllers] def noUpcomingObligationsAction(serviceInfoContent: Html, currentDate: LocalDate)
                                                       (implicit request: Request[AnyContent],
                                                       user: User): Future[Result] = {
-    returnsService.getFulfilledObligations(currentDate).map {
+    returnsService.getFulfilledObligations(user.vrn, currentDate).map {
       case Right(VatReturnObligations(Seq())) => Ok(views.html.returns.noUpcomingReturnDeadlines(None, serviceInfoContent))
       case Right(VatReturnObligations(obligations)) =>
         val lastFulfilledObligation: VatReturnObligation = returnsService.getLastObligation(obligations)
