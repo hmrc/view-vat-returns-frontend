@@ -17,12 +17,13 @@
 package services
 
 import connectors.ServiceInfoConnector
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import play.api.mvc.Request
 import play.twirl.api.Html
 
 import scala.concurrent.{ExecutionContext, Future}
 
+@Singleton
 class ServiceInfoService @Inject()(serviceInfoConnector: ServiceInfoConnector) {
 
   def getServiceInfoPartial(implicit request: Request[_], ec: ExecutionContext): Future[Html] =

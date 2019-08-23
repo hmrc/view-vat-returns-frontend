@@ -26,11 +26,12 @@ import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.{Retrievals, ~}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import controllers.predicate.AuthoriseAgentWithClient
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import utils.LoggerUtil._
 
 import scala.concurrent.Future
 
+@Singleton
 class AuthorisedController @Inject()(enrolmentsAuthService: EnrolmentsAuthService,
                                      val messagesApi: MessagesApi,
                                      val agentWithClientPredicate: AuthoriseAgentWithClient,
