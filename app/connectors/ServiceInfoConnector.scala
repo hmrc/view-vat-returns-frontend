@@ -17,7 +17,7 @@
 package connectors
 
 import config.{AppConfig, VatHeaderCarrierForPartialsConverter}
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.Request
 import play.twirl.api.Html
@@ -28,6 +28,7 @@ import utils.LoggerUtil.logWarn
 
 import scala.concurrent.{ExecutionContext, Future}
 
+@Singleton
 class ServiceInfoConnector @Inject()(http: HttpClient,
                                      hcForPartials: VatHeaderCarrierForPartialsConverter)
                                     (implicit val messagesApi: MessagesApi,

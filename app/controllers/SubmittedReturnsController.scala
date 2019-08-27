@@ -70,14 +70,14 @@ class SubmittedReturnsController @Inject()(val messagesApi: MessagesApi,
     year <= upperBound && year >= upperBound - 2
   }
 
-  private[controllers] def getPreviousReturnYears(user: User,
+  private[controllers] def getPreviousReturnYears(vrn: String,
                                                   status: Obligation.Status.Value,
                                                   currentYear: Int)
                                                  (implicit hc: HeaderCarrier): Future[ServiceResponse[Seq[Int]]] = {
 
     val currentYearMinusOne = currentYear - 1
 
-    returnsService.getReturnObligationsForYear(user, currentYearMinusOne, status) map {
+    returnsService.getReturnObligationsForYear(vrn, currentYearMinusOne, status) map {
       case Right(VatReturnObligations(obligations)) =>
         if (obligations.nonEmpty) {
           Right(Seq[Int](currentYear, currentYearMinusOne))
@@ -91,7 +91,7 @@ class SubmittedReturnsController @Inject()(val messagesApi: MessagesApi,
     }
   }
 
-  private[controllers] def getReturnYears(user: User,
+  private[controllers] def getReturnYears(vrn: String,
                                           status: Obligation.Status.Value)
                                          (implicit hc: HeaderCarrier): Future[ServiceResponse[Seq[Int]]] = {
 
@@ -99,12 +99,12 @@ class SubmittedReturnsController @Inject()(val messagesApi: MessagesApi,
     val currentYearMinusTwo = currentYear - 2
 
     if (currentYear > 2019) {
-      returnsService.getReturnObligationsForYear(user, currentYearMinusTwo, status) flatMap {
+      returnsService.getReturnObligationsForYear(vrn, currentYearMinusTwo, status) flatMap {
         case Right(VatReturnObligations(obligations)) =>
           if (obligations.nonEmpty) {
             Future.successful(Right(Seq[Int](currentYear, currentYear - 1, currentYearMinusTwo)))
           } else {
-            getPreviousReturnYears(user, status, currentYear)
+            getPreviousReturnYears(vrn, status, currentYear)
           }
         case Left(error) =>
           logWarn("[ReturnObligationsController][getReturnYears] error: " + error.toString)
@@ -112,7 +112,7 @@ class SubmittedReturnsController @Inject()(val messagesApi: MessagesApi,
       }
     }
     else {
-      getPreviousReturnYears(user, status, currentYear)
+      getPreviousReturnYears(vrn, status, currentYear)
     }
   }
 
@@ -121,11 +121,11 @@ class SubmittedReturnsController @Inject()(val messagesApi: MessagesApi,
                                                 status: Obligation.Status.Value)
                                                (implicit hc: HeaderCarrier): Future[ServiceResponse[VatReturnsViewModel]] =
 
-    getReturnYears(user, status) flatMap {
+    getReturnYears(user.vrn, status) flatMap {
       case Right(years) =>
 
         if (years.contains(selectedYear)) {
-          returnsService.getReturnObligationsForYear(user, selectedYear, status) map {
+          returnsService.getReturnObligationsForYear(user.vrn, selectedYear, status) map {
             case Right(VatReturnObligations(obligations)) =>
 
               auditService.extendedAudit(

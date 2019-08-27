@@ -53,13 +53,13 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
       implicit user =>
         if(validPeriodKey(periodKey)) {
           val isReturnsPageRequest = true
-          val vatReturnCall = returnsService.getVatReturn(user, periodKey)
-          val entityNameCall = subscriptionService.getUserDetails(user)
-          val obligationCall = returnsService.getObligationWithMatchingPeriodKey(user, year, periodKey)
+          val vatReturnCall = returnsService.getVatReturn(user.vrn, periodKey)
+          val entityNameCall = subscriptionService.getUserDetails(user.vrn)
+          val obligationCall = returnsService.getObligationWithMatchingPeriodKey(user.vrn, year, periodKey)
 
           def financialDataCall(customerInfo: Option[CustomerDetail]): Future[Option[Payment]] = {
             val isHybridUser = customerInfo.fold(false)(_.isPartialMigration)
-            if (isHybridUser) Future.successful(None) else returnsService.getPayment(user, periodKey, Some(year))
+            if (isHybridUser) Future.successful(None) else returnsService.getPayment(user.vrn, periodKey, Some(year))
           }
 
           (for {
@@ -82,13 +82,13 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
       implicit user =>
         if(validPeriodKey(periodKey)) {
           val isReturnsPageRequest = false
-          val vatReturnCall = returnsService.getVatReturn(user, periodKey)
-          val entityNameCall = subscriptionService.getUserDetails(user)
-          val financialDataCall = returnsService.getPayment(user, periodKey)
+          val vatReturnCall = returnsService.getVatReturn(user.vrn, periodKey)
+          val entityNameCall = subscriptionService.getUserDetails(user.vrn)
+          val financialDataCall = returnsService.getPayment(user.vrn, periodKey)
 
           def obligationCall(payment: Option[Payment]) = {
             payment.fold(Future.successful(Option.empty[VatReturnObligation])) { p =>
-              returnsService.getObligationWithMatchingPeriodKey(user, p.end.getYear, periodKey)
+              returnsService.getObligationWithMatchingPeriodKey(user.vrn, p.end.getYear, periodKey)
             }
           }
 

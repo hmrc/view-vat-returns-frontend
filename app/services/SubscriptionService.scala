@@ -19,7 +19,7 @@ package services
 import javax.inject.{Inject, Singleton}
 import connectors.VatSubscriptionConnector
 import models.customer.CustomerDetail
-import models.{CustomerInformation, User}
+import models.CustomerInformation
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -27,8 +27,8 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class SubscriptionService @Inject()(connector: VatSubscriptionConnector) {
 
-  def getUserDetails(user: User)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[CustomerDetail]] = {
-    connector.getCustomerInfo(user.vrn).map {
+  def getUserDetails(vrn: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[CustomerDetail]] = {
+    connector.getCustomerInfo(vrn).map {
 
       case Right(CustomerInformation(None, None, None, None, _, _)) => None
 

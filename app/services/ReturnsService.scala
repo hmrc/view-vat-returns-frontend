@@ -32,15 +32,15 @@ import scala.concurrent.{ExecutionContext, Future}
 class ReturnsService @Inject()(vatObligationsConnector: VatObligationsConnector, financialDataConnector: FinancialDataConnector,
                                vatReturnConnector: VatReturnsConnector, vatSubscriptionConnector: VatSubscriptionConnector) {
 
-  def getVatReturn(user: User, periodKey: String)
+  def getVatReturn(vrn: String, periodKey: String)
                   (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ServiceResponse[VatReturn]] =
-    vatReturnConnector.getVatReturnDetails(user.vrn, periodKey).map {
+    vatReturnConnector.getVatReturnDetails(vrn, periodKey).map {
       case Right(vatReturn) => Right(vatReturn)
       case Left(UnexpectedStatusError("404", _)) => Left(NotFoundError)
       case Left(_) => Left(VatReturnError)
     }
 
-  def getReturnObligationsForYear(user: User,
+  def getReturnObligationsForYear(vrn: String,
                                   searchYear: Int,
                                   status: Status.Value)
                                  (implicit hc: HeaderCarrier,
@@ -48,23 +48,23 @@ class ReturnsService @Inject()(vatObligationsConnector: VatObligationsConnector,
     val from: LocalDate = LocalDate.parse(s"$searchYear-01-01")
     val to: LocalDate = LocalDate.parse(s"$searchYear-12-31")
 
-    vatObligationsConnector.getVatReturnObligations(user.vrn, Some(from), Some(to), status).map {
+    vatObligationsConnector.getVatReturnObligations(vrn, Some(from), Some(to), status).map {
       case Right(obligations) => Right(filterObligationsByDueDate(obligations, searchYear))
       case Left(_) => Left(ObligationError)
     }
   }
 
-  def getOpenReturnObligations(user: User)
+  def getOpenReturnObligations(vrn: String)
                               (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ServiceResponse[VatReturnObligations]] =
-    vatObligationsConnector.getVatReturnObligations(user.vrn, status = Obligation.Status.Outstanding).map {
+    vatObligationsConnector.getVatReturnObligations(vrn, status = Obligation.Status.Outstanding).map {
       case Right(obligations) => Right(obligations)
       case Left(_) => Left(ObligationError)
     }
 
-  def getFulfilledObligations(currentDate: LocalDate)
-                             (implicit user: User, hc: HeaderCarrier, ec: ExecutionContext): Future[ServiceResponse[VatReturnObligations]] = {
+  def getFulfilledObligations(vrn: String, currentDate: LocalDate)
+                             (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ServiceResponse[VatReturnObligations]] = {
     val from: LocalDate = currentDate.minusMonths(3)
-    vatObligationsConnector.getVatReturnObligations(user.vrn, Some(from), Some(currentDate), Status.Fulfilled).map {
+    vatObligationsConnector.getVatReturnObligations(vrn, Some(from), Some(currentDate), Status.Fulfilled).map {
       case Right(obligations) => Right(obligations)
       case Left(_) => Left(ObligationError)
     }
@@ -72,12 +72,12 @@ class ReturnsService @Inject()(vatObligationsConnector: VatObligationsConnector,
 
   def getLastObligation(obligations: Seq[VatReturnObligation]): VatReturnObligation = obligations.sortWith(_.due isAfter _.due).head
 
-  def getObligationWithMatchingPeriodKey(user: User,
+  def getObligationWithMatchingPeriodKey(vrn: String,
                                          year: Int,
                                          periodKey: String)
                                         (implicit hc: HeaderCarrier,
                                          ec: ExecutionContext): Future[Option[VatReturnObligation]] =
-    getReturnObligationsForYear(user, year, Status.Fulfilled).map {
+    getReturnObligationsForYear(vrn, year, Status.Fulfilled).map {
       case Right(VatReturnObligations(obligations)) => obligations.find(_.periodKey == periodKey)
       case Left(_) => None
     }
@@ -85,9 +85,9 @@ class ReturnsService @Inject()(vatObligationsConnector: VatObligationsConnector,
   private[services] def filterObligationsByDueDate(returnObligations: VatReturnObligations, searchYear: Int): VatReturnObligations =
     VatReturnObligations(returnObligations.obligations.filter(_.end.getYear == searchYear))
 
-  def getPayment(user: User, requiredPeriod: String, year: Option[Int] = None)
+  def getPayment(vrn: String, requiredPeriod: String, year: Option[Int] = None)
                 (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[Payment]] = {
-    financialDataConnector.getPayments(user.vrn, year).map {
+    financialDataConnector.getPayments(vrn, year).map {
       case Right(payments) => filterPaymentsByPeriodKey(payments, requiredPeriod)
       case Left(_) => None
     }
