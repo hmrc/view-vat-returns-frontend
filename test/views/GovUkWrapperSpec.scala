@@ -32,7 +32,7 @@ class GovUkWrapperSpec extends ViewBaseSpec {
       lazy implicit val document: Document = Jsoup.parse(view.body)
 
       "have no nav title" in {
-        elementText(navTitleSelector) shouldBe ""
+        elementText(navTitleSelector) shouldBe "VAT"
       }
     }
 
