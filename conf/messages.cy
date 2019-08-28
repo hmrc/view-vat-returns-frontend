@@ -7,6 +7,7 @@ base.pageTitle = {0} - {1} - GOV.UK
 
 navTitle.nonAgent = Cyfrif Treth Busnes
 navTitle.agent = Manylion TAW y cleient
+navTitle.makingTaxDigitalForVat = TAW
 
 month.1 = Ionawr
 month.2 = Chwefror

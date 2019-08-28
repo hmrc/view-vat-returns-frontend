@@ -7,6 +7,7 @@ base.pageTitle = {0} - {1} - GOV.UK
 
 navTitle.nonAgent = Business tax account
 navTitle.agent = Client’s VAT details
+navTitle.makingTaxDigitalForVat = VAT
 
 sessionTimeout.title = Your session has timed out
 sessionTimeout.helpOne = To view your VAT returns, you will have to
