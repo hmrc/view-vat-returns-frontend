@@ -6,7 +6,7 @@ base.signOut = Sign out
 base.pageTitle = {0} - {1} - GOV.UK
 
 navTitle.nonAgent = Business tax account
-navTitle.agent = Client’s VAT details
+navTitle.agent = Your client’s VAT details
 navTitle.makingTaxDigitalForVat = VAT
 
 sessionTimeout.title = Your session has timed out

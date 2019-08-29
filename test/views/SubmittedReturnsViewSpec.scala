@@ -410,7 +410,7 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
         lazy implicit val document: Document = Jsoup.parse(view.body)
 
         "have the correct document title" in {
-          document.title shouldBe "Submitted returns - Client’s VAT details - GOV.UK"
+          document.title shouldBe "Submitted returns - Your client’s VAT details - GOV.UK"
         }
 
         "not render breadcrumbs which" in {
