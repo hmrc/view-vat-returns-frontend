@@ -248,7 +248,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
       }
 
       "have the correct document title" in {
-        document.title shouldBe "Submit VAT Return - Client’s VAT details - GOV.UK"
+        document.title shouldBe "Submit VAT Return - Your client’s VAT details - GOV.UK"
       }
 
       "have a submit-your-return link" in {
