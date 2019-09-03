@@ -16,7 +16,7 @@
 
 @(user: models.User)(implicit appConfig: config.AppConfig, request: Request[_], messages: Messages)
 
-@views.html.main_template(title = messages("preMtdReturn.title"), bodyClasses = None, appConfig = appConfig, user = Some(user)) {
+@views.html.main_template(title = messages("preMtdReturn.heading"), bodyClasses = None, appConfig = appConfig, user = Some(user)) {
 <a id="back" class="link-back" href="javascript:history.back()">@messages("base.back")</a>
 <div class="grid-row">
     <div class="column-two-thirds">

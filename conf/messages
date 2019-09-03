@@ -75,7 +75,6 @@ yourVatReturn.bullet1 = £10,000 or less
 yourVatReturn.bullet2 = 1% or less of your box 6 figure and below £50,000
 yourVatReturn.returnTotal = Return total
 
-preMtdReturn.title = This return is not available
 preMtdReturn.heading = This return is not available
 preMtdReturn.message = This is because you might have submitted it before you first joined Making Tax Digital for VAT.
 preMtdReturn.link = View your previously submitted returns (opens in a new tab)
