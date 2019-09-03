@@ -69,7 +69,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
             obligation <- obligationCall
             serviceInfoContent <- if(user.isAgent) Future.successful(HtmlFormat.empty) else serviceInfoService.getServiceInfoPartial
           } yield ReturnsControllerData(vatReturn, customerInfo, payment, obligation, serviceInfoContent))
-            .flatMap(pageData => renderResult(pageData, isReturnsPageRequest))
+            .flatMap(pageData => renderResult(pageData, isReturnsPageRequest, numericPeriodKey(periodKey)))
 
         } else {
           logWarn(s"[ReturnsController][vatReturn] - The given period key was invalid - `$periodKey`")
@@ -99,7 +99,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
             obligation <- obligationCall(payment)
             serviceInfoContent <- if(user.isAgent) Future.successful(HtmlFormat.empty) else serviceInfoService.getServiceInfoPartial
           } yield ReturnsControllerData(vatReturnResult, customerInfo, payment, obligation, serviceInfoContent))
-            .flatMap(pageData => renderResult(pageData, isReturnsPageRequest))
+            .flatMap(pageData => renderResult(pageData, isReturnsPageRequest, numericPeriodKey(periodKey)))
 
         } else {
           logWarn(s"[ReturnsController][vatReturnViaPayments] - The given period key was invalid - `$periodKey`")
@@ -146,14 +146,17 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
     }
   }
 
-  private[controllers] def renderResult(pageData: ReturnsControllerData, isReturnsPageRequest: Boolean)
+  private[controllers] def renderResult(pageData: ReturnsControllerData,
+                                        isReturnsPageRequest: Boolean, isNumericPeriodKey: Boolean)
                                        (implicit req: Request[AnyContent], user: User): Future[Result] = {
     (pageData.vatReturnResult, pageData.obligation, pageData.payment) match {
       case (Right(vatReturn), Some(ob), payment) =>
         val returnDetails = returnsService.constructReturnDetailsModel(vatReturn, payment)
         handleMandationStatus(pageData.customerInfo, ob, returnDetails, isReturnsPageRequest, pageData.serviceInfoContent)
-      case (Left(NotFoundError), _, _) =>
+      case (Left(NotFoundError), _, _) if !isNumericPeriodKey =>
         Future.successful(NotFound(views.html.errors.notFound()))
+      case (Left(NotFoundError), _, _) if isNumericPeriodKey =>
+        Future.successful(NotFound(views.html.errors.preMtdReturn(user)))
       case (Right(_), None, _) =>
         logWarn("[ReturnsController][renderResult] error: render required a valid obligation but none was returned")
         Future.successful(InternalServerError(views.html.errors.technicalProblem()))
@@ -205,4 +208,10 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
     val periodKeyRegex = """^([0-9 A-Z]{4})$|^(#[0-9]{3})$"""
     periodKey.matches(periodKeyRegex)
   }
+
+  private[controllers] def numericPeriodKey(periodKey: String): Boolean = {
+    val numericPeriodKeyRegex = """^([0-9]{4})$"""
+    periodKey.matches(numericPeriodKeyRegex)
+  }
+
 }

@@ -101,7 +101,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
       "mandation status is not in session" when {
 
-        "a valid period key is provided" should {
+        "a valid period key which isn't all numeric is provided" should {
 
           lazy val result = {
             callAuthService(individualAuthResult)
@@ -143,6 +143,33 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
           "return charset utf-8" in {
             charset(result) shouldBe Some("utf-8")
+          }
+        }
+
+        "an all numeric period key is provided but a return cannot be found matching period key" should {
+
+          lazy val result = {
+            callAuthService(individualAuthResult)
+            callVatReturn(Left(NotFoundError))
+            setupCommonSuccessMocks()
+            callServiceInfoPartialService
+            controller.vatReturn(2018, "3002")(fakeRequest)
+          }
+
+          "return 404" in {
+            status(result) shouldBe Status.NOT_FOUND
+          }
+
+          "return HTML" in {
+            contentType(result) shouldBe Some("text/html")
+          }
+
+          "return charset utf-8" in {
+            charset(result) shouldBe Some("utf-8")
+          }
+
+          "have the correct title" in {
+            contentAsString(result) should include ("This return is not available")
           }
         }
 
@@ -361,6 +388,33 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
             charset(result) shouldBe Some("utf-8")
           }
         }
+
+        "an all numeric period key is provided but but a return cannot be found matching period key" should {
+
+          lazy val result = {
+            callAuthService(individualAuthResult)
+            callVatReturn(Left(NotFoundError))
+            setupCommonSuccessMocks()
+            callServiceInfoPartialService
+            controller.vatReturnViaPayments("3001")(fakeRequest)
+          }
+
+          "return 404" in {
+            status(result) shouldBe Status.NOT_FOUND
+          }
+
+          "return HTML" in {
+            contentType(result) shouldBe Some("text/html")
+          }
+
+          "return charset utf-8" in {
+            charset(result) shouldBe Some("utf-8")
+          }
+
+          "have the correct title" in {
+            contentAsString(result) should include ("This return is not available")
+          }
+        }
       }
 
       "mandation status is in session" should {
@@ -550,7 +604,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         callDateService()
         callAudit
         callMandationService(Right(MandationStatus("Non MTDfB")))
-        controller.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
+        controller.renderResult(data, isReturnsPageRequest = true, isNumericPeriodKey = false)(fakeRequest, user)
       }
 
       "return an OK status" in {
@@ -558,12 +612,25 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       }
     }
 
-    "the VAT return is not found" should {
+    "the VAT return is not found" when {
+      "the period key is not all numeric" should {
 
-      "return a Not Found status" in {
-        val data = ReturnsControllerData(Left(NotFoundError), None, None, None, Html(""))
-        lazy val result = controller.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
-        result.header.status shouldBe Status.NOT_FOUND
+        "return a Not Found status" in {
+          val data = ReturnsControllerData(Left(NotFoundError), None, None, None, Html(""))
+          lazy val result = controller.renderResult(data, isReturnsPageRequest = true,
+            isNumericPeriodKey = false)(fakeRequest, user)
+          result.header.status shouldBe Status.NOT_FOUND
+        }
+      }
+
+      "the period key is all numeric" should {
+
+        "return a Not Found status" in {
+          val data = ReturnsControllerData(Left(NotFoundError), None, None, None, Html(""))
+          lazy val result = controller.renderResult(data, isReturnsPageRequest = true,
+            isNumericPeriodKey = true)(fakeRequest, user)
+          result.header.status shouldBe Status.NOT_FOUND
+        }
       }
     }
 
@@ -571,7 +638,8 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
       "return an Internal Server Error status" in {
         val data = ReturnsControllerData(Right(exampleVatReturn), None, None, None, Html(""))
-        lazy val result = controller.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
+        lazy val result = controller.renderResult(data, isReturnsPageRequest = true,
+          isNumericPeriodKey = false)(fakeRequest, user)
         result.header.status shouldBe Status.INTERNAL_SERVER_ERROR
       }
     }
@@ -580,7 +648,8 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
       "return an Internal Server Error status" in {
         val data = ReturnsControllerData(Left(VatReturnError), None, None, None, Html(""))
-        lazy val result = controller.renderResult(data, isReturnsPageRequest = true)(fakeRequest, user)
+        lazy val result = controller.renderResult(data, isReturnsPageRequest = true,
+          isNumericPeriodKey = false)(fakeRequest, user)
         result.header.status shouldBe Status.INTERNAL_SERVER_ERROR
       }
     }
@@ -627,6 +696,30 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
       "return false" in {
         controller.validPeriodKey("13A") shouldBe false
+      }
+    }
+  }
+
+  "Calling .numericPeriodKey" when {
+
+    "a numeric period key is provided without a hash" should {
+
+      "return true" in {
+        controller.numericPeriodKey("1334") shouldBe true
+      }
+    }
+
+    "a numeric period key is provided with a hash" should {
+
+      "return false" in {
+        controller.numericPeriodKey("#001") shouldBe false
+      }
+    }
+
+    "an alphanumeric period key is provided" should {
+
+      "return false" in {
+        controller.numericPeriodKey("13aC") shouldBe false
       }
     }
   }
