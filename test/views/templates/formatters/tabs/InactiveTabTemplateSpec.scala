@@ -30,8 +30,8 @@ class InactiveTabTemplateSpec extends TemplateBaseSpec {
 
       val expectedMarkup = Html(
         """
-          |<li class="tabs-nav__tab font-medium">
-          |  <a href="/my-tab-page">
+          |<li class="tabs-nav__tab font-medium" role="presentation">
+          |  <a href="/my-tab-page" role="tab" aria-controls="Tabby" aria-selected="false" tabindex="-1">
           |    Tabby
           |    <span class="visuallyhidden">This is an inactive tab</span>
           |  </a>

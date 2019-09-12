@@ -29,8 +29,11 @@ class ActiveTabTemplateSpec extends TemplateBaseSpec {
 
       val expectedMarkup = Html(
         """
-          |<li class="tabs-nav__tab tabs-nav__tab--active font-medium">
-          |  <a href="#" class="in-selected-tab">Tabby</a>
+          |<li class="tabs-nav__tab tabs-nav__tab--active font-medium" role="presentation">
+          |  <a href="#" class="in-selected-tab" role="tab"
+          |    aria-controls="Tabby" aria-selected="true" tabindex="0">
+          |    Tabby
+          |</a>
           |  <span class="visuallyhidden">This is an active tab</span>
           |</li>
         """.stripMargin
