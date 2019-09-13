@@ -50,7 +50,7 @@
 
           case (0 | 1 | 2, true) => {
 
-            <ul class="tabs-nav">
+            <ul class="tabs-nav" role="tablist">
 
               @submittedReturnsTabs(model.returnYears, model.selectedYear)
 
@@ -68,7 +68,7 @@
 
           case (2 | 3, _) => {
 
-            <ul class="tabs-nav">
+            <ul class="tabs-nav" role="tablist">
             @submittedReturnsTabs(model.returnYears, model.selectedYear)
             </ul>
           }

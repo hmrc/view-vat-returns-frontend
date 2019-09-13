@@ -37,18 +37,20 @@ class SubmittedReturnsTabsTemplateSpec extends TemplateBaseSpec {
 
       val expectedMarkup = Html(
         s"""
-          |<li class="tabs-nav__tab font-medium">
-          |  <a href="${tabUrl(tab1Year)}">
+          |<li class="tabs-nav__tab font-medium" role="presentation">
+          |  <a href="${tabUrl(tab1Year)}" role="tab" aria-controls="$tab1Year" aria-selected="false" tabindex="-1">
           |    $tab1Year
           |    <span class="visuallyhidden">$hiddenText1</span>
           |  </a>
           |</li>
-          |<li class="tabs-nav__tab tabs-nav__tab--active font-medium">
-          |  <a href="#" class="in-selected-tab">$tab2Year</a>
+          |<li class="tabs-nav__tab tabs-nav__tab--active font-medium" role="presentation">
+          |  <a href="#" class="in-selected-tab" role="tab" aria-controls="$tab2Year" aria-selected="true" tabindex="0">
+          |    $tab2Year
+          |</a>
           |  <span class="visuallyhidden">$hiddenText2</span>
           |</li>
-          |<li class="tabs-nav__tab font-medium">
-          |  <a href="${tabUrl(tab3Year)}">
+          |<li class="tabs-nav__tab font-medium" role="presentation">
+          |  <a href="${tabUrl(tab3Year)}" role="tab" aria-controls="$tab3Year" aria-selected="false" tabindex="-1">
           |    $tab3Year
           |    <span class="visuallyhidden">$hiddenText3</span>
           |  </a>
