@@ -61,11 +61,10 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     val backLink = "#link-back"
 
     val gaTagElement = "#content ul"
-    val minusSymbol = "#box-four > div.column-one-quarter.form-hint.text--right > span"
-  }
+    val minusSymbol = "#box-four > dd.column-one-quarter.form-hint.text--right > span"
 
-  def boxElement(box: String, column: Int): String = {
-    s"$box > div:nth-child($column)"
+    def boxTitle(box: String): String = s"$box > dt"
+    def boxDescription(box: String): String = s"$box > dd:nth-of-type(1)"
   }
 
   val currentYear: Int = 2018
@@ -166,7 +165,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
 
     "have the correct box numbers in the table" in {
       val expectedBoxes = Array("Box 1", "Box 2", "Box 3", "Box 4", "Box 5", "Box 6", "Box 7", "Box 8", "Box 9")
-      expectedBoxes.indices.foreach(i => elementText(boxElement(Selectors.boxes(i), 1)) shouldBe expectedBoxes(i))
+      expectedBoxes.indices.foreach(i => elementText(Selectors.boxTitle(Selectors.boxes(i))) shouldBe expectedBoxes(i))
     }
 
     "have the correct row descriptions in the table" in {
@@ -181,7 +180,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
         "Total value of supplied goods to EC countries and related costs (excluding VAT)",
         "Total value of goods purchased from EC countries and brought into the UK, as well as any related costs (excluding VAT)"
       )
-      expectedDescriptions.indices.foreach(i => elementText(boxElement(Selectors.boxes(i), 2)) shouldBe expectedDescriptions(i))
+      expectedDescriptions.indices.foreach(i => elementText(Selectors.boxDescription(Selectors.boxes(i))) shouldBe
+        expectedDescriptions(i))
     }
 
     "have the minus symbol before the box four amount" in {
@@ -221,7 +221,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
 
   "Rendering the vat return details page from the returns route with flat rate scheme for an agent" should {
 
-    lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)(fakeRequestWithClientsVRN, messages, mockConfig, Lang.forCode("en"), agentUser)
+    lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)(
+      fakeRequestWithClientsVRN, messages, mockConfig, Lang.forCode("en"), agentUser)
 
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
@@ -254,7 +255,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
 
     "have the correct box 6 description in the table" in {
       val expectedDescription = "Total value of sales and other supplies, excluding VAT"
-      elementText(boxElement(Selectors.boxes(5), 2)) shouldBe expectedDescription
+      elementText(Selectors.boxDescription(Selectors.boxes(5))) shouldBe expectedDescription
     }
   }
 
@@ -369,7 +370,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     }
 
     "have the correct box 5 description in the table" in {
-      elementText(boxElement(Selectors.boxes(4), 2)) shouldBe "Return total"
+      elementText(Selectors.boxDescription(Selectors.boxes(4))) shouldBe "Return total"
     }
   }
 
@@ -425,7 +426,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     }
 
     "have the correct box 5 description in the table" in {
-      elementText(boxElement(Selectors.boxes(4), 2)) shouldBe "Return total"
+      elementText(Selectors.boxDescription(Selectors.boxes(4))) shouldBe "Return total"
     }
   }
 
@@ -477,7 +478,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     }
 
     "have the correct box 5 description in the table" in {
-      elementText(boxElement(Selectors.boxes(4), 2)) shouldBe "Return total"
+      elementText(Selectors.boxDescription(Selectors.boxes(4))) shouldBe "Return total"
     }
   }
 

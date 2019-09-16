@@ -100,7 +100,11 @@
 }
 
 @footerTop = {}
-@footerLinks = {}
+
+@footerLinks = {
+    @uiLayouts.footer_links(
+        accessibilityFooterUrl = Some(appConfig.accessibilityLinkUrl))
+    }
 
 @phaseBanner = {
 <div class="beta-banner">
@@ -148,4 +152,4 @@
     )
 }
 
-@hmrcGovUkTemplate(Some(pageTitle), bodyClasses)(head, bodyEnd, insideHeader, afterHeader, footerTop, Some(uiLayouts.footer_links()), true)(content)
+@hmrcGovUkTemplate(Some(pageTitle), bodyClasses)(head, bodyEnd, insideHeader, afterHeader, footerTop, Some(footerLinks), true)(content)
