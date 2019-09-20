@@ -55,6 +55,7 @@ class MockAppConfig(val runModeConfiguration: Configuration, val mode: Mode = Mo
   override val staticDateValue: String = "2018-05-01"
   override val future2020DateValue: String = "2020-05-01"
   override val finalReturnPeriodKey: String = "9999"
+  override val accessibilityLinkUrl: String = "/accessibility-statement"
   override def surveyUrl(identifier: String): String = s"/some-survey-url/$identifier"
   override def signOutUrl(identifier: String): String = s"/some-gg-signout-url/$identifier"
   override val mtdVatSignUpUrl: String = "mtd-sign-up"

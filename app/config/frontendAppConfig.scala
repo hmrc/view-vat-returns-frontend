@@ -77,6 +77,7 @@ trait AppConfig extends ServicesConfig {
   val agentClientLookupUrl: String => String
   val agentClientUnauthorisedUrl: String => String
   val agentClientActionUrl: String
+  val accessibilityLinkUrl: String
 }
 
 @Singleton
@@ -191,4 +192,6 @@ class FrontendAppConfig @Inject()(val runModeConfiguration: Configuration, val e
 
   override lazy val agentClientActionUrl: String =
     getString(Keys.vatAgentClientLookupFrontendHost) + getString(Keys.vatAgentClientLookupActionUrl)
+
+  override val accessibilityLinkUrl: String = getString(ConfigKeys.vatSummaryBase) + getString(ConfigKeys.vatSummaryAccessibilityUrl)
 }

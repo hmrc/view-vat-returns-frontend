@@ -23,6 +23,7 @@ import org.jsoup.nodes.Document
 class GovUkWrapperSpec extends ViewBaseSpec {
 
   val navTitleSelector = ".header__menu__proposition-name"
+  val accessibilityLinkSelector = "#footer > div > div > div.footer-meta-inner > ul > li:nth-child(2) > a"
 
   "Calling .govuk_wrapper" when {
 
@@ -33,6 +34,10 @@ class GovUkWrapperSpec extends ViewBaseSpec {
 
       "have no nav title" in {
         elementText(navTitleSelector) shouldBe "VAT"
+      }
+
+      "have the correct Accessibility link" in {
+        element(accessibilityLinkSelector).attr("href") shouldBe "/accessibility-statement"
       }
     }
 
@@ -46,6 +51,10 @@ class GovUkWrapperSpec extends ViewBaseSpec {
         "have a nav title of 'Your client’s VAT details'" in {
           elementText(navTitleSelector) shouldBe "Your client’s VAT details"
         }
+
+        "have the correct Accessibility link" in {
+          element(accessibilityLinkSelector).attr("href") shouldBe "/accessibility-statement"
+        }
       }
 
       "user is not an agent" should {
@@ -55,6 +64,10 @@ class GovUkWrapperSpec extends ViewBaseSpec {
 
         "have a nav title of 'Business tax account'" in {
           elementText(navTitleSelector) shouldBe "Business tax account"
+        }
+
+        "have the correct Accessibility link" in {
+          element(accessibilityLinkSelector).attr("href") shouldBe "/accessibility-statement"
         }
       }
     }
