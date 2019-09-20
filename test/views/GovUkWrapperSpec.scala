@@ -36,8 +36,8 @@ class GovUkWrapperSpec extends ViewBaseSpec {
         elementText(navTitleSelector) shouldBe "VAT"
       }
 
-      s"have the correct Accessibility link" in {
-        element(accessibilityLinkSelector).attr("href") shouldBe mockConfig.accessibilityLinkUrl
+      "have the correct Accessibility link" in {
+        element(accessibilityLinkSelector).attr("href") shouldBe "/accessibility-statement"
       }
     }
 
@@ -52,8 +52,8 @@ class GovUkWrapperSpec extends ViewBaseSpec {
           elementText(navTitleSelector) shouldBe "Your client’s VAT details"
         }
 
-        s"have the correct Accessibility link" in {
-          element(accessibilityLinkSelector).attr("href") shouldBe mockConfig.accessibilityLinkUrl
+        "have the correct Accessibility link" in {
+          element(accessibilityLinkSelector).attr("href") shouldBe "/accessibility-statement"
         }
       }
 
@@ -66,8 +66,8 @@ class GovUkWrapperSpec extends ViewBaseSpec {
           elementText(navTitleSelector) shouldBe "Business tax account"
         }
 
-        s"have the correct Accessibility link" in {
-          element(accessibilityLinkSelector).attr("href") shouldBe mockConfig.accessibilityLinkUrl
+        "have the correct Accessibility link" in {
+          element(accessibilityLinkSelector).attr("href") shouldBe "/accessibility-statement"
         }
       }
     }
