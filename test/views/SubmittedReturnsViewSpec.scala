@@ -370,7 +370,7 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
 
       "have the correct alternate content" in {
         elementText(Selectors.noReturnsFound) shouldBe
-          "You have not submitted any returns for 2018 yet. You must use accounting software to submit your returns."
+          "You have not submitted any returns using the new VAT service this year."
       }
 
     }
