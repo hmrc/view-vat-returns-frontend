@@ -563,10 +563,6 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     "not show the entity name heading" in {
       document.select(Selectors.entityNameHeading) shouldBe empty
     }
-
-    "append a GA tag to the ul element regarding the graceful error handling" in {
-      element(Selectors.gaTagElement).attr("data-metrics") shouldBe "error:hidden-text:vat-return-entity-name"
-    }
   }
 
   "Rendering the VAT return details page when the period key is 9999 (Final Return)" should {

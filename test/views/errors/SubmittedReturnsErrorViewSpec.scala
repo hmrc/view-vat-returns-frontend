@@ -77,10 +77,6 @@ class SubmittedReturnsErrorViewSpec extends ViewBaseSpec {
     "have the correct link" in {
       element(Selectors.previousReturnsLink).attr("href") shouldBe "/portal-url/111111111"
     }
-
-    "have the correct GA tag for the graceful error content" in {
-      element(Selectors.previousReturn).attr("data-metrics") shouldBe "error:help-text:portal-returns"
-    }
   }
 
 }

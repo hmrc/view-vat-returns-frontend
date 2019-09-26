@@ -116,14 +116,6 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
       "have a submit-your-return link" in {
         document.getElementById("submit-return-link").text() shouldBe "Submit VAT Return"
       }
-
-      "have the correct GA event tag for submitting a return" in {
-        document.getElementById("submit-return-link").attr("data-journey-click") shouldBe "submit-return:click:return-deadlines"
-      }
-
-      "have the correct GA event tag for a page view" in {
-        document.getElementsByTag("h1").attr("data-metrics") shouldBe "opted-out:view:return-deadlines"
-      }
     }
 
     "end date has not yet passed" should {
@@ -197,14 +189,6 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
       )
 
       lazy implicit val document: Document = Jsoup.parse(view.body)
-
-      "have the correct GA event tag for submitting a return" in {
-        document.getElementById("submit-return-link").attr("data-journey-click") shouldBe "agent_submit-return:click:return-deadlines"
-      }
-
-      "have the correct GA event tag for a page view" in {
-        document.getElementsByTag("h1").attr("data-metrics") shouldBe "agent_opted-out:view:return-deadlines"
-      }
     }
   }
 
@@ -253,14 +237,6 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
 
       "have a submit-your-return link" in {
         document.getElementById("submit-return-link").text() shouldBe "Submit VAT Return"
-      }
-
-      "have the correct GA event tag for submitting a return" in {
-        document.getElementById("submit-return-link").attr("data-journey-click") shouldBe "agent_submit-return:click:return-deadlines"
-      }
-
-      "have the correct GA event tag for a page view" in {
-        document.getElementsByTag("h1").attr("data-metrics") shouldBe "agent_opted-out:view:return-deadlines"
       }
     }
 

@@ -83,7 +83,7 @@
       vatReturnViewModel.isHybridUser
     )
 
-    <ul @if(vatReturnViewModel.entityName.isEmpty){data-metrics="error:hidden-text:vat-return-entity-name"}>
+    <ul>
       <li>@messages("yourVatReturn.returnDueDate") @displayDate(vatReturnViewModel.dueDate)</li>
       <li>@messages("yourVatReturn.dateSubmitted") @displayDate(vatReturnViewModel.dateSubmitted)</li>
     </ul>

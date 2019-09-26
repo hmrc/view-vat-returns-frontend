@@ -45,8 +45,7 @@
                     <a id="link-back" class="link-back" href='@appConfig.agentClientActionUrl'>@messages("base.back")</a>
                 }
 
-                <h1 class="heading-xlarge"
-                    data-metrics="@{gaPrefix + "opted-out:view:return-deadlines"}">@messages("returnDeadlines.submitReturn.title")</h1>
+                <h1 class="heading-xlarge">@messages("returnDeadlines.submitReturn.title")</h1>
                 <div class="form-group">
                     <ul class="list">
                     @for(deadline <- deadlines){
@@ -72,8 +71,7 @@
 
                                 @if(currentDate.isAfter(deadline.end)) {
                                     <a href="@{appConfig.submitVatReturnForm(deadline.periodKey)}"
-                                        id="submit-return-link"
-                                        data-journey-click="@{gaPrefix + "submit-return:click:return-deadlines"}">@messages("returnDeadlines.submitReturn")
+                                        id="submit-return-link">@messages("returnDeadlines.submitReturn")
                                     </a>
                                 } else {
                                     <span>@messages("returnDeadlines.submitReturn.futureReturn", displayDate(deadline.end.plusDays(1), showYear = false))</span>

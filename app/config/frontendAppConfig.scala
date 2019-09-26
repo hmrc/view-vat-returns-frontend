@@ -31,8 +31,6 @@ import play.api.i18n.Lang
 
 trait AppConfig extends ServicesConfig {
   val appName:String
-  val analyticsToken: String
-  val analyticsHost: String
   val reportAProblemPartialUrl: String
   val reportAProblemNonJSUrl: String
   val whitelistEnabled: Boolean
@@ -94,9 +92,6 @@ class FrontendAppConfig @Inject()(val runModeConfiguration: Configuration, val e
   override lazy val reportAProblemNonJSUrl: String =
     s"$contactHost/contact/problem_reports_nonjs?service=$contactFormServiceIdentifier"
   override lazy val feedbackFormPartialUrl: String = s"$contactFrontendService/contact/beta-feedback/form"
-
-  override lazy val analyticsToken: String = getString(Keys.googleAnalyticsToken)
-  override lazy val analyticsHost: String = getString(Keys.googleAnalyticsHost)
 
   private def whitelistConfig(key: String): Seq[String] = Some(new String(Base64.getDecoder
     .decode(runModeConfiguration.getString(key).getOrElse("")), "UTF-8"))
