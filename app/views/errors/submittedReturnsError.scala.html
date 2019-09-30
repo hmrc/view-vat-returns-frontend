@@ -24,9 +24,9 @@
       <p class="lede">@messages("technicalProblem.message")</p>
 
       @if(user.hasNonMtdVat) {
-        <p data-metrics="error:help-text:portal-returns">
+        <p>
           @messages("submittedReturns.previousReturnsOne")
-          <a href="@appConfig.portalUrl(user.vrn)" data-journey-click="return:view-portal-returns:submitted-returns">
+          <a href="@appConfig.portalUrl(user.vrn)" >
           @messages("submittedReturns.previousReturnsTwo")</a>.
         </p>
       }

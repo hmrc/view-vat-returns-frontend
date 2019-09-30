@@ -83,7 +83,7 @@
           <h2>@messages("submittedReturns.previousReturns")</h2>
           <p id="previous-one">
             @messages("submittedReturns.previousReturnsOne")
-            <a target="_blank" href="@appConfig.portalUrl(model.vrn)" data-journey-click="return:view-portal-returns:submitted-returns">
+            <a target="_blank" href="@appConfig.portalUrl(model.vrn)">
             @messages("submittedReturns.previousReturnsTwo")</a>.
           </p>
         } else {
@@ -99,12 +99,7 @@
             <ul class="list list-bullet">
             @for(obligation <- model.obligations) {
               <li>
-                <a href="@controllers.routes.ReturnsController.vatReturn(model.selectedYear, obligation.periodKey)"
-                data-journey-click="returns:view-return-@{
-                  obligation.start
-                }-to-@{
-                  obligation.end
-                }:submitted-returns">
+                <a href="@controllers.routes.ReturnsController.vatReturn(model.selectedYear, obligation.periodKey)">
                   <span class="visually-hidden">@messages("submittedReturns.periodPrefix")</span>
                   @if(obligation.isFinalObligation) {
                     @messages("submittedReturns.finalReturn")
@@ -119,16 +114,15 @@
             @if(model.returnYears.max == model.selectedYear && user.isAgent && appConfig.features.agentAccess()){
               <p>
                 <a id="changeClient"
-                  href="@{appConfig.agentClientLookupUrl(appConfig.agentClientActionUrl)}"
-                  data-journey-click="agent_returns:click:change-client">@messages("submittedReturns.changeClient")
+                  href="@{appConfig.agentClientLookupUrl(appConfig.agentClientActionUrl)}">
+                  @messages("submittedReturns.changeClient")
                 </a>
               </p>
               <p>
                 <a id="finish"
                    class="btn button"
                    role="button"
-                   href="@appConfig.agentClientActionUrl"
-                   data-journey-click="agent_returns:click:finish">@messages("submittedReturns.finish")
+                   href="@appConfig.agentClientActionUrl">@messages("submittedReturns.finish")
                 </a>
               </p>
             }

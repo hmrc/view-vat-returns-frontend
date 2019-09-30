@@ -27,8 +27,6 @@ class MockAppConfig(val runModeConfiguration: Configuration, val mode: Mode = Mo
 
   override def feedbackUrl(redirect: String): String = "localhost/feedback"
   override val appName: String = "view-vat-returns-frontend"
-  override val analyticsToken: String = ""
-  override val analyticsHost: String = ""
   override val reportAProblemPartialUrl: String = ""
   override val reportAProblemNonJSUrl: String = ""
   override val whitelistEnabled: Boolean = false
