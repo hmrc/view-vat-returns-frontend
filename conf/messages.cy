@@ -116,7 +116,7 @@ paymentStatus.repaymentProcessing = Gall gymryd hyd at 30 diwrnod i chi gael ad-
 paymentStatus.whatYouOweCalc = Rydym wedi cyfrifo’r hyn sydd arnoch ar sail unrhyw daliadau mae’n bosibl eich bod wedi eu gwneud ar eich cyfrif.
 
 submittedReturns.title = Ffurflenni TAW wedi’u cyflwyno
-submittedReturns.yearReturns = {0} Ffurflen TAW
+submittedReturns.yearReturns = Ffurflenni TAW {0}
 submittedReturns.period = Ar gyfer y cyfnod:
 submittedReturns.periodPrefix = Bwrw golwg dros Ffurflen TAW ar gyfer y cyfnod
 submittedReturns.previousReturnsOne = Os ydych wedi cyflwyno Ffurflenni TAW heb ddefnyddio’r feddalwedd ar gyfer y gwasanaeth newydd hwn, gallwch
