@@ -108,48 +108,48 @@ class PaymentsHttpParserSpec extends UnitSpec {
       val expected = Right(Payments(Seq(
         Payment(
           "VAT Return Debit Charge",
-          start = LocalDate.parse("2016-12-01"),
-          end = LocalDate.parse("2017-01-01"),
+          periodFrom = LocalDate.parse("2016-12-01"),
+          periodTo = LocalDate.parse("2017-01-01"),
           due = LocalDate.parse("2017-10-25"),
           outstandingAmount = BigDecimal(1000.00),
           periodKey = "#003"
         ),
         Payment(
           "VAT Return Credit Charge",
-          start = LocalDate.parse("2017-12-01"),
-          end = LocalDate.parse("2018-01-01"),
+          periodFrom = LocalDate.parse("2017-12-01"),
+          periodTo = LocalDate.parse("2018-01-01"),
           due = LocalDate.parse("2018-10-25"),
           outstandingAmount = BigDecimal(-1000.00),
           periodKey = "#004"
         ),
         Payment(
           "VAT AA Return Debit Charge",
-          start = LocalDate.parse("2018-12-01"),
-          end = LocalDate.parse("2019-01-01"),
+          periodFrom = LocalDate.parse("2018-12-01"),
+          periodTo = LocalDate.parse("2019-01-01"),
           due = LocalDate.parse("2019-10-25"),
           outstandingAmount = BigDecimal(1000.00),
           periodKey = "#005"
         ),
         Payment(
           "VAT AA Return Credit Charge",
-          start = LocalDate.parse("2019-12-01"),
-          end = LocalDate.parse("2020-01-01"),
+          periodFrom = LocalDate.parse("2019-12-01"),
+          periodTo = LocalDate.parse("2020-01-01"),
           due = LocalDate.parse("2020-10-25"),
           outstandingAmount = BigDecimal(-1000.00),
           periodKey = "#006"
         ),
         Payment(
           "VAT POA Return Debit Charge",
-          start = LocalDate.parse("2020-12-01"),
-          end = LocalDate.parse("2021-01-01"),
+          periodFrom = LocalDate.parse("2020-12-01"),
+          periodTo = LocalDate.parse("2021-01-01"),
           due = LocalDate.parse("2021-10-25"),
           outstandingAmount = BigDecimal(1000.00),
           periodKey = "#007"
         ),
         Payment(
           "VAT POA Return Credit Charge",
-          start = LocalDate.parse("2021-12-01"),
-          end = LocalDate.parse("2022-01-01"),
+          periodFrom = LocalDate.parse("2021-12-01"),
+          periodTo = LocalDate.parse("2022-01-01"),
           due = LocalDate.parse("2022-10-25"),
           outstandingAmount = BigDecimal(-1000.00),
           periodKey = "#008"

@@ -53,8 +53,8 @@ class ReturnDeadlinesController @Inject()(val messagesApi: MessagesApi,
   private[controllers] def toReturnDeadlineViewModel(obligation: VatReturnObligation, date: LocalDate): ReturnDeadlineViewModel = {
     ReturnDeadlineViewModel(
       obligation.due,
-      obligation.start,
-      obligation.end,
+      obligation.periodFrom,
+      obligation.periodTo,
       obligation.due.isBefore(date),
       obligation.periodKey
     )

@@ -35,7 +35,7 @@
 
     <h1 class="heading-xlarge">@messages("returnDeadlines.title")</h1>
     @lastObligation.map { obligation =>
-            <p class="lede">@messages("returnDeadlines.receivedReturn", displayDateRange(obligation.start, obligation.end))</p>
+            <p class="lede">@messages("returnDeadlines.receivedReturn", displayDateRange(obligation.periodFrom, obligation.periodTo))</p>
     }
 
     <p>

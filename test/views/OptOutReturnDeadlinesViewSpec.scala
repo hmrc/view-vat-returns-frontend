@@ -60,7 +60,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
         ReturnDeadlineViewModel(
           LocalDate.parse("2018-02-02"),
           LocalDate.parse("2018-01-01"),
-          end = LocalDate.parse("2018-01-01"),
+          periodTo = LocalDate.parse("2018-01-01"),
           periodKey = "18CC"
         )
       )
@@ -124,7 +124,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
         ReturnDeadlineViewModel(
           LocalDate.parse("2018-02-02"),
           LocalDate.parse("2018-01-01"),
-          end = LocalDate.parse("2018-12-31"),
+          periodTo = LocalDate.parse("2018-12-31"),
           periodKey = "18CC"
         )
       )
@@ -151,7 +151,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
         ReturnDeadlineViewModel(
           LocalDate.parse("2018-02-02"),
           LocalDate.parse("2018-01-01"),
-          end = currentDate,
+          periodTo = currentDate,
           periodKey = "18CC"
         )
       )
@@ -174,7 +174,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
         ReturnDeadlineViewModel(
           LocalDate.parse("2018-02-02"),
           LocalDate.parse("2018-01-01"),
-          end = LocalDate.parse("2018-01-01"),
+          periodTo = LocalDate.parse("2018-01-01"),
           periodKey = "18CC"
         )
       )
@@ -200,7 +200,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
         ReturnDeadlineViewModel(
           LocalDate.parse("2018-02-02"),
           LocalDate.parse("2018-01-01"),
-          end = LocalDate.parse("2018-01-01"),
+          periodTo = LocalDate.parse("2018-01-01"),
           periodKey = "18CC"
         )
       )
@@ -246,7 +246,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
         ReturnDeadlineViewModel(
           LocalDate.parse("2018-02-02"),
           LocalDate.parse("2018-01-01"),
-          end = LocalDate.parse("2018-12-31"),
+          periodTo = LocalDate.parse("2018-12-31"),
           periodKey = "18CC"
         )
       )
@@ -273,7 +273,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
         ReturnDeadlineViewModel(
           LocalDate.parse("2018-02-02"),
           LocalDate.parse("2018-01-01"),
-          end = currentDate,
+          periodTo = currentDate,
           periodKey = "18CC"
         )
       )
@@ -296,7 +296,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
         ReturnDeadlineViewModel(
           LocalDate.parse("2018-02-02"),
           LocalDate.parse("2018-01-01"),
-          end = LocalDate.parse("2018-01-01"),
+          periodTo = LocalDate.parse("2018-01-01"),
           periodKey = "18CC"
         )
       )

@@ -64,17 +64,17 @@
                                     @if(deadline.isFinalReturn) {
                                         @messages("returnDeadlines.finalReturn")
                                     } else {
-                                        @messages("returnDeadlines.periodEnding", displayDateRange(deadline.start, deadline.end))
+                                        @messages("returnDeadlines.periodEnding", displayDateRange(deadline.periodFrom, deadline.periodTo))
                                     }
                                 </span>
 
 
-                                @if(currentDate.isAfter(deadline.end)) {
+                                @if(currentDate.isAfter(deadline.periodTo)) {
                                     <a href="@{appConfig.submitVatReturnForm(deadline.periodKey)}"
                                         id="submit-return-link">@messages("returnDeadlines.submitReturn")
                                     </a>
                                 } else {
-                                    <span>@messages("returnDeadlines.submitReturn.futureReturn", displayDate(deadline.end.plusDays(1), showYear = false))</span>
+                                    <span>@messages("returnDeadlines.submitReturn.futureReturn", displayDate(deadline.periodTo.plusDays(1), showYear = false))</span>
                                 }
                             </p>
                         </li>

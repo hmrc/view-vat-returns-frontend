@@ -104,7 +104,7 @@
                   @if(obligation.isFinalObligation) {
                     @messages("submittedReturns.finalReturn")
                   } else {
-                    @displayDateRange(obligation.start, obligation.end)
+                    @displayDateRange(obligation.periodFrom, obligation.periodTo)
                   }
                 </a>
               </li>

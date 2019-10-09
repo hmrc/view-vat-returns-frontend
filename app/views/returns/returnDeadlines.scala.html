@@ -54,7 +54,7 @@
                   @if(deadline.isFinalReturn) {
                     @messages("returnDeadlines.finalReturn")
                   } else {
-                    @messages("returnDeadlines.periodEnding", displayDateRange(deadline.start, deadline.end))
+                    @messages("returnDeadlines.periodEnding", displayDateRange(deadline.periodFrom, deadline.periodTo))
                   }
                 </span>
               </p>

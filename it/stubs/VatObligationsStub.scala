@@ -35,35 +35,35 @@ class VatObligationsStub(backendFeatureEnabled: Boolean) extends WireMockMethods
     when(method = GET, uri = obligationsUri, queryParams = Map(
       "from" -> dateRegex, "to" -> dateRegex, "status" -> "A"
     ))
-      .thenReturn(status = OK, body = Json.toJson(allObligations))
+      .thenReturn(status = OK, body = allObligationsJson)
   }
 
   def stubOutstandingObligations: StubMapping = {
     when(method = GET, uri = obligationsUri, queryParams = Map(
       "status" -> "O"
     ))
-      .thenReturn(status = OK, body = Json.toJson(outstandingObligations))
+      .thenReturn(status = OK, body = pastOutstandingObligationJson)
   }
 
   def stubFulfilledObligations: StubMapping = {
     when(method = GET, uri = obligationsUri, queryParams = Map(
       "from" -> dateRegex, "to" -> dateRegex, "status" -> "F"
     ))
-      .thenReturn(status = OK, body = Json.toJson(fulfilledObligations))
+      .thenReturn(status = OK, body = pastFulfilledObligationJson)
   }
 
   def stub2018Obligations: StubMapping = {
     when(method = GET, uri = obligationsUri, queryParams = Map(
       "from" -> dateRegex, "to" -> dateRegex, "status" -> "F"
     ))
-      .thenReturn(status = OK, body = Json.toJson(obligationsFor2018))
+      .thenReturn(status = OK, body = obligationsFor2018Json)
   }
 
   def stub2017Obligations: StubMapping = {
     when(method = GET, uri = obligationsUri, queryParams = Map(
       "from" -> dateRegex, "to" -> dateRegex, "status" -> "F"
     ))
-      .thenReturn(status = OK, body = Json.toJson(obligationsFor2017))
+      .thenReturn(status = OK, body = obligationsFor2017Json)
   }
 
   def stubNoObligations: StubMapping = {
@@ -115,75 +115,91 @@ class VatObligationsStub(backendFeatureEnabled: Boolean) extends WireMockMethods
       .thenReturn(BAD_REQUEST, body = Json.toJson(multipleErrors))
   }
 
-  val pastFulfilledObligation = VatReturnObligation(
-    start = LocalDate.parse("2018-01-01"),
-    end = LocalDate.parse("2018-03-31"),
-    due = LocalDate.parse("2018-05-07"),
-    status = "F",
-    received = Some(LocalDate.parse("2018-04-15")),
-    periodKey = "#001"
-  )
-
-  val pastOutstandingObligation = VatReturnObligation(
-    start = LocalDate.parse("2018-01-01"),
-    end = LocalDate.parse("2018-03-31"),
-    due = LocalDate.parse("2018-05-07"),
-    status = "O",
-    received = None,
-    periodKey = "#004"
-  )
-
-  val allObligations = VatReturnObligations(
-    Seq(
-      pastFulfilledObligation,
-      pastOutstandingObligation
+  private val pastFulfilledObligationJson = Json.obj(
+    "obligations" -> Json.arr(
+      Json.obj(
+        "start" -> "2018-01-01",
+        "end" -> "2018-03-31",
+        "due" -> "2018-05-07",
+        "status" -> "F",
+        "received" -> "2018-04-15",
+        "periodKey" -> "#001"
+      )
     )
   )
 
-  val obligationsFor2018 = VatReturnObligations(Seq(
-    VatReturnObligation(
-      LocalDate.parse("2018-07-31"),
-      LocalDate.parse("2018-10-31"),
-      LocalDate.parse("2018-11-30"),
-      "F",
-      Some(LocalDate.parse("2018-11-27")),
-      "#002"
+  private val pastOutstandingObligationJson = Json.obj(
+    "obligations" -> Json.arr(
+      Json.obj(
+        "start" -> "2018-01-01",
+        "end" -> "2018-03-31",
+        "due" -> "2018-05-07",
+        "status" -> "O",
+        "periodKey" -> "#004"
+      )
     )
-  ))
-
-  val obligationsFor2017 = VatReturnObligations(Seq(
-    VatReturnObligation(
-      LocalDate.parse("2017-07-31"),
-      LocalDate.parse("2017-10-31"),
-      LocalDate.parse("2017-11-30"),
-      "F",
-      Some(LocalDate.parse("2017-11-27")),
-      "#002"
-    ),
-    VatReturnObligation(
-      LocalDate.parse("2017-04-30"),
-      LocalDate.parse("2017-07-31"),
-      LocalDate.parse("2017-08-31"),
-      "F",
-      Some(LocalDate.parse("2017-08-30")),
-      "#003"
-    ),
-    VatReturnObligation(
-      LocalDate.parse("2017-01-31"),
-      LocalDate.parse("2017-04-30"),
-      LocalDate.parse("2017-05-31"),
-      "F",
-      Some(LocalDate.parse("2017-05-28")),
-      "#004"
-    ))
   )
 
-  val outstandingObligations = VatReturnObligations(
-    allObligations.obligations.filter(_.status == "O")
+  private val allObligationsJson = Json.obj(
+    "obligations" -> Json.arr(
+      Json.obj(
+        "start" -> "2018-01-01",
+        "end" -> "2018-03-31",
+        "due" -> "2018-05-07",
+        "status" -> "F",
+        "received" -> "2018-04-15",
+        "periodKey" -> "#001"
+      ),
+      Json.obj(
+        "start" -> "2018-01-01",
+        "end" -> "2018-03-31",
+        "due" -> "2018-05-07",
+        "status" -> "O",
+        "periodKey" -> "#004"
+      )
+    )
   )
 
-  val fulfilledObligations = VatReturnObligations(
-    allObligations.obligations.filter(_.status == "F")
+  private val obligationsFor2018Json = Json.obj(
+    "obligations" -> Json.arr(
+      Json.obj(
+        "start" -> "2018-07-31",
+        "end" -> "2018-10-31",
+        "due" -> "2018-11-30",
+        "status" -> "F",
+        "received" -> "2018-11-27",
+        "periodKey" -> "#002"
+      )
+    )
+  )
+
+  private val obligationsFor2017Json = Json.obj(
+    "obligations" -> Json.arr(
+      Json.obj(
+        "start" -> "2017-07-31",
+        "end" -> "2017-10-31",
+        "due" -> "2017-11-30",
+        "status" -> "F",
+        "received" -> "2017-11-27",
+        "periodKey" -> "#002"
+      ),
+      Json.obj(
+        "start" -> "2017-04-30",
+        "end" -> "2017-07-31",
+        "due" -> "2017-08-31",
+        "status" -> "F",
+        "received" -> "2017-08-30",
+        "periodKey" -> "#003"
+      ),
+      Json.obj(
+        "start" -> "2017-01-31",
+        "end" -> "2017-04-30",
+        "due" -> "2017-05-31",
+        "status" -> "F",
+        "received" -> "2017-05-28",
+        "periodKey" -> "#004"
+      )
+    )
   )
 
   val noObligations = VatReturnObligations(Seq.empty)

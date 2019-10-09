@@ -78,8 +78,8 @@ class NoUpcomingReturnDeadlinesViewSpec extends ViewBaseSpec {
   "Rendering the Return deadlines page with a fulfilled obligation" should {
 
     val fulfilledObligation = Some(ReturnDeadlineViewModel(
-      end = LocalDate.parse("2018-04-01"),
-      start = LocalDate.parse("2018-01-01"),
+      periodTo = LocalDate.parse("2018-04-01"),
+      periodFrom = LocalDate.parse("2018-01-01"),
       due = LocalDate.parse("2018-05-01"),
       periodKey = "18CC"
     ))
