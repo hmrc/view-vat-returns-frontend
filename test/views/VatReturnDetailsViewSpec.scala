@@ -338,8 +338,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
         oweHmrc = Some(true),
         Some(Payment(
           chargeType = "VAT",
-          start = LocalDate.parse("2017-01-01"),
-          end = LocalDate.parse("2017-03-31"),
+          periodFrom = LocalDate.parse("2017-01-01"),
+          periodTo = LocalDate.parse("2017-03-31"),
           due = LocalDate.parse("2017-04-06"),
           outstandingAmount = 1000.00,
           periodKey = "#001"
@@ -400,8 +400,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
         oweHmrc = Some(false),
         Some(Payment(
           chargeType = "VAT",
-          start = LocalDate.parse("2017-01-01"),
-          end = LocalDate.parse("2017-03-31"),
+          periodFrom = LocalDate.parse("2017-01-01"),
+          periodTo = LocalDate.parse("2017-03-31"),
           due = LocalDate.parse("2017-04-06"),
           outstandingAmount = 1000.00,
           periodKey = "#001"
@@ -456,8 +456,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
         oweHmrc = Some(false),
         Some(Payment(
           chargeType = "VAT Return Credit Charge",
-          start = LocalDate.parse("2017-01-01"),
-          end = LocalDate.parse("2017-03-31"),
+          periodFrom = LocalDate.parse("2017-01-01"),
+          periodTo = LocalDate.parse("2017-03-31"),
           due = LocalDate.parse("2017-04-06"),
           outstandingAmount = 0,
           periodKey = "#001"

@@ -37,7 +37,7 @@ class VatReturnObligationSpec extends UnitSpec {
       )
 
       val expected =
-        """{"start":"2017-01-01","end":"2017-12-31","due":"2018-01-31","status":"O","periodKey":"#001"}"""
+        """{"periodFrom":"2017-01-01","periodTo":"2017-12-31","due":"2018-01-31","status":"O","periodKey":"#001"}"""
 
 
       val result = Json.toJson(input).toString()
@@ -85,7 +85,7 @@ class VatReturnObligationSpec extends UnitSpec {
       )
 
       val expected =
-        """{"obligations":[{"start":"2017-01-01","end":"2017-12-31","due":"2018-01-31","status":"O","periodKey":"#001"}]}"""
+        """{"obligations":[{"periodFrom":"2017-01-01","periodTo":"2017-12-31","due":"2018-01-31","status":"O","periodKey":"#001"}]}"""
 
       val result = Json.toJson(input).toString()
 

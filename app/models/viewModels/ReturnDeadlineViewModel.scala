@@ -21,8 +21,8 @@ import java.time.LocalDate
 import config.AppConfig
 
 case class ReturnDeadlineViewModel(due: LocalDate,
-                                   start: LocalDate,
-                                   end: LocalDate,
+                                   periodFrom: LocalDate,
+                                   periodTo: LocalDate,
                                    overdue: Boolean = false,
                                    periodKey: String) {
 

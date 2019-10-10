@@ -88,7 +88,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
 
           def obligationCall(payment: Option[Payment]) = {
             payment.fold(Future.successful(Option.empty[VatReturnObligation])) { p =>
-              returnsService.getObligationWithMatchingPeriodKey(user.vrn, p.end.getYear, periodKey)
+              returnsService.getObligationWithMatchingPeriodKey(user.vrn, p.periodTo.getYear, periodKey)
             }
           }
 
@@ -190,8 +190,8 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
 
     VatReturnViewModel(
       entityName = customerDetail.fold(Option.empty[String])(detail => Some(detail.entityName)),
-      periodFrom = obligation.start,
-      periodTo = obligation.end,
+      periodFrom = obligation.periodFrom,
+      periodTo = obligation.periodTo,
       dueDate = obligation.due,
       returnTotal = amountToShow,
       dateSubmitted = obligation.received.get,

@@ -20,8 +20,8 @@ import java.time.LocalDate
 
 import config.AppConfig
 
-case class ReturnObligationsViewModel(start: LocalDate,
-                                      end: LocalDate,
+case class ReturnObligationsViewModel(periodFrom: LocalDate,
+                                      periodTo: LocalDate,
                                       periodKey: String) {
 
   def isFinalObligation(implicit appConfig: AppConfig): Boolean = periodKey == appConfig.finalReturnPeriodKey

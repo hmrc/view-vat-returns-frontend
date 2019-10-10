@@ -567,8 +567,8 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
       val expectedViewModel = VatReturnViewModel(
         entityName = Some("Cheapo Clothing"),
-        periodFrom = exampleObligation.start,
-        periodTo = exampleObligation.end,
+        periodFrom = exampleObligation.periodFrom,
+        periodTo = exampleObligation.periodTo,
         dueDate = exampleObligation.due,
         returnTotal = examplePayment.outstandingAmount,
         dateSubmitted = exampleObligation.received.get,

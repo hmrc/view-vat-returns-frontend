@@ -28,8 +28,8 @@ case class ViewSubmittedVatObligationsAuditModel(user: User,
 
   override val transactionName: String = "view-submitted-vat-obligations"
 
-  private case class FulfilledObligationDetails(start: LocalDate,
-                                                end: LocalDate,
+  private case class FulfilledObligationDetails(periodFrom: LocalDate,
+                                                periodTo: LocalDate,
                                                 due: LocalDate,
                                                 periodKey: String)
 
@@ -40,7 +40,7 @@ case class ViewSubmittedVatObligationsAuditModel(user: User,
   private implicit val auditDetailWrites: Writes[AuditDetail] = Json.writes[AuditDetail]
 
   private val fulfilledObligations = obligations.map { obligation =>
-    FulfilledObligationDetails(obligation.start, obligation.end, obligation.due, obligation.periodKey)
+    FulfilledObligationDetails(obligation.periodFrom, obligation.periodTo, obligation.due, obligation.periodKey)
   }
 
   private val eventData = AuditDetail(user.vrn, fulfilledObligations)

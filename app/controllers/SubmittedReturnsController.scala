@@ -138,8 +138,8 @@ class SubmittedReturnsController @Inject()(val messagesApi: MessagesApi,
                 selectedYear,
                 obligations.map(obligation =>
                   ReturnObligationsViewModel(
-                    obligation.start,
-                    obligation.end,
+                    obligation.periodFrom,
+                    obligation.periodTo,
                     obligation.periodKey
                   )
                 ),
