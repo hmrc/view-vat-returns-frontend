@@ -44,7 +44,7 @@ class SubmittedReturnsController @Inject()(val messagesApi: MessagesApi,
                                            auditService: AuditingService)
   extends FrontendController with I18nSupport {
 
-  def submittedReturns(year: Int): Action[AnyContent] = authorisedController.authorisedAction { implicit request =>
+  def submittedReturns(year: Int): Action[AnyContent] = authorisedController.authorisedAction ({ implicit request =>
     implicit user =>
       if (isValidSearchYear(year)) {
         for {
@@ -62,7 +62,7 @@ class SubmittedReturnsController @Inject()(val messagesApi: MessagesApi,
       } else {
         Future.successful(NotFound(views.html.errors.notFound()))
       }
-  }
+  }, ignoreMandatedStatus = true)
 
 
 

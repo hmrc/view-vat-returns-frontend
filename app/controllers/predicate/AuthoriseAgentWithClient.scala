@@ -38,9 +38,9 @@ class AuthoriseAgentWithClient @Inject()(enrolmentsAuthService: EnrolmentsAuthSe
                                          implicit val appConfig: AppConfig
                                         ) extends FrontendController with I18nSupport {
 
-  def authoriseAsAgent(block: Request[AnyContent] => User => Future[Result])
+  def authoriseAsAgent(block: Request[AnyContent] => User => Future[Result], ignoreMandatedStatus: Boolean)
                       (implicit request: Request[AnyContent]): Future[Result] = {
-    
+
     val delegatedAuthRule: String => Enrolment = vrn =>
       Enrolment(EnrolmentKeys.mtdVatEnrolmentKey)
         .withIdentifier(EnrolmentKeys.vatIdentifierId, vrn)
@@ -55,7 +55,7 @@ class AuthoriseAgentWithClient @Inject()(enrolmentsAuthService: EnrolmentsAuthSe
               enrolments.enrolments.collectFirst {
                 case Enrolment(EnrolmentKeys.agentEnrolmentKey, EnrolmentIdentifier(_, arn) :: _, EnrolmentKeys.activated, _) => arn
               } match {
-                case Some(arn) => checkMandationStatus(block, vrn, arn)
+                case Some(arn) => checkMandationStatus(block, vrn, arn, ignoreMandatedStatus)
                 case None =>
                   logDebug("[AuthPredicate][authoriseAsAgent] - Agent with no HMRC-AS-AGENT enrolment. Rendering unauthorised view.")
                   Future.successful(Forbidden(views.html.errors.unauthorised()))
@@ -76,11 +76,15 @@ class AuthoriseAgentWithClient @Inject()(enrolmentsAuthService: EnrolmentsAuthSe
   }
 
 
-  private def checkMandationStatus(block: Request[AnyContent] => User => Future[Result], vrn: String, arn: String)
-                                  (implicit request: Request[AnyContent], hc: HeaderCarrier): Future[Result] = {
+  private def checkMandationStatus(
+                                    block: Request[AnyContent] => User => Future[Result],
+                                    vrn: String,
+                                    arn: String,
+                                    ignoreMandatedStatus: Boolean
+                                  )(implicit request: Request[AnyContent], hc: HeaderCarrier): Future[Result] = {
 
     mandationStatusService.getMandationStatus(vrn) flatMap {
-      case Right(MandationStatus(MandationStatuses.nonMTDfB)) =>
+      case Right(MandationStatus(status)) if (ignoreMandatedStatus && status == MandationStatuses.mandated) || status == MandationStatuses.nonMTDfB =>
         val user = User(vrn, arn = Some(arn))
         block(request)(user)
       case Right(_) =>

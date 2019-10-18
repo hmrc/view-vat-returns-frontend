@@ -37,13 +37,17 @@ class AuthorisedController @Inject()(enrolmentsAuthService: EnrolmentsAuthServic
                                      val agentWithClientPredicate: AuthoriseAgentWithClient,
                                      implicit val appConfig: AppConfig) extends FrontendController with I18nSupport {
 
-  def authorisedAction(block: Request[AnyContent] => User => Future[Result], allowAgentAccess: Boolean = true): Action[AnyContent] = Action.async {
+  def authorisedAction(
+                        block: Request[AnyContent] => User => Future[Result],
+                        allowAgentAccess: Boolean = true,
+                        ignoreMandatedStatus: Boolean = false
+                      ): Action[AnyContent] = Action.async {
     implicit request =>
 
       enrolmentsAuthService.authorised.retrieve(Retrievals.allEnrolments and Retrievals.affinityGroup) {
         case _ ~ Some(AffinityGroup.Agent) =>
           if (allowAgentAccess && appConfig.features.agentAccess()) {
-            agentWithClientPredicate.authoriseAsAgent(block)
+            agentWithClientPredicate.authoriseAsAgent(block, ignoreMandatedStatus)
           } else {
             logDebug("[AuthorisedController][authorisedAction] User is agent and agent access is forbidden. Redirecting to Agent Action page.")
             Future.successful(Redirect(appConfig.agentClientActionUrl))
