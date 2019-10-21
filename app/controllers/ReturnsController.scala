@@ -48,7 +48,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
                                   auditService: AuditingService)
   extends FrontendController with I18nSupport {
 
-  def vatReturn(year: Int, periodKey: String): Action[AnyContent] = authorisedController.authorisedAction {
+  def vatReturn(year: Int, periodKey: String): Action[AnyContent] = authorisedController.authorisedAction ({
     implicit request =>
       implicit user =>
         if(validPeriodKey(periodKey)) {
@@ -75,9 +75,9 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
           logWarn(s"[ReturnsController][vatReturn] - The given period key was invalid - `$periodKey`")
           Future.successful(NotFound(views.html.errors.notFound()))
         }
-  }
+  }, ignoreMandatedStatus = true)
 
-  def vatReturnViaPayments(periodKey: String): Action[AnyContent] = authorisedController.authorisedAction {
+  def vatReturnViaPayments(periodKey: String): Action[AnyContent] = authorisedController.authorisedAction ({
     implicit request =>
       implicit user =>
         if(validPeriodKey(periodKey)) {
@@ -105,7 +105,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
           logWarn(s"[ReturnsController][vatReturnViaPayments] - The given period key was invalid - `$periodKey`")
           Future.successful(NotFound(views.html.errors.notFound()))
         }
-  }
+  }, ignoreMandatedStatus = true)
 
   private def handleMandationStatus(customerDetail: Option[CustomerDetail],
                                     obligation: VatReturnObligation,
