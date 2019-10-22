@@ -58,11 +58,11 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
       mockConfig
     )
 
-    def target(request: Request[AnyContent]): Future[Result] = mockAgentPredicate.authoriseAsAgent({
+    def target(request: Request[AnyContent], ignoreMandatedStatus: Boolean = false): Future[Result] = mockAgentPredicate.authoriseAsAgent({
       implicit request =>
         implicit user =>
           Ok("welcome")
-    })(request)
+    }, ignoreMandatedStatus)(request)
   }
 
   "AgentPredicate .authoriseAsAgent" when {
@@ -141,6 +141,38 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
           (mockReturnsService.getMandationStatus(_: String)(_: HeaderCarrier, _: ExecutionContext))
             .expects(*, *, *)
             .returns(mandationStatusResult("MTDfB Mandated"))
+
+          lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
+
+          await(status(result)) shouldBe Status.SEE_OTHER
+          redirectLocation(result) shouldBe Some(mockConfig.agentClientActionUrl)
+        }
+
+        "correctly redirect if 'ignoreMandatedStatus' is set to true" in new Test {
+
+          (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
+            .expects(*, *, *, *)
+            .returns(authResponse)
+
+          (mockReturnsService.getMandationStatus(_: String)(_: HeaderCarrier, _: ExecutionContext))
+            .expects(*, *, *)
+            .returns(mandationStatusResult("MTDfB Mandated"))
+
+          lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"), ignoreMandatedStatus = true)
+
+          await(status(result)) shouldBe Status.OK
+          await(bodyOf(result)) shouldBe "welcome"
+        }
+
+        "redirect to agent-client-lookup agent access page if 'ignoreMandatedStatus' is true, but mandation status is incorrect" in new Test {
+
+          (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
+            .expects(*, *, *, *)
+            .returns(authResponse)
+
+          (mockReturnsService.getMandationStatus(_: String)(_: HeaderCarrier, _: ExecutionContext))
+            .expects(*, *, *)
+            .returns(mandationStatusResult("MTDfB Different Mandated Status"))
 
           lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
 
