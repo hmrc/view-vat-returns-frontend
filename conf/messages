@@ -74,6 +74,7 @@ yourVatReturn.reportLink3 = to HMRC.
 yourVatReturn.bullet1 = £10,000 or less
 yourVatReturn.bullet2 = 1% or less of your box 6 figure and below £50,000
 yourVatReturn.returnTotal = Return total
+yourVatReturn.print = Print VAT Return
 
 preMtdReturn.heading = This return is not available
 preMtdReturn.message = This is because you might have submitted it before you first joined Making Tax Digital for VAT.
