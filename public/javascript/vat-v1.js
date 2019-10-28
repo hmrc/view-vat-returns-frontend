@@ -16,7 +16,7 @@ mediaQueryList.addListener(function(mql) {
     document.getElementsByTagName("h1").item(0).innerHTML = newH1;
     returnTotal.remove();
     document.getElementsByClassName("button").item(0).insertAdjacentHTML("afterend", currReturnTotal);
-    console.log('webkit equivalent of onbeforeprint');
+    document.insert;
   } else {
     location.reload();
   }

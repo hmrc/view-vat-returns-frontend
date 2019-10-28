@@ -1,11 +1,26 @@
+@media screen {
+    .onlyprint {
+        display: none;
+    }
+}
+
 @media print {
 
     header, #notice-banner, .centered-content, .button, .breadcrumbs, #content > .float--right, button, #get-help-action, .link-back, p, details, title {
         display: none;
     }
 
+    .onlyprint {
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        color: #6f777b;
+        font-size: 14px;
+    }
+
     #content {
         padding-bottom: 0px;
+        margin: 5%;
     }
 
     .heading-xlarge {
@@ -14,65 +29,8 @@
         margin-top: 0px;
     }
 
-    .cert-header {
-        padding-bottom: 0px;
-    }
-
-    .cert-header img {
-        width: 120px;
-    }
-
     .heading-medium {
         font-size: 18px;
-    }
-
-    .card-full-container {
-        margin-top: 16px;
-        margin-bottom: 0px;
-        padding-bottom: 0px;
-        border: 1px solid #dee0e2;
-    }
-
-    .card-full-container .card-heading {
-        margin-bottom: 6px;
-    }
-
-    table td {
-        font-size: 14px;
-    }
-
-    .govuk-check-your-answers {
-        padding-top: 10px;
-        padding-bottom: 5px;
-        border-bottom: 1px solid #dee0e2;
-    }
-
-
-
-    .govuk-check-your-answers:before,
-    .govuk-check-your-answers:after {
-        content: " "; /* 1 */
-        display: table; /* 2 */
-    }
-
-    .govuk-check-your-answers:after {
-        clear: both;
-    }
-
-    .govuk-check-your-answers div {
-        border-bottom: none;
-    }
-
-    .cya-question{
-        border-bottom: none;
-    }
-
-    .cya-answer {
-        border-bottom: none;
-    }
-
-    .card-full .govuk-check-your-answers:last-child {
-        border-bottom: none;
     }
 
     dt, dd {
@@ -84,7 +42,6 @@
         clear: left;
         width: 25%;
         text-align: left;
-        font-weight: bold;
         border-bottom: none;
     }
 
@@ -96,14 +53,8 @@
         border-bottom: none;
     }
 
-
-
     .column-one-half {
-        float: left;
-        text-align: left;
         width: 50%;
-        overflow: hidden;
-        border-bottom: none;
     }
 
 }

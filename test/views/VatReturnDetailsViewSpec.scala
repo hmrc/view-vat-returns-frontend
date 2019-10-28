@@ -188,6 +188,10 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       elementText(Selectors.minusSymbol) shouldBe "−"
     }
 
+    "have a print button" in {
+      element(".button").text() shouldBe "Print VAT Return"
+    }
+
     "render the correct help revealing link text" in {
       elementText(Selectors.helpTitle) shouldBe "There is an error in my return"
     }
@@ -242,6 +246,10 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
 
     "render a back link" in {
       elementText(Selectors.backLink) shouldBe "Back"
+    }
+
+    "have a print button" in {
+      element(".button").text() shouldBe "Print VAT Return"
     }
   }
 

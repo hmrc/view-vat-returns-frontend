@@ -21,6 +21,7 @@
 @import views.html.templates.formatters.breadcrumbs._
 @import java.time.LocalDate
 @import uk.gov.hmrc.play.views.html.helpers.form
+@import utils.ImplicitDateFormatter._
 
 @(vatReturnViewModel: VatReturnViewModel, serviceInfoContent: Html = HtmlFormat.empty)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig, lang: Lang, user: User)
 
@@ -181,6 +182,8 @@
     <div class="form-group">
         @expandingHelpSection(messages("yourVatReturn.helpTitle"), "vatReturn", "vatReturn", hiddenHelpTextContent)
     </div>
+
+    <div class="onlyprint">@messages("yourVatReturn.footer", s"${currentDate.toLongDate}")</div>
 
   </section>
 }
