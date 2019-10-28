@@ -26,6 +26,7 @@ import models.customer.CustomerDetail
 import models.errors.NotFoundError
 import models.payments.Payment
 import models.viewModels.VatReturnViewModel
+import play.api.Logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc._
 import play.twirl.api.{Html, HtmlFormat}
@@ -153,16 +154,36 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
       case (Right(vatReturn), Some(ob), payment) =>
         val returnDetails = returnsService.constructReturnDetailsModel(vatReturn, payment)
         handleMandationStatus(pageData.customerInfo, ob, returnDetails, isReturnsPageRequest, pageData.serviceInfoContent)
-      case (Left(NotFoundError), _, _) if !isNumericPeriodKey =>
-        Future.successful(NotFound(views.html.errors.notFound()))
-      case (Left(NotFoundError), _, _) if isNumericPeriodKey =>
-        Future.successful(NotFound(views.html.errors.preMtdReturn(user)))
+      case (Left(NotFoundError), _, _) =>
+        checkIfComingFromSubmissionConfirmation(isNumericPeriodKey)
       case (Right(_), None, _) =>
         logWarn("[ReturnsController][renderResult] error: render required a valid obligation but none was returned")
         Future.successful(InternalServerError(views.html.errors.technicalProblem()))
       case _ =>
         logWarn("[ReturnsController][renderResult] error: Unknown error")
         Future.successful(InternalServerError(views.html.errors.technicalProblem()))
+    }
+  }
+
+  private def checkIfComingFromSubmissionConfirmation(preMtdReturn: Boolean)(implicit req: Request[AnyContent], user: User): Future[Result] = {
+    val inSessionYear = req.session.get("submissionYear")
+    val inSessionPeriodKey = req.session.get("inSessionPeriodKey")
+
+    if(inSessionYear.nonEmpty && inSessionPeriodKey.nonEmpty) {
+      logWarn(
+        "[ReturnsController][checkIfComingFromSubmissionConfirmation] error: User has come from the submission confirmation page, " +
+        "but their submission has not yet been processed."
+      )
+      val yearAsInt: Int = inSessionYear.get.toInt
+      Future.successful(
+        Redirect(routes.SubmittedReturnsController.submittedReturns(yearAsInt)).removingFromSession("submissionYear", "inSessionPeriodKey")
+      )
+    } else {
+      if(preMtdReturn) {
+        Future.successful(NotFound(views.html.errors.preMtdReturn(user)))
+      } else {
+        Future.successful(NotFound(views.html.errors.notFound()))
+      }
     }
   }
 

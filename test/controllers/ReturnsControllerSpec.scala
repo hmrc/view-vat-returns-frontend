@@ -48,7 +48,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     mockConfig,
     mockAuditService
   )
-  
+
   def setupCommonSuccessMocks(): Any = {
     callObligationWithMatchingPeriodKey(Some(exampleObligation))
     callVatReturnPayment(Some(examplePayment))
@@ -308,16 +308,43 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
     "the specified VAT return is not found" should {
 
-      lazy val result = {
-        callAuthService(individualAuthResult)
-        callVatReturn(Left(NotFoundError))
-        setupCommonSuccessMocks()
-        callServiceInfoPartialService
-        controller.vatReturn(2018, "#001")(fakeRequest)
+      "not redirect if year and periodKey are not in session" should {
+        lazy val result = {
+          callAuthService(individualAuthResult)
+          callVatReturn(Left(NotFoundError))
+          setupCommonSuccessMocks()
+          callServiceInfoPartialService
+          controller.vatReturn(2018, "#001")(fakeRequest)
+        }
+
+        "return 404 (Not Found)" in {
+          status(result) shouldBe Status.NOT_FOUND
+        }
       }
 
-      "return 404 (Not Found)" in {
-        status(result) shouldBe Status.NOT_FOUND
+      "redirect if the user has come from the submission confirmation page" should {
+        lazy val result = {
+          callAuthService(individualAuthResult)
+          callVatReturn(Left(NotFoundError))
+          setupCommonSuccessMocks()
+          callServiceInfoPartialService
+          controller.vatReturn(2018, "18AA")(
+            fakeRequest.withSession(
+              "submissionYear" -> "2018",
+              "inSessionPeriodKey" -> "18AA"
+            )
+          )
+        }
+
+        "return 303 (See Other)" in {
+          status(result) shouldBe Status.SEE_OTHER
+          redirectLocation(result) shouldBe Some("/vat-through-software/vat-returns/submitted/2018")
+        }
+
+        "submission year and period key will no longer be in session" in {
+          result.session.get("submissionYear") shouldBe None
+          result.session.get("inSessionPeriodKey") shouldBe None
+        }
       }
     }
 
