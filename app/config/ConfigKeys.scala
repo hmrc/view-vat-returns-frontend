@@ -38,6 +38,7 @@ object ConfigKeys {
   val useLanguageSelectorFeature: String = "features.useLanguageSelector.enabled"
   val submitReturnFeatures: String = "features.submitReturnFeatures.enabled"
   val agentAccessFeature: String = "features.agentAccess.enabled"
+  val enablePrintPastReturns: String = "features.enablePrintPastReturns"
 
   val finalReturnPeriodKey: String = "final-return.periodKey"
 

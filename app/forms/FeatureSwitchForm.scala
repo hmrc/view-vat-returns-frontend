@@ -32,7 +32,8 @@ object FeatureSwitchForm {
       ConfigKeys.future2020DateEnabledFeature -> boolean,
       ConfigKeys.useLanguageSelectorFeature -> boolean,
       ConfigKeys.submitReturnFeatures -> boolean,
-      ConfigKeys.agentAccessFeature -> boolean
+      ConfigKeys.agentAccessFeature -> boolean,
+      ConfigKeys.enablePrintPastReturns -> boolean
   )(FeatureSwitchModel.apply)(FeatureSwitchModel.unapply)
   )
 }

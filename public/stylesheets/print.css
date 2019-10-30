@@ -1,16 +1,16 @@
 @media screen {
-    .onlyprint {
+    .onlyprint, .heading-secondary.onlyprint {
         display: none;
     }
 }
 
 @media print {
 
-    header, #notice-banner, .centered-content, .button, .breadcrumbs, #content > .float--right, button, #get-help-action, .link-back, p, details, title {
+    header, #notice-banner, .centered-content, .button, .breadcrumbs, #content > .float--right, button, #get-help-action, .link-back, p, details, title, .noprint, .heading-secondary.noprint {
         display: none;
     }
 
-    .onlyprint {
+    .foot {
         position: fixed;
         bottom: 0;
         right: 0;

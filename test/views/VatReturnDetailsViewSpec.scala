@@ -610,7 +610,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the pageHeading of 'Final return'" in {
-      elementText(Selectors.pageHeading) shouldBe "Submitted returns Final return"
+      elementText(Selectors.pageHeading + " > .noprint") shouldBe "Submitted returns Final return"
     }
 
     "have the breadcrumb heading of 'Final return" in {

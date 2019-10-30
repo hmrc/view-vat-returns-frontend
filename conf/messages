@@ -75,6 +75,7 @@ yourVatReturn.bullet1 = £10,000 or less
 yourVatReturn.bullet2 = 1% or less of your box 6 figure and below £50,000
 yourVatReturn.returnTotal = Return total
 yourVatReturn.print = Print VAT Return
+yourVatReturn.printHeading = Your VAT Return
 yourVatReturn.footer = Correct as of {0}
 
 preMtdReturn.heading = This return is not available

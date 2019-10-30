@@ -71,8 +71,14 @@
     }
 
     <h1 class="heading-xlarge">
-      <span class="heading-secondary">@messages("yourVatReturn.title")</span>
-      @returnHeading(useShortDayFormat = true)
+        <span class="noprint">
+            <span class="heading-secondary">@messages("yourVatReturn.title")</span>
+            @returnHeading(useShortDayFormat = true)
+        </span>
+        <span class="onlyprint">
+            @messages("yourVatReturn.printHeading")
+            <span class="heading-secondary">@returnHeading(useShortDayFormat = true)</span>
+        </span>
     </h1>
 
     @views.html.templates.returns.paymentStatus(
@@ -179,11 +185,12 @@
         </button>
     </div>
 
-    <div class="form-group">
+    @if(appConfig.features.enablePrintPastReturns()) {
+        <div class="form-group">
         @expandingHelpSection(messages("yourVatReturn.helpTitle"), "vatReturn", "vatReturn", hiddenHelpTextContent)
-    </div>
+        </div>
 
-    <div class="onlyprint">@messages("yourVatReturn.footer", s"${currentDate.toLongDate}")</div>
-
+        <div class="onlyprint foot">@messages("yourVatReturn.footer", s"${currentDate.toLongDate}")</div>
+    }
   </section>
 }
