@@ -32,8 +32,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     val pageHeading = "#content h1"
     val subHeading = "#content h2.heading-large"
     val entityNameHeading = "#content h2.heading-medium"
-    val mainInformationText = "#content > article > section > p:nth-of-type(1)"
-    val extraInformationText = "#content > article > section > p:nth-of-type(2)"
+    val mainInformationText = "#content > article > section > span > p:nth-of-type(1)"
+    val extraInformationText = "#content > article > section > span > p:nth-of-type(2)"
     val tableHeadingOne = "#content section:nth-of-type(1) h3"
     val tableHeadingTwo = "#content section:nth-of-type(2) h3"
 

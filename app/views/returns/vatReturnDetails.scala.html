@@ -81,14 +81,16 @@
         </span>
     </h1>
 
-    @views.html.templates.returns.paymentStatus(
-      vatReturnViewModel.vatReturnDetails.vatReturn.netVatDue,
-      vatReturnViewModel.vatReturnDetails.payment.map(_.outstandingAmount),
-      vatReturnViewModel.dueDate,
-      vatReturnViewModel.vatReturnDetails.moneyOwed,
-      vatReturnViewModel.vatReturnDetails.oweHmrc,
-      vatReturnViewModel.isHybridUser
-    )
+    <span class="noprint">
+        @views.html.templates.returns.paymentStatus(
+          vatReturnViewModel.vatReturnDetails.vatReturn.netVatDue,
+          vatReturnViewModel.vatReturnDetails.payment.map(_.outstandingAmount),
+          vatReturnViewModel.dueDate,
+          vatReturnViewModel.vatReturnDetails.moneyOwed,
+          vatReturnViewModel.vatReturnDetails.oweHmrc,
+          vatReturnViewModel.isHybridUser
+        )
+    </span>
 
     <ul>
       <li>@messages("yourVatReturn.returnDueDate") @displayDate(vatReturnViewModel.dueDate)</li>
@@ -179,18 +181,30 @@
       </dl>
     </section>
 
-    <div class="form-group">
-        <button class="btn button"
-        onclick="javascript:window.print()">@messages("yourVatReturn.print")
-        </button>
-    </div>
+    <span class="onlyprint">
+    @views.html.templates.returns.paymentStatus(
+        vatReturnViewModel.vatReturnDetails.vatReturn.netVatDue,
+        vatReturnViewModel.vatReturnDetails.payment.map(_.outstandingAmount),
+        vatReturnViewModel.dueDate,
+        vatReturnViewModel.vatReturnDetails.moneyOwed,
+        vatReturnViewModel.vatReturnDetails.oweHmrc,
+        vatReturnViewModel.isHybridUser
+    )
+    </span>
 
     @if(appConfig.features.enablePrintPastReturns()) {
         <div class="form-group">
-        @expandingHelpSection(messages("yourVatReturn.helpTitle"), "vatReturn", "vatReturn", hiddenHelpTextContent)
+            <button class="btn button"
+            onclick="javascript:window.print()">@messages("yourVatReturn.print")
+            </button>
         </div>
-
-        <div class="onlyprint foot">@messages("yourVatReturn.footer", s"${currentDate.toLongDate}")</div>
     }
+
+    <div class="form-group">
+    @expandingHelpSection(messages("yourVatReturn.helpTitle"), "vatReturn", "vatReturn", hiddenHelpTextContent)
+    </div>
+
+    <div class="onlyprint foot">@messages("yourVatReturn.footer", s"${currentDate.toLongDate}")</div>
+
   </section>
 }
