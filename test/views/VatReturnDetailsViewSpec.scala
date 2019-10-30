@@ -23,10 +23,16 @@ import models.{VatReturn, VatReturnDetails}
 import models.viewModels.VatReturnViewModel
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.scalatest.BeforeAndAfterEach
 import org.scalatest.exceptions.TestFailedException
 import play.i18n.Lang
 
-class VatReturnDetailsViewSpec extends ViewBaseSpec {
+class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
+
+  override def beforeEach(): Unit = {
+    super.beforeEach()
+    mockConfig.features.enablePrintPastReturns(true)
+  }
 
   object Selectors {
     val pageHeading = "#content h1"
@@ -102,6 +108,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
   )
 
   "Rendering the vat return details page from the returns route with flat rate scheme" should {
+
+    mockConfig.features.enablePrintPastReturns(true)
 
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
     lazy implicit val document: Document = Jsoup.parse(view.body)
@@ -223,7 +231,19 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     }
   }
 
+  "Rendering the vat return details page from the returns route when the printPastReturn feature switch is off" should {
+
+    "not have a print button" in {
+      mockConfig.features.enablePrintPastReturns(false)
+      lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
+      lazy implicit val document: Document = Jsoup.parse(view.body)
+      elementAsOpt(".button") shouldBe None
+    }
+  }
+
   "Rendering the vat return details page from the returns route with flat rate scheme for an agent" should {
+
+    mockConfig.features.enablePrintPastReturns(true)
 
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)(
       fakeRequestWithClientsVRN, messages, mockConfig, Lang.forCode("en"), agentUser)
