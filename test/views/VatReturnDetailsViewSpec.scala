@@ -32,8 +32,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     val pageHeading = "#content h1"
     val subHeading = "#content h2.heading-large"
     val entityNameHeading = "#content h2.heading-medium"
-    val mainInformationText = "#content > article > section > p:nth-of-type(1)"
-    val extraInformationText = "#content > article > section > p:nth-of-type(2)"
+    val mainInformationText = "#content > article > section > span > p:nth-of-type(1)"
+    val extraInformationText = "#content > article > section > span > p:nth-of-type(2)"
     val tableHeadingOne = "#content section:nth-of-type(1) h3"
     val tableHeadingTwo = "#content section:nth-of-type(2) h3"
 
@@ -188,6 +188,10 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
       elementText(Selectors.minusSymbol) shouldBe "−"
     }
 
+    "have a print button" in {
+      element(".button").text() shouldBe "Print VAT Return"
+    }
+
     "render the correct help revealing link text" in {
       elementText(Selectors.helpTitle) shouldBe "There is an error in my return"
     }
@@ -242,6 +246,10 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
 
     "render a back link" in {
       elementText(Selectors.backLink) shouldBe "Back"
+    }
+
+    "have a print button" in {
+      element(".button").text() shouldBe "Print VAT Return"
     }
   }
 
@@ -602,7 +610,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec {
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the pageHeading of 'Final return'" in {
-      elementText(Selectors.pageHeading) shouldBe "Submitted returns Final return"
+      elementText(Selectors.pageHeading + " > .noprint") shouldBe "Submitted returns Final return"
     }
 
     "have the breadcrumb heading of 'Final return" in {

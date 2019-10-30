@@ -21,6 +21,7 @@
 @import views.html.templates.formatters.breadcrumbs._
 @import java.time.LocalDate
 @import uk.gov.hmrc.play.views.html.helpers.form
+@import utils.ImplicitDateFormatter._
 
 @(vatReturnViewModel: VatReturnViewModel, serviceInfoContent: Html = HtmlFormat.empty)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig, lang: Lang, user: User)
 
@@ -70,18 +71,26 @@
     }
 
     <h1 class="heading-xlarge">
-      <span class="heading-secondary">@messages("yourVatReturn.title")</span>
-      @returnHeading(useShortDayFormat = true)
+        <span class="noprint">
+            <span class="heading-secondary">@messages("yourVatReturn.title")</span>
+            @returnHeading(useShortDayFormat = true)
+        </span>
+        <span class="onlyprint">
+            @messages("yourVatReturn.printHeading")
+            <span class="heading-secondary">@returnHeading(useShortDayFormat = true)</span>
+        </span>
     </h1>
 
-    @views.html.templates.returns.paymentStatus(
-      vatReturnViewModel.vatReturnDetails.vatReturn.netVatDue,
-      vatReturnViewModel.vatReturnDetails.payment.map(_.outstandingAmount),
-      vatReturnViewModel.dueDate,
-      vatReturnViewModel.vatReturnDetails.moneyOwed,
-      vatReturnViewModel.vatReturnDetails.oweHmrc,
-      vatReturnViewModel.isHybridUser
-    )
+    <span class="noprint">
+        @views.html.templates.returns.paymentStatus(
+          vatReturnViewModel.vatReturnDetails.vatReturn.netVatDue,
+          vatReturnViewModel.vatReturnDetails.payment.map(_.outstandingAmount),
+          vatReturnViewModel.dueDate,
+          vatReturnViewModel.vatReturnDetails.moneyOwed,
+          vatReturnViewModel.vatReturnDetails.oweHmrc,
+          vatReturnViewModel.isHybridUser
+        )
+    </span>
 
     <ul>
       <li>@messages("yourVatReturn.returnDueDate") @displayDate(vatReturnViewModel.dueDate)</li>
@@ -172,9 +181,30 @@
       </dl>
     </section>
 
+    <span class="onlyprint">
+    @views.html.templates.returns.paymentStatus(
+        vatReturnViewModel.vatReturnDetails.vatReturn.netVatDue,
+        vatReturnViewModel.vatReturnDetails.payment.map(_.outstandingAmount),
+        vatReturnViewModel.dueDate,
+        vatReturnViewModel.vatReturnDetails.moneyOwed,
+        vatReturnViewModel.vatReturnDetails.oweHmrc,
+        vatReturnViewModel.isHybridUser
+    )
+    </span>
+
+    @if(appConfig.features.enablePrintPastReturns()) {
+        <div class="form-group">
+            <button class="btn button"
+            onclick="javascript:window.print()">@messages("yourVatReturn.print")
+            </button>
+        </div>
+    }
+
     <div class="form-group">
-        @expandingHelpSection(messages("yourVatReturn.helpTitle"), "vatReturn", "vatReturn", hiddenHelpTextContent)
+    @expandingHelpSection(messages("yourVatReturn.helpTitle"), "vatReturn", "vatReturn", hiddenHelpTextContent)
     </div>
+
+    <div class="onlyprint foot">@messages("yourVatReturn.footer", s"${currentDate.toLongDate}")</div>
 
   </section>
 }

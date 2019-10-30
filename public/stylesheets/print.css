@@ -1,0 +1,60 @@
+@media screen {
+    .onlyprint, .heading-secondary.onlyprint {
+        display: none;
+    }
+}
+
+@media print {
+
+    header, #notice-banner, .centered-content, .button, .breadcrumbs, #content > .float--right, button, #get-help-action, .link-back, p, details, title, .noprint, .heading-secondary.noprint {
+        display: none;
+    }
+
+    .foot {
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        color: #6f777b;
+        font-size: 14px;
+    }
+
+    #content {
+        padding-bottom: 0px;
+        margin: 5%;
+    }
+
+    .heading-xlarge {
+        font-size: 30px;
+        margin-bottom: 12px;
+        margin-top: 0px;
+    }
+
+    .heading-medium {
+        font-size: 18px;
+    }
+
+    dt, dd {
+        font-size: 14px;
+    }
+
+    dt {
+        float: left;
+        clear: left;
+        width: 25%;
+        text-align: left;
+        border-bottom: none;
+    }
+
+    dd {
+        float: left;
+        text-align: left;
+        width: 25%;
+        overflow: hidden;
+        border-bottom: none;
+    }
+
+    .column-one-half {
+        width: 50%;
+    }
+
+}
