@@ -109,8 +109,6 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
 
   "Rendering the vat return details page from the returns route with flat rate scheme" should {
 
-    mockConfig.features.enablePrintPastReturns(true)
-
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
@@ -242,8 +240,6 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
   }
 
   "Rendering the vat return details page from the returns route with flat rate scheme for an agent" should {
-
-    mockConfig.features.enablePrintPastReturns(true)
 
     lazy val view = views.html.returns.vatReturnDetails(vatReturnViewModel)(
       fakeRequestWithClientsVRN, messages, mockConfig, Lang.forCode("en"), agentUser)

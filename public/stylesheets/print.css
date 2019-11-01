@@ -10,6 +10,10 @@
         display: none;
     }
 
+    .grid-row.column-two-thirds {
+        width: 100%;
+    }
+
     .foot {
         position: fixed;
         bottom: 0;
