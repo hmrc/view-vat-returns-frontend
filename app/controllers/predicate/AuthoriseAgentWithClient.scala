@@ -84,7 +84,7 @@ class AuthoriseAgentWithClient @Inject()(enrolmentsAuthService: EnrolmentsAuthSe
                                   )(implicit request: Request[AnyContent], hc: HeaderCarrier): Future[Result] = {
 
     mandationStatusService.getMandationStatus(vrn) flatMap {
-      case Right(MandationStatus(status)) if (ignoreMandatedStatus && status == MandationStatuses.mandated) || status == MandationStatuses.nonMTDfB =>
+      case Right(MandationStatus(status)) if ignoreMandatedStatus || status == MandationStatuses.nonMTDfB =>
         val user = User(vrn, arn = Some(arn))
         block(request)(user)
       case Right(_) =>
