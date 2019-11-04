@@ -15,7 +15,7 @@
     }
 
     .foot {
-        position: fixed;
+        position: absolute;
         bottom: 0;
         right: 0;
         color: #6f777b;
