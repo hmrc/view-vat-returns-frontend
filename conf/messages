@@ -40,7 +40,7 @@ btaNavLinks.manageAccount = Manage account
 btaNavLinks.messages = Messages
 btaNavLinks.helpAndContact = Help and contact
 
-yourVatReturn.title = Submitted returns
+yourVatReturn.title = Submitted return for
 yourVatReturn.dateSubmitted = Date submitted:
 yourVatReturn.returnDueDate = Return due date:
 yourVatReturn.vatDetails = VAT details

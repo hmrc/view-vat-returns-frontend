@@ -66,7 +66,7 @@ btaNavLinks.manageAccount = Rheoli''r cyfrif
 btaNavLinks.messages = Negeseuon
 btaNavLinks.helpAndContact = Cymorth a chysylltu
 
-yourVatReturn.title = Ffurflenni TAW wedi’u cyflwyno
+yourVatReturn.title = Ffurflen TAW a gyflwynwyd ar gyfer
 yourVatReturn.dateSubmitted = Dyddiad cyflwyno:
 yourVatReturn.returnDueDate = Dyddiad cau ar gyfer cyflwyno’r Ffurflen TAW:
 yourVatReturn.vatDetails = Manylion TAW
