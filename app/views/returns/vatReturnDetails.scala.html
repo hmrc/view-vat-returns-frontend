@@ -47,7 +47,7 @@
 }
 
 @views.html.main_template(
-  title = messages("yourVatReturn.title"),
+  title = messages("yourVatReturn.title") + returnHeading(useShortDayFormat = false),
   appConfig = appConfig,
   serviceInfoContent = serviceInfoContent,
   user = Some(user)

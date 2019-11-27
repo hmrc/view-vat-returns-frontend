@@ -113,11 +113,11 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct document title" in {
-      document.title shouldBe "Submitted returns - Business tax account - GOV.UK"
+      document.title shouldBe "Submitted return for 1 January to 31 March 2017 - Business tax account - GOV.UK"
     }
 
     "have the correct page heading" in {
-      elementText(Selectors.pageHeading) should include("Submitted returns")
+      elementText(Selectors.pageHeading) should include("Submitted return for")
     }
 
     "render breadcrumbs which" should {
@@ -247,7 +247,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct document title" in {
-      document.title shouldBe "Submitted returns - Your client’s VAT details - GOV.UK"
+      document.title shouldBe "Submitted return for 1 January to 31 March 2017 - Your client’s VAT details - GOV.UK"
     }
 
     "not render breadcrumbs which" in {
@@ -626,7 +626,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the pageHeading of 'Final return'" in {
-      elementText(Selectors.pageHeading + " > .noprint") shouldBe "Submitted returns Final return"
+      elementText(Selectors.pageHeading + " > .noprint") shouldBe "Submitted return for Final return"
     }
 
     "have the breadcrumb heading of 'Final return" in {
