@@ -26,7 +26,6 @@ import models.customer.CustomerDetail
 import models.errors.NotFoundError
 import models.payments.Payment
 import models.viewModels.VatReturnViewModel
-import play.api.Logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc._
 import play.twirl.api.{Html, HtmlFormat}
@@ -176,7 +175,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
       )
       val yearAsInt: Int = inSessionYear.get.toInt
       Future.successful(
-        Redirect(routes.SubmittedReturnsController.submittedReturns(yearAsInt)).removingFromSession("submissionYear", "inSessionPeriodKey")
+        Redirect(routes.SubmittedReturnsController.submittedReturns()).removingFromSession("submissionYear", "inSessionPeriodKey")
       )
     } else {
       if(preMtdReturn) {

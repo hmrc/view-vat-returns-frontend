@@ -142,9 +142,9 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
         elementText(Selectors.previousPageBreadcrumb) shouldBe "Submitted returns"
       }
 
-      s"link to ${controllers.routes.SubmittedReturnsController.submittedReturns(currentYear).url}" in {
+      s"link to ${controllers.routes.SubmittedReturnsController.submittedReturns().url}" in {
         element(Selectors.previousPageBreadcrumbLink).attr("href") shouldBe
-          controllers.routes.SubmittedReturnsController.submittedReturns(currentYear).url
+          controllers.routes.SubmittedReturnsController.submittedReturns().url
       }
 
       "have the correct current page text containing the obligation dates" in {

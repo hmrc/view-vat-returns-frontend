@@ -31,7 +31,7 @@ class SubmittedReturnsPageSpec extends IntegrationBaseSpec {
 
     def request(): WSRequest = {
       setupStubs()
-      buildRequest("/submitted/2018")
+      buildRequest("/submitted")
     }
 
     val backendFeatureEnabled: Boolean =
@@ -53,7 +53,7 @@ class SubmittedReturnsPageSpec extends IntegrationBaseSpec {
 
           override def request(): WSRequest = {
             setupStubs()
-            buildRequest("/submitted/2018")
+            buildRequest("/submitted")
           }
 
           val response: WSResponse = await(request().get())
@@ -69,14 +69,14 @@ class SubmittedReturnsPageSpec extends IntegrationBaseSpec {
 
           override def request(): WSRequest = {
             setupStubs()
-            buildRequest("/submitted/2018")
+            buildRequest("/submitted")
           }
 
           val response: WSResponse = await(request().get())
 
           lazy implicit val document: Document = Jsoup.parse(response.body)
 
-          val bulletPointSelector = ".list-bullet li"
+          val bulletPointSelector = ".tabbed section .list-bullet li"
 
           document.select(bulletPointSelector).size() shouldBe 1
         }

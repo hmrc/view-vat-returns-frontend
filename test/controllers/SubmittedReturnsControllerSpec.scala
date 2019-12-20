@@ -71,7 +71,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
         callOpenObligationsForYear(exampleObligations)
         callOpenObligationsForYear(exampleObligations)
         callServiceInfoPartialService
-        controller.submittedReturns(previousYear)(fakeRequest)
+        controller.submittedReturns(fakeRequest)
       }
 
       "return 200" in {
@@ -103,7 +103,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
               callMandationService(Right(MandationStatus("Non MTDfB")))
               callOpenObligationsForYear(exampleObligations)
               callOpenObligationsForYear(exampleObligations)
-              controller.submittedReturns(previousYear)(fakeRequestWithClientsVRN)
+              controller.submittedReturns(fakeRequestWithClientsVRN)
             }
 
             "return 200" in {
@@ -126,7 +126,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
         lazy val result = {
           mockConfig.features.agentAccess(false)
           callAuthService(agentAuthResult)
-          controller.submittedReturns(previousYear)(fakeRequestWithClientsVRN)
+          controller.submittedReturns(fakeRequestWithClientsVRN)
         }
 
         "return 303 (SEE_OTHER)" in {
@@ -143,7 +143,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
 
       lazy val result = {
         callAuthService(Future.failed(InsufficientEnrolments()))
-        controller.submittedReturns(previousYear)(fakeRequest)
+        controller.submittedReturns(fakeRequest)
       }
 
       "return 403 (Forbidden)" in {
@@ -155,7 +155,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
 
       lazy val result = {
         callAuthService(Future.failed(MissingBearerToken()))
-        controller.submittedReturns(previousYear)(fakeRequest)
+        controller.submittedReturns(fakeRequest)
       }
 
       "return 303 (SEE_OTHER)" in {
@@ -167,19 +167,6 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
       }
     }
 
-    "A user enters an invalid search year for their submitted returns" should {
-
-      lazy val result = {
-        callAuthService(individualAuthResult)
-        callDateService()
-        controller.submittedReturns(year = 2021)(fakeRequest)
-      }
-
-      "return 404 (Not Found)" in {
-        status(result) shouldBe Status.NOT_FOUND
-      }
-    }
-
     "An error occurs upstream" should {
 
       lazy val result: Result = {
@@ -187,7 +174,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
         callDateService()
         callServiceInfoPartialService
         callOpenObligationsForYear(Left(ObligationError))
-        controller.submittedReturns(previousYear)(fakeRequest)
+        controller.submittedReturns(fakeRequest)
       }
 
       "return 500" in {
@@ -317,49 +304,6 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
         }
 
         result shouldBe Left(ObligationError)
-      }
-    }
-  }
-
-  "Calling .isValidSearchYear" when {
-
-    "the year is on the upper search boundary" should {
-
-      "return true" in {
-        val result: Boolean = controller.isValidSearchYear(2018, 2018)
-        result shouldBe true
-      }
-    }
-
-    "the year is above the upper search boundary" should {
-
-      "return false" in {
-        val result: Boolean = controller.isValidSearchYear(2019, 2018)
-        result shouldBe false
-      }
-    }
-
-    "the year is on the lower boundary" should {
-
-      "return true" in {
-        val result: Boolean = controller.isValidSearchYear(2017, 2019)
-        result shouldBe true
-      }
-    }
-
-    "the year is below the lower boundary" should {
-
-      "return false" in {
-        val result: Boolean = controller.isValidSearchYear(2014, 2018)
-        result shouldBe false
-      }
-    }
-
-    "the year is between the upper and lower boundaries" should {
-
-      "return true" in {
-        val result: Boolean = controller.isValidSearchYear(2017, 2018)
-        result shouldBe true
       }
     }
   }

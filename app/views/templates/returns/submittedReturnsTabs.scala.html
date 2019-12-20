@@ -14,18 +14,21 @@
  * limitations under the License.
  *@
 
-@import views.html.templates.formatters.tabs._
+@(years: Seq[Int], showPreviousReturnsTab: Boolean)(implicit messages: Messages)
 
-@(years: Seq[Int], selectedYear: Int)(implicit messages: Messages)
-
-@for(yearToDisplay <- years) {
-  @if(yearToDisplay == selectedYear) {
-    @activeTab(yearToDisplay.toString, messages("submittedReturns.activeTab", yearToDisplay.toString))
-  } else {
-    @inactiveTab(
-      yearToDisplay.toString,
-      messages("submittedReturns.inactiveTab", yearToDisplay.toString),
-      controllers.routes.SubmittedReturnsController.submittedReturns(yearToDisplay).url
-    )
-  }
-}
+<ul>
+    @for(year <- years) {
+        <li class="tablinks" aria-controls="@year">
+            <a href="#@year">
+            @year
+            </a>
+        </li>
+    }
+    @if(showPreviousReturnsTab && years.size < 3) {
+        <li class="tablinks" aria-controls="@messages("submittedReturns.previousReturns")">
+            <a href="#@messages("submittedReturns.previousReturns")">
+            @messages("submittedReturns.previousReturns")
+            </a>
+        </li>
+    }
+</ul>

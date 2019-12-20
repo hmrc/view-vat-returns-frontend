@@ -338,7 +338,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
         "return 303 (See Other)" in {
           status(result) shouldBe Status.SEE_OTHER
-          redirectLocation(result) shouldBe Some("/vat-through-software/vat-returns/submitted/2018")
+          redirectLocation(result) shouldBe Some("/vat-through-software/vat-returns/submitted")
         }
 
         "submission year and period key will no longer be in session" in {

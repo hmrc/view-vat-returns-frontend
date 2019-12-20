@@ -58,7 +58,7 @@
         links = Map(
           appConfig.btaHomeUrl -> messages("breadcrumbs.bta"),
           appConfig.vatDetailsUrl -> messages("breadcrumbs.vat"),
-          if(vatReturnViewModel.showReturnsBreadcrumb) controllers.routes.SubmittedReturnsController.submittedReturns(vatReturnViewModel.currentYear).url -> messages("submittedReturns.title")
+          if(vatReturnViewModel.showReturnsBreadcrumb) controllers.routes.SubmittedReturnsController.submittedReturns().url -> messages("submittedReturns.title")
           else appConfig.vatPaymentsUrl -> messages("breadcrumbs.vatPayments")
         ),
         currentPage = returnHeading(useShortDayFormat = false).toString
@@ -67,7 +67,7 @@
 
 <section class="grid-row column-two-thirds">
     @if(user.isAgent) {
-        <a id="link-back" class="link-back" href='@controllers.routes.SubmittedReturnsController.submittedReturns(vatReturnViewModel.currentYear)'>@messages("base.back")</a>
+        <a id="link-back" class="link-back" href='@controllers.routes.SubmittedReturnsController.submittedReturns()'>@messages("base.back")</a>
     }
 
     <h1 class="heading-xlarge">

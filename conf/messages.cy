@@ -133,6 +133,7 @@ submittedReturns.previousReturns = Ffurflenni TAW blaenorol
 submittedReturns.finalReturn = Ffurflen TAW derfynol
 submittedReturns.changeClient = Newid cleient
 submittedReturns.finish = Gorffen
+submittedReturns.backToTop = Nôl i’r brig
 
 returnDeadlines.title = Dyddiadau cau ar gyfer cyflwyno
 returnDeadlines.submitBy = Defnyddiwch eich meddalwedd cyfrifyddu i gyflwyno Ffurflen TAW erbyn:

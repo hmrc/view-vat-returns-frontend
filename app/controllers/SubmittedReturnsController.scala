@@ -44,11 +44,10 @@ class SubmittedReturnsController @Inject()(val messagesApi: MessagesApi,
                                            auditService: AuditingService)
   extends FrontendController with I18nSupport {
 
-  def submittedReturns(year: Int): Action[AnyContent] = authorisedController.authorisedAction ({ implicit request =>
+  def submittedReturns: Action[AnyContent] = authorisedController.authorisedAction ({ implicit request =>
     implicit user =>
-      if (isValidSearchYear(year)) {
         for {
-          obligationsResult <- getReturnObligations(user, year, Obligation.Status.Fulfilled)
+          obligationsResult <- getReturnObligations(user, dateService.now().getYear, Obligation.Status.Fulfilled)
           serviceInfoContent <- if(user.isAgent) Future.successful(HtmlFormat.empty) else serviceInfoService.getServiceInfoPartial
         } yield {
          obligationsResult match {
@@ -58,17 +57,8 @@ class SubmittedReturnsController @Inject()(val messagesApi: MessagesApi,
               logWarn("[ReturnObligationsController][submittedReturns] error: " + error.toString)
               InternalServerError(views.html.errors.submittedReturnsError(user))
           }
-        }
-      } else {
-        Future.successful(NotFound(views.html.errors.notFound()))
       }
   }, ignoreMandatedStatus = true)
-
-
-
-  private[controllers] def isValidSearchYear(year: Int, upperBound: Int = dateService.now().getYear) = {
-    year <= upperBound && year >= upperBound - 2
-  }
 
   private[controllers] def getPreviousReturnYears(vrn: String,
                                                   status: Obligation.Status.Value,
@@ -130,7 +120,7 @@ class SubmittedReturnsController @Inject()(val messagesApi: MessagesApi,
 
               auditService.extendedAudit(
                 ViewSubmittedVatObligationsAuditModel(user, obligations),
-                routes.SubmittedReturnsController.submittedReturns(selectedYear).url
+                routes.SubmittedReturnsController.submittedReturns().url
               )
 
               Right(VatReturnsViewModel(
