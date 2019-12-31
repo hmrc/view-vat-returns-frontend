@@ -17,8 +17,7 @@
 package config
 
 import javax.inject.Inject
-
-import play.api.i18n.MessagesApi
+import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.{Request, Result}
 import play.api.mvc.Results.InternalServerError
 import play.twirl.api.Html
@@ -32,5 +31,5 @@ class ServiceErrorHandler @Inject()(val messagesApi: MessagesApi, val appConfig:
   def showInternalServerError(implicit request: Request[_]): Result = InternalServerError(internalServerErrorTemplate)
 
   override def notFoundTemplate(implicit request: Request[_]): Html =
-    views.html.errors.standardError(appConfig,"notFound.title", "notFound.heading", "notFound.message")
+    standardErrorTemplate(Messages("notFound.title"), Messages("notFound.heading"), Messages("notFound.message"))
 }
