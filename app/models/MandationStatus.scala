@@ -29,4 +29,4 @@ implicit val format: Format[MandationStatus] = Json.format[MandationStatus]
 
 object NonMtdfb extends MandationStatus("Non MTDfB")
 
-
+object NonDigital extends MandationStatus("Non Digital")

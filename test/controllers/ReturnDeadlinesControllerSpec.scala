@@ -134,6 +134,58 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
       }
     }
 
+    "for a non-Digital user (with the submit return feature enabled)" when {
+
+      "mandation status is in session" should {
+
+        lazy val result = {
+          mockConfig.features.submitReturnFeatures(true)
+          callAuthService(individualAuthResult)
+          callDateService()
+          callOpenObligations(exampleObligations)
+          callExtendedAudit
+          callServiceInfoPartialService
+          controller.returnDeadlines()(fakeRequest.withSession("mtdVatMandationStatus" -> "Non Digital"))
+        }
+
+        "return 200" in {
+          status(result) shouldBe Status.OK
+        }
+
+        "return the opt-out return deadlines page" in {
+          val document: Document = Jsoup.parse(bodyOf(result))
+          document.getElementById("submit-return-link").text() shouldBe "Submit VAT Return"
+        }
+      }
+
+      "mandation status is not in session" should {
+
+        lazy val result = {
+          mockConfig.features.submitReturnFeatures(true)
+          callAuthService(individualAuthResult)
+          callDateService()
+          callOpenObligations(exampleObligations)
+          callExtendedAudit
+          callServiceInfoPartialService
+          callMandationService(Right(MandationStatus("Non Digital")))
+          controller.returnDeadlines()(fakeRequest)
+        }
+
+        "return 200" in {
+          status(result) shouldBe Status.OK
+        }
+
+        "return the opt-out return deadlines page" in {
+          val document: Document = Jsoup.parse(bodyOf(result))
+          document.getElementById("submit-return-link").text() shouldBe "Submit VAT Return"
+        }
+
+        "put the mandation status in the session" in {
+          session(result).get(SessionKeys.mtdVatMandationStatus) shouldBe Some("Non Digital")
+        }
+      }
+    }
+
     "for an MTDfB user (with the submit return feature enabled)" when {
 
       "mandation status is in session" should {
