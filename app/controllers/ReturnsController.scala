@@ -119,8 +119,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
       customerDetail,
       obligation,
       returnDetails,
-      isReturnsPageRequest,
-      isOptedOutUser
+      isReturnsPageRequest
     )
 
     if(appConfig.features.submitReturnFeatures()) {
@@ -204,8 +203,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
   private[controllers] def constructViewModel(customerDetail: Option[CustomerDetail],
                                               obligation: VatReturnObligation,
                                               returnDetails: VatReturnDetails,
-                                              isReturnsPageRequest: Boolean,
-                                              isOptedOutUser: Boolean): VatReturnViewModel = {
+                                              isReturnsPageRequest: Boolean): VatReturnViewModel = {
 
     val amountToShow: BigDecimal = returnDetails.vatReturn.netVatDue
 
@@ -220,7 +218,6 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
       showReturnsBreadcrumb = isReturnsPageRequest,
       currentYear = dateService.now().getYear,
       hasFlatRateScheme = customerDetail.fold(false)(_.hasFlatRateScheme),
-      isOptOutMtdVatUser = isOptedOutUser,
       isHybridUser = customerDetail.fold(false)(_.isPartialMigration)
     )
   }
