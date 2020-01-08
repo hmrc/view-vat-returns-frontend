@@ -93,7 +93,6 @@ yourVatReturn.boxNine = Blwch 9
 yourVatReturn.boxNineDescription = Cyfanswm gwerth y nwyddau a brynwyd o wledydd y GE ac y daethpwyd â nhw i mewn i’r DU, yn ogystal ag unrhyw gostau perthynol (ac eithrio TAW)
 yourVatReturn.helpTitle = Mae gwall ar fy Ffurflen TAW
 yourVatReturn.helpLine = Gallwch gywiro rhai gwallau yn eich Ffurflen TAW nesaf. Rhaid bod y gwall wedi digwydd yn ystod cyfnod cyfrifyddu a ddaeth i ben yn ystod y 4 blynedd diwethaf, a rhaid ei fod naill ai:
-yourVatReturn.helpLineOptOut = Gallwch gywiro rhai gwallau yn eich Ffurflen TAW nesaf. Mae’n rhaid bod y gwall wedi digwydd mewn cyfnod cyfrifyddu a ddaeth i ben yn ystod y 4 blynedd diwethaf, a rhaid ei fod naill ai:
 yourVatReturn.reportLink1 = Mae’n rhaid i chi
 yourVatReturn.reportLink2 = roi gwybod am unrhyw wallau eraill (yn agor tab newydd)
 yourVatReturn.reportLink3 = i CThEM.

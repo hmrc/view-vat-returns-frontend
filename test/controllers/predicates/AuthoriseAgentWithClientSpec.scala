@@ -71,22 +71,44 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
 
       "agent has delegated enrolment for VRN" when {
 
-        "agent has HMRC-AS-AGENT enrolment" should {
+        "agent has HMRC-AS-AGENT enrolment" when {
 
-          "return the result of the original code block" in new Test {
+          "client is Non MTDfB" should {
 
-            (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
-              .expects(*, *, *, *)
-              .returns(authResponse)
+            "return the result of the original code block" in new Test {
 
-            (mockReturnsService.getMandationStatus(_: String)(_: HeaderCarrier, _: ExecutionContext))
-              .expects(*, *, *)
-              .returns(mandationStatusResult("Non MTDfB"))
+              (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
+                .expects(*, *, *, *)
+                .returns(authResponse)
 
-            lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
+              (mockReturnsService.getMandationStatus(_: String)(_: HeaderCarrier, _: ExecutionContext))
+                .expects(*, *, *)
+                .returns(mandationStatusResult("Non MTDfB"))
 
-            status(result) shouldBe Status.OK
-            await(bodyOf(result)) shouldBe "welcome"
+              lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
+
+              status(result) shouldBe Status.OK
+              await(bodyOf(result)) shouldBe "welcome"
+            }
+          }
+
+          "client is Non Digital" should {
+
+            "return the result of the original code block" in new Test {
+
+              (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
+                .expects(*, *, *, *)
+                .returns(authResponse)
+
+              (mockReturnsService.getMandationStatus(_: String)(_: HeaderCarrier, _: ExecutionContext))
+                .expects(*, *, *)
+                .returns(mandationStatusResult("Non Digital"))
+
+              lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
+
+              status(result) shouldBe Status.OK
+              await(bodyOf(result)) shouldBe "welcome"
+            }
           }
         }
 

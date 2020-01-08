@@ -603,7 +603,6 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         showReturnsBreadcrumb = true,
         currentYear = 2018,
         hasFlatRateScheme = true,
-        isOptOutMtdVatUser = false,
         isHybridUser = false
       )
 
@@ -613,8 +612,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         exampleCustomerDetail,
         exampleObligation,
         exampleVatReturnDetails,
-        isReturnsPageRequest = true,
-        isOptedOutUser = false
+        isReturnsPageRequest = true
       )
       result shouldBe expectedViewModel
     }

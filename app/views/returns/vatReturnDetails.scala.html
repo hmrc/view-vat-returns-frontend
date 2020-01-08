@@ -26,11 +26,7 @@
 @(vatReturnViewModel: VatReturnViewModel, serviceInfoContent: Html = HtmlFormat.empty)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig, lang: Lang, user: User)
 
 @hiddenHelpTextContent = {
-  @if(vatReturnViewModel.isOptOutMtdVatUser) {
-    <p>@messages("yourVatReturn.helpLineOptOut")</p>
-  } else {
-    <p>@messages("yourVatReturn.helpLine")</p>
-  }
+  <p>@messages("yourVatReturn.helpLine")</p>
   <ul class="list list-bullet">
     <li>@messages("yourVatReturn.bullet1")</li>
     <li>@messages("yourVatReturn.bullet2")</li>

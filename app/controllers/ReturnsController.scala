@@ -26,7 +26,6 @@ import models.customer.CustomerDetail
 import models.errors.NotFoundError
 import models.payments.Payment
 import models.viewModels.VatReturnViewModel
-import play.api.Logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc._
 import play.twirl.api.{Html, HtmlFormat}
@@ -119,8 +118,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
       customerDetail,
       obligation,
       returnDetails,
-      isReturnsPageRequest,
-      isOptedOutUser
+      isReturnsPageRequest
     )
 
     if(appConfig.features.submitReturnFeatures()) {
@@ -204,8 +202,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
   private[controllers] def constructViewModel(customerDetail: Option[CustomerDetail],
                                               obligation: VatReturnObligation,
                                               returnDetails: VatReturnDetails,
-                                              isReturnsPageRequest: Boolean,
-                                              isOptedOutUser: Boolean): VatReturnViewModel = {
+                                              isReturnsPageRequest: Boolean): VatReturnViewModel = {
 
     val amountToShow: BigDecimal = returnDetails.vatReturn.netVatDue
 
@@ -220,7 +217,6 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
       showReturnsBreadcrumb = isReturnsPageRequest,
       currentYear = dateService.now().getYear,
       hasFlatRateScheme = customerDetail.fold(false)(_.hasFlatRateScheme),
-      isOptOutMtdVatUser = isOptedOutUser,
       isHybridUser = customerDetail.fold(false)(_.isPartialMigration)
     )
   }
