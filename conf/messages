@@ -67,7 +67,6 @@ yourVatReturn.boxNine = Box 9
 yourVatReturn.boxNineDescription = Total value of goods purchased from EC countries and brought into the UK, as well as any related costs (excluding VAT)
 yourVatReturn.helpTitle = There is an error in my return
 yourVatReturn.helpLine = You can correct some errors in your next return. The error must have happened in an accounting period that ended in the last 4 years and be either:
-yourVatReturn.helpLineOptOut = You can correct some errors in your next return. The error must have happened in an accounting period that ended in the last 4 years and be either:
 yourVatReturn.reportLink1 = You must
 yourVatReturn.reportLink2 = report any other errors (opens in a new tab)
 yourVatReturn.reportLink3 = to HMRC.
