@@ -77,10 +77,9 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
         lazy val view: Html = views.html.returns.submittedReturns(
           VatReturnsViewModel(
             returnYears = Seq(2018),
-            selectedYear = 2018,
             obligations = exampleReturns,
-            hasNonMtdVatEnrolment = false,
-            vrn = "999999999"
+            showPreviousReturnsTab = false,
+            vrn = vrn
           )
         )
 
@@ -154,7 +153,6 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
         "have a single tab" in {
           elementText(Selectors.tabOne) should include("2018")
         }
-
       }
 
       "there is a final return for year of 2018" should {
@@ -171,20 +169,16 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
         lazy val view: Html = views.html.returns.submittedReturns(
           VatReturnsViewModel(
             returnYears = Seq(2018),
-            selectedYear = 2018,
             obligations = exampleReturn,
-            hasNonMtdVatEnrolment = false,
-            vrn = "999999999"
+            showPreviousReturnsTab = false,
+            vrn = vrn
           )
         )
 
         lazy implicit val document: Document = Jsoup.parse(view.body)
 
-        "contain the first return which" should {
-
-          "contains the correct obligation period text" in {
-            elementText(Selectors.obligation(1)) shouldBe "View return for the period Final return"
-          }
+        "contain the first obligation" in {
+          elementText(Selectors.obligation(1)) shouldBe "View return for the period Final return"
         }
       }
     }
@@ -218,31 +212,22 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
         )
 
       lazy val view = views.html.returns.submittedReturns(
-        VatReturnsViewModel(returnYears, 2020, exampleReturns, hasNonMtdVatEnrolment = false, "999999999")
+        VatReturnsViewModel(returnYears, exampleReturns, showPreviousReturnsTab = false, vrn)
       )
 
       lazy implicit val document: Document = Jsoup.parse(view.body)
 
-      "have a tab for 2020" should {
-
-        "have the text '2020'" in {
-          elementText(Selectors.tabOne) should include("2020")
-        }
-
+      "have a tab for 2020" in {
+        elementText(Selectors.tabOne) should include("2020")
       }
 
-      "have a tab for 2019" should {
-
-        "have the text '2019'" in {
-          elementText(Selectors.tabTwo) should include("2019")
-        }
-
+      "have a tab for 2019" in {
+        elementText(Selectors.tabTwo) should include("2019")
       }
 
       "not display the previous returns tab" in {
-        document.select(Selectors.tabThree).size shouldBe 0
+        elementAsOpt(Selectors.tabThree) shouldBe None
       }
-
     }
 
     "more than 2 return years are retrieved" should {
@@ -284,45 +269,32 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
         )
 
       lazy val view = views.html.returns.submittedReturns(
-        VatReturnsViewModel(returnYears, 2020, exampleReturns, hasNonMtdVatEnrolment = true, "999999999")
+        VatReturnsViewModel(returnYears, exampleReturns, showPreviousReturnsTab = false, vrn)
       )
 
       lazy implicit val document: Document = Jsoup.parse(view.body)
 
-      "have a tab for 2020" should {
-
-        "have the text '2020'" in {
-          elementText(Selectors.tabOne) should include("2020")
-        }
-
+      "have a tab for 2020" in {
+        elementText(Selectors.tabOne) should include("2020")
       }
 
-      "have a tab for 2019" should {
-
-        "have the text '2019'" in {
-          elementText(Selectors.tabTwo) should include("2019")
-        }
-
+      "have a tab for 2019" in {
+        elementText(Selectors.tabTwo) should include("2019")
       }
 
-      "have a tab for 2018" should {
-
-        "have the text '2018'" in {
-          elementText(Selectors.tabThree) should include("2018")
-        }
-
+      "have a tab for 2018" in {
+        elementText(Selectors.tabThree) should include("2018")
       }
 
       "not display the previous returns tab" in {
-        document.select(Selectors.tabFour).size shouldBe 0
+        elementAsOpt(Selectors.tabFour) shouldBe None
       }
-
     }
 
     "there are no returns for the year retrieved" should {
 
       lazy val view = views.html.returns.submittedReturns(
-        VatReturnsViewModel(Seq(2018), 2018, Seq(), hasNonMtdVatEnrolment = false, "999999999")
+        VatReturnsViewModel(Seq(2018), Seq(), showPreviousReturnsTab = false, vrn)
       )
 
       lazy implicit val document: Document = Jsoup.parse(view.body)
@@ -335,9 +307,7 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
         elementText(Selectors.noReturnsFound) shouldBe
           "You have not submitted any returns using the new VAT service this year."
       }
-
     }
-
   }
 
   "Rendering the Submitted Returns page with a HMRC-MTD-VAT enrolment assigned to an agent" when {
@@ -363,10 +333,9 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
         lazy val view: Html = views.html.returns.submittedReturns(
           VatReturnsViewModel(
             returnYears = Seq(2018),
-            selectedYear = 2018,
             obligations = exampleReturns,
-            hasNonMtdVatEnrolment = false,
-            vrn = "999999999"
+            showPreviousReturnsTab = false,
+            vrn = vrn
           )
         )(fakeRequestWithClientsVRN, messages, mockConfig, Lang.apply("en"), agentUser)
 
@@ -414,24 +383,17 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
       "the current year is 2018" should {
 
         lazy val view = views.html.returns.submittedReturns(
-          VatReturnsViewModel(returnYears, 2018, exampleReturns, hasNonMtdVatEnrolment = true, "999999999")
+          VatReturnsViewModel(returnYears, exampleReturns, showPreviousReturnsTab = true, vrn)
         )
 
         lazy implicit val document: Document = Jsoup.parse(view.body)
 
-        "have a tab for 2018" should {
-
-          "have the text '2018'" in {
-            elementText(Selectors.tabOne) should include("2018")
-          }
-
+        "have a tab for 2018" in {
+          elementText(Selectors.tabOne) should include("2018")
         }
 
-        "have a tab for Previous Returns" should {
-
-          "have the text 'Previous returns'" in {
-            elementText(Selectors.tabTwo) should include("Previous returns")
-          }
+        "have a tab for 'Previous returns'" in {
+          elementText(Selectors.tabTwo) should include("Previous returns")
         }
       }
     }
@@ -467,32 +429,21 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
           )
 
         lazy val view = views.html.returns.submittedReturns(
-          VatReturnsViewModel(returnYears, 2020, exampleReturns, hasNonMtdVatEnrolment = true, "999999999")
+          VatReturnsViewModel(returnYears, exampleReturns, showPreviousReturnsTab = true, vrn)
         )
 
         lazy implicit val document: Document = Jsoup.parse(view.body)
 
-        "have a tab for 2020" should {
-
-          "have the text '2020'" in {
-            elementText(Selectors.tabOne) should include("2020")
-          }
-
+        "have a tab for 2020" in {
+          elementText(Selectors.tabOne) should include("2020")
         }
 
-        "have a tab for 2019" should {
-
-          "have the text '2019'" in {
-            elementText(Selectors.tabTwo) should include("2019")
-          }
-
+        "have a tab for 2019" in {
+          elementText(Selectors.tabTwo) should include("2019")
         }
 
-        "have a tab for previous returns" should {
-
-          "have the text 'Previous Returns'" in {
-            elementText(Selectors.tabThree) should include("Previous returns")
-          }
+        "have a tab for 'Previous Returns'" in {
+          elementText(Selectors.tabThree) should include("Previous returns")
         }
       }
     }
@@ -539,97 +490,88 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
         )
 
       lazy val view = views.html.returns.submittedReturns(
-        VatReturnsViewModel(returnYears, 2020, exampleReturns, hasNonMtdVatEnrolment = true, "999999999")
+        VatReturnsViewModel(returnYears, exampleReturns, showPreviousReturnsTab = true, vrn)
       )
 
       lazy implicit val document: Document = Jsoup.parse(view.body)
 
-      "have a tab for 2020" should {
-
-        "have the text '2020'" in {
-          elementText(Selectors.tabOne) should include("2020")
-        }
-
+      "have a tab for 2020" in {
+        elementText(Selectors.tabOne) should include("2020")
       }
 
-      "have a tab for 2019" should {
-
-        "have the text '2019'" in {
-          elementText(Selectors.tabTwo) should include("2019")
-        }
-
+      "have a tab for 2019" in {
+        elementText(Selectors.tabTwo) should include("2019")
       }
 
-      "have a tab for 2018" should {
-
-        "have the text '2018'" in {
-          elementText(Selectors.tabThree) should include("2018")
-        }
-
+      "have a tab for 2018" in {
+        elementText(Selectors.tabThree) should include("2018")
       }
 
-      "not display the previous returns tab" in {
-        document.select(Selectors.tabFour).size shouldBe 0
+      "have a tab for 'Previous Returns'" in {
+        elementText(Selectors.tabFour) should include("Previous returns")
       }
-
     }
-
   }
 
-  "Rendering the submitted returns page for an agent with the agentAccess feature enabled" when {
+  "Rendering the submitted returns page for an agent with the agentAccess feature enabled" should {
 
     mockConfig.features.agentAccess(true)
 
-    "multiple years are returned" should {
+    val returnYears = Seq(2020, 2019, 2018)
 
-      val returnYears = Seq(2020, 2019, 2018)
+    lazy val exampleReturns: Seq[ReturnObligationsViewModel] = Seq(
+      ReturnObligationsViewModel(
+        LocalDate.parse("2020-01-01"),
+        LocalDate.parse("2020-03-31"),
+        "#001"
+      ),
+      ReturnObligationsViewModel(
+        LocalDate.parse("2020-04-01"),
+        LocalDate.parse("2020-06-30"),
+        "#002"
+      ),
+      ReturnObligationsViewModel(
+        LocalDate.parse("2019-01-01"),
+        LocalDate.parse("2019-03-31"),
+        "#001"
+      ),
+      ReturnObligationsViewModel(
+        LocalDate.parse("2019-04-01"),
+        LocalDate.parse("2019-06-30"),
+        "#002"
+      )
+    )
 
-      lazy val exampleReturns: Seq[ReturnObligationsViewModel] =
-        Seq(
-          ReturnObligationsViewModel(
-            LocalDate.parse("2020-01-01"),
-            LocalDate.parse("2020-03-31"),
-            "#001"
-          ),
-          ReturnObligationsViewModel(
-            LocalDate.parse("2020-04-01"),
-            LocalDate.parse("2020-06-30"),
-            "#002"
-          ),
-          ReturnObligationsViewModel(
-            LocalDate.parse("2019-01-01"),
-            LocalDate.parse("2019-03-31"),
-            "#001"
-          ),
-          ReturnObligationsViewModel(
-            LocalDate.parse("2019-04-01"),
-            LocalDate.parse("2019-06-30"),
-            "#002"
-          )
-        )
+    lazy val view = views.html.returns.submittedReturns(
+      VatReturnsViewModel(returnYears, exampleReturns, showPreviousReturnsTab = true, vrn)
+    )(fakeRequestWithClientsVRN, messages, mockConfig, Lang("en-GB"), agentUser)
 
-      "have a tab for 2020 which displays the 'changeClient' and 'finish' links" should {
+    lazy implicit val document: Document = Jsoup.parse(view.body)
 
-        lazy val view = views.html.returns.submittedReturns(
-          VatReturnsViewModel(returnYears, 2020, exampleReturns, hasNonMtdVatEnrolment = true, "999999999")
-        )(fakeRequestWithClientsVRN, messages, mockConfig, Lang("en-GB"), agentUser)
+    "have a tab for 2020" in {
+      elementText(Selectors.tabOne) should include("2020")
+    }
 
-        lazy implicit val document: Document = Jsoup.parse(view.body)
+    "have a tab for 2019" in {
+      elementText(Selectors.tabTwo) should include("2019")
+    }
 
-        "have the text '2020'" in {
-          elementText(Selectors.tabOne) should include("2020")
-        }
+    "have a tab for 2018" in {
+      elementText(Selectors.tabThree) should include("2018")
+    }
 
-        "display a 'change client' link" in {
-          document.getElementById("changeClient").text() shouldBe "Change client"
-          document.getElementById("changeClient").attr("href") shouldBe mockConfig.agentClientLookupUrl(mockConfig.agentClientActionUrl)
-        }
+    "have a tab for 'Previous Returns'" in {
+      elementText(Selectors.tabFour) should include("Previous returns")
+    }
 
-        "display a 'finish' button" in {
-          document.getElementById("finish").text() shouldBe "Finish"
-          document.getElementById("finish").attr("href") shouldBe mockConfig.agentClientActionUrl
-        }
-      }
+    "display a 'change client' link" in {
+      document.getElementById("changeClient").text() shouldBe "Change client"
+      document.getElementById("changeClient").attr("href") shouldBe mockConfig.agentClientLookupUrl(mockConfig.agentClientActionUrl)
+    }
+
+    "display a 'finish' button" in {
+      document.getElementById("finish").text() shouldBe "Finish"
+      document.getElementById("finish").attr("href") shouldBe mockConfig.agentClientActionUrl
     }
   }
 }

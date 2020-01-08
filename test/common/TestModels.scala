@@ -17,6 +17,7 @@
 package common
 
 import models.CustomerInformation
+import models.customer.CustomerDetail
 
 object TestModels {
 
@@ -26,6 +27,11 @@ object TestModels {
     Some("Jones"),
     Some("Cheapo Clothing"),
     hasFlatRateScheme = true,
-    Some(false)
+    Some(false),
+    Some("2018-01-01")
+  )
+
+  val customerDetailMax = CustomerDetail(
+    "Cheapo Clothing", hasFlatRateScheme = true, isPartialMigration = true, Some("2017-01-01")
   )
 }

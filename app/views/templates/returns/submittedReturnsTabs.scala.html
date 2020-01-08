@@ -17,18 +17,18 @@
 @(years: Seq[Int], showPreviousReturnsTab: Boolean)(implicit messages: Messages)
 
 <ul>
-    @for(year <- years) {
-        <li class="tablinks" aria-controls="@year">
-            <a href="#@year">
-            @year
-            </a>
-        </li>
-    }
-    @if(showPreviousReturnsTab && years.size < 3) {
-        <li class="tablinks" aria-controls="@messages("submittedReturns.previousReturns")">
-            <a href="#@messages("submittedReturns.previousReturns")">
-            @messages("submittedReturns.previousReturns")
-            </a>
-        </li>
-    }
+  @for(year <- years) {
+    <li class="tablinks" aria-controls="@year">
+      <a href="#@year">
+        @year
+      </a>
+    </li>
+  }
+  @if(showPreviousReturnsTab) {
+    <li class="tablinks" aria-controls="@messages("submittedReturns.previousReturns")">
+      <a href="#@messages("submittedReturns.previousReturns")">
+        @messages("submittedReturns.previousReturns")
+      </a>
+    </li>
+  }
 </ul>

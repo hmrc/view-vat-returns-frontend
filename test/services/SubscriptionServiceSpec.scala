@@ -48,7 +48,8 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           Some("Smith"),
           Some("My trading name"),
           hasFlatRateSchemeYes,
-          Some(true)
+          Some(true),
+          None
         )
 
         (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
@@ -57,7 +58,7 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
 
         lazy val result: Option[CustomerDetail] = await(service.getUserDetails(vrn))
 
-        result shouldBe Some(CustomerDetail("My trading name", hasFlatRateSchemeYes, isPartialMigration = true))
+        result shouldBe Some(CustomerDetail("My trading name", hasFlatRateSchemeYes, isPartialMigration = true, None))
       }
     }
 
@@ -70,7 +71,8 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           Some("Smith"),
           None,
           hasFlatRateSchemeNo,
-          Some(false)
+          Some(false),
+          None
         )
 
         (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
@@ -79,7 +81,7 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
 
         val result: Option[CustomerDetail] = await(service.getUserDetails(vrn))
 
-        result shouldBe Some(CustomerDetail("John Smith", hasFlatRateSchemeNo, isPartialMigration = false))
+        result shouldBe Some(CustomerDetail("John Smith", hasFlatRateSchemeNo, isPartialMigration = false, None))
       }
     }
 
@@ -92,7 +94,8 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           Some("Smith"),
           None,
           hasFlatRateSchemeNo,
-          Some(false)
+          Some(false),
+          None
         )
 
         (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
@@ -101,7 +104,7 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
 
         val result: Option[CustomerDetail] = await(service.getUserDetails(vrn))
 
-        result shouldBe Some(CustomerDetail("My organisation name", hasFlatRateSchemeNo, isPartialMigration = false))
+        result shouldBe Some(CustomerDetail("My organisation name", hasFlatRateSchemeNo, isPartialMigration = false, None))
       }
     }
 
@@ -114,7 +117,8 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           None,
           None,
           hasFlatRateSchemeNo,
-          Some(true)
+          Some(true),
+          None
         )
 
         (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
@@ -123,7 +127,7 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
 
         val result: Option[CustomerDetail] = await(service.getUserDetails(vrn))
 
-        result shouldBe Some(CustomerDetail("My organisation name", hasFlatRateSchemeNo, isPartialMigration = true))
+        result shouldBe Some(CustomerDetail("My organisation name", hasFlatRateSchemeNo, isPartialMigration = true, None))
       }
     }
 
@@ -137,6 +141,7 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           Some("Smith"),
           None,
           hasFlatRateSchemeNo,
+          None,
           None
         )
 
@@ -146,7 +151,7 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
 
         val result: Option[CustomerDetail] = await(service.getUserDetails(vrn))
 
-        result shouldBe Some(CustomerDetail("John Smith", hasFlatRateSchemeNo, isPartialMigration = false))
+        result shouldBe Some(CustomerDetail("John Smith", hasFlatRateSchemeNo, isPartialMigration = false, None))
       }
     }
 

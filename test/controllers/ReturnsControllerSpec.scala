@@ -71,7 +71,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
   )
 
   val exampleCustomerDetail: Option[CustomerDetail] =
-    Some(CustomerDetail("Cheapo Clothing", hasFlatRateScheme = true, isPartialMigration = false))
+    Some(CustomerDetail("Cheapo Clothing", hasFlatRateScheme = true, isPartialMigration = false, None))
 
   val examplePayment: Payment = Payment(
     "VAT",

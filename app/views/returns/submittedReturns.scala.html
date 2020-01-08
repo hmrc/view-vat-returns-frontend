@@ -46,7 +46,7 @@
             <h1 id="top" class="heading-xlarge">@messages("submittedReturns.title")</h1>
 
             <div class="tabbed">
-                @submittedReturnsTabs(years = model.returnYears, showPreviousReturnsTab = model.hasNonMtdVatEnrolment)
+                @submittedReturnsTabs(years = model.returnYears, showPreviousReturnsTab = model.showPreviousReturnsTab)
                 @submittedReturnsTabsContent(model, javascriptEnabled = true)
             </div>
 

@@ -18,13 +18,15 @@ package controllers
 
 import java.time.LocalDate
 
+import common.TestModels.customerDetailMax
 import models._
 import models.errors.ObligationError
 import models.viewModels.{ReturnObligationsViewModel, VatReturnsViewModel}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.http.Status
-import play.api.mvc.Result
+import play.api.mvc.{AnyContentAsEmpty, Result}
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core._
 
@@ -32,22 +34,18 @@ import scala.concurrent.Future
 
 class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
 
-  val exampleObligations: Future[ServiceResponse[VatReturnObligations]] = Right(
-    VatReturnObligations(
-      Seq(
-        VatReturnObligation(
-          LocalDate.parse("2222-01-01"),
-          LocalDate.parse("2222-12-31"),
-          LocalDate.parse("2222-01-31"),
-          "O",
-          None,
-          "#001"
-        )
-      )
-    )
+  def exampleObligations(year: Int): Future[ServiceResponse[VatReturnObligations]] = Right(
+    VatReturnObligations(Seq(VatReturnObligation(
+      LocalDate.parse(s"$year-01-01"),
+      LocalDate.parse(s"$year-12-31"),
+      LocalDate.parse(s"$year-01-31"),
+      "F",
+      None,
+      "#001"
+    )))
   )
+
   val emptyObligations: ServiceResponse[VatReturnObligations] = Right(VatReturnObligations(Seq.empty))
-  val previousYear: Int = 2017
 
   def controller: SubmittedReturnsController = new SubmittedReturnsController(
     messages,
@@ -56,21 +54,28 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
     mockAuthorisedController,
     mockDateService,
     mockServiceInfoService,
+    mockSubscriptionService,
     mockConfig,
     mockAuditService
   )
 
+  lazy val fakeRequestWithEmptyDate: FakeRequest[AnyContentAsEmpty.type] =
+    fakeRequest.withSession("customerMigratedToETMPDate" -> "")
+
+  val exampleMigrationDate = Some(LocalDate.parse("2018-01-01"))
+
   "Calling the .submittedReturns action" when {
 
-    "A user is logged in and enrolled to HMRC-MTD-VAT" should {
+    "a user is logged in and enrolled to HMRC-MTD-VAT" should {
 
       lazy val result = {
         callDateService()
         callExtendedAudit
         callAuthService(individualAuthResult)
-        callOpenObligationsForYear(exampleObligations)
-        callOpenObligationsForYear(exampleObligations)
+        callObligationsForYear(exampleObligations(2018))
+        callObligationsForYear(exampleObligations(2017))
         callServiceInfoPartialService
+        callSubscriptionService(Some(customerDetailMax))
         controller.submittedReturns(fakeRequest)
       }
 
@@ -89,35 +94,30 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
 
     "an agent logs into the service" when {
 
-      "agent access is enabled" when {
+      "agent access is enabled" should {
 
-        "there is a clients vrn in session" when {
+        lazy val result = {
+          callDateService()
+          callExtendedAudit
+          callAuthService(agentAuthResult)
+          callAuthServiceEnrolmentsOnly(Enrolments(agentEnrolment))
+          callMandationService(Right(MandationStatus("Non MTDfB")))
+          callObligationsForYear(exampleObligations(2018))
+          callObligationsForYear(exampleObligations(2017))
+          callSubscriptionService(Some(customerDetailMax))
+          controller.submittedReturns(fakeRequestWithClientsVRN)
+        }
 
-          "the agent has the correct authorised delegation" should {
+        "return 200" in {
+          status(result) shouldBe Status.OK
+        }
 
-            lazy val result = {
-              callDateService()
-              callExtendedAudit
-              callAuthService(agentAuthResult)
-              callAuthServiceEnrolmentsOnly(Enrolments(agentEnrolment))
-              callMandationService(Right(MandationStatus("Non MTDfB")))
-              callOpenObligationsForYear(exampleObligations)
-              callOpenObligationsForYear(exampleObligations)
-              controller.submittedReturns(fakeRequestWithClientsVRN)
-            }
+        "return HTML" in {
+          contentType(result) shouldBe Some("text/html")
+        }
 
-            "return 200" in {
-              status(result) shouldBe Status.OK
-            }
-
-            "return HTML" in {
-              contentType(result) shouldBe Some("text/html")
-            }
-
-            "return charset of utf-8" in {
-              charset(result) shouldBe Some("utf-8")
-            }
-          }
+        "return charset of utf-8" in {
+          charset(result) shouldBe Some("utf-8")
         }
       }
 
@@ -139,7 +139,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
       }
     }
 
-    "A user is not authorised" should {
+    "a user is not authorised" should {
 
       lazy val result = {
         callAuthService(Future.failed(InsufficientEnrolments()))
@@ -151,7 +151,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
       }
     }
 
-    "A user is not authenticated" should {
+    "a user is not authenticated" should {
 
       lazy val result = {
         callAuthService(Future.failed(MissingBearerToken()))
@@ -167,13 +167,15 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
       }
     }
 
-    "An error occurs upstream" should {
+    "an error occurs upstream" should {
 
       lazy val result: Result = {
         callAuthService(individualAuthResult)
         callDateService()
         callServiceInfoPartialService
-        callOpenObligationsForYear(Left(ObligationError))
+        callObligationsForYear(Left(ObligationError))
+        callObligationsForYear(Left(ObligationError))
+        callSubscriptionService(Some(customerDetailMax))
         controller.submittedReturns(fakeRequest)
       }
 
@@ -181,129 +183,167 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
       }
 
-      "return the submitted returns error view" in {
+      "return the standard error view" in {
         val document: Document = Jsoup.parse(bodyOf(result))
         document.select("h1").first().text() shouldBe "Sorry, there is a problem with the service"
       }
     }
   }
 
-  "Calling the .getReturnObligations function" when {
+  "Calling .getValidYears" when {
 
-    "the vatReturnsService retrieves a valid list of VatReturnObligations" when {
+    "the migration date is in the current year" should {
 
-      "the mocked date is 2020 or above" should {
-
-        "return a VatReturnsViewModel with valid obligations" in {
-
-          lazy val result = {
-            callDateService(LocalDate.parse("2020-05-05"))
-            callOpenObligationsForYear(exampleObligations)
-            callOpenObligationsForYear(exampleObligations)
-            callExtendedAudit
-            controller.getReturnObligations(user, 2020, Obligation.Status.All)
-          }
-
-          val expectedResult = Right(VatReturnsViewModel(
-            Seq(2020, 2019, 2018),
-            2020,
-            Seq(ReturnObligationsViewModel(
-              LocalDate.parse("2222-01-01"),
-              LocalDate.parse("2222-12-31"),
-              "#001"
-            )),
-            hasNonMtdVatEnrolment = false,
-            vrn
-          ))
-
-          await(result) shouldBe expectedResult
-        }
-
-        "return a VatReturnsViewModel with empty obligations" in {
-
-          lazy val result = {
-            callDateService(LocalDate.parse("2020-05-05"))
-            callOpenObligationsForYear(emptyObligations)
-            callOpenObligationsForYear(emptyObligations)
-            callOpenObligationsForYear(emptyObligations)
-            callExtendedAudit
-            controller.getReturnObligations(user, 2020, Obligation.Status.All)
-          }
-
-          val expectedResult = Right(VatReturnsViewModel(
-            Seq(2020),
-            2020,
-            List(),
-            hasNonMtdVatEnrolment = false,
-            vrn
-          ))
-
-          await(result) shouldBe expectedResult
-        }
+      lazy val result = {
+        callDateService()
+        controller.getValidYears(exampleMigrationDate)
       }
 
-      "the mocked date is below 2020" should {
-
-        "return a VatReturnsViewModel with valid obligations" in {
-
-          lazy val result = {
-            callDateService()
-            callOpenObligationsForYear(exampleObligations)
-            callOpenObligationsForYear(exampleObligations)
-            callExtendedAudit
-            controller.getReturnObligations(user, 2017, Obligation.Status.All)
-          }
-
-          val expectedResult = Right(VatReturnsViewModel(
-            Seq(2018, 2017),
-            2017,
-            Seq(
-              ReturnObligationsViewModel(
-                LocalDate.parse("2222-01-01"),
-                LocalDate.parse("2222-12-31"),
-                "#001"
-              )
-            ),
-            hasNonMtdVatEnrolment = false,
-            vrn
-          ))
-
-          await(result) shouldBe expectedResult
-        }
-
-        "return a VatReturnsViewModel with empty obligations" in {
-
-          lazy val result = {
-            callDateService()
-            callOpenObligationsForYear(emptyObligations)
-            callExtendedAudit
-            controller.getReturnObligations(user, 2017, Obligation.Status.All)
-          }
-
-          val expectedResult = Right(VatReturnsViewModel(
-            Seq(2018),
-            2017,
-            Seq(),
-            hasNonMtdVatEnrolment = false,
-            vrn
-          ))
-
-          await(result) shouldBe expectedResult
-        }
+      "return a sequence containing one service call" in {
+        await(result) shouldBe Seq(2018)
       }
     }
 
-    "the vatReturnsService retrieves an error" should {
+    "the migration date is last year" should {
+
+      lazy val result = {
+        callDateService()
+        controller.getValidYears(Some(LocalDate.parse("2017-01-01")))
+      }
+
+      "return a sequence containing one service call" in {
+        await(result) shouldBe Seq(2018, 2017)
+      }
+    }
+
+    "the migration date is before last year" should {
+
+      lazy val result = {
+        callDateService()
+        controller.getValidYears(Some(LocalDate.parse("2016-01-01")))
+      }
+
+      "return a sequence containing one service call" in {
+        await(result) shouldBe Seq(2018, 2017, 2016)
+      }
+    }
+  }
+
+  "Calling .getReturnObligations" when {
+
+    "the obligation calls are successful" should {
+
+      lazy val result = {
+        callDateService()
+        callObligationsForYear(exampleObligations(2018))
+        callExtendedAudit
+        controller.getReturnObligations(exampleMigrationDate)
+      }
+
+      val expectedModel = VatReturnsViewModel(
+        Seq(2018),
+        Seq(ReturnObligationsViewModel(
+          LocalDate.parse("2018-01-01"),
+          LocalDate.parse("2018-12-31"),
+          "#001"
+        )),
+        showPreviousReturnsTab = false,
+        vrn
+      )
+
+      "return a VatReturnsViewModel with the correct information" in {
+        await(result) shouldBe Right(expectedModel)
+      }
+    }
+
+    "at least one call to the obligations service is unsuccessful" should {
+
+      lazy val result = {
+        callDateService()
+        callObligationsForYear(Left(ObligationError))
+        controller.getReturnObligations(exampleMigrationDate)
+      }
+
+      "return an ObligationError" in {
+        await(result) shouldBe Left(ObligationError)
+      }
+    }
+  }
+
+  "Calling .customerMigratedWithin15M" when {
+
+    "the interval between dates is less than 15 months" should {
+
+      "return true" in {
+        callDateService()
+        controller.customerMigratedWithin15M(Some(LocalDate.parse("2017-02-02"))) shouldBe true
+      }
+    }
+
+    "the interval between dates is 15 months or greater" should {
+
+      "return false" in {
+        callDateService()
+        controller.customerMigratedWithin15M(Some(LocalDate.parse("2017-02-01"))) shouldBe false
+      }
+    }
+
+    "the interval is 0 days" should {
+
+      "return true" in {
+        callDateService()
+        controller.customerMigratedWithin15M(Some(LocalDate.parse("2018-05-01"))) shouldBe true
+      }
+    }
+
+    "the date provided is None" should {
+
+      "return false as a default" in {
+        controller.customerMigratedWithin15M(None) shouldBe false
+      }
+    }
+  }
+
+  "Calling .getMigratedToETMPDate" when {
+
+    "the ETMP migration date is already in session" should {
+
+      "return the date" in {
+        await(controller.getMigratedToETMPDate(fakeRequestWithSession, user)) shouldBe exampleMigrationDate
+      }
+    }
+
+    "an empty value is in session" should {
 
       "return None" in {
+        await(controller.getMigratedToETMPDate(fakeRequestWithEmptyDate, user)) shouldBe None
+      }
+    }
+
+    "no value is in session" when {
+
+      "the account details service returns a successful result" should {
 
         lazy val result = {
-          callDateService()
-          callOpenObligationsForYear(Left(ObligationError))
-          await(controller.getReturnObligations(user, 2017, Obligation.Status.All))
+          callSubscriptionService(Some(customerDetailMax))
+          controller.getMigratedToETMPDate
         }
 
-        result shouldBe Left(ObligationError)
+        "return the date" in {
+          await(result) shouldBe Some(LocalDate.parse("2017-01-01"))
+        }
+      }
+
+      "the account details service returns a failure" should {
+
+        lazy val result = {
+          callSubscriptionService(None)
+          controller.getMigratedToETMPDate
+        }
+
+        "return None" in {
+          await(result) shouldBe None
+        }
       }
     }
   }
