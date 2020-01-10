@@ -84,7 +84,7 @@ trait MockAuth extends UnitSpec with GuiceOneAppPerSuite with BeforeAndAfterEach
     .expects(*, *, *)
     .returns(Future.successful(response))
 
-  def callOpenObligationsForYear(response: ServiceResponse[VatReturnObligations]): Any =
+  def callObligationsForYear(response: ServiceResponse[VatReturnObligations]): Any =
     (mockVatReturnService.getReturnObligationsForYear(_: String, _: Int, _: Obligation.Status.Value)
     (_: HeaderCarrier, _: ExecutionContext))
       .expects(*, *, *, *, *)

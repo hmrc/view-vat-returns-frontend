@@ -16,4 +16,7 @@
 
 package models.customer
 
-case class CustomerDetail(entityName: String, hasFlatRateScheme: Boolean, isPartialMigration: Boolean)
+case class CustomerDetail(entityName: String,
+                          hasFlatRateScheme: Boolean,
+                          isPartialMigration: Boolean,
+                          customerMigratedToETMPDate: Option[String])

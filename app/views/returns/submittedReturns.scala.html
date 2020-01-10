@@ -16,9 +16,8 @@
 
 @import views.html.templates.formatters.breadcrumbs.navigationBreadcrumb
 @import views.html.templates.formatters.dates.displayDateRange
-@import views.html.templates.formatters.tabs._
-@import views.html.templates.returns.submittedReturnsTabs
-@import models.viewModels._
+@import views.html.templates.returns.{submittedReturnsTabs, submittedReturnsTabsContent}
+@import models.viewModels.VatReturnsViewModel
 
 @(model: VatReturnsViewModel, serviceInfoContent: Html = HtmlFormat.empty)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig, lang: Lang, user: User)
 
@@ -39,94 +38,23 @@
     }
 
     <div class="grid-row">
-      <div class="column-two-thirds">
-        @if(user.isAgent) {
-          <a id="link-back" class="link-back" href='@appConfig.agentClientActionUrl'>@messages("base.back")</a>
-        }
-
-        <h1 class="heading-xlarge">@messages("submittedReturns.title")</h1>
-
-        @(model.returnYears.length, model.hasNonMtdVatEnrolment) match {
-
-          case (0 | 1 | 2, true) => {
-
-            <ul class="tabs-nav" role="tablist">
-
-              @submittedReturnsTabs(model.returnYears, model.selectedYear)
-
-              @if(!model.returnYears.contains(model.selectedYear)) {
-                @activeTab(messages("submittedReturns.previousReturns"), messages("submittedReturns.activePrevious"))
-              } else {
-                @inactiveTab(
-                  messages("submittedReturns.previousReturns"),
-                  messages("submittedReturns.inactivePrevious"),
-                  controllers.routes.SubmittedReturnsController.submittedReturns(model.returnYears.last - 1).url
-                )
-              }
-            </ul>
-          }
-
-          case (2 | 3, _) => {
-
-            <ul class="tabs-nav" role="tablist">
-            @submittedReturnsTabs(model.returnYears, model.selectedYear)
-            </ul>
-          }
-
-          case (_, _) => { }
-
-        }
-
-
-        @if(model.hasNonMtdVatEnrolment && !model.returnYears.contains(model.selectedYear)) {
-
-          <h2>@messages("submittedReturns.previousReturns")</h2>
-          <p id="previous-one">
-            @messages("submittedReturns.previousReturnsOne")
-            <a target="_blank" href="@appConfig.portalUrl(model.vrn)">
-            @messages("submittedReturns.previousReturnsTwo")</a>.
-          </p>
-        } else {
-
-          <h2>@messages("submittedReturns.yearReturns", model.selectedYear.toString)</h2>
-
-
-          @if(model.obligations.isEmpty) {
-            <p>@messages("submittedReturns.noSubmitted")</p>
-          } else {
-            <p aria-hidden="true">@messages("submittedReturns.period")</p>
-
-            <ul class="list list-bullet">
-            @for(obligation <- model.obligations) {
-              <li>
-                <a href="@controllers.routes.ReturnsController.vatReturn(model.selectedYear, obligation.periodKey)">
-                  <span class="visually-hidden">@messages("submittedReturns.periodPrefix")</span>
-                  @if(obligation.isFinalObligation) {
-                    @messages("submittedReturns.finalReturn")
-                  } else {
-                    @displayDateRange(obligation.periodFrom, obligation.periodTo)
-                  }
-                </a>
-              </li>
+        <div class="column-two-thirds">
+            @if(user.isAgent) {
+                <a id="link-back" class="link-back" href='@appConfig.agentClientActionUrl'>@messages("base.back")</a>
             }
-            </ul>
-          }
-            @if(model.returnYears.max == model.selectedYear && user.isAgent && appConfig.features.agentAccess()){
-              <p>
-                <a id="changeClient"
-                  href="@{appConfig.agentClientLookupUrl(appConfig.agentClientActionUrl)}">
-                  @messages("submittedReturns.changeClient")
-                </a>
-              </p>
-              <p>
-                <a id="finish"
-                   class="btn button"
-                   role="button"
-                   href="@appConfig.agentClientActionUrl">@messages("submittedReturns.finish")
-                </a>
-              </p>
-            }
-        }
-      </div>
+
+            <h1 id="top" class="heading-xlarge">@messages("submittedReturns.title")</h1>
+
+            <div class="tabbed">
+                @submittedReturnsTabs(years = model.returnYears, showPreviousReturnsTab = model.showPreviousReturnsTab)
+                @submittedReturnsTabsContent(model, javascriptEnabled = true)
+            </div>
+
+            <noscript>
+                @submittedReturnsTabsContent(model, javascriptEnabled = false)
+            </noscript>
+
+        </div>
+
     </div>
-  }
+}

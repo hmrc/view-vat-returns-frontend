@@ -19,7 +19,7 @@ package controllers
 import akka.actor.ActorSystem
 import akka.stream.{ActorMaterializer, Materializer}
 import common.EnrolmentKeys._
-import common.SessionKeys.clientVrn
+import common.SessionKeys.{clientVrn, migrationToETMP}
 import mocks.MockAuth
 import models.User
 import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded}
@@ -43,7 +43,10 @@ class ControllerBaseSpec extends MockAuth {
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
   lazy val fakeRequestWithSession: FakeRequest[AnyContentAsEmpty.type] = fakeRequest.withSession(
-    GovUkSessionKeys.lastRequestTimestamp -> "1498236506662", GovUkSessionKeys.authToken -> "Bearer Token")
+    GovUkSessionKeys.lastRequestTimestamp -> "1498236506662",
+    GovUkSessionKeys.authToken -> "Bearer Token",
+    migrationToETMP -> "2018-01-01"
+  )
 
   def fakeRequestToPOSTWithSession(input: (String, String)*): FakeRequest[AnyContentAsFormUrlEncoded] =
     fakeRequestWithSession.withFormUrlEncodedBody(input: _*)

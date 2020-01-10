@@ -30,7 +30,7 @@ class SubscriptionService @Inject()(connector: VatSubscriptionConnector) {
   def getUserDetails(vrn: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[CustomerDetail]] = {
     connector.getCustomerInfo(vrn).map {
 
-      case Right(CustomerInformation(None, None, None, None, _, _)) => None
+      case Right(CustomerInformation(None, None, None, None, _, _, _)) => None
 
       case Right(model) =>
 
@@ -42,7 +42,7 @@ class SubscriptionService @Inject()(connector: VatSubscriptionConnector) {
 
         val isPartialMigration: Boolean = model.isPartialMigration.contains(true)
 
-        Some(CustomerDetail(entityName, model.hasFlatRateScheme, isPartialMigration))
+        Some(CustomerDetail(entityName, model.hasFlatRateScheme, isPartialMigration, model.customerMigratedToETMPDate))
 
       case Left(_) => None
     }

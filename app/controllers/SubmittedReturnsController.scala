@@ -16,20 +16,24 @@
 
 package controllers
 
+import java.time.{LocalDate, Period}
+
 import audit.AuditingService
 import audit.models.ViewSubmittedVatObligationsAuditModel
+import common.SessionKeys
 import config.AppConfig
 import javax.inject.{Inject, Singleton}
 import models.viewModels.{ReturnObligationsViewModel, VatReturnsViewModel}
-import models._
+import models.{ServiceResponse, User}
+import models.errors.ObligationError
+import models.Obligation.Status.Fulfilled
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{Action, AnyContent, Request}
 import play.twirl.api.HtmlFormat
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import utils.LoggerUtil.logWarn
-
 
 import scala.concurrent.Future
 
@@ -40,128 +44,95 @@ class SubmittedReturnsController @Inject()(val messagesApi: MessagesApi,
                                            authorisedController: AuthorisedController,
                                            dateService: DateService,
                                            serviceInfoService: ServiceInfoService,
+                                           subscriptionService: SubscriptionService,
                                            implicit val appConfig: AppConfig,
                                            auditService: AuditingService)
   extends FrontendController with I18nSupport {
 
-  def submittedReturns(year: Int): Action[AnyContent] = authorisedController.authorisedAction ({ implicit request =>
+  lazy val currentYear: Int = dateService.now().getYear
+
+  def submittedReturns: Action[AnyContent] = authorisedController.authorisedAction({ implicit request =>
     implicit user =>
-      if (isValidSearchYear(year)) {
-        for {
-          obligationsResult <- getReturnObligations(user, year, Obligation.Status.Fulfilled)
-          serviceInfoContent <- if(user.isAgent) Future.successful(HtmlFormat.empty) else serviceInfoService.getServiceInfoPartial
-        } yield {
-         obligationsResult match {
-            case Right(model) =>
-              Ok(views.html.returns.submittedReturns(model, serviceInfoContent))
-            case Left(error) =>
-              logWarn("[ReturnObligationsController][submittedReturns] error: " + error.toString)
-              InternalServerError(views.html.errors.submittedReturnsError(user))
-          }
+      for {
+        serviceInfoContent <- if (user.isAgent) Future.successful(HtmlFormat.empty) else serviceInfoService.getServiceInfoPartial
+        migrationDate <- getMigratedToETMPDate
+        obligationsResult <- getReturnObligations(migrationDate)
+      } yield {
+        obligationsResult match {
+          case Right(model) =>
+            Ok(views.html.returns.submittedReturns(model, serviceInfoContent))
+          case Left(error) =>
+            logWarn("[ReturnObligationsController][submittedReturns] error: " + error.toString)
+            InternalServerError(views.html.errors.submittedReturnsError(user))
         }
-      } else {
-        Future.successful(NotFound(views.html.errors.notFound()))
       }
   }, ignoreMandatedStatus = true)
 
-
-
-  private[controllers] def isValidSearchYear(year: Int, upperBound: Int = dateService.now().getYear) = {
-    year <= upperBound && year >= upperBound - 2
-  }
-
-  private[controllers] def getPreviousReturnYears(vrn: String,
-                                                  status: Obligation.Status.Value,
-                                                  currentYear: Int)
-                                                 (implicit hc: HeaderCarrier): Future[ServiceResponse[Seq[Int]]] = {
-
-    val currentYearMinusOne = currentYear - 1
-
-    returnsService.getReturnObligationsForYear(vrn, currentYearMinusOne, status) map {
-      case Right(VatReturnObligations(obligations)) =>
-        if (obligations.nonEmpty) {
-          Right(Seq[Int](currentYear, currentYearMinusOne))
-        }
-        else {
-          Right(Seq[Int](currentYear))
-        }
-      case Left(error) =>
-        logWarn("[ReturnObligationsController][getPreviousReturnYears] error: " + error.toString)
-        Left(error)
+  private[controllers] def getValidYears(migrationDate: Option[LocalDate]): Seq[Int] =
+    migrationDate match {
+      case Some(date) if date.getYear == currentYear => Seq(currentYear)
+      case Some(date) if date.getYear == currentYear - 1 => Seq(currentYear, currentYear - 1)
+      case _ => Seq(currentYear, currentYear - 1, currentYear - 2)
     }
-  }
 
-  private[controllers] def getReturnYears(vrn: String,
-                                          status: Obligation.Status.Value)
-                                         (implicit hc: HeaderCarrier): Future[ServiceResponse[Seq[Int]]] = {
+  private[controllers] def getReturnObligations(migrationDate: Option[LocalDate])
+                                               (implicit user: User,
+                                                hc: HeaderCarrier): Future[ServiceResponse[VatReturnsViewModel]] = {
 
-    val currentYear = dateService.now().getYear
-    val currentYearMinusTwo = currentYear - 2
+    val years = getValidYears(migrationDate)
 
-    if (currentYear > 2019) {
-      returnsService.getReturnObligationsForYear(vrn, currentYearMinusTwo, status) flatMap {
-        case Right(VatReturnObligations(obligations)) =>
-          if (obligations.nonEmpty) {
-            Future.successful(Right(Seq[Int](currentYear, currentYear - 1, currentYearMinusTwo)))
-          } else {
-            getPreviousReturnYears(vrn, status, currentYear)
-          }
-        case Left(error) =>
-          logWarn("[ReturnObligationsController][getReturnYears] error: " + error.toString)
-          Future.successful(Left(error))
+    for {
+      obligationsResult <- Future.sequence(years.map { year =>
+        returnsService.getReturnObligationsForYear(user.vrn, year, Fulfilled)
+      })
+    } yield {
+      obligationsResult match {
+
+        case result if result.exists(_.isLeft) =>
+          Left(ObligationError)
+
+        case result =>
+
+          val obligations = result.flatMap(_.right.toSeq).flatMap(_.obligations)
+          val migratedWithin15Months = customerMigratedWithin15M(migrationDate)
+
+          auditService.extendedAudit(
+            ViewSubmittedVatObligationsAuditModel(user, obligations),
+            routes.SubmittedReturnsController.submittedReturns().url
+          )
+
+          Right(VatReturnsViewModel(
+            years,
+            obligations.map(obligation =>
+              ReturnObligationsViewModel(
+                obligation.periodFrom,
+                obligation.periodTo,
+                obligation.periodKey
+              )
+            ),
+            user.hasNonMtdVat && migratedWithin15Months,
+            user.vrn
+          ))
       }
     }
-    else {
-      getPreviousReturnYears(vrn, status, currentYear)
-    }
   }
 
-  private[controllers] def getReturnObligations(user: User,
-                                                selectedYear: Int,
-                                                status: Obligation.Status.Value)
-                                               (implicit hc: HeaderCarrier): Future[ServiceResponse[VatReturnsViewModel]] =
+  private[controllers] def getMigratedToETMPDate(implicit request: Request[_], user: User): Future[Option[LocalDate]] =
+    request.session.get(SessionKeys.migrationToETMP) match {
+      case Some(date) if date.nonEmpty => Future.successful(Some(LocalDate.parse(date)))
+      case Some(_) => Future.successful(None)
+      case None => subscriptionService.getUserDetails(user.vrn) map {
+        case Some(details) => details.customerMigratedToETMPDate.map(LocalDate.parse)
+        case None => None
+      }
+    }
 
-    getReturnYears(user.vrn, status) flatMap {
-      case Right(years) =>
-
-        if (years.contains(selectedYear)) {
-          returnsService.getReturnObligationsForYear(user.vrn, selectedYear, status) map {
-            case Right(VatReturnObligations(obligations)) =>
-
-              auditService.extendedAudit(
-                ViewSubmittedVatObligationsAuditModel(user, obligations),
-                routes.SubmittedReturnsController.submittedReturns(selectedYear).url
-              )
-
-              Right(VatReturnsViewModel(
-                years,
-                selectedYear,
-                obligations.map(obligation =>
-                  ReturnObligationsViewModel(
-                    obligation.periodFrom,
-                    obligation.periodTo,
-                    obligation.periodKey
-                  )
-                ),
-                user.hasNonMtdVat,
-                user.vrn
-              ))
-            case Left(error) =>
-              logWarn(s"[ReturnObligationsController][getReturnObligations] error: ${error.toString}")
-              Left(error)
-          }
-        }
-        else {
-          Future.successful(Right(VatReturnsViewModel(
-            years,
-            selectedYear,
-            Seq(),
-            user.hasNonMtdVat,
-            user.vrn
-          )))
-        }
-      case Left(error) =>
-        logWarn(s"[ReturnObligationsController][getReturnObligations] error: ${error.toString}")
-        Future.successful(Left(error))
+  private[controllers] def customerMigratedWithin15M(migrationDate: Option[LocalDate]): Boolean =
+    migrationDate match {
+      case Some(date) =>
+        val prevReturnsMonthLimit = 14
+        val monthsSinceMigration = Math.abs(Period.between(dateService.now(), date).toTotalMonths)
+        0 to prevReturnsMonthLimit contains monthsSinceMigration
+      case None => false
     }
 }

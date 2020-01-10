@@ -1,3 +1,5 @@
+@import "tabs.css";
+
 .task-overdue {
   display: -moz-inline-stack;
   display: inline-block;

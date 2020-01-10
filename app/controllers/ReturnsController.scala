@@ -174,7 +174,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
       )
       val yearAsInt: Int = inSessionYear.get.toInt
       Future.successful(
-        Redirect(routes.SubmittedReturnsController.submittedReturns(yearAsInt)).removingFromSession("submissionYear", "inSessionPeriodKey")
+        Redirect(routes.SubmittedReturnsController.submittedReturns()).removingFromSession("submissionYear", "inSessionPeriodKey")
       )
     } else {
       if(preMtdReturn) {

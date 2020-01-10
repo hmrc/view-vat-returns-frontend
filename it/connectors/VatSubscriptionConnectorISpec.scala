@@ -48,7 +48,8 @@ class VatSubscriptionConnectorISpec extends IntegrationBaseSpec {
           Some("Vatreturn"),
           Some("Cheapo Clothing"),
           hasFlatRateScheme = true,
-          Some(true)
+          Some(true),
+          Some("2018-01-01")
         ))
         private val result = await(connector.getCustomerInfo("999999999"))
 
