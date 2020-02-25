@@ -23,10 +23,13 @@ import models.customer.CustomerDetail
 import models.errors.{MandationStatusError, NotFoundError, VatReturnError}
 import models.payments.Payment
 import models.viewModels.VatReturnViewModel
+import org.jsoup.Jsoup
 import play.api.http.Status
 import play.api.test.Helpers._
 import play.twirl.api.Html
 import uk.gov.hmrc.auth.core.{Enrolments, InsufficientEnrolments, MissingBearerToken}
+import views.html.errors.{NotFoundView, PreMtdReturnView, TechnicalProblemView}
+import views.html.returns.VatReturnDetailsView
 
 import scala.concurrent.Future
 
@@ -38,15 +41,17 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
   }
 
   def controller: ReturnsController = new ReturnsController(
-    messages,
+    mcc,
     enrolmentsAuthService,
     mockVatReturnService,
     mockSubscriptionService,
     mockDateService,
     mockServiceInfoService,
     mockAuthorisedController,
-    mockConfig,
-    mockAuditService
+    inject[NotFoundView],
+    inject[VatReturnDetailsView],
+    inject[TechnicalProblemView],
+    inject[PreMtdReturnView]
   )
 
   def setupCommonSuccessMocks(): Any = {
@@ -110,7 +115,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
             callServiceInfoPartialService
             callConstructReturnDetailsModel(exampleVatReturnDetails)
             callMandationService(Right(MandationStatus("Non MTDfB")))
-            controller.vatReturn(2018, "#001")(fakeRequest)
+            controller.vatReturn(2018, "#001")(request())
           }
 
           "return 200" in {
@@ -130,7 +135,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
           lazy val result = {
             callAuthService(individualAuthResult)
-            controller.vatReturn(2018, "form-label")(fakeRequest)
+            controller.vatReturn(2018, "form-label")(request())
           }
 
           "return 404" in {
@@ -153,7 +158,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
             callVatReturn(Left(NotFoundError))
             setupCommonSuccessMocks()
             callServiceInfoPartialService
-            controller.vatReturn(2018, "3002")(fakeRequest)
+            controller.vatReturn(2018, "3002")(request())
           }
 
           "return 404" in {
@@ -169,7 +174,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
           }
 
           "have the correct title" in {
-            contentAsString(result) should include ("This return is not available")
+            messages(Jsoup.parse(bodyOf(result)).select("h1").text) shouldBe "This return is not available"
           }
         }
 
@@ -182,7 +187,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
             callServiceInfoPartialService
             callConstructReturnDetailsModel(exampleVatReturnDetails)
             callMandationService(Left(MandationStatusError))
-            controller.vatReturn(2018, "#001")(fakeRequest)
+            controller.vatReturn(2018, "#001")(request())
           }
 
           "return 500" in {
@@ -199,7 +204,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
           setupCommonSuccessMocks()
           callServiceInfoPartialService
           callConstructReturnDetailsModel(exampleVatReturnDetails)
-          controller.vatReturn(2018, "#001")(fakeRequest.withSession("mtdVatMandationStatus" -> "Non MTDfB"))
+          controller.vatReturn(2018, "#001")(request(fakeRequest.withSession("mtdVatMandationStatus" -> "Non MTDfB")))
         }
 
         "not make a call to retrieve mandation status" in {
@@ -216,7 +221,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
           setupCommonSuccessMocks()
           callServiceInfoPartialService
           callConstructReturnDetailsModel(exampleVatReturnDetails)
-          controller.vatReturn(2018, "#001")(fakeRequest)
+          controller.vatReturn(2018, "#001")(request())
         }
 
         "not make a call to retrieve mandation status" in {
@@ -239,7 +244,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
             callConstructReturnDetailsModel(exampleVatReturnDetails)
             callMandationService(Right(MandationStatus("Non MTDfB")))
             callMandationService(Right(MandationStatus("Non MTDfB")))
-            controller.vatReturn(2018, "#001")(fakeRequestWithClientsVRN)
+            controller.vatReturn(2018, "#001")(request(fakeRequestWithClientsVRN))
           }
 
           "return 200" in {
@@ -254,7 +259,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
             lazy val result = {
               callAuthService(agentAuthResult)
               callAuthServiceEnrolmentsOnly(Enrolments(mtdVatEnrolment))
-              controller.vatReturn(2018, "#001")(fakeRequestWithClientsVRN)
+              controller.vatReturn(2018, "#001")(request(fakeRequestWithClientsVRN))
             }
 
             status(result) shouldBe Status.FORBIDDEN
@@ -269,7 +274,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
           lazy val result = {
             mockConfig.features.agentAccess(false)
             callAuthService(agentAuthResult)
-            controller.vatReturn(2018, "#001")(fakeRequestWithClientsVRN)
+            controller.vatReturn(2018, "#001")(request(fakeRequestWithClientsVRN))
           }
 
           status(result) shouldBe Status.SEE_OTHER
@@ -282,7 +287,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
       lazy val result = {
         callAuthService(Future.failed(InsufficientEnrolments()))
-        controller.vatReturn(2018, "#001")(fakeRequest)
+        controller.vatReturn(2018, "#001")(request())
       }
 
       "return 403 (Forbidden)" in {
@@ -294,7 +299,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
       lazy val result = {
         callAuthService(Future.failed(MissingBearerToken()))
-        controller.vatReturn(2018, "#001")(fakeRequest)
+        controller.vatReturn(2018, "#001")(request())
       }
 
       "return 303 (SEE_OTHER)" in {
@@ -314,7 +319,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
           callVatReturn(Left(NotFoundError))
           setupCommonSuccessMocks()
           callServiceInfoPartialService
-          controller.vatReturn(2018, "#001")(fakeRequest)
+          controller.vatReturn(2018, "#001")(request())
         }
 
         "return 404 (Not Found)" in {
@@ -329,10 +334,10 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
           setupCommonSuccessMocks()
           callServiceInfoPartialService
           controller.vatReturn(2018, "18AA")(
-            fakeRequest.withSession(
+            request(fakeRequest.withSession(
               "submissionYear" -> "2018",
               "inSessionPeriodKey" -> "18AA"
-            )
+            ))
           )
         }
 
@@ -342,8 +347,8 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         }
 
         "submission year and period key will no longer be in session" in {
-          result.session.get("submissionYear") shouldBe None
-          result.session.get("inSessionPeriodKey") shouldBe None
+          session(result).get("submissionYear") shouldBe None
+          session(result).get("inSessionPeriodKey") shouldBe None
         }
       }
     }
@@ -355,7 +360,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         callVatReturn(Left(VatReturnError))
         setupCommonSuccessMocks()
         callServiceInfoPartialService
-        controller.vatReturn(2018, "#001")(fakeRequest)
+        controller.vatReturn(2018, "#001")(request())
       }
 
       "return 500 (Internal Server Error)" in {
@@ -380,7 +385,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
             callServiceInfoPartialService
             callConstructReturnDetailsModel(exampleVatReturnDetails)
             callMandationService(Right(MandationStatus("Non MTDfB")))
-            controller.vatReturnViaPayments("#001")(fakeRequest)
+            controller.vatReturnViaPayments("#001")(request())
           }
 
           "return 200" in {
@@ -400,7 +405,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
           lazy val result = {
             callAuthService(individualAuthResult)
-            controller.vatReturnViaPayments("form-label")(fakeRequest)
+            controller.vatReturnViaPayments("form-label")(request())
           }
 
           "return 404" in {
@@ -423,7 +428,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
             callVatReturn(Left(NotFoundError))
             setupCommonSuccessMocks()
             callServiceInfoPartialService
-            controller.vatReturnViaPayments("3001")(fakeRequest)
+            controller.vatReturnViaPayments("3001")(request())
           }
 
           "return 404" in {
@@ -439,7 +444,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
           }
 
           "have the correct title" in {
-            contentAsString(result) should include ("This return is not available")
+            messages(Jsoup.parse(bodyOf(result)).select("h1").text) shouldBe "This return is not available"
           }
         }
       }
@@ -452,7 +457,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
           setupCommonSuccessMocks()
           callServiceInfoPartialService
           callConstructReturnDetailsModel(exampleVatReturnDetails)
-          controller.vatReturnViaPayments("#001")(fakeRequest.withSession("mtdVatMandationStatus" -> "Non MTDfB"))
+          controller.vatReturnViaPayments("#001")(request(fakeRequest.withSession("mtdVatMandationStatus" -> "Non MTDfB")))
         }
 
         "not make a call to retrieve mandation status" in {
@@ -469,7 +474,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
           setupCommonSuccessMocks()
           callServiceInfoPartialService
           callConstructReturnDetailsModel(exampleVatReturnDetails)
-          controller.vatReturnViaPayments("#001")(fakeRequest)
+          controller.vatReturnViaPayments("#001")(request())
         }
 
         "not make a call to retrieve mandation status" in {
@@ -492,7 +497,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
             callConstructReturnDetailsModel(exampleVatReturnDetails)
             callMandationService(Right(MandationStatus("Non MTDfB")))
             callMandationService(Right(MandationStatus("Non MTDfB")))
-            controller.vatReturnViaPayments("#001")(fakeRequestWithClientsVRN)
+            controller.vatReturnViaPayments("#001")(request(fakeRequestWithClientsVRN))
           }
 
           "return 200" in {
@@ -505,7 +510,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
           lazy val result = {
             callAuthService(agentAuthResult)
             callAuthServiceEnrolmentsOnly(Enrolments(mtdVatEnrolment))
-            controller.vatReturnViaPayments("#001")(fakeRequestWithClientsVRN)
+            controller.vatReturnViaPayments("#001")(request(fakeRequestWithClientsVRN))
           }
 
           "return 403" in {
@@ -519,7 +524,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         lazy val result = {
           mockConfig.features.agentAccess(false)
           callAuthService(agentAuthResult)
-          controller.vatReturnViaPayments("#001")(fakeRequestWithClientsVRN)
+          controller.vatReturnViaPayments("#001")(request(fakeRequestWithClientsVRN))
         }
 
         "return 303" in {
@@ -533,7 +538,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
       lazy val result = {
         callAuthService(Future.failed(InsufficientEnrolments()))
-        controller.vatReturnViaPayments("#001")(fakeRequestWithClientsVRN)
+        controller.vatReturnViaPayments("#001")(request(fakeRequestWithClientsVRN))
       }
 
       "return 403 (Forbidden)" in {
@@ -545,7 +550,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
       lazy val result = {
         callAuthService(Future.failed(MissingBearerToken()))
-        controller.vatReturnViaPayments("#001")(fakeRequestWithClientsVRN)
+        controller.vatReturnViaPayments("#001")(request(fakeRequestWithClientsVRN))
       }
 
       "return 303 (SEE_OTHER)" in {
@@ -564,7 +569,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         callVatReturn(Left(NotFoundError))
         setupCommonSuccessMocks()
         callServiceInfoPartialService
-        controller.vatReturnViaPayments("#001")(fakeRequest)
+        controller.vatReturnViaPayments("#001")(request())
       }
 
       "return 404 (Not Found)" in {
@@ -579,7 +584,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         callVatReturn(Left(VatReturnError))
         setupCommonSuccessMocks()
         callServiceInfoPartialService
-        controller.vatReturn(2018, "#001")(fakeRequest)
+        controller.vatReturn(2018, "#001")(request())
       }
 
       "return 500 (Internal Server Error)" in {
@@ -629,7 +634,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         callDateService()
         callAudit
         callMandationService(Right(MandationStatus("Non MTDfB")))
-        controller.renderResult(data, isReturnsPageRequest = true, isNumericPeriodKey = false)(fakeRequest, user)
+        controller.renderResult(data, isReturnsPageRequest = true, isNumericPeriodKey = false)(request(), user)
       }
 
       "return an OK status" in {
@@ -643,7 +648,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         "return a Not Found status" in {
           val data = ReturnsControllerData(Left(NotFoundError), None, None, None, Html(""))
           lazy val result = controller.renderResult(data, isReturnsPageRequest = true,
-            isNumericPeriodKey = false)(fakeRequest, user)
+            isNumericPeriodKey = false)(request(), user)
           result.header.status shouldBe Status.NOT_FOUND
         }
       }
@@ -653,7 +658,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         "return a Not Found status" in {
           val data = ReturnsControllerData(Left(NotFoundError), None, None, None, Html(""))
           lazy val result = controller.renderResult(data, isReturnsPageRequest = true,
-            isNumericPeriodKey = true)(fakeRequest, user)
+            isNumericPeriodKey = true)(request(), user)
           result.header.status shouldBe Status.NOT_FOUND
         }
       }
@@ -664,7 +669,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       "return an Internal Server Error status" in {
         val data = ReturnsControllerData(Right(exampleVatReturn), None, None, None, Html(""))
         lazy val result = controller.renderResult(data, isReturnsPageRequest = true,
-          isNumericPeriodKey = false)(fakeRequest, user)
+          isNumericPeriodKey = false)(request(), user)
         result.header.status shouldBe Status.INTERNAL_SERVER_ERROR
       }
     }
@@ -674,7 +679,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       "return an Internal Server Error status" in {
         val data = ReturnsControllerData(Left(VatReturnError), None, None, None, Html(""))
         lazy val result = controller.renderResult(data, isReturnsPageRequest = true,
-          isNumericPeriodKey = false)(fakeRequest, user)
+          isNumericPeriodKey = false)(request(), user)
         result.header.status shouldBe Status.INTERNAL_SERVER_ERROR
       }
     }

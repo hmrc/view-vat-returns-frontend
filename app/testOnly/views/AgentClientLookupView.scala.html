@@ -16,11 +16,13 @@
 
 @import helper.CSRF
 @import testOnly.models.StubAgentClientLookupModel
-@import uk.gov.hmrc.play.views.html.helpers
+@import uk.gov.hmrc.play.views.html.helpers.Input
+
+@this(mainTemplate: MainTemplate, input: Input)
 
 @(form: Form[StubAgentClientLookupModel], redirectUrl: String)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
-@views.html.main_template(title = "Stub Agent Client Lookup Frontend", bodyClasses = None, appConfig = appConfig) {
+@mainTemplate(title = "Stub Agent Client Lookup Frontend") {
 
     @helper.form(action = testOnly.controllers.routes.StubAgentClientLookupController.post) {
         @CSRF.formField
@@ -30,7 +32,7 @@
             <label><h2>Client VRN</h2></label>
 
           <div class="form-field">
-            @helpers.input(
+            @input(
               form("vrn"),
               '_label -> messages("Client VRN"),
               '_labelTextClass -> "form-label visuallyhidden",

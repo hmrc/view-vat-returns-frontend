@@ -19,8 +19,11 @@ package views.errors
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import views.ViewBaseSpec
+import views.html.errors.UnauthorisedView
 
 class UnauthorisedViewSpec extends ViewBaseSpec {
+
+  val injectedView: UnauthorisedView = inject[UnauthorisedView]
 
   "Rendering the unauthorised page" should {
 
@@ -32,7 +35,7 @@ class UnauthorisedViewSpec extends ViewBaseSpec {
       val signOutLink = "#content p:nth-of-type(3) a"
     }
 
-    lazy val view = views.html.errors.unauthorised()
+    lazy val view = injectedView()
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct document title" in {

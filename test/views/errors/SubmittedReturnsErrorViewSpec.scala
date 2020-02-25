@@ -20,9 +20,11 @@ import models.User
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import views.ViewBaseSpec
+import views.html.errors.SubmittedReturnsErrorView
 
 class SubmittedReturnsErrorViewSpec extends ViewBaseSpec {
 
+  val injectedView: SubmittedReturnsErrorView = inject[SubmittedReturnsErrorView]
 
   object Selectors {
     val heading = "h1"
@@ -36,7 +38,7 @@ class SubmittedReturnsErrorViewSpec extends ViewBaseSpec {
 
   "Rendering the submitted returns error view" should {
 
-    lazy val view = views.html.errors.submittedReturnsError(user)
+    lazy val view = injectedView(user)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct document title" in {
@@ -54,7 +56,7 @@ class SubmittedReturnsErrorViewSpec extends ViewBaseSpec {
 
   "Rendering the submitted returns error view with a non mtd vat enrolment" should {
 
-    lazy val view = views.html.errors.submittedReturnsError(userWithNonMtdVat)
+    lazy val view = injectedView(userWithNonMtdVat)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct document title" in {
@@ -78,5 +80,4 @@ class SubmittedReturnsErrorViewSpec extends ViewBaseSpec {
       element(Selectors.previousReturnsLink).attr("href") shouldBe "/portal-url/111111111"
     }
   }
-
 }

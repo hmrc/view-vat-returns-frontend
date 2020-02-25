@@ -16,7 +16,9 @@
 
 @import config.AppConfig
 @import models.viewModels.VatReturnsViewModel
-@import views.html.templates.formatters.dates.displayDateRange
+@import views.html.templates.formatters.dates.DisplayDateRange
+
+@this(displayDateRange: DisplayDateRange)
 
 @(model: VatReturnsViewModel, javascriptEnabled: Boolean)(implicit messages: Messages, appConfig: AppConfig, user: User)
 

@@ -19,9 +19,11 @@ package views.templates
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import views.ViewBaseSpec
+import views.html.templates.UserResearchBanner
 
 class UserResearchBannerSpec extends ViewBaseSpec {
 
+  val injectedTemplate: UserResearchBanner = inject[UserResearchBanner]
   mockConfig.features.userResearchBanner(true)
 
   object Selectors {
@@ -34,7 +36,7 @@ class UserResearchBannerSpec extends ViewBaseSpec {
 
   "The User Research banner" should {
 
-    lazy val view = views.html.templates.userResearchBanner(mockConfig)
+    lazy val view = injectedTemplate(mockConfig)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct heading message" in {

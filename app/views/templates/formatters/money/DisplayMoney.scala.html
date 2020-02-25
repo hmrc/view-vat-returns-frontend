@@ -14,13 +14,15 @@
  * limitations under the License.
  *@
 
-@(links: Map[String, String], currentPage: String)
+@import uk.gov.hmrc.play.views.formatting.Money
 
-<div class="breadcrumbs soft--top">
-    <ol class="push--top">
-        @links.map {
-            case (key, value) => { <li><a href="@key">@value</a></li> }
-        }
-        <li aria-current="page">@currentPage</li>
-    </ol>
-</div>
+@this()
+
+@(value: BigDecimal)(implicit messages: Messages)
+
+@(value.isWhole, value >= 0) match {
+  case (true, true) => { @Money.pounds(value) }
+  case (true, false) => { <span aria-hidden="true">&minus;</span>@Money.pounds(value.abs) }
+  case (false, true) => { @Money.pounds(value, 2) }
+  case (false, false) => { <span aria-hidden="true">&minus;</span>@Money.pounds(value.abs, 2) }
+}

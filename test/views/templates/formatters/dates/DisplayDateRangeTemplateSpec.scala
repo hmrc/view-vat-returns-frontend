@@ -20,9 +20,12 @@ import java.time.LocalDate
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import views.html.templates.formatters.dates.DisplayDateRange
 import views.templates.TemplateBaseSpec
 
 class DisplayDateRangeTemplateSpec extends TemplateBaseSpec {
+
+  val injectedTemplate: DisplayDateRange = inject[DisplayDateRange]
 
   "Calling displayDateRange template" when {
 
@@ -32,7 +35,7 @@ class DisplayDateRangeTemplateSpec extends TemplateBaseSpec {
 
       val endDate: LocalDate = LocalDate.parse("2017-04-01")
 
-      lazy val template = views.html.templates.formatters.dates.displayDateRange(startDate, endDate)
+      lazy val template = injectedTemplate(startDate, endDate)
       lazy val document: Document = Jsoup.parse(template.body)
 
       "render the correct text" in {
@@ -44,7 +47,7 @@ class DisplayDateRangeTemplateSpec extends TemplateBaseSpec {
 
       val endDate: LocalDate = LocalDate.parse("2017-04-01")
 
-      lazy val template = views.html.templates.formatters.dates.displayDateRange(startDate, endDate, useShortDayFormat = true)
+      lazy val template = injectedTemplate(startDate, endDate, useShortDayFormat = true)
       lazy val document: Document = Jsoup.parse(template.body)
 
       "render the correct text" in {
@@ -56,7 +59,7 @@ class DisplayDateRangeTemplateSpec extends TemplateBaseSpec {
 
       val endDate: LocalDate = LocalDate.parse("2018-04-01")
 
-      lazy val template = views.html.templates.formatters.dates.displayDateRange(startDate, endDate)
+      lazy val template = injectedTemplate(startDate, endDate)
       lazy val document: Document = Jsoup.parse(template.body)
 
       "render the correct text" in {
@@ -68,13 +71,12 @@ class DisplayDateRangeTemplateSpec extends TemplateBaseSpec {
 
       val endDate: LocalDate = LocalDate.parse("2018-04-01")
 
-      lazy val template = views.html.templates.formatters.dates.displayDateRange(startDate, endDate, useShortDayFormat = true)
+      lazy val template = injectedTemplate(startDate, endDate, useShortDayFormat = true)
       lazy val document: Document = Jsoup.parse(template.body)
 
       "render the correct text" in {
         document.body().text() shouldEqual "1 Jan 2017 to 1 Apr 2018"
       }
     }
-
   }
 }

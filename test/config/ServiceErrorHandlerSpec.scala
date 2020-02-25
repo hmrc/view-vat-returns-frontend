@@ -16,31 +16,24 @@
 
 package config
 
-import mocks.MockAppConfig
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.scalamock.scalatest.MockFactory
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.mvc.AnyContentAsEmpty
-import play.api.test.FakeRequest
 import views.ViewBaseSpec
+import views.html.errors.{NotFoundView, TechnicalProblemView}
 
-class ServiceErrorHandlerSpec extends ViewBaseSpec with MockFactory with GuiceOneAppPerSuite{
+class ServiceErrorHandlerSpec extends ViewBaseSpec {
 
-  implicit val mockAppConfig: AppConfig = new MockAppConfig(app.configuration)
-  implicit lazy val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
+  val service: ServiceErrorHandler = new ServiceErrorHandler(messagesApi, inject[TechnicalProblemView], inject[NotFoundView])
 
-  val service: ServiceErrorHandler = new ServiceErrorHandler(messagesApi,mockAppConfig)
+  object Selectors {
+    val pageHeading = "h1"
+    val message = ".lede"
+  }
 
-  "calling .notFoundTemplate " should {
+  "Calling .notFoundTemplate" should {
 
-    object Selectors {
-      val pageHeading = "h1"
-      val message = ".lede"
-    }
-    lazy val view=service.notFoundTemplate
+    lazy val view = service.notFoundTemplate
     lazy implicit val document: Document = Jsoup.parse(view.body)
-
 
     "display the correct title" in {
       document.title shouldBe "Page not found - VAT - GOV.UK"
@@ -52,6 +45,24 @@ class ServiceErrorHandlerSpec extends ViewBaseSpec with MockFactory with GuiceOn
 
     "displays the correct message" in {
       element(Selectors.message).text() shouldBe "Please check that you have entered the correct web address."
+    }
+  }
+
+  "Calling .standardErrorTemplate" should {
+
+    lazy val view = service.standardErrorTemplate("", "", "")
+    lazy implicit val document: Document = Jsoup.parse(view.body)
+
+    "display the correct title" in {
+      document.title shouldBe "There is a problem with the service - VAT - GOV.UK"
+    }
+
+    "displays the correct page heading" in {
+      elementText(Selectors.pageHeading) shouldBe "Sorry, there is a problem with the service"
+    }
+
+    "displays the correct message" in {
+      element(Selectors.message).text() shouldBe "Try again later."
     }
   }
 }

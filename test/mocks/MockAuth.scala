@@ -32,46 +32,54 @@ import models.{Obligation, _}
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.i18n.MessagesApi
-import play.api.mvc.Request
+import play.api.i18n.{Lang, Messages, MessagesApi, MessagesImpl}
+import play.api.mvc.{MessagesControllerComponents, Request}
+import play.api.test.Injecting
 import play.twirl.api.Html
 import services._
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.{Retrieval, ~}
 import uk.gov.hmrc.auth.core.{AffinityGroup, AuthConnector, Enrolments}
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.bootstrap.tools.Stubs.stubMessagesControllerComponents
 import uk.gov.hmrc.play.test.UnitSpec
+import views.html.errors.UnauthorisedView
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait MockAuth extends UnitSpec with GuiceOneAppPerSuite with BeforeAndAfterEach with MockFactory {
+trait MockAuth extends UnitSpec with GuiceOneAppPerSuite with BeforeAndAfterEach with MockFactory with Injecting {
 
-  lazy val messages: MessagesApi = app.injector.instanceOf[MessagesApi]
   implicit val mockConfig: AppConfig = new MockAppConfig(app.configuration)
+  implicit val ec: ExecutionContext = inject[ExecutionContext]
+
+  val mcc: MessagesControllerComponents = stubMessagesControllerComponents()
+  implicit lazy val messages: Messages = MessagesImpl(Lang("en-GB"), inject[MessagesApi])
 
   val mockAuthConnector: AuthConnector = mock[AuthConnector]
   val mockVatReturnService: ReturnsService = mock[ReturnsService]
   val mockDateService: DateService = mock[DateService]
-  val mockAuditService: AuditingService = mock[AuditingService]
+  implicit val mockAuditService: AuditingService = mock[AuditingService]
   val mockServiceInfoService: ServiceInfoService = mock[ServiceInfoService]
   val mockSubscriptionService: SubscriptionService = mock[SubscriptionService]
   val mockVatObligationsConnector: VatObligationsConnector = mock[VatObligationsConnector]
   val mockVatSubscriptionConnector: VatSubscriptionConnector = mock[VatSubscriptionConnector]
+
+  val unauthorisedView: UnauthorisedView = inject[UnauthorisedView]
 
   val enrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
 
   val mockAuthorisedAgentWithClient: AuthoriseAgentWithClient = new AuthoriseAgentWithClient(
     enrolmentsAuthService,
     mockVatReturnService,
-    messages,
-    mockConfig
+    mcc,
+    unauthorisedView
   )
 
   val mockAuthorisedController: AuthorisedController = new AuthorisedController(
     enrolmentsAuthService,
-    messages,
     mockAuthorisedAgentWithClient,
-    mockConfig
+    mcc,
+    unauthorisedView
   )
 
   def callDateService(response: LocalDate = LocalDate.parse("2018-05-01")): Any =

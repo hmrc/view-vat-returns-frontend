@@ -15,11 +15,18 @@
  *@
 
 @import java.time.LocalDate
-@import views.html.templates.formatters.dates._
-@import views.html.templates.formatters.money._
-@import models.payments.Payment
+@import views.html.templates.formatters.dates.DisplayDate
+@import views.html.templates.formatters.money.DisplayMoney
 
-@(amount: BigDecimal, outstandingAmount: Option[BigDecimal], dueDate: LocalDate, moneyOwed: Boolean, oweHmrc: Option[Boolean], isHybridUser: Boolean)(implicit messages: Messages, lang: Lang)
+@this(displayMoney: DisplayMoney,
+      displayDate: DisplayDate)
+
+@(amount: BigDecimal,
+  outstandingAmount: Option[BigDecimal],
+  dueDate: LocalDate,
+  moneyOwed: Boolean,
+  oweHmrc: Option[Boolean],
+  isHybridUser: Boolean)(implicit messages: Messages)
 
 @if(isHybridUser) {
     <h2 class="heading-large">@messages("paymentStatus.returnTotal") @displayMoney(amount)</h2>
@@ -28,21 +35,21 @@
     <p>@messages("paymentStatus.whatYouOweCalc")</p>
 
     @(moneyOwed, oweHmrc, outstandingAmount) match {
-        case (true, Some(false), Some(outstandingAmnt)) => {
+        case (true, Some(false), Some(outstandingAmount)) => {
             <p>@messages("paymentStatus.repaymentProcessing")</p>
             <h2 class="heading-large">@messages("paymentStatus.returnTotal") @displayMoney(amount)
-                <span class="heading-medium">@messages("paymentStatus.hmrcOwesYou") @displayMoney(outstandingAmnt.abs)</span>
+                <span class="heading-medium">@messages("paymentStatus.hmrcOwesYou") @displayMoney(outstandingAmount.abs)</span>
             </h2>
         }
-        case (true, Some(true), Some(outstandingAmnt)) => {
+        case (true, Some(true), Some(outstandingAmount)) => {
             <p>@messages("paymentStatus.billToPay", displayDate(dueDate)) @messages("paymentStatus.paymentProcessing")</p>
             <h2 class="heading-large">@messages("paymentStatus.returnTotal") @displayMoney(amount)
-                <span class="heading-medium">@messages("paymentStatus.youOweHmrc") @displayMoney(outstandingAmnt)</span>
+                <span class="heading-medium">@messages("paymentStatus.youOweHmrc") @displayMoney(outstandingAmount)</span>
             </h2>
         }
-        case (false, _, Some(outstandingAmnt)) => {
+        case (false, _, Some(outstandingAmount)) => {
             <h2 class="heading-large">@messages("paymentStatus.returnTotal") @displayMoney(amount)
-                <span class="heading-medium">@messages("paymentStatus.youOweHmrc") @displayMoney(outstandingAmnt)</span>
+                <span class="heading-medium">@messages("paymentStatus.youOweHmrc") @displayMoney(outstandingAmount)</span>
             </h2>
         }
         case _ => {

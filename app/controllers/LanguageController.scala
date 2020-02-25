@@ -18,14 +18,15 @@ package controllers
 
 import config.AppConfig
 import javax.inject.{Inject, Singleton}
-import play.api.i18n.{I18nSupport, Lang, MessagesApi}
-import play.api.mvc.{Action, AnyContent, Call}
+import play.api.Play
+import play.api.i18n.{Lang, Langs}
+import play.api.mvc.{Action, AnyContent, Call, Flash, MessagesControllerComponents, RequestHeader}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
-import uk.gov.hmrc.play.language.LanguageUtils
 
 @Singleton
-class LanguageController @Inject()(val appConfig: AppConfig,
-                                      val messagesApi: MessagesApi) extends FrontendController with I18nSupport {
+class LanguageController @Inject()(langs: Langs,
+                                   appConfig: AppConfig,
+                                   mcc: MessagesControllerComponents) extends FrontendController(mcc) {
 
   def langToCall: String => Call = appConfig.routeToSwitchLanguage
 
@@ -33,10 +34,15 @@ class LanguageController @Inject()(val appConfig: AppConfig,
 
   def languageMap: Map[String, Lang] = appConfig.languageMap
 
+  def getCurrentLang(implicit request: RequestHeader): Lang = {
+    val maybeLangFromCookie = request.cookies.get(Play.langCookieName).flatMap(c => Lang.get(c.value))
+    maybeLangFromCookie.getOrElse(langs.preferred(request.acceptLanguages))
+  }
+
   def switchLanguage(language: String): Action[AnyContent] = Action { implicit request =>
-    val lang = languageMap.getOrElse(language, LanguageUtils.getCurrentLang)
+    val lang = languageMap.getOrElse(language, getCurrentLang)
     val redirectUrl = request.headers.get(REFERER).getOrElse(fallbackURL)
 
-    Redirect(redirectUrl).withLang(Lang(lang.code)).flashing(LanguageUtils.FlashWithSwitchIndicator)
+    mcc.messagesApi.setLang(Redirect(redirectUrl).flashing(Flash(Map("switching-language" -> "true"))), lang)
   }
 }

@@ -22,10 +22,12 @@ import models.viewModels.{ReturnObligationsViewModel, VatReturnsViewModel}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.scalatest.exceptions.TestFailedException
-import play.api.i18n.Lang
 import play.twirl.api.Html
+import views.html.returns.SubmittedReturnsView
 
 class SubmittedReturnsViewSpec extends ViewBaseSpec {
+
+  val injectedView: SubmittedReturnsView = inject[SubmittedReturnsView]
 
   object Selectors {
     val pageHeading = "h1"
@@ -74,7 +76,7 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
             )
           )
 
-        lazy val view: Html = views.html.returns.submittedReturns(
+        lazy val view: Html = injectedView(
           VatReturnsViewModel(
             returnYears = Seq(2018),
             obligations = exampleReturns,
@@ -166,7 +168,7 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
             )
           )
 
-        lazy val view: Html = views.html.returns.submittedReturns(
+        lazy val view: Html = injectedView(
           VatReturnsViewModel(
             returnYears = Seq(2018),
             obligations = exampleReturn,
@@ -211,7 +213,7 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
           )
         )
 
-      lazy val view = views.html.returns.submittedReturns(
+      lazy val view = injectedView(
         VatReturnsViewModel(returnYears, exampleReturns, showPreviousReturnsTab = false, vrn)
       )
 
@@ -268,7 +270,7 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
           )
         )
 
-      lazy val view = views.html.returns.submittedReturns(
+      lazy val view = injectedView(
         VatReturnsViewModel(returnYears, exampleReturns, showPreviousReturnsTab = false, vrn)
       )
 
@@ -293,7 +295,7 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
 
     "there are no returns for the year retrieved" should {
 
-      lazy val view = views.html.returns.submittedReturns(
+      lazy val view = injectedView(
         VatReturnsViewModel(Seq(2018), Seq(), showPreviousReturnsTab = false, vrn)
       )
 
@@ -330,14 +332,14 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
             )
           )
 
-        lazy val view: Html = views.html.returns.submittedReturns(
+        lazy val view: Html = injectedView(
           VatReturnsViewModel(
             returnYears = Seq(2018),
             obligations = exampleReturns,
             showPreviousReturnsTab = false,
             vrn = vrn
           )
-        )(fakeRequestWithClientsVRN, messages, mockConfig, Lang.apply("en"), agentUser)
+        )(fakeRequestWithClientsVRN, messages, mockConfig, agentUser)
 
         lazy implicit val document: Document = Jsoup.parse(view.body)
 
@@ -382,7 +384,7 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
 
       "the current year is 2018" should {
 
-        lazy val view = views.html.returns.submittedReturns(
+        lazy val view = injectedView(
           VatReturnsViewModel(returnYears, exampleReturns, showPreviousReturnsTab = true, vrn)
         )
 
@@ -428,7 +430,7 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
             )
           )
 
-        lazy val view = views.html.returns.submittedReturns(
+        lazy val view = injectedView(
           VatReturnsViewModel(returnYears, exampleReturns, showPreviousReturnsTab = true, vrn)
         )
 
@@ -489,7 +491,7 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
           )
         )
 
-      lazy val view = views.html.returns.submittedReturns(
+      lazy val view = injectedView(
         VatReturnsViewModel(returnYears, exampleReturns, showPreviousReturnsTab = true, vrn)
       )
 
@@ -542,9 +544,9 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
       )
     )
 
-    lazy val view = views.html.returns.submittedReturns(
+    lazy val view = injectedView(
       VatReturnsViewModel(returnYears, exampleReturns, showPreviousReturnsTab = true, vrn)
-    )(fakeRequestWithClientsVRN, messages, mockConfig, Lang("en-GB"), agentUser)
+    )(fakeRequestWithClientsVRN, messages, mockConfig, agentUser)
 
     lazy implicit val document: Document = Jsoup.parse(view.body)
 

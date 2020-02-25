@@ -14,21 +14,25 @@
  * limitations under the License.
  *@
 
+@this(mainTemplate: MainTemplate)
+
 @(user: models.User)(implicit appConfig: config.AppConfig, request: Request[_], messages: Messages)
 
-@views.html.main_template(title = messages("preMtdReturn.heading"), bodyClasses = None, appConfig = appConfig, user = Some(user)) {
-<a id="back" class="link-back" href="javascript:history.back()">@messages("base.back")</a>
-<div class="grid-row">
-    <div class="column-two-thirds">
-        <h1 class="heading-large">@messages("preMtdReturn.heading")</h1>
-        <p>@messages("preMtdReturn.message")</p>
+@mainTemplate(title = messages("technicalProblem.title"), user = Some(user)) {
 
-        @if(user.hasNonMtdVat) {
-            <p>
-                <a href="@appConfig.portalUrl(user.vrn)">@messages("preMtdReturn.link")</a>
-            </p>
-        }
+  <div class="grid-row">
+    <div class="column-two-thirds">
+      <h1 class="heading-xlarge">@messages("technicalProblem.heading")</h1>
+      <p class="lede">@messages("technicalProblem.message")</p>
+
+      @if(user.hasNonMtdVat) {
+        <p>
+          @messages("submittedReturns.previousReturnsOne")
+          <a href="@appConfig.portalUrl(user.vrn)" >
+          @messages("submittedReturns.previousReturnsTwo")</a>.
+        </p>
+      }
 
     </div>
-</div>
+  </div>
 }

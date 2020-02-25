@@ -14,16 +14,23 @@
  * limitations under the License.
  *@
 
+@import play.twirl.api.HtmlFormat
 @import models.viewModels.ReturnDeadlineViewModel
 @import views.html.templates.formatters.breadcrumbs._
 @import views.html.templates.formatters.dates._
 
-@(deadlines: Seq[ReturnDeadlineViewModel], serviceInfoContent: Html = HtmlFormat.empty)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig, lang: Lang, user: User)
+@this(mainTemplate: MainTemplate,
+      navigationBreadcrumb: NavigationBreadcrumb,
+      displayDate: DisplayDate,
+      displayDateRange: DisplayDateRange)
 
-@views.html.main_template(
+@(deadlines: Seq[ReturnDeadlineViewModel],
+  serviceInfoContent: Html = HtmlFormat.empty)(
+  implicit request: Request[_],messages: Messages, appConfig: config.AppConfig, user: User)
+
+@mainTemplate(
     title = messages("returnDeadlines.title"),
     serviceInfoContent = serviceInfoContent,
-    appConfig = appConfig,
     user = Some(user)
 ) {
 

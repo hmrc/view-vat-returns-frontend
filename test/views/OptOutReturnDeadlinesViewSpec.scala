@@ -23,9 +23,11 @@ import models.viewModels.ReturnDeadlineViewModel
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.scalatest.exceptions.TestFailedException
-import play.api.i18n.Lang
+import views.html.returns.OptOutReturnDeadlinesView
 
 class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
+
+  val injectedView: OptOutReturnDeadlinesView = inject[OptOutReturnDeadlinesView]
 
   object Selectors {
     val pageHeading = "#content h1"
@@ -67,7 +69,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
 
       val currentDate = LocalDate.parse("2018-01-02")
 
-      lazy val view = views.html.returns.optOutReturnDeadlines(singleDeadline, currentDate)
+      lazy val view = injectedView(singleDeadline, currentDate)
       lazy implicit val document: Document = Jsoup.parse(view.body)
 
       "render the breadcrumbs which" should {
@@ -131,7 +133,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
 
       val currentDate = LocalDate.parse("2018-12-30")
 
-      lazy val view = views.html.returns.optOutReturnDeadlines(singleDeadline, currentDate)
+      lazy val view = injectedView(singleDeadline, currentDate)
       lazy implicit val document: Document = Jsoup.parse(view.body)
 
       "show text regarding when return can be submitted" in {
@@ -139,7 +141,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
       }
 
       "not show a 'Submit VAT Return' link" in {
-        document.getElementById("submit-return-link") shouldBe null
+        elementAsOpt("#submit-return-link") shouldBe None
       }
     }
 
@@ -156,7 +158,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
         )
       )
 
-      lazy val view = views.html.returns.optOutReturnDeadlines(singleDeadline, currentDate)
+      lazy val view = injectedView(singleDeadline, currentDate)
       lazy implicit val document: Document = Jsoup.parse(view.body)
 
       "show text regarding when return can be submitted" in {
@@ -164,7 +166,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
       }
 
       "not show a 'Submit VAT Return' link" in {
-        document.getElementById("submit-return-link") shouldBe null
+        elementAsOpt("#submit-return-link") shouldBe None
       }
     }
 
@@ -181,10 +183,9 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
 
       val currentDate = LocalDate.parse("2018-01-02")
 
-      lazy val view = views.html.returns.optOutReturnDeadlines(singleDeadline, currentDate)(request,
+      lazy val view = injectedView(singleDeadline, currentDate)(request,
         messages,
         mockConfig,
-        messages.lang,
         User("", arn = Some(""))
       )
 
@@ -207,8 +208,8 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
 
       val currentDate = LocalDate.parse("2018-01-02")
 
-      lazy val view = views.html.returns.optOutReturnDeadlines(singleDeadline, currentDate)(
-        fakeRequestWithClientsVRN, messages, mockConfig, Lang.apply("en"), agentUser
+      lazy val view = injectedView(singleDeadline, currentDate)(
+        fakeRequestWithClientsVRN, messages, mockConfig, agentUser
       )
       lazy implicit val document: Document = Jsoup.parse(view.body)
 
@@ -253,7 +254,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
 
       val currentDate = LocalDate.parse("2018-12-30")
 
-      lazy val view = views.html.returns.optOutReturnDeadlines(singleDeadline, currentDate)
+      lazy val view = injectedView(singleDeadline, currentDate)
       lazy implicit val document: Document = Jsoup.parse(view.body)
 
       "show text regarding when return can be submitted" in {
@@ -261,7 +262,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
       }
 
       "not show a 'Submit VAT Return' link" in {
-        document.getElementById("submit-return-link") shouldBe null
+        elementAsOpt("#submit-return-link") shouldBe None
       }
     }
 
@@ -278,7 +279,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
         )
       )
 
-      lazy val view = views.html.returns.optOutReturnDeadlines(singleDeadline, currentDate)
+      lazy val view = injectedView(singleDeadline, currentDate)
       lazy implicit val document: Document = Jsoup.parse(view.body)
 
       "show text regarding when return can be submitted" in {
@@ -286,30 +287,8 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
       }
 
       "not show a 'Submit VAT Return' link" in {
-        document.getElementById("submit-return-link") shouldBe null
+        elementAsOpt("#submit-return-link") shouldBe None
       }
-    }
-
-    "user is an agent" should {
-
-      val singleDeadline = Seq(
-        ReturnDeadlineViewModel(
-          LocalDate.parse("2018-02-02"),
-          LocalDate.parse("2018-01-01"),
-          periodTo = LocalDate.parse("2018-01-01"),
-          periodKey = "18CC"
-        )
-      )
-
-      val currentDate = LocalDate.parse("2018-01-02")
-
-      lazy val view = views.html.returns.optOutReturnDeadlines(singleDeadline, currentDate)(request,
-        messages,
-        mockConfig,
-        messages.lang,
-        User("", arn = Some(""))
-      )
-
     }
   }
 
@@ -333,7 +312,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
 
     val currentDate = LocalDate.parse("2018-01-02")
 
-    lazy val view = views.html.returns.optOutReturnDeadlines(multipleDeadlines, currentDate)
+    lazy val view = injectedView(multipleDeadlines, currentDate)
 
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
@@ -375,7 +354,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
 
     val currentDate = LocalDate.parse("2018-01-02")
 
-    lazy val view = views.html.returns.optOutReturnDeadlines(finalReturnDeadline, currentDate)
+    lazy val view = injectedView(finalReturnDeadline, currentDate)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct obligation due date for the deadline" in {

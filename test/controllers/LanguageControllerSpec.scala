@@ -16,53 +16,59 @@
 
 package controllers
 
-import play.api.Play
 import play.api.http.Status.SEE_OTHER
-import play.api.mvc.{AnyContentAsEmpty, Cookie}
+import play.api.i18n.Langs
+import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 
 class LanguageControllerSpec extends ControllerBaseSpec {
-  lazy val controller = new LanguageController(mockConfig, messages)
+
+  lazy val controller = new LanguageController(inject[Langs], mockConfig, mcc)
 
   lazy val fRequest: FakeRequest[AnyContentAsEmpty.type] =
     FakeRequest("get", "aurl").withHeaders(REFERER -> "thisIsMyNextLocation")
 
   "switchLanguage" should {
+
     "correctly change the language session property" when {
+
       "English is passed in" in {
         lazy val result = controller.switchLanguage("english")(fRequest)
 
         status(result) shouldBe SEE_OTHER
-        cookies(result).get(Play.langCookieName(messages)) shouldBe Some(Cookie("PLAY_LANG", "en", None, "/", None, secure = false, httpOnly = true))
+        cookies(result).get("PLAY_LANG").get.value shouldBe "en"
         redirectLocation(result) shouldBe Some("thisIsMyNextLocation")
       }
+
       "Welsh is passed in" in {
         lazy val result = controller.switchLanguage("cymraeg")(fRequest)
 
         status(result) shouldBe SEE_OTHER
-        cookies(result).get(Play.langCookieName(messages)) shouldBe Some(Cookie("PLAY_LANG", "cy", None, "/", None, secure = false, httpOnly = true))
+        cookies(result).get("PLAY_LANG").get.value shouldBe "cy"
         redirectLocation(result) shouldBe Some("thisIsMyNextLocation")
       }
     }
+
     "remain on the same language" when {
+
       "an invalid language is requested" in {
         lazy val result = controller.switchLanguage("dovahtongue")(fRequest)
 
         status(result) shouldBe SEE_OTHER
-        cookies(result).get(Play.langCookieName(messages)) shouldBe Some(Cookie("PLAY_LANG", "en", None, "/", None, secure = false, httpOnly = true))
+        cookies(result).get("PLAY_LANG").get.value shouldBe "en"
         redirectLocation(result) shouldBe Some("thisIsMyNextLocation")
       }
     }
+
     "redirect to the fallback url" when {
+
       "one is not provided" in {
         lazy val result = controller.switchLanguage("english")(fakeRequest)
 
-        val expectedResponse = mockConfig.vatDetailsUrl
-
         status(result) shouldBe SEE_OTHER
-        cookies(result).get(Play.langCookieName(messages)) shouldBe Some(Cookie("PLAY_LANG", "en", None, "/", None, secure = false, httpOnly = true))
-        redirectLocation(result) shouldBe Some(expectedResponse)
+        cookies(result).get("PLAY_LANG").get.value shouldBe "en"
+        redirectLocation(result) shouldBe Some(mockConfig.vatDetailsUrl)
       }
     }
   }

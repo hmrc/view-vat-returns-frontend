@@ -19,8 +19,11 @@ package views.errors
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import views.ViewBaseSpec
+import views.html.errors.TechnicalProblemView
 
 class TechnicalProblemViewSpec extends ViewBaseSpec {
+
+  val injectedView: TechnicalProblemView = inject[TechnicalProblemView]
 
   "Rendering the server error page" should {
 
@@ -29,7 +32,7 @@ class TechnicalProblemViewSpec extends ViewBaseSpec {
       val instructions = "#content > p"
     }
 
-    lazy val view = views.html.errors.technicalProblem()
+    lazy val view = injectedView()
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct document title" in {

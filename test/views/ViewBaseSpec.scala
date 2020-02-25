@@ -21,30 +21,26 @@ import models.User
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.i18n.{Lang, Messages, MessagesApi}
-import play.api.inject.Injector
+import play.api.i18n.{Lang, Messages, MessagesApi, MessagesImpl}
 import play.api.mvc.AnyContentAsEmpty
-import play.api.test.FakeRequest
+import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.play.test.UnitSpec
 import common.SessionKeys
 
 import scala.collection.JavaConversions._
 
-class ViewBaseSpec extends UnitSpec with GuiceOneAppPerSuite {
+class ViewBaseSpec extends UnitSpec with GuiceOneAppPerSuite with Injecting {
 
   implicit lazy val mockConfig: MockAppConfig = new MockAppConfig(app.configuration)
   implicit lazy val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
-  implicit lazy val messages: Messages = Messages(Lang("en-GB"), messagesApi)
-  lazy val injector: Injector = app.injector
-  lazy val messagesApi: MessagesApi = injector.instanceOf[MessagesApi]
+  lazy val messagesApi: MessagesApi = inject[MessagesApi]
+  implicit lazy val messages: Messages = MessagesImpl(Lang("en-GB"), messagesApi)
   lazy val vrn = "999999999"
   lazy val arn = "XAIT00000000000"
   lazy val fakeRequestWithClientsVRN: FakeRequest[AnyContentAsEmpty.type] =
     FakeRequest().withSession(SessionKeys.clientVrn -> vrn)
   implicit val user: User = User(vrn)
   lazy val agentUser: User = User(vrn, active = true, hasNonMtdVat = true, Some(arn))
-
-
 
   def element(cssSelector: String)(implicit document: Document): Element = {
     val elements = document.select(cssSelector)
@@ -56,7 +52,6 @@ class ViewBaseSpec extends UnitSpec with GuiceOneAppPerSuite {
     document.select(cssSelector).first()
   }
 
-  // Useful if you want to check that an element doesn't exist
   def elementAsOpt(cssSelector: String)(implicit document: Document): Option[Element] = {
     val elements = document.select(cssSelector)
 
@@ -77,5 +72,4 @@ class ViewBaseSpec extends UnitSpec with GuiceOneAppPerSuite {
   }
 
   def formatHtml(markup: String): String = Jsoup.parseBodyFragment(s"\n$markup\n").toString.trim
-
 }

@@ -14,16 +14,26 @@
  * limitations under the License.
  *@
 
-@import models.viewModels._
-@import views.html.templates.expandingHelpSection
+@import models.viewModels.VatReturnViewModel
+@import play.twirl.api.HtmlFormat
+@import utils.ImplicitDateFormatter._
+@import views.html.templates.ExpandingHelpSection
 @import views.html.templates.formatters.dates._
 @import views.html.templates.formatters.money._
 @import views.html.templates.formatters.breadcrumbs._
-@import java.time.LocalDate
-@import uk.gov.hmrc.play.views.html.helpers.form
-@import utils.ImplicitDateFormatter._
+@import views.html.templates.returns.PaymentStatus
 
-@(vatReturnViewModel: VatReturnViewModel, serviceInfoContent: Html = HtmlFormat.empty)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig, lang: Lang, user: User)
+@this(mainTemplate: MainTemplate,
+      navigationBreadcrumb: NavigationBreadcrumb,
+      displayDate: DisplayDate,
+      displayDateRange: DisplayDateRange,
+      displayMoney: DisplayMoney,
+      expandingHelpSection: ExpandingHelpSection,
+      paymentStatus: PaymentStatus)
+
+@(vatReturnViewModel: VatReturnViewModel,
+  serviceInfoContent: Html = HtmlFormat.empty)(
+  implicit request: Request[_], messages: Messages, appConfig: config.AppConfig, user: User)
 
 @hiddenHelpTextContent = {
   <p>@messages("yourVatReturn.helpLine")</p>
@@ -42,9 +52,8 @@
   }
 }
 
-@views.html.main_template(
+@mainTemplate(
   title = messages("yourVatReturn.title") + returnHeading(useShortDayFormat = false),
-  appConfig = appConfig,
   serviceInfoContent = serviceInfoContent,
   user = Some(user)
 ) {
@@ -78,7 +87,7 @@
     </h1>
 
     <span class="noprint">
-        @views.html.templates.returns.paymentStatus(
+        @paymentStatus(
           vatReturnViewModel.vatReturnDetails.vatReturn.netVatDue,
           vatReturnViewModel.vatReturnDetails.payment.map(_.outstandingAmount),
           vatReturnViewModel.dueDate,
@@ -136,7 +145,11 @@
             <dd class="column-one-quarter text--right">
               <strong class="bold-small">
                 <span class="visually-hidden">
-                  @messages("yourVatReturn.boxFiveContext", displayMoney(vatReturnViewModel.vatReturnDetails.vatReturn.totalVatDue), displayMoney(vatReturnViewModel.vatReturnDetails.vatReturn.vatReclaimedCurrentPeriod))
+                  @messages(
+                    "yourVatReturn.boxFiveContext",
+                    displayMoney(vatReturnViewModel.vatReturnDetails.vatReturn.totalVatDue),
+                    displayMoney(vatReturnViewModel.vatReturnDetails.vatReturn.vatReclaimedCurrentPeriod)
+                  )
                 </span>
                 @displayMoney(vatReturnViewModel.vatReturnDetails.vatReturn.netVatDue)
               </strong>
@@ -178,7 +191,7 @@
     </section>
 
     <span class="onlyprint">
-    @views.html.templates.returns.paymentStatus(
+    @paymentStatus(
         vatReturnViewModel.vatReturnDetails.vatReturn.netVatDue,
         vatReturnViewModel.vatReturnDetails.payment.map(_.outstandingAmount),
         vatReturnViewModel.dueDate,
@@ -189,15 +202,15 @@
     </span>
 
     @if(appConfig.features.enablePrintPastReturns()) {
-        <div class="form-group">
-            <button class="btn button"
-            onclick="javascript:window.print()">@messages("yourVatReturn.print")
-            </button>
-        </div>
+      <div class="form-group">
+          <button class="btn button"
+          onclick="javascript:window.print()">@messages("yourVatReturn.print")
+          </button>
+      </div>
     }
 
     <div class="form-group">
-    @expandingHelpSection(messages("yourVatReturn.helpTitle"), "vatReturn", "vatReturn", hiddenHelpTextContent)
+      @expandingHelpSection(messages("yourVatReturn.helpTitle"), "vatReturn", "vatReturn", hiddenHelpTextContent)
     </div>
 
     <div class="onlyprint foot">@messages("yourVatReturn.footer", s"${currentDate.toLongDate}")</div>

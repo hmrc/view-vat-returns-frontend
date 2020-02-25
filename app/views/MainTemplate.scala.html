@@ -14,33 +14,36 @@
  * limitations under the License.
  *@
 
+@import play.twirl.api.HtmlFormat
+@import uk.gov.hmrc.play.views.html.layouts.{Article, Sidebar}
+
+@this(govukWrapper: GovukWrapper, article: Article, sidebar: Sidebar)
+
 @(title: String,
   sidebarLinks: Option[Html] = None,
   contentHeader: Option[Html] = None,
   bodyClasses: Option[String] = None,
   mainClass: Option[String] = Some("full-width"),
-  appConfig: config.AppConfig,
   showLogout: Boolean = true,
   feedbackOnSignOut: Boolean = true,
   serviceInfoContent: Html = HtmlFormat.empty,
-  user: Option[User] = None)(mainContent: Html)(implicit request : Request[_], messages: Messages)
+  user: Option[User] = None)(mainContent: Html)(implicit appConfig: config.AppConfig, request : Request[_], messages: Messages)
 
-@import uk.gov.hmrc.play.views.html.layouts
 
-@sidebar = {
-    @if(sidebarLinks.isDefined) {
-        @layouts.sidebar(sidebarLinks.get, Some("sidebar"))
-    }
+@sidebarContent = {
+  @if(sidebarLinks.isDefined) {
+    @sidebar(sidebarLinks.get, Some("sidebar"))
+  }
 }
 
-@govuk_wrapper(appConfig = appConfig,
-               title = title,
-               mainClass = mainClass,
-               bodyClasses = bodyClasses,
-               sidebar = sidebar,
-               contentHeader = contentHeader,
-               mainContent = layouts.article(mainContent),
-               serviceInfoContent = serviceInfoContent,
-               showLogout = showLogout,
-               feedbackOnSignOut = feedbackOnSignOut,
-               user = user)
+@govukWrapper(appConfig = appConfig,
+              title = title,
+              mainClass = mainClass,
+              bodyClasses = bodyClasses,
+              sidebar = sidebarContent,
+              contentHeader = contentHeader,
+              mainBody = article(mainContent),
+              serviceInfoContent = serviceInfoContent,
+              showLogout = showLogout,
+              feedbackOnSignOut = feedbackOnSignOut,
+              user = user)

@@ -14,10 +14,11 @@
  * limitations under the License.
  *@
 
+@this(standardErrorView: StandardErrorView)
+
 @()(implicit appConfig: config.AppConfig, request: Request[_], messages: Messages, user: Option[User] = None)
 
-@views.html.errors.standardError(
-  appConfig,
+@standardErrorView(
   messages("technicalProblem.title"),
   messages("technicalProblem.heading"),
   messages("technicalProblem.message")

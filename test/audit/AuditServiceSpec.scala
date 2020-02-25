@@ -18,15 +18,13 @@ package auditSpec
 
 import audit.AuditingService
 import audit.models.ViewOpenVatObligationsAuditModel
-import config.FrontendAuditConnector
 import controllers.ControllerBaseSpec
 import models.{User, VatReturnObligation}
 import org.scalatest.BeforeAndAfterEach
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.audit.http.connector.AuditResult
+import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.audit.model.DataEvent
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 import java.time.LocalDate
 
@@ -35,8 +33,7 @@ class AuditServiceSpec extends ControllerBaseSpec with BeforeAndAfterEach {
 
   private trait Test {
 
-    lazy val mockAuditConnector: FrontendAuditConnector = mock[FrontendAuditConnector]
-    implicit val hc: HeaderCarrier = HeaderCarrier()
+    lazy val mockAuditConnector: AuditConnector = mock[AuditConnector]
 
     def setupMocks(): Unit= {}
 
@@ -50,7 +47,7 @@ class AuditServiceSpec extends ControllerBaseSpec with BeforeAndAfterEach {
       "extract the data and pass it into the AuditConnector" in new Test {
 
         val testModel = ViewOpenVatObligationsAuditModel(
-          User("111111111", true, true),
+          User("111111111", hasNonMtdVat = true),
           Seq(VatReturnObligation(
             LocalDate.parse("2017-01-01"),
             LocalDate.parse("2017-12-31"),

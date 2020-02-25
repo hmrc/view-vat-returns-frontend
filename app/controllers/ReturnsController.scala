@@ -26,27 +26,32 @@ import models.customer.CustomerDetail
 import models.errors.NotFoundError
 import models.payments.Payment
 import models.viewModels.VatReturnViewModel
-import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc._
 import play.twirl.api.{Html, HtmlFormat}
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import utils.LoggerUtil.logWarn
+import views.html.errors.{NotFoundView, PreMtdReturnView, TechnicalProblemView}
+import views.html.returns.VatReturnDetailsView
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ReturnsController @Inject()(val messagesApi: MessagesApi,
+class ReturnsController @Inject()(mcc: MessagesControllerComponents,
                                   enrolmentsAuthService: EnrolmentsAuthService,
                                   returnsService: ReturnsService,
                                   subscriptionService: SubscriptionService,
                                   dateService: DateService,
                                   serviceInfoService: ServiceInfoService,
                                   authorisedController: AuthorisedController,
-                                  implicit val appConfig: AppConfig,
-                                  auditService: AuditingService)
-  extends FrontendController with I18nSupport {
+                                  notFoundView: NotFoundView,
+                                  vatReturnDetailsView: VatReturnDetailsView,
+                                  technicalProblemView: TechnicalProblemView,
+                                  preMtdReturnView: PreMtdReturnView)
+                                 (implicit val appConfig: AppConfig,
+                                  auditService: AuditingService,
+                                  ec: ExecutionContext) extends FrontendController(mcc) {
 
   def vatReturn(year: Int, periodKey: String): Action[AnyContent] = authorisedController.authorisedAction ({
     implicit request =>
@@ -73,7 +78,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
 
         } else {
           logWarn(s"[ReturnsController][vatReturn] - The given period key was invalid - `$periodKey`")
-          Future.successful(NotFound(views.html.errors.notFound()))
+          Future.successful(NotFound(notFoundView()))
         }
   }, ignoreMandatedStatus = true)
 
@@ -103,7 +108,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
 
         } else {
           logWarn(s"[ReturnsController][vatReturnViaPayments] - The given period key was invalid - `$periodKey`")
-          Future.successful(NotFound(views.html.errors.notFound()))
+          Future.successful(NotFound(notFoundView()))
         }
   }, ignoreMandatedStatus = true)
 
@@ -112,7 +117,7 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
                                     returnDetails: VatReturnDetails,
                                     isReturnsPageRequest: Boolean,
                                     serviceInfoContent: Html)
-                                   (implicit user: User, request: Request[AnyContent]): Future[Result] = {
+                                   (implicit user: User, request: MessagesRequest[AnyContent]): Future[Result] = {
 
     def viewModel(isOptedOutUser: Boolean) = constructViewModel(
       customerDetail,
@@ -126,28 +131,28 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
         case Some(status) =>
           val model = viewModel(status == NonMtdfb.mandationStatus)
           auditEvent(isReturnsPageRequest, model)
-          Future.successful(Ok(views.html.returns.vatReturnDetails(model, serviceInfoContent)))
+          Future.successful(Ok(vatReturnDetailsView(model, serviceInfoContent)))
         case None =>
           returnsService.getMandationStatus(user.vrn) map {
             case Right(MandationStatus(status)) =>
               val model = viewModel(status == NonMtdfb.mandationStatus)
               auditEvent(isReturnsPageRequest, model)
-              Ok(views.html.returns.vatReturnDetails(model, serviceInfoContent)).addingToSession(SessionKeys.mtdVatMandationStatus -> status)
+              Ok(vatReturnDetailsView(model, serviceInfoContent)).addingToSession(SessionKeys.mtdVatMandationStatus -> status)
             case error =>
               logWarn(s"[ReturnsController][handleMandationStatus] - getMandationStatus returned an Error: $error")
-              InternalServerError(views.html.errors.technicalProblem())
+              InternalServerError(technicalProblemView())
         }
       }
     } else {
       val model = viewModel(false)
       auditEvent(isReturnsPageRequest, model)
-      Future.successful(Ok(views.html.returns.vatReturnDetails(model, serviceInfoContent)))
+      Future.successful(Ok(vatReturnDetailsView(model, serviceInfoContent)))
     }
   }
 
   private[controllers] def renderResult(pageData: ReturnsControllerData,
                                         isReturnsPageRequest: Boolean, isNumericPeriodKey: Boolean)
-                                       (implicit req: Request[AnyContent], user: User): Future[Result] = {
+                                       (implicit req: MessagesRequest[AnyContent], user: User): Future[Result] = {
     (pageData.vatReturnResult, pageData.obligation, pageData.payment) match {
       case (Right(vatReturn), Some(ob), payment) =>
         val returnDetails = returnsService.constructReturnDetailsModel(vatReturn, payment)
@@ -156,14 +161,16 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
         checkIfComingFromSubmissionConfirmation(isNumericPeriodKey)
       case (Right(_), None, _) =>
         logWarn("[ReturnsController][renderResult] error: render required a valid obligation but none was returned")
-        Future.successful(InternalServerError(views.html.errors.technicalProblem()))
+        Future.successful(InternalServerError(technicalProblemView()))
       case _ =>
         logWarn("[ReturnsController][renderResult] error: Unknown error")
-        Future.successful(InternalServerError(views.html.errors.technicalProblem()))
+        Future.successful(InternalServerError(technicalProblemView()))
     }
   }
 
-  private def checkIfComingFromSubmissionConfirmation(preMtdReturn: Boolean)(implicit req: Request[AnyContent], user: User): Future[Result] = {
+  private def checkIfComingFromSubmissionConfirmation(preMtdReturn: Boolean)
+                                                     (implicit req: MessagesRequest[AnyContent],
+                                                      user: User): Future[Result] = {
     val inSessionYear = req.session.get("submissionYear")
     val inSessionPeriodKey = req.session.get("inSessionPeriodKey")
 
@@ -172,15 +179,14 @@ class ReturnsController @Inject()(val messagesApi: MessagesApi,
         "[ReturnsController][checkIfComingFromSubmissionConfirmation] error: User has come from the submission confirmation page, " +
         "but their submission has not yet been processed."
       )
-      val yearAsInt: Int = inSessionYear.get.toInt
       Future.successful(
         Redirect(routes.SubmittedReturnsController.submittedReturns()).removingFromSession("submissionYear", "inSessionPeriodKey")
       )
     } else {
       if(preMtdReturn) {
-        Future.successful(NotFound(views.html.errors.preMtdReturn(user)))
+        Future.successful(NotFound(preMtdReturnView(user)))
       } else {
-        Future.successful(NotFound(views.html.errors.notFound()))
+        Future.successful(NotFound(notFoundView()))
       }
     }
   }

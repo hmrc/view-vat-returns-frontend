@@ -22,10 +22,9 @@ import common.EnrolmentKeys._
 import common.SessionKeys.{clientVrn, migrationToETMP}
 import mocks.MockAuth
 import models.User
-import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded}
+import play.api.i18n.MessagesApi
+import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, MessagesRequest}
 import play.api.test.FakeRequest
-import play.filters.csrf.CSRF.Token
-import play.filters.csrf.{CSRFConfigProvider, CSRFFilter}
 import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual}
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.auth.core.{AffinityGroup, Enrolment, EnrolmentIdentifier, Enrolments}
@@ -42,32 +41,21 @@ class ControllerBaseSpec extends MockAuth {
   implicit val materializer: Materializer = ActorMaterializer()
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
+  def fakeRequestToPOSTWithSession(input: (String, String)*): FakeRequest[AnyContentAsFormUrlEncoded] =
+    fakeRequestWithSession.withFormUrlEncodedBody(input: _*)
+
+  lazy val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
+  def request(request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()): MessagesRequest[AnyContentAsEmpty.type] =
+    new MessagesRequest[AnyContentAsEmpty.type](request, mcc.messagesApi)
+  implicit val user: User = User(vrn)
+
   lazy val fakeRequestWithSession: FakeRequest[AnyContentAsEmpty.type] = fakeRequest.withSession(
     GovUkSessionKeys.lastRequestTimestamp -> "1498236506662",
     GovUkSessionKeys.authToken -> "Bearer Token",
     migrationToETMP -> "2018-01-01"
   )
 
-  def fakeRequestToPOSTWithSession(input: (String, String)*): FakeRequest[AnyContentAsFormUrlEncoded] =
-    fakeRequestWithSession.withFormUrlEncodedBody(input: _*)
-
-  implicit val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
-  implicit val user: User = User(vrn)
-
   lazy val fakeRequestWithClientsVRN: FakeRequest[AnyContentAsEmpty.type] = fakeRequest.withSession(clientVrn -> vrn)
-
-  implicit class CSRFTokenAdder[T](req: FakeRequest[T]) {
-    def addToken(): FakeRequest[T] = {
-      val csrfConfig = app.injector.instanceOf[CSRFConfigProvider].get
-      val csrfFilter = app.injector.instanceOf[CSRFFilter]
-      val token = csrfFilter.tokenProvider.generateToken
-
-      req.copyFakeRequest(tags = req.tags ++ Map(
-        Token.NameRequestTag -> csrfConfig.tokenName,
-        Token.RequestTag -> token
-      )).withHeaders(csrfConfig.headerName -> token)
-    }
-  }
 
   val mtdVatEnrolment: Set[Enrolment] = Set(Enrolment(
     mtdVatEnrolmentKey,

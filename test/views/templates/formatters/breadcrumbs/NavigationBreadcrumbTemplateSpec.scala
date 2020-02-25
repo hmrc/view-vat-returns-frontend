@@ -17,10 +17,12 @@
 package views.templates.formatters.breadcrumbs
 
 import play.twirl.api.Html
-import views.html.templates.formatters.breadcrumbs.navigationBreadcrumb
+import views.html.templates.formatters.breadcrumbs.NavigationBreadcrumb
 import views.templates.TemplateBaseSpec
 
 class NavigationBreadcrumbTemplateSpec extends TemplateBaseSpec {
+
+  val injectedTemplate: NavigationBreadcrumb = inject[NavigationBreadcrumb]
 
   "Calling navigationBreadcrumb" should {
 
@@ -43,7 +45,7 @@ class NavigationBreadcrumbTemplateSpec extends TemplateBaseSpec {
       """.stripMargin
     )
 
-    val markup = navigationBreadcrumb(navigationMap, currentPage)
+    val markup = injectedTemplate(navigationMap, currentPage)
 
     "return the correct markup" in {
       formatHtml(markup) shouldBe formatHtml(expectedMarkup)

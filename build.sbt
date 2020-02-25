@@ -56,23 +56,25 @@ lazy val coverageSettings: Seq[Setting[_]] = {
 
 val compile = Seq(
   ws,
-  "uk.gov.hmrc" %% "bootstrap-play-25" % "5.1.0",
-  "uk.gov.hmrc" %% "govuk-template" % "5.48.0-play-25",
-  "uk.gov.hmrc" %% "play-ui" % "8.5.0-play-25",
-  "uk.gov.hmrc" %% "play-partials" % "6.9.0-play-25",
-  "uk.gov.hmrc" %% "play-whitelist-filter" % "3.1.0-play-25",
-  "uk.gov.hmrc" %% "play-language" % "3.4.0"
+  "uk.gov.hmrc" %% "bootstrap-play-26" % "1.3.0",
+  "uk.gov.hmrc" %% "govuk-template" % "5.52.0-play-26",
+  "uk.gov.hmrc" %% "play-ui" % "8.8.0-play-26",
+  "uk.gov.hmrc" %% "play-partials" % "6.9.0-play-26",
+  "uk.gov.hmrc" %% "play-whitelist-filter" % "3.1.0-play-26",
+  "uk.gov.hmrc" %% "play-language" % "4.2.0-play-26",
+  "com.typesafe.play" %% "play-json-joda" % "2.7.4"
 )
 
 def test(scope: String = "test, it"): Seq[ModuleID] = Seq(
-  "uk.gov.hmrc" %% "hmrctest" % "3.9.0-play-25" % scope,
+  "uk.gov.hmrc" %% "hmrctest" % "3.9.0-play-26" % scope,
+  "uk.gov.hmrc" %% "bootstrap-play-26" % "1.3.0" % scope classifier "tests",
   "org.scalatest" %% "scalatest" % "3.0.1" % scope,
   "org.pegdown" % "pegdown" % "1.6.0" % scope,
   "org.jsoup" % "jsoup" % "1.10.3" % scope,
   "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
-  "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0" % scope,
+  "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % scope,
   "org.scalamock" %% "scalamock-scalatest-support" % "3.6.0" % scope,
-  "com.github.tomakehurst" % "wiremock" % "2.6.0" % scope
+  "com.github.tomakehurst" % "wiremock-jre8" % "2.26.0" % scope
 )
 
 def oneForkedJvmPerTest(tests: Seq[TestDefinition]): Seq[Group] = tests map {
@@ -97,8 +99,7 @@ lazy val microservice = Project(appName, file("."))
     scalaVersion := "2.11.11",
     libraryDependencies ++= appDependencies,
     retrieveManaged := true,
-    evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
-    routesGenerator := InjectedRoutesGenerator
+    evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false)
   )
   .configs(IntegrationTest)
   .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)

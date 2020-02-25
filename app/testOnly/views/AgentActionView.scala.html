@@ -14,14 +14,10 @@
  * limitations under the License.
  *@
 
-@(redirectUrl: String)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
+@this(mainTemplate: MainTemplate)
 
-@views.html.main_template(title = "Stub Agent Client Lookup Frontend - Unauthorised", bodyClasses = None, appConfig = appConfig) {
+@()(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
-    <h1>Agent Unauthorised</h1>
-
-    <p><span class="bold-small">RedirectUrl:</span> @redirectUrl</p>
-
-    <a class="button" role="button" id="continue-button" href="@redirectUrl">Redirect</a>
-
+@mainTemplate(title = "Stub Agent Client Lookup Frontend - Agent Action") {
+    <h1>Agent Action</h1>
 }

@@ -19,30 +19,30 @@ package controllers
 import common.{EnrolmentKeys => Keys}
 import config.AppConfig
 import models.User
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, Request, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, MessagesRequest, Result}
 import services.EnrolmentsAuthService
 import uk.gov.hmrc.auth.core._
-import uk.gov.hmrc.auth.core.retrieve.{Retrievals, ~}
+import uk.gov.hmrc.auth.core.retrieve.~
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import controllers.predicate.AuthoriseAgentWithClient
 import javax.inject.{Inject, Singleton}
 import utils.LoggerUtil._
+import views.html.errors.UnauthorisedView
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class AuthorisedController @Inject()(enrolmentsAuthService: EnrolmentsAuthService,
-                                     val messagesApi: MessagesApi,
-                                     val agentWithClientPredicate: AuthoriseAgentWithClient,
-                                     implicit val appConfig: AppConfig) extends FrontendController with I18nSupport {
+                                     agentWithClientPredicate: AuthoriseAgentWithClient,
+                                     mcc: MessagesControllerComponents,
+                                     unauthorisedView: UnauthorisedView)
+                                    (implicit appConfig: AppConfig,
+                                     ec: ExecutionContext) extends FrontendController(mcc) {
 
-  def authorisedAction(
-                        block: Request[AnyContent] => User => Future[Result],
-                        allowAgentAccess: Boolean = true,
-                        ignoreMandatedStatus: Boolean = false
-                      ): Action[AnyContent] = Action.async {
-    implicit request =>
+  def authorisedAction(block: MessagesRequest[AnyContent] => User => Future[Result],
+                       allowAgentAccess: Boolean = true,
+                       ignoreMandatedStatus: Boolean = false): Action[AnyContent] = Action.async { implicit request =>
 
       enrolmentsAuthService.authorised.retrieve(Retrievals.allEnrolments and Retrievals.affinityGroup) {
         case _ ~ Some(AffinityGroup.Agent) =>
@@ -60,15 +60,15 @@ class AuthorisedController @Inject()(enrolmentsAuthService: EnrolmentsAuthServic
         case _: NoActiveSession => Future.successful(Redirect(appConfig.signInUrl))
         case _: InsufficientEnrolments =>
           logWarn(s"[AuthorisedController][authorisedAction] insufficient enrolment exception encountered")
-          Future.successful(Forbidden(views.html.errors.unauthorised()))
+          Future.successful(Forbidden(unauthorisedView()))
         case _: AuthorisationException =>
           logWarn(s"[AuthorisedController][authorisedAction] encountered unauthorisation exception")
-          Future.successful(Forbidden(views.html.errors.unauthorised()))
+          Future.successful(Forbidden(unauthorisedView()))
       }
   }
 
-  private def authorisedAsNonAgent(block: Request[AnyContent] => User => Future[Result], enrolments: Enrolments)
-                                  (implicit request: Request[AnyContent]): Future[Result] = {
+  private def authorisedAsNonAgent(block: MessagesRequest[AnyContent] => User => Future[Result], enrolments: Enrolments)
+                                  (implicit request: MessagesRequest[AnyContent]): Future[Result] = {
 
     val vatEnrolments: Set[Enrolment] = User.extractVatEnrolments(enrolments)
 
@@ -88,7 +88,7 @@ class AuthorisedController @Inject()(enrolmentsAuthService: EnrolmentsAuthServic
       }
     } else {
       logDebug("[AuthPredicate][authoriseAsNonAgent] Non-agent with no HMRC-MTD-VAT enrolment. Rendering unauthorised view.")
-      Future.successful(Forbidden(views.html.errors.unauthorised()))
+      Future.successful(Forbidden(unauthorisedView()))
     }
   }
 }

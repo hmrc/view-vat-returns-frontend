@@ -27,6 +27,8 @@ import play.api.http.Status
 import play.api.test.Helpers.{charset, contentType, _}
 import play.twirl.api.Html
 import uk.gov.hmrc.auth.core.{User => _, _}
+import views.html.errors.TechnicalProblemView
+import views.html.returns.{NoUpcomingReturnDeadlinesView, OptOutReturnDeadlinesView, ReturnDeadlinesView}
 
 import scala.concurrent.Future
 
@@ -46,14 +48,16 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
   val emptyObligations: ServiceResponse[VatReturnObligations] = Right(VatReturnObligations(Seq.empty))
 
   def controller: ReturnDeadlinesController = new ReturnDeadlinesController(
-    messages,
+    mcc,
     enrolmentsAuthService,
     mockVatReturnService,
     mockAuthorisedController,
     mockDateService,
     mockServiceInfoService,
-    mockConfig,
-    mockAuditService
+    inject[TechnicalProblemView],
+    inject[NoUpcomingReturnDeadlinesView],
+    inject[ReturnDeadlinesView],
+    inject[OptOutReturnDeadlinesView]
   )
 
   "Calling the .returnDeadlines action" when {
@@ -66,7 +70,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
         callOpenObligations(exampleObligations)
         callExtendedAudit
         callServiceInfoPartialService
-        controller.returnDeadlines()(fakeRequest)
+        controller.returnDeadlines()(request())
       }
 
       "return 200" in {
@@ -93,7 +97,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
           callOpenObligations(exampleObligations)
           callExtendedAudit
           callServiceInfoPartialService
-          controller.returnDeadlines()(fakeRequest.withSession("mtdVatMandationStatus" -> "Non MTDfB"))
+          controller.returnDeadlines()(request(fakeRequest.withSession("mtdVatMandationStatus" -> "Non MTDfB")))
         }
 
         "return 200" in {
@@ -102,7 +106,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
 
         "return the opt-out return deadlines page" in {
           val document: Document = Jsoup.parse(bodyOf(result))
-          document.getElementById("submit-return-link").text() shouldBe "Submit VAT Return"
+          messages(document.getElementById("submit-return-link").text()) shouldBe "Submit VAT Return"
         }
       }
 
@@ -116,7 +120,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
           callExtendedAudit
           callServiceInfoPartialService
           callMandationService(Right(MandationStatus("Non MTDfB")))
-          controller.returnDeadlines()(fakeRequest)
+          controller.returnDeadlines()(request())
         }
 
         "return 200" in {
@@ -125,7 +129,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
 
         "return the opt-out return deadlines page" in {
           val document: Document = Jsoup.parse(bodyOf(result))
-          document.getElementById("submit-return-link").text() shouldBe "Submit VAT Return"
+          messages(document.getElementById("submit-return-link").text()) shouldBe "Submit VAT Return"
         }
 
         "put the mandation status in the session" in {
@@ -145,7 +149,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
           callOpenObligations(exampleObligations)
           callExtendedAudit
           callServiceInfoPartialService
-          controller.returnDeadlines()(fakeRequest.withSession("mtdVatMandationStatus" -> "Non Digital"))
+          controller.returnDeadlines()(request(fakeRequest.withSession("mtdVatMandationStatus" -> "Non Digital")))
         }
 
         "return 200" in {
@@ -154,7 +158,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
 
         "return the opt-out return deadlines page" in {
           val document: Document = Jsoup.parse(bodyOf(result))
-          document.getElementById("submit-return-link").text() shouldBe "Submit VAT Return"
+          messages(document.getElementById("submit-return-link").text()) shouldBe "Submit VAT Return"
         }
       }
 
@@ -168,7 +172,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
           callExtendedAudit
           callServiceInfoPartialService
           callMandationService(Right(MandationStatus("Non Digital")))
-          controller.returnDeadlines()(fakeRequest)
+          controller.returnDeadlines()(request())
         }
 
         "return 200" in {
@@ -177,7 +181,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
 
         "return the opt-out return deadlines page" in {
           val document: Document = Jsoup.parse(bodyOf(result))
-          document.getElementById("submit-return-link").text() shouldBe "Submit VAT Return"
+          messages(document.getElementById("submit-return-link").text()) shouldBe "Submit VAT Return"
         }
 
         "put the mandation status in the session" in {
@@ -197,7 +201,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
           callOpenObligations(exampleObligations)
           callExtendedAudit
           callServiceInfoPartialService
-          controller.returnDeadlines()(fakeRequest.withSession("mtdVatMandationStatus" -> "MTDfB Mandated"))
+          controller.returnDeadlines()(request(fakeRequest.withSession("mtdVatMandationStatus" -> "MTDfB Mandated")))
         }
 
         "return 200" in {
@@ -220,7 +224,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
           callExtendedAudit
           callServiceInfoPartialService
           callMandationService(Right(MandationStatus("MTDfB Mandated")))
-          controller.returnDeadlines()(fakeRequest)
+          controller.returnDeadlines()(request())
         }
 
         "return 200" in {
@@ -247,7 +251,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
         callFulfilledObligations(emptyObligations)
         callExtendedAudit
         callServiceInfoPartialService
-        controller.returnDeadlines()(fakeRequest)
+        controller.returnDeadlines()(request())
       }
 
 
@@ -257,9 +261,8 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
 
       "return the no returns view" in {
         val document: Document = Jsoup.parse(bodyOf(result))
-        document.select("article > p:nth-child(3)").text() shouldBe
-          "You do not have any returns due right now. Your next deadline will show here on the first day of your next" +
-            " accounting period."
+        messages(document.select("article > p:nth-child(3)").text.takeWhile(_ != ' ')) shouldBe
+          "You do not have any returns due right now."
       }
     }
 
@@ -272,7 +275,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
         callOpenObligations(exampleObligations)
         callExtendedAudit
         callMandationService(Right(MandationStatus("Non MTDfB")))
-        controller.returnDeadlines()(fakeRequestWithClientsVRN)
+        controller.returnDeadlines()(request(fakeRequestWithClientsVRN))
       }
 
       "the client has open obligations" should {
@@ -300,7 +303,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
           callFulfilledObligations(emptyObligations)
           callExtendedAudit
           callMandationService(Right(MandationStatus("Non MTDfB")))
-          controller.returnDeadlines()(fakeRequestWithClientsVRN)
+          controller.returnDeadlines()(request(fakeRequestWithClientsVRN))
         }
 
         "return 200" in {
@@ -309,9 +312,8 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
 
         "return the no returns view" in {
           val document: Document = Jsoup.parse(bodyOf(result))
-          document.select("article > p:nth-child(3)").text() shouldBe
-            "You do not have any returns due right now. Your next deadline will show here on the first day of your next" +
-              " accounting period."
+          messages(document.select("article > p:nth-child(3)").text.takeWhile(_ != ' ')) shouldBe
+            "You do not have any returns due right now."
         }
       }
 
@@ -324,7 +326,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
           callOpenObligations(Left(ObligationError))
           callExtendedAudit
           callMandationService(Right(MandationStatus("Non MTDfB")))
-          controller.returnDeadlines()(fakeRequestWithClientsVRN)
+          controller.returnDeadlines()(request(fakeRequestWithClientsVRN))
         }
 
         "return 500" in {
@@ -333,7 +335,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
 
         "return the technical problem view" in {
           val document: Document = Jsoup.parse(bodyOf(result))
-          document.title shouldBe "There is a problem with the service - VAT - GOV.UK"
+          messages(document.select("h1").text) shouldBe "Sorry, there is a problem with the service"
         }
       }
     }
@@ -343,7 +345,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
       lazy val result = {
         callAuthService(Future.failed(InsufficientEnrolments()))
         callDateService()
-        controller.returnDeadlines()(fakeRequest)
+        controller.returnDeadlines()(request())
       }
 
       "return 403 (Forbidden)" in {
@@ -356,7 +358,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
       lazy val result = {
         callAuthService(Future.failed(MissingBearerToken()))
         callDateService()
-        controller.returnDeadlines()(fakeRequest)
+        controller.returnDeadlines()(request())
       }
 
       "return 303 (SEE_OTHER)" in {
@@ -374,7 +376,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
         callAuthService(individualAuthResult)
         callDateService()
         callOpenObligations(Left(ObligationError))
-        controller.returnDeadlines()(fakeRequest)
+        controller.returnDeadlines()(request())
       }
 
       "return 500" in {
@@ -383,7 +385,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
 
       "return the technical problem view" in {
         val document: Document = Jsoup.parse(bodyOf(result))
-        document.title shouldBe "There is a problem with the service - VAT - GOV.UK"
+        messages(document.select("h1").text) shouldBe "Sorry, there is a problem with the service"
       }
     }
   }
@@ -395,7 +397,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
       lazy val result = {
         (mockVatReturnService.getLastObligation(_: Seq[VatReturnObligation])).expects(*).returns(obligation)
         callFulfilledObligations(exampleObligations)
-        controller.noUpcomingObligationsAction(Html(""), LocalDate.parse("2018-01-01"))(fakeRequest, user)
+        controller.noUpcomingObligationsAction(Html(""), LocalDate.parse("2018-01-01"))(request(), user)
       }
 
       "return 200" in {
@@ -407,7 +409,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
 
       lazy val result = {
         callFulfilledObligations(Left(ObligationError))
-        controller.noUpcomingObligationsAction(Html(""), LocalDate.parse("2018-01-01"))(fakeRequest, user)
+        controller.noUpcomingObligationsAction(Html(""), LocalDate.parse("2018-01-01"))(request(), user)
       }
 
       "return 500" in {

@@ -19,30 +19,29 @@ package connectors
 import config.VatHeaderCarrierForPartialsConverter
 import controllers.ControllerBaseSpec
 import play.api.http.Status
-import play.api.i18n.{Lang, Messages}
+import play.api.i18n.MessagesApi
 import play.twirl.api.Html
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.play.partials.HtmlPartial
 import uk.gov.hmrc.play.partials.HtmlPartial.{Failure, Success}
+import views.html.templates.BtaNavigationLinks
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class ServiceInfoConnectorSpec extends ControllerBaseSpec {
 
-  val hcForPartials: VatHeaderCarrierForPartialsConverter = app.injector.instanceOf[VatHeaderCarrierForPartialsConverter]
-  implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
-  implicit val messagesImpl: Messages = Messages(Lang("en-GB"), messages)
-  val validHtml = Html("<nav>BTA LINK</nav>")
-
   private trait Test {
+    val hcForPartials: VatHeaderCarrierForPartialsConverter = inject[VatHeaderCarrierForPartialsConverter]
+    val btaNavigationLinks: BtaNavigationLinks = inject[BtaNavigationLinks]
+    val validHtml = Html("<nav>BTA LINK</nav>")
     val result :Future[HtmlPartial] = Future.successful(Success(None,validHtml))
     val httpClient: HttpClient = mock[HttpClient]
     lazy val connector: ServiceInfoConnector = {
       (httpClient.GET[HtmlPartial](_: String)(_: HttpReads[HtmlPartial],_: HeaderCarrier,_: ExecutionContext))
         .stubs(*,*,*,*)
         .returns(result)
-      new ServiceInfoConnector(httpClient, hcForPartials)(messages, mockConfig)
+      new ServiceInfoConnector(httpClient, hcForPartials, btaNavigationLinks)(inject[MessagesApi], mockConfig)
     }
   }
 
@@ -59,7 +58,7 @@ class ServiceInfoConnectorSpec extends ControllerBaseSpec {
 
       "return the fall back partial" in new Test {
         override val result: Future[Failure] = Future.successful(Failure(Some(Status.GATEWAY_TIMEOUT)))
-        await(connector.getServiceInfoPartial) shouldBe views.html.templates.btaNavigationLinks()
+        await(connector.getServiceInfoPartial(fakeRequest, ec)) shouldBe btaNavigationLinks()
       }
     }
 
@@ -67,14 +66,14 @@ class ServiceInfoConnectorSpec extends ControllerBaseSpec {
 
       "return the fall back partial" in new Test {
         override val result: Future[Failure] = Future.successful(Failure(Some(Status.INTERNAL_SERVER_ERROR)))
-        await(connector.getServiceInfoPartial) shouldBe views.html.templates.btaNavigationLinks()
+        await(connector.getServiceInfoPartial(fakeRequest, ec)) shouldBe btaNavigationLinks()
       }
     }
 
     "a successful response is returned" should {
 
       "return the Bta partial" in new Test {
-        await(connector.getServiceInfoPartial) shouldBe validHtml
+        await(connector.getServiceInfoPartial(fakeRequest, ec)) shouldBe validHtml
       }
     }
   }

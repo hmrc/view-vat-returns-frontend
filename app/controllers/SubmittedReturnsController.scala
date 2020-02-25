@@ -27,27 +27,30 @@ import models.viewModels.{ReturnObligationsViewModel, VatReturnsViewModel}
 import models.{ServiceResponse, User}
 import models.errors.ObligationError
 import models.Obligation.Status.Fulfilled
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, Request}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import play.twirl.api.HtmlFormat
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import utils.LoggerUtil.logWarn
+import views.html.errors.SubmittedReturnsErrorView
+import views.html.returns.SubmittedReturnsView
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SubmittedReturnsController @Inject()(val messagesApi: MessagesApi,
+class SubmittedReturnsController @Inject()(mcc: MessagesControllerComponents,
                                            enrolmentsAuthService: EnrolmentsAuthService,
                                            returnsService: ReturnsService,
                                            authorisedController: AuthorisedController,
                                            dateService: DateService,
                                            serviceInfoService: ServiceInfoService,
                                            subscriptionService: SubscriptionService,
-                                           implicit val appConfig: AppConfig,
-                                           auditService: AuditingService)
-  extends FrontendController with I18nSupport {
+                                           submittedReturnsView: SubmittedReturnsView,
+                                           submittedReturnsErrorView: SubmittedReturnsErrorView)
+                                          (implicit appConfig: AppConfig,
+                                           auditService: AuditingService,
+                                           ec: ExecutionContext) extends FrontendController(mcc) {
 
   lazy val currentYear: Int = dateService.now().getYear
 
@@ -60,10 +63,10 @@ class SubmittedReturnsController @Inject()(val messagesApi: MessagesApi,
       } yield {
         obligationsResult match {
           case Right(model) =>
-            Ok(views.html.returns.submittedReturns(model, serviceInfoContent))
+            Ok(submittedReturnsView(model, serviceInfoContent))
           case Left(error) =>
             logWarn("[ReturnObligationsController][submittedReturns] error: " + error.toString)
-            InternalServerError(views.html.errors.submittedReturnsError(user))
+            InternalServerError(submittedReturnsErrorView(user))
         }
       }
   }, ignoreMandatedStatus = true)

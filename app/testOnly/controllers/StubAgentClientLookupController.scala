@@ -19,26 +19,28 @@ package testOnly.controllers
 import common.SessionKeys
 import config.AppConfig
 import javax.inject.Inject
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import testOnly.forms.StubAgentClientLookupForm
+import testOnly.views.html.{AgentActionView, AgentClientLookupView, AgentClientUnauthView}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 
-class StubAgentClientLookupController @Inject()(val messagesApi: MessagesApi,
-                                                implicit val appConfig: AppConfig)
-  extends FrontendController with I18nSupport {
+class StubAgentClientLookupController @Inject()(mcc: MessagesControllerComponents,
+                                                agentClientLookupView: AgentClientLookupView,
+                                                agentClientUnauthView: AgentClientUnauthView,
+                                                agentActionView: AgentActionView)
+                                               (implicit appConfig: AppConfig) extends FrontendController(mcc) {
 
   def show(redirectUrl: String): Action[AnyContent] = Action { implicit request =>
-    Ok(testOnly.views.html.agentClientLookup(StubAgentClientLookupForm.form, redirectUrl))
+    Ok(agentClientLookupView(StubAgentClientLookupForm.form, redirectUrl))
   }
 
   def unauth(redirectUrl: String): Action[AnyContent] = Action { implicit request =>
-    Ok(testOnly.views.html.agentClientUnauth(redirectUrl))
+    Ok(agentClientUnauthView(redirectUrl))
       .removingFromSession(SessionKeys.clientVrn)
   }
 
   def agentAction: Action[AnyContent] = Action { implicit request =>
-    Ok(testOnly.views.html.agentAction())
+    Ok(agentActionView())
   }
 
   def post: Action[AnyContent] = Action { implicit request =>

@@ -19,12 +19,15 @@ package views.templates
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.twirl.api.Html
+import views.html.templates.BtaNavigationLinks
 
 class BtaNavigationLinksTemplateSpec extends TemplateBaseSpec {
 
+  val injectedTemplate: BtaNavigationLinks = inject[BtaNavigationLinks]
+
   "The BtaNavigationLinks template" should {
 
-    val view: Html = views.html.templates.btaNavigationLinks()
+    val view: Html = injectedTemplate()
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have a link to BTA home" which {

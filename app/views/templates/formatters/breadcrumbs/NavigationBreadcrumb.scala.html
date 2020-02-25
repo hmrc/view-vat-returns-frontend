@@ -14,11 +14,15 @@
  * limitations under the License.
  *@
 
-@(helpTextTitle: String, feature: String, pageName: String, content: Html)
+@this()
 
-<details>
-  <summary><span class="summary">@helpTextTitle</span></summary>
-  <div class="panel-indent">
-    @content
-  </div>
-</details>
+@(links: Map[String, String], currentPage: String)
+
+<div class="breadcrumbs soft--top">
+    <ol class="push--top">
+        @links.map {
+            case (key, value) => { <li><a href="@key">@value</a></li> }
+        }
+        <li aria-current="page">@currentPage</li>
+    </ol>
+</div>

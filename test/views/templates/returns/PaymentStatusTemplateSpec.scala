@@ -20,9 +20,12 @@ import java.time.LocalDate
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import views.html.templates.returns.PaymentStatus
 import views.templates.TemplateBaseSpec
 
 class PaymentStatusTemplateSpec extends TemplateBaseSpec {
+
+  val injectedTemplate: PaymentStatus = inject[PaymentStatus]
 
   val whatYouOweCalc = "We have worked out what you owe based on any payments you might have made on your account. "
 
@@ -38,7 +41,7 @@ class PaymentStatusTemplateSpec extends TemplateBaseSpec {
           "Return total: £1,000 " +
           "You owe HMRC: £1,000"
 
-        val template = views.html.templates.returns.paymentStatus(
+        val template = injectedTemplate(
           1000,
           dueDate = LocalDate.parse("2011-11-11"),
           moneyOwed = true,
@@ -57,7 +60,7 @@ class PaymentStatusTemplateSpec extends TemplateBaseSpec {
 
         val expectedText = whatYouOweCalc + "Return total: £0 You owe HMRC: £0"
 
-        val template = views.html.templates.returns.paymentStatus(
+        val template = injectedTemplate(
           0,
           dueDate = LocalDate.parse("2011-11-11"),
           moneyOwed = false,
@@ -80,7 +83,7 @@ class PaymentStatusTemplateSpec extends TemplateBaseSpec {
           "Return total: £1,000 " +
           "You owe HMRC: £500"
 
-        val template = views.html.templates.returns.paymentStatus(
+        val template = injectedTemplate(
           1000,
           dueDate = LocalDate.parse("2011-11-11"),
           moneyOwed = true,
@@ -100,7 +103,7 @@ class PaymentStatusTemplateSpec extends TemplateBaseSpec {
         val expectedText = whatYouOweCalc + "It can take up to 30 days for you to receive a repayment. " +
           "Return total: £1,000 HMRC owes you: £1,000"
 
-        val template = views.html.templates.returns.paymentStatus(
+        val template = injectedTemplate(
           1000,
           dueDate = LocalDate.parse("2011-11-11"),
           moneyOwed = true,
@@ -120,7 +123,7 @@ class PaymentStatusTemplateSpec extends TemplateBaseSpec {
 
       val expectedText = "Return total: £1,000"
 
-      val template = views.html.templates.returns.paymentStatus(
+      val template = injectedTemplate(
         1000,
         dueDate = LocalDate.parse("2011-11-11"),
         oweHmrc = Some(false),

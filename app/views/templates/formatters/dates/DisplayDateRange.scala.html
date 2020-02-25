@@ -14,10 +14,12 @@
  * limitations under the License.
  *@
 
-@()(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
+@import java.time.LocalDate
 
-@views.html.main_template(title = "Stub Agent Client Lookup Frontend - Agent Action", bodyClasses = None, appConfig = appConfig) {
+@this(displayDate: DisplayDate)
 
-    <h1>Agent Action</h1>
+@(from: LocalDate, to: LocalDate, useShortDayFormat: Boolean = false)(implicit messages: Messages)
 
-}
+@displayDate(from, from.getYear != to.getYear, useShortDayFormat)
+@messages("common.dateRangeSeparator")
+@displayDate(to, showYear = true, useShortDayFormat = useShortDayFormat)

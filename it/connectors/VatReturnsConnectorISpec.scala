@@ -24,8 +24,6 @@ import play.api.libs.json.Json
 import stubs.VatReturnsStub
 import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
 class VatReturnsConnectorISpec extends IntegrationBaseSpec {
 
   private trait Test {

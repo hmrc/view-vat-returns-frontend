@@ -14,13 +14,13 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.play.views.formatting.Money
+@this()
 
-@(value: BigDecimal)(implicit messages: Messages)
+@(helpTextTitle: String, feature: String, pageName: String, content: Html)
 
-@(value.isWhole, value >= 0) match {
-  case (true, true) => { @Money.pounds(value) }
-  case (true, false) => { <span aria-hidden="true">&minus;</span>@Money.pounds(value.abs) }
-  case (false, true) => { @Money.pounds(value, 2) }
-  case (false, false) => { <span aria-hidden="true">&minus;</span>@Money.pounds(value.abs, 2) }
-}
+<details>
+  <summary><span class="summary">@helpTextTitle</span></summary>
+  <div class="panel-indent">
+    @content
+  </div>
+</details>

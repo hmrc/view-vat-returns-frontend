@@ -19,8 +19,11 @@ package views
 import models.User
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import views.html.GovukWrapper
 
 class GovUkWrapperSpec extends ViewBaseSpec {
+
+  val injectedView: GovukWrapper = inject[GovukWrapper]
 
   val navTitleSelector = ".header__menu__proposition-name"
   val accessibilityLinkSelector = "#footer > div > div > div.footer-meta-inner > ul > li:nth-child(2) > a"
@@ -29,7 +32,7 @@ class GovUkWrapperSpec extends ViewBaseSpec {
 
     "user is not known" should {
 
-      lazy val view = views.html.govuk_wrapper(mockConfig, "title", user = None)
+      lazy val view = injectedView(mockConfig, "title", user = None)
       lazy implicit val document: Document = Jsoup.parse(view.body)
 
       "have no nav title" in {
@@ -45,7 +48,7 @@ class GovUkWrapperSpec extends ViewBaseSpec {
 
       "user is an agent" should {
 
-        lazy val view = views.html.govuk_wrapper(mockConfig, "title", user = Some(User("999999999", arn = Some("XARN1234567"))))
+        lazy val view = injectedView(mockConfig, "title", user = Some(User("999999999", arn = Some("XARN1234567"))))
         lazy implicit val document: Document = Jsoup.parse(view.body)
 
         "have a nav title of 'Your client’s VAT details'" in {
@@ -59,7 +62,7 @@ class GovUkWrapperSpec extends ViewBaseSpec {
 
       "user is not an agent" should {
 
-        lazy val view = views.html.govuk_wrapper(mockConfig, "title", user = Some(User("999999999", arn = None)))
+        lazy val view = injectedView(mockConfig, "title", user = Some(User("999999999", arn = None)))
         lazy implicit val document: Document = Jsoup.parse(view.body)
 
         "have a nav title of 'Business tax account'" in {
