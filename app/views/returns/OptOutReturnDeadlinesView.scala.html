@@ -1,0 +1,96 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import play.twirl.api.HtmlFormat
+@import models.viewModels.ReturnDeadlineViewModel
+@import views.html.templates.formatters.breadcrumbs._
+@import views.html.templates.formatters.dates._
+@import java.time.LocalDate
+
+@this(mainTemplate: MainTemplate,
+      navigationBreadcrumb: NavigationBreadcrumb,
+      displayDate: DisplayDate,
+      displayDateRange: DisplayDateRange)
+
+@(deadlines: Seq[ReturnDeadlineViewModel],
+  currentDate: LocalDate,
+  serviceInfoContent: Html = HtmlFormat.empty)(
+  implicit request: Request[_], messages: Messages, appConfig: config.AppConfig, user: User)
+
+@gaPrefix = @{if(user.isAgent) "agent_" else ""}
+
+@mainTemplate(
+  title = messages("returnDeadlines.submitReturn.title"),
+  serviceInfoContent = serviceInfoContent,
+  user = Some(user)
+) {
+
+  @if(!user.isAgent) {
+    @navigationBreadcrumb(Map(
+      appConfig.btaHomeUrl -> messages("breadcrumbs.bta"),
+      appConfig.vatDetailsUrl -> messages("breadcrumbs.vat")),
+      currentPage = messages("returnDeadlines.submitReturn.title")
+    )
+  }
+
+  <div class="grid-row">
+    <div class="column-two-thirds">
+
+      @if(user.isAgent) {
+          <a id="link-back" class="link-back" href='@appConfig.agentClientActionUrl'>@messages("base.back")</a>
+      }
+
+      <h1 class="heading-xlarge">@messages("returnDeadlines.submitReturn.title")</h1>
+      <div class="form-group">
+        <ul class="list">
+        @for(deadline <- deadlines){
+          <li class="section divider--bottom">
+            <p>
+              <span class="bold-medium">
+                @messages("returnDeadlines.submitReturn.returnDeadline")
+                @displayDate(deadline.due)
+              </span>
+              @if(deadline.overdue) {
+                <span>
+                  <strong class="task-overdue">@messages("common.overdue")</strong>
+                </span>
+              }
+              <span class="form-hint">
+                @if(deadline.isFinalReturn) {
+                  @messages("returnDeadlines.finalReturn")
+                } else {
+                  @messages("returnDeadlines.periodEnding", displayDateRange(deadline.periodFrom, deadline.periodTo))
+                }
+              </span>
+
+
+              @if(currentDate.isAfter(deadline.periodTo)) {
+                <a href="@{appConfig.submitVatReturnForm(deadline.periodKey)}"
+                  id="submit-return-link">@messages("returnDeadlines.submitReturn")
+                </a>
+              } else {
+                <span>
+                  @messages("returnDeadlines.submitReturn.futureReturn", displayDate(deadline.periodTo.plusDays(1), showYear = false))
+                </span>
+              }
+            </p>
+          </li>
+        }
+        </ul>
+      </div>
+    </div>
+  </div>
+}

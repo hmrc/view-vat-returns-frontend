@@ -28,8 +28,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class SignOutControllerSpec extends ControllerBaseSpec {
 
-  implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
-  val controller: SignOutController = new SignOutController(messages, enrolmentsAuthService)
+  val controller: SignOutController = new SignOutController(enrolmentsAuthService, mcc)
 
   def mockAuth(authResult: Future[Option[AffinityGroup]]): Any =
     (mockAuthConnector.authorise(_: Predicate, _: Retrieval[Option[AffinityGroup]])(_: HeaderCarrier, _: ExecutionContext))

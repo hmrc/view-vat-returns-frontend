@@ -20,9 +20,11 @@ import models.User
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import views.ViewBaseSpec
+import views.html.errors.PreMtdReturnView
 
 class PreMtdReturnViewSpec extends ViewBaseSpec {
 
+  val injectedView: PreMtdReturnView = inject[PreMtdReturnView]
 
   object Selectors {
     val heading = "h1"
@@ -35,7 +37,7 @@ class PreMtdReturnViewSpec extends ViewBaseSpec {
 
   "Rendering the pre mtd return error view without the HMCE-VATDEC-ORG enrolment" should {
 
-    lazy val view = views.html.errors.preMtdReturn(user)
+    lazy val view = injectedView(user)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct document title" in {
@@ -57,7 +59,7 @@ class PreMtdReturnViewSpec extends ViewBaseSpec {
 
   "Rendering the pre mtd return error view with the HMCE-VATDEC-ORG enrolment" should {
 
-    lazy val view = views.html.errors.preMtdReturn(userWithNonMtdVat)
+    lazy val view = injectedView(userWithNonMtdVat)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct document title" in {
@@ -75,7 +77,5 @@ class PreMtdReturnViewSpec extends ViewBaseSpec {
     "have the correct link" in {
       element(Selectors.link).attr("href") shouldBe "/portal-url/111111111"
     }
-
   }
-
 }

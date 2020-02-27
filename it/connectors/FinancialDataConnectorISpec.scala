@@ -25,8 +25,6 @@ import models.payments.{Payment, Payments}
 import stubs.FinancialDataStub
 import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
 class FinancialDataConnectorISpec extends IntegrationBaseSpec {
 
   private trait Test {

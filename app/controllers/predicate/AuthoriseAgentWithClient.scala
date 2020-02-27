@@ -20,26 +20,27 @@ import common._
 import config.AppConfig
 import javax.inject.{Inject, Singleton}
 import models.{MandationStatus, User}
-import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc._
 import services.{EnrolmentsAuthService, ReturnsService}
 import uk.gov.hmrc.auth.core._
-import uk.gov.hmrc.auth.core.retrieve.Retrievals.allEnrolments
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.allEnrolments
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.LoggerUtil._
+import views.html.errors.UnauthorisedView
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class AuthoriseAgentWithClient @Inject()(enrolmentsAuthService: EnrolmentsAuthService,
                                          mandationStatusService: ReturnsService,
-                                         val messagesApi: MessagesApi,
-                                         implicit val appConfig: AppConfig
-                                        ) extends FrontendController with I18nSupport {
+                                         mcc: MessagesControllerComponents,
+                                         unauthorisedView: UnauthorisedView)
+                                        (implicit appConfig: AppConfig,
+                                         ec: ExecutionContext) extends FrontendController(mcc) {
 
-  def authoriseAsAgent(block: Request[AnyContent] => User => Future[Result], ignoreMandatedStatus: Boolean)
-                      (implicit request: Request[AnyContent]): Future[Result] = {
+  def authoriseAsAgent(block: MessagesRequest[AnyContent] => User => Future[Result], ignoreMandatedStatus: Boolean)
+                      (implicit request: MessagesRequest[AnyContent]): Future[Result] = {
 
     val delegatedAuthRule: String => Enrolment = vrn =>
       Enrolment(EnrolmentKeys.mtdVatEnrolmentKey)
@@ -58,7 +59,7 @@ class AuthoriseAgentWithClient @Inject()(enrolmentsAuthService: EnrolmentsAuthSe
                 case Some(arn) => checkMandationStatus(block, vrn, arn, ignoreMandatedStatus)
                 case None =>
                   logDebug("[AuthPredicate][authoriseAsAgent] - Agent with no HMRC-AS-AGENT enrolment. Rendering unauthorised view.")
-                  Future.successful(Forbidden(views.html.errors.unauthorised()))
+                  Future.successful(Forbidden(unauthorisedView()))
               }
           } recover {
           case _: NoActiveSession =>
@@ -76,12 +77,11 @@ class AuthoriseAgentWithClient @Inject()(enrolmentsAuthService: EnrolmentsAuthSe
   }
 
 
-  private def checkMandationStatus(
-                                    block: Request[AnyContent] => User => Future[Result],
-                                    vrn: String,
-                                    arn: String,
-                                    ignoreMandatedStatus: Boolean
-                                  )(implicit request: Request[AnyContent], hc: HeaderCarrier): Future[Result] = {
+  private def checkMandationStatus(block: MessagesRequest[AnyContent] => User => Future[Result],
+                                   vrn: String,
+                                   arn: String,
+                                   ignoreMandatedStatus: Boolean)
+                                  (implicit request: MessagesRequest[AnyContent], hc: HeaderCarrier): Future[Result] = {
 
     val permittedStatuses: List[String] = List(MandationStatuses.nonMTDfB, MandationStatuses.nonDigital)
 

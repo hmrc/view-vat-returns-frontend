@@ -20,8 +20,11 @@ import models.User
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import views.ViewBaseSpec
+import views.html.errors.NotFoundView
 
 class NotFoundViewSpec extends ViewBaseSpec {
+
+  val injectedView: NotFoundView = inject[NotFoundView]
 
   "Rendering the not found page" should {
 
@@ -30,7 +33,7 @@ class NotFoundViewSpec extends ViewBaseSpec {
       val instructions = "#content > p"
     }
 
-    lazy val view = views.html.errors.notFound()(mockConfig, request, messages, user = Some(User("999999999")))
+    lazy val view = injectedView()(mockConfig, request, messages, user = Some(User("999999999")))
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct document title" in {

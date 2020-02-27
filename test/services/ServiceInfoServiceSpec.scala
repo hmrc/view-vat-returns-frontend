@@ -27,7 +27,6 @@ class ServiceInfoServiceSpec extends ControllerBaseSpec {
 
   val mockConnector: ServiceInfoConnector = mock[ServiceInfoConnector]
   val service: ServiceInfoService = new ServiceInfoService(mockConnector)
-  implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
 
   val validHtml = Html("<nav>BTA LINK</nav>")
 
@@ -38,7 +37,7 @@ class ServiceInfoServiceSpec extends ControllerBaseSpec {
         .expects(*, *)
         .returning(Future.successful(validHtml))
 
-      val result: Html = await(service.getServiceInfoPartial)
+      val result: Html = await(service.getServiceInfoPartial(fakeRequest, ec))
 
       result shouldBe validHtml
     }

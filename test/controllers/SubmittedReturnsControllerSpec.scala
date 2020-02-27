@@ -29,6 +29,8 @@ import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core._
+import views.html.errors.SubmittedReturnsErrorView
+import views.html.returns.SubmittedReturnsView
 
 import scala.concurrent.Future
 
@@ -48,15 +50,15 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
   val emptyObligations: ServiceResponse[VatReturnObligations] = Right(VatReturnObligations(Seq.empty))
 
   def controller: SubmittedReturnsController = new SubmittedReturnsController(
-    messages,
+    mcc,
     enrolmentsAuthService,
     mockVatReturnService,
     mockAuthorisedController,
     mockDateService,
     mockServiceInfoService,
     mockSubscriptionService,
-    mockConfig,
-    mockAuditService
+    inject[SubmittedReturnsView],
+    inject[SubmittedReturnsErrorView]
   )
 
   lazy val fakeRequestWithEmptyDate: FakeRequest[AnyContentAsEmpty.type] =
@@ -76,7 +78,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
         callObligationsForYear(exampleObligations(2017))
         callServiceInfoPartialService
         callSubscriptionService(Some(customerDetailMax))
-        controller.submittedReturns(fakeRequest)
+        controller.submittedReturns(request())
       }
 
       "return 200" in {
@@ -105,7 +107,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
           callObligationsForYear(exampleObligations(2018))
           callObligationsForYear(exampleObligations(2017))
           callSubscriptionService(Some(customerDetailMax))
-          controller.submittedReturns(fakeRequestWithClientsVRN)
+          controller.submittedReturns(request(fakeRequestWithClientsVRN))
         }
 
         "return 200" in {
@@ -126,7 +128,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
         lazy val result = {
           mockConfig.features.agentAccess(false)
           callAuthService(agentAuthResult)
-          controller.submittedReturns(fakeRequestWithClientsVRN)
+          controller.submittedReturns(request(fakeRequestWithClientsVRN))
         }
 
         "return 303 (SEE_OTHER)" in {
@@ -143,7 +145,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
 
       lazy val result = {
         callAuthService(Future.failed(InsufficientEnrolments()))
-        controller.submittedReturns(fakeRequest)
+        controller.submittedReturns(request())
       }
 
       "return 403 (Forbidden)" in {
@@ -155,7 +157,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
 
       lazy val result = {
         callAuthService(Future.failed(MissingBearerToken()))
-        controller.submittedReturns(fakeRequest)
+        controller.submittedReturns(request())
       }
 
       "return 303 (SEE_OTHER)" in {
@@ -176,7 +178,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
         callObligationsForYear(Left(ObligationError))
         callObligationsForYear(Left(ObligationError))
         callSubscriptionService(Some(customerDetailMax))
-        controller.submittedReturns(fakeRequest)
+        controller.submittedReturns(request())
       }
 
       "return 500" in {
@@ -185,7 +187,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
 
       "return the standard error view" in {
         val document: Document = Jsoup.parse(bodyOf(result))
-        document.select("h1").first().text() shouldBe "Sorry, there is a problem with the service"
+        messages(document.select("h1").first().text()) shouldBe "Sorry, there is a problem with the service"
       }
     }
   }
@@ -309,14 +311,14 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
     "the ETMP migration date is already in session" should {
 
       "return the date" in {
-        await(controller.getMigratedToETMPDate(fakeRequestWithSession, user)) shouldBe exampleMigrationDate
+        await(controller.getMigratedToETMPDate(request(fakeRequestWithSession), user)) shouldBe exampleMigrationDate
       }
     }
 
     "an empty value is in session" should {
 
       "return None" in {
-        await(controller.getMigratedToETMPDate(fakeRequestWithEmptyDate, user)) shouldBe None
+        await(controller.getMigratedToETMPDate(request(fakeRequestWithEmptyDate), user)) shouldBe None
       }
     }
 
@@ -326,7 +328,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
 
         lazy val result = {
           callSubscriptionService(Some(customerDetailMax))
-          controller.getMigratedToETMPDate
+          controller.getMigratedToETMPDate(request(), user)
         }
 
         "return the date" in {
@@ -338,7 +340,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
 
         lazy val result = {
           callSubscriptionService(None)
-          controller.getMigratedToETMPDate
+          controller.getMigratedToETMPDate(request(), user)
         }
 
         "return None" in {

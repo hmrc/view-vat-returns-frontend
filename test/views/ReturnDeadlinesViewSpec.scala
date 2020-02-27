@@ -21,9 +21,11 @@ import java.time.LocalDate
 import models.viewModels.ReturnDeadlineViewModel
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import play.twirl.api.Html
+import views.html.returns.ReturnDeadlinesView
 
 class ReturnDeadlinesViewSpec extends ViewBaseSpec {
+
+  val injectedView: ReturnDeadlinesView = inject[ReturnDeadlinesView]
 
   object Selectors {
     val pageHeading = "#content h1"
@@ -58,7 +60,7 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
       )
     )
 
-    lazy val view = views.html.returns.returnDeadlines(singleDeadline)
+    lazy val view = injectedView(singleDeadline)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "render the breadcrumbs which" should {
@@ -143,7 +145,7 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
       )
     )
 
-    lazy val view = views.html.returns.returnDeadlines(multipleDeadlines)
+    lazy val view = injectedView(multipleDeadlines)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct obligation due date for the first deadline" in {
@@ -178,7 +180,7 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
       )
     )
 
-    lazy val view = views.html.returns.returnDeadlines(finalReturnDeadline)
+    lazy val view = injectedView(finalReturnDeadline)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct obligation due date for the deadline" in {

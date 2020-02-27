@@ -18,16 +18,19 @@ package views.templates.formatters.money
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import views.html.templates.formatters.money.DisplayMoney
 import views.templates.TemplateBaseSpec
 
 class DisplayMoneyTemplateSpec extends TemplateBaseSpec {
+
+  val injectedTemplate: DisplayMoney = inject[DisplayMoney]
 
   "Calling displayMoney" when {
 
     "the amount is a whole number" should {
 
       lazy val money = BigDecimal("9999999")
-      lazy val template = views.html.templates.formatters.money.displayMoney(money)
+      lazy val template = injectedTemplate(money)
       lazy val document: Document = Jsoup.parse(template.body)
 
       "render the amount with the correct formatting" in {
@@ -38,7 +41,7 @@ class DisplayMoneyTemplateSpec extends TemplateBaseSpec {
     "the amount is not a whole number" should {
 
       lazy val money = BigDecimal("9999.99")
-      lazy val template = views.html.templates.formatters.money.displayMoney(money)
+      lazy val template = injectedTemplate(money)
       lazy val document: Document = Jsoup.parse(template.body)
 
       "render the amount with the correct formatting" in {
@@ -49,7 +52,7 @@ class DisplayMoneyTemplateSpec extends TemplateBaseSpec {
     "the amount is negative" should {
 
       lazy val money = BigDecimal("-1")
-      lazy val template = views.html.templates.formatters.money.displayMoney(money)
+      lazy val template = injectedTemplate(money)
       lazy val document: Document = Jsoup.parse(template.body)
 
       "render the amount with a negative prefix" in {
@@ -60,7 +63,7 @@ class DisplayMoneyTemplateSpec extends TemplateBaseSpec {
     "the amount is zero" should {
 
       lazy val money = BigDecimal("0")
-      lazy val template = views.html.templates.formatters.money.displayMoney(money)
+      lazy val template = injectedTemplate(money)
       lazy val document: Document = Jsoup.parse(template.body)
 
       "render the amount without a negative prefix" in {
@@ -71,7 +74,7 @@ class DisplayMoneyTemplateSpec extends TemplateBaseSpec {
     "the amount is positive" should {
 
       lazy val money = BigDecimal("1")
-      lazy val template = views.html.templates.formatters.money.displayMoney(money)
+      lazy val template = injectedTemplate(money)
       lazy val document: Document = Jsoup.parse(template.body)
 
       "render the amount without a negative prefix" in {

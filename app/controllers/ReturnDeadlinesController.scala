@@ -25,25 +25,30 @@ import config.AppConfig
 import javax.inject.{Inject, Singleton}
 import models.viewModels.ReturnDeadlineViewModel
 import models._
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, Request, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, MessagesRequest, Request, Result}
 import play.twirl.api.{Html, HtmlFormat}
 import services.{DateService, EnrolmentsAuthService, ReturnsService, ServiceInfoService}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import utils.LoggerUtil.logWarn
+import views.html.errors.TechnicalProblemView
+import views.html.returns.{NoUpcomingReturnDeadlinesView, OptOutReturnDeadlinesView, ReturnDeadlinesView}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ReturnDeadlinesController @Inject()(val messagesApi: MessagesApi,
+class ReturnDeadlinesController @Inject()(mcc: MessagesControllerComponents,
                                           enrolmentsAuthService: EnrolmentsAuthService,
                                           returnsService: ReturnsService,
                                           authorisedController: AuthorisedController,
                                           dateService: DateService,
                                           serviceInfoService: ServiceInfoService,
-                                          implicit val appConfig: AppConfig,
-                                          auditService: AuditingService)
-  extends FrontendController with I18nSupport {
+                                          technicalProblemView: TechnicalProblemView,
+                                          noUpcomingReturnDeadlinesView: NoUpcomingReturnDeadlinesView,
+                                          returnDeadlinesView: ReturnDeadlinesView,
+                                          optOutReturnDeadlinesView: OptOutReturnDeadlinesView)
+                                         (implicit appConfig: AppConfig,
+                                          auditService: AuditingService,
+                                          ec: ExecutionContext) extends FrontendController(mcc) {
 
 
   private[controllers] def serviceInfoCall()(implicit user: User, req: Request[_]): Future[Html] = {
@@ -81,33 +86,36 @@ class ReturnDeadlinesController @Inject()(val messagesApi: MessagesApi,
           }
         case Left(error) =>
           logWarn("[ReturnObligationsController][returnDeadlines] error: " + error.toString)
-          Future.successful(InternalServerError(views.html.errors.technicalProblem()))
+          Future.successful(InternalServerError(technicalProblemView()))
       }
   }
 
   private[controllers] def noUpcomingObligationsAction(serviceInfoContent: Html, currentDate: LocalDate)
-                                                      (implicit request: Request[AnyContent],
-                                                      user: User): Future[Result] = {
+                                                      (implicit request: MessagesRequest[AnyContent],
+                                                       user: User): Future[Result] = {
     returnsService.getFulfilledObligations(user.vrn, currentDate).map {
-      case Right(VatReturnObligations(Seq())) => Ok(views.html.returns.noUpcomingReturnDeadlines(None, serviceInfoContent))
+      case Right(VatReturnObligations(Seq())) => Ok(noUpcomingReturnDeadlinesView(None, serviceInfoContent))
       case Right(VatReturnObligations(obligations)) =>
         val lastFulfilledObligation: VatReturnObligation = returnsService.getLastObligation(obligations)
-        Ok(views.html.returns.noUpcomingReturnDeadlines(Some(toReturnDeadlineViewModel(lastFulfilledObligation, currentDate)), serviceInfoContent))
+        Ok(noUpcomingReturnDeadlinesView(Some(toReturnDeadlineViewModel(lastFulfilledObligation, currentDate)), serviceInfoContent))
       case Left(error) =>
         logWarn("[ReturnObligationsController][fulfilledObligationsAction] error: " + error.toString)
-        InternalServerError(views.html.errors.technicalProblem())
+        InternalServerError(technicalProblemView())
     }
   }
 
   private[controllers] def upcomingObligationsAction(obligations: Seq[ReturnDeadlineViewModel],
                                                      serviceInfoContent: Html)
-                                                    (implicit user: User, request: Request[AnyContent]): Future[Result] = {
+                                                    (implicit user: User,
+                                                     request: MessagesRequest[AnyContent]): Future[Result] = {
 
     val submitStatuses : List[String] = List(NonMtdfb.mandationStatus, NonDigital.mandationStatus)
 
     def view(mandationStatus: String) = mandationStatus match {
-      case status if submitStatuses.contains(status) => views.html.returns.optOutReturnDeadlines(obligations, dateService.now(), serviceInfoContent)
-      case _ => views.html.returns.returnDeadlines(obligations, serviceInfoContent)
+      case status if submitStatuses.contains(status) =>
+        optOutReturnDeadlinesView(obligations, dateService.now(), serviceInfoContent)
+      case _ =>
+        returnDeadlinesView(obligations, serviceInfoContent)
     }
 
     if (appConfig.features.submitReturnFeatures()) {
@@ -119,11 +127,11 @@ class ReturnDeadlinesController @Inject()(val messagesApi: MessagesApi,
               Ok(view(status)).addingToSession(SessionKeys.mtdVatMandationStatus -> status)
             case error =>
               logWarn(s"[ReturnObligationsController][handleMandationStatus] - getMandationStatus returned an Error: $error")
-              InternalServerError(views.html.errors.technicalProblem())
+              InternalServerError(technicalProblemView())
           }
       }
     } else {
-      Future.successful(Ok(views.html.returns.returnDeadlines(obligations, serviceInfoContent)))
+      Future.successful(Ok(returnDeadlinesView(obligations, serviceInfoContent)))
     }
   }
 }

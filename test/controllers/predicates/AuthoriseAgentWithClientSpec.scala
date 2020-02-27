@@ -21,7 +21,7 @@ import controllers.predicate.AuthoriseAgentWithClient
 import models.errors.MandationStatusError
 import models.{MandationStatus, ServiceResponse}
 import play.api.http.Status
-import play.api.mvc.{AnyContent, Request, Result}
+import play.api.mvc.{AnyContent, MessagesRequest, Request, Result}
 import play.api.mvc.Results.Ok
 import services.{EnrolmentsAuthService, ReturnsService}
 import uk.gov.hmrc.auth.core._
@@ -54,15 +54,15 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
     lazy val mockAgentPredicate: AuthoriseAgentWithClient = new AuthoriseAgentWithClient(
       mockEnrolmentsAuthService,
       mockReturnsService,
-      messages,
-      mockConfig
+      mcc,
+      unauthorisedView
     )
 
     def target(request: Request[AnyContent], ignoreMandatedStatus: Boolean = false): Future[Result] = mockAgentPredicate.authoriseAsAgent({
       implicit request =>
         implicit user =>
           Ok("welcome")
-    }, ignoreMandatedStatus)(request)
+    }, ignoreMandatedStatus)(new MessagesRequest[AnyContent](request, mcc.messagesApi))
   }
 
   "AgentPredicate .authoriseAsAgent" when {

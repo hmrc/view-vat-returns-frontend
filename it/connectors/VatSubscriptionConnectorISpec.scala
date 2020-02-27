@@ -23,8 +23,6 @@ import models.errors.ServerSideError
 import stubs.CustomerInfoStub
 import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
 class VatSubscriptionConnectorISpec extends IntegrationBaseSpec {
 
   private trait Test {

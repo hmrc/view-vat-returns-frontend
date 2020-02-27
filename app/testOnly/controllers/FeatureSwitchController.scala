@@ -17,20 +17,19 @@
 package testOnly.controllers
 
 import javax.inject.Inject
-
 import config.AppConfig
 import forms.FeatureSwitchForm
 import models.FeatureSwitchModel
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import testOnly.views.html.FeatureSwitchView
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 
-class FeatureSwitchController @Inject()(val messagesApi: MessagesApi,
-                                        implicit val appConfig: AppConfig)
-  extends FrontendController with I18nSupport {
+class FeatureSwitchController @Inject()(mcc: MessagesControllerComponents,
+                                        featureSwitchView: FeatureSwitchView)
+                                       (implicit appConfig: AppConfig) extends FrontendController(mcc) {
 
   def featureSwitch: Action[AnyContent] = Action { implicit request =>
-    Ok(testOnly.views.html.featureSwitch(FeatureSwitchForm.form.fill(
+    Ok(featureSwitchView(FeatureSwitchForm.form.fill(
       FeatureSwitchModel(
         userResearchBannerEnabled = appConfig.features.userResearchBanner(),
         staticDateEnabled = appConfig.features.staticDateEnabled(),

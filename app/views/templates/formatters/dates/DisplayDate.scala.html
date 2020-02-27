@@ -16,21 +16,21 @@
 
 @import java.time.LocalDate
 @import java.time.format.{DateTimeFormatter, ResolverStyle}
-@import play.api.i18n.Messages
 
-@(date: LocalDate, showYear: Boolean = true, useShortDayFormat: Boolean = false)(implicit messages: Messages, lang: Lang)
+@this()
+
+@(date: LocalDate, showYear: Boolean = true, useShortDayFormat: Boolean = false)(implicit messages: Messages)
 
 @defining( {
-val englishFormat = (if (useShortDayFormat) "d MMM" else "d MMMM") + (if (showYear) " uuuu" else "")
-val welshFormat = {
-  (if(useShortDayFormat){
-    s"""d '${messages(s"month.short.${date.getMonthValue}")}'"""
-  } else {
-    s"""d '${messages(s"month.${date.getMonthValue}")}'"""
-  }) + (if (showYear) " uuuu" else "")
-}
-val format = if(messages.lang.language == "cy") welshFormat else englishFormat
-val formatter = DateTimeFormatter.ofPattern(format).withResolverStyle(ResolverStyle.STRICT)
-date.format(formatter)
-}) { displayDate =>
-@displayDate}
+  val englishFormat = (if (useShortDayFormat) "d MMM" else "d MMMM") + (if (showYear) " uuuu" else "")
+  val welshFormat = {
+    (if(useShortDayFormat){
+      s"""d '${messages(s"month.short.${date.getMonthValue}")}'"""
+    } else {
+      s"""d '${messages(s"month.${date.getMonthValue}")}'"""
+    }) + (if (showYear) " uuuu" else "")
+  }
+  val format = if(messages.lang.language == "cy") welshFormat else englishFormat
+  val formatter = DateTimeFormatter.ofPattern(format).withResolverStyle(ResolverStyle.STRICT)
+  date.format(formatter)
+}) { displayDate => @displayDate}

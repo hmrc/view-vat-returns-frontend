@@ -14,12 +14,23 @@
  * limitations under the License.
  *@
 
-@(field: Field, label: String)(implicit messages: Messages)
+@this()
 
-@value = @{ field.value match { case Some(x) => x case None => "false" case x => x }}
+@(years: Seq[Int], showPreviousReturnsTab: Boolean)(implicit messages: Messages)
 
-<div class="multiple-choice">
-    <input id="@{field.name}" name="@{field.name}" type="checkbox" value="true" @if(value == "true"){ checked }>
-    <label for="@{field.name}">@label</label>
-</div>
-
+<ul>
+  @for(year <- years) {
+    <li class="tablinks">
+      <a href="#@year">
+        @year
+      </a>
+    </li>
+  }
+  @if(showPreviousReturnsTab) {
+    <li class="tablinks">
+      <a href="#@messages("submittedReturns.previousReturns")">
+        @messages("submittedReturns.previousReturns")
+      </a>
+    </li>
+  }
+</ul>

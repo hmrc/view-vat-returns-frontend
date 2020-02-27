@@ -17,19 +17,23 @@
 package config
 
 import javax.inject.Inject
-import play.api.i18n.{Messages, MessagesApi}
+import play.api.i18n.MessagesApi
 import play.api.mvc.{Request, Result}
 import play.api.mvc.Results.InternalServerError
 import play.twirl.api.Html
 import uk.gov.hmrc.play.bootstrap.http.FrontendErrorHandler
+import views.html.errors.{NotFoundView, TechnicalProblemView}
 
-class ServiceErrorHandler @Inject()(val messagesApi: MessagesApi, val appConfig: AppConfig) extends FrontendErrorHandler {
+class ServiceErrorHandler @Inject()(val messagesApi: MessagesApi,
+                                    technicalProblemView: TechnicalProblemView,
+                                    notFoundView: NotFoundView)
+                                   (implicit appConfig: AppConfig) extends FrontendErrorHandler {
 
-  override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit request: Request[_]): Html =
-    views.html.errors.standardError(appConfig, Messages("technicalProblem.title"), Messages("technicalProblem.heading"), Messages("technicalProblem.message"))
+  override def standardErrorTemplate(pageTitle: String, heading: String, message: String)
+                                    (implicit request: Request[_]): Html =
+    technicalProblemView()
 
   def showInternalServerError(implicit request: Request[_]): Result = InternalServerError(internalServerErrorTemplate)
 
-  override def notFoundTemplate(implicit request: Request[_]): Html =
-    views.html.errors.standardError(appConfig, Messages("notFound.title"), Messages("notFound.heading"), Messages("notFound.message"))
+  override def notFoundTemplate(implicit request: Request[_]): Html = notFoundView()
 }

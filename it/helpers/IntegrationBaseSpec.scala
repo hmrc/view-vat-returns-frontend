@@ -23,16 +23,20 @@ import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.{Application, Environment, Mode}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
+import play.api.test.Injecting
 import uk.gov.hmrc.play.test.UnitSpec
 
+import scala.concurrent.ExecutionContext
+
 trait IntegrationBaseSpec extends UnitSpec with WireMockHelper with GuiceOneServerPerSuite with TestSuite
-  with BeforeAndAfterEach with BeforeAndAfterAll {
+  with BeforeAndAfterEach with BeforeAndAfterAll with Injecting {
 
   val mockHost: String = WireMockHelper.host
   val mockPort: String = WireMockHelper.wireMockPort.toString
   val appRouteContext: String = "/vat-through-software/vat-returns"
 
-  lazy val client: WSClient = app.injector.instanceOf[WSClient]
+  lazy val client: WSClient = inject[WSClient]
+  implicit val ec: ExecutionContext = inject[ExecutionContext]
 
   def servicesConfig: Map[String, String] = Map(
     "microservice.services.auth.host" -> mockHost,

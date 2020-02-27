@@ -14,17 +14,24 @@
  * limitations under the License.
  *@
 
-@import views.html.templates.formatters.breadcrumbs.navigationBreadcrumb
-@import views.html.templates.formatters.dates.displayDateRange
-@import views.html.templates.returns.{submittedReturnsTabs, submittedReturnsTabsContent}
+@import play.twirl.api.HtmlFormat
+@import views.html.templates.formatters.breadcrumbs.NavigationBreadcrumb
+@import views.html.templates.formatters.dates.DisplayDateRange
+@import views.html.templates.returns.{SubmittedReturnsTabs, SubmittedReturnsTabsContent}
 @import models.viewModels.VatReturnsViewModel
 
-@(model: VatReturnsViewModel, serviceInfoContent: Html = HtmlFormat.empty)(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig, lang: Lang, user: User)
+@this(mainTemplate: MainTemplate,
+      navigationBreadcrumb: NavigationBreadcrumb,
+      submittedReturnsTabs: SubmittedReturnsTabs,
+      submittedReturnsTabsContent: SubmittedReturnsTabsContent)
 
-@views.html.main_template(
+@(model: VatReturnsViewModel,
+  serviceInfoContent: Html = HtmlFormat.empty)(
+  implicit request: Request[_], messages: Messages, appConfig: config.AppConfig, user: User)
+
+@mainTemplate(
   title = messages("submittedReturns.title"),
   serviceInfoContent = serviceInfoContent,
-  appConfig = appConfig,
   user = Some(user)
 ) {
 
