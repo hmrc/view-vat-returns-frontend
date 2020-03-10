@@ -72,6 +72,7 @@ class MockAppConfig(val runModeConfiguration: Configuration, val mode: Mode = Mo
   override val submitVatReturnBase: String = "submitReturnBase"
   override val submitVatReturnUrl: String = submitVatReturnBase + "/submitUrl"
   override val submitVatReturnForm: String => String = periodKey => submitVatReturnUrl + s"$periodKey/submit-form"
+  override val submitVatHonestyDeclaration: String => String = periodKey => submitVatReturnUrl + s"$periodKey/honesty-declaration"
   override val agentClientLookupUrl: String => String = uri =>  s"/agent-client-lookup/$uri"
   override val agentClientUnauthorisedUrl: String => String = uri => s"agent-client-unauthorised/$uri"
   override val agentClientActionUrl: String = "agent-client-agent-action"

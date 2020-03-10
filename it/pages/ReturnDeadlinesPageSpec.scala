@@ -104,7 +104,7 @@ class ReturnDeadlinesPageSpec extends IntegrationBaseSpec {
         document.select(deadlineSelector).size() shouldBe 1
         document.getElementById("submit-return-link").text() shouldBe "Submit VAT Return"
         document.getElementById("submit-return-link").attr("href") shouldBe
-          "http://localhost:9147/vat-through-software/submit-vat-return/%23004/submit-form"
+          "http://localhost:9147/vat-through-software/submit-vat-return/%23004/honesty-declaration"
       }
     }
 
