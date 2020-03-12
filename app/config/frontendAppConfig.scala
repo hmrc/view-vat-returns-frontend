@@ -70,6 +70,7 @@ trait AppConfig {
   val submitVatReturnBase: String
   val submitVatReturnUrl: String
   val submitVatReturnForm: String => String
+  val submitVatHonestyDeclaration: String => String
   def feedbackUrl(redirect: String): String
   val agentClientLookupUrl: String => String
   val agentClientUnauthorisedUrl: String => String
@@ -132,6 +133,10 @@ class FrontendAppConfig @Inject()(implicit configuration: Configuration, sc: Ser
     submitVatReturnUrl +
     s"/${URLEncoder.encode(periodKey, "utf-8")}" +
     sc.getString(Keys.submitVatReturnForm)
+  override lazy val submitVatHonestyDeclaration: String => String = periodKey =>
+    submitVatReturnUrl +
+      s"/${URLEncoder.encode(periodKey, "utf-8")}" +
+      sc.getString(Keys.submitVatHonestyDeclaration)
 
   override lazy val reportVatErrorUrl: String = sc.getString(Keys.reportVatErrorUrl)
 

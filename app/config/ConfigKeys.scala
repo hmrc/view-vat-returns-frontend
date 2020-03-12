@@ -61,6 +61,7 @@ object ConfigKeys {
   val submitVatReturnBase: String = "submit-vat-return-frontend.host"
   val submitVatReturnUrl: String = "submit-vat-return-frontend.url"
   val submitVatReturnForm: String = "submit-vat-return-frontend.submit-form"
+  val submitVatHonestyDeclaration: String = "submit-vat-return-frontend.honesty-declaration"
 
   val vatAgentClientLookupFrontendHost: String = "vat-agent-client-lookup-frontend.host"
   val vatAgentClientLookupFrontendUrl: String = "vat-agent-client-lookup-frontend.startUrl"
