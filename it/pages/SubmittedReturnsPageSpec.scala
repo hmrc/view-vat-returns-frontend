@@ -22,7 +22,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.http.Status
 import play.api.libs.ws.{WSRequest, WSResponse}
-import stubs.{AuthStub, VatObligationsStub}
+import stubs.{AuthStub, CustomerInfoStub, VatObligationsStub}
 
 class SubmittedReturnsPageSpec extends IntegrationBaseSpec {
 
@@ -48,6 +48,7 @@ class SubmittedReturnsPageSpec extends IntegrationBaseSpec {
         "return 200" in new Test {
           override def setupStubs(): StubMapping = {
             AuthStub.authorised()
+            CustomerInfoStub.stubCustomerInfo()
             obligationsStub.stub2018Obligations
           }
 
@@ -80,6 +81,29 @@ class SubmittedReturnsPageSpec extends IntegrationBaseSpec {
 
           document.select(bulletPointSelector).size() shouldBe 1
         }
+      }
+    }
+  }
+
+  "Calling the redirect route" when {
+
+    "user is authorised" should {
+
+      "redirect to /vat-through-software/vat-returns/submitted" in new Test {
+
+        override def setupStubs(): StubMapping = {
+          AuthStub.authorised()
+        }
+
+        override def request(): WSRequest = {
+          setupStubs()
+          buildRequest("/submitted/2020")
+        }
+
+        val response: WSResponse = await(request().get())
+
+        response.status shouldBe 301
+        response.header("Location") shouldBe Some("/vat-through-software/vat-returns/submitted")
       }
     }
   }

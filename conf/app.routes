@@ -5,6 +5,7 @@ GET        /return-deadlines            controllers.ReturnDeadlinesController.re
 
 # Get submitted returns for a year
 GET        /submitted                   controllers.SubmittedReturnsController.submittedReturns
+GET        /submitted/:year             controllers.SubmittedReturnsController.redirect(year: Int)
 
 # Get a return via the submitted returns page
 GET        /submitted/:year/:periodKey  controllers.ReturnsController.vatReturn(year: Int, periodKey: String)

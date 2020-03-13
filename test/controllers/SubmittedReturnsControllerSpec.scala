@@ -66,6 +66,34 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
 
   val exampleMigrationDate = Some(LocalDate.parse("2018-01-01"))
 
+  "Calling the .redirect action" when {
+
+    "authorised" should {
+
+      lazy val result = {
+        callAuthService(individualAuthResult)
+        controller.redirect(2020)(fakeRequest)
+      }
+
+      s"redirect the user to ${controllers.routes.SubmittedReturnsController.submittedReturns().url}" in {
+        status(result) shouldBe MOVED_PERMANENTLY
+        redirectLocation(result) shouldBe Some("/vat-through-software/vat-returns/submitted")
+      }
+    }
+
+    "unauthorised" should {
+
+      lazy val result = {
+        callAuthService(Future.failed(InsufficientEnrolments()))
+        controller.redirect(2020)(fakeRequest)
+      }
+
+      "return forbidden" in {
+        status(result) shouldBe FORBIDDEN
+      }
+    }
+  }
+
   "Calling the .submittedReturns action" when {
 
     "a user is logged in and enrolled to HMRC-MTD-VAT" should {
