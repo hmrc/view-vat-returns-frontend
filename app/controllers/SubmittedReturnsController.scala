@@ -57,7 +57,7 @@ class SubmittedReturnsController @Inject()(mcc: MessagesControllerComponents,
       Future(MovedPermanently(controllers.routes.SubmittedReturnsController.submittedReturns().url))
   }, ignoreMandatedStatus = true)
 
-  lazy val currentYear: Int = dateService.now().getYear
+  def currentYear: Int = dateService.now().getYear
 
   def submittedReturns: Action[AnyContent] = authorisedController.authorisedAction({ implicit request =>
     implicit user =>
