@@ -51,3 +51,7 @@ a.in-selected-tab {
 .bta-navigation {
     padding: 10px 0 8px 0;
 }
+
+i {
+    display: none !important;
+}
