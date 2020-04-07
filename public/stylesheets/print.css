@@ -6,6 +6,10 @@
 
 @media print {
 
+    @page {
+        margin: 15mm 15mm 15mm 15mm;
+    }
+
     header, #notice-banner, .centered-content, .button, .breadcrumbs, #content > .float--right, button, #get-help-action, .link-back, p, details, title, .noprint, .heading-secondary.noprint {
         display: none;
     }
@@ -14,9 +18,13 @@
         width: 100%;
     }
 
+    html {
+        background: white;
+    }
+
     .foot {
         position: absolute;
-        bottom: 0;
+        bottom: 10px;
         right: 0;
         color: #6f777b;
         font-size: 14px;
@@ -27,18 +35,39 @@
         margin: 5%;
     }
 
+    .form-group {
+        margin-bottom: 15px;
+    }
+
     .heading-xlarge {
         font-size: 30px;
         margin-bottom: 12px;
         margin-top: 0px;
     }
 
+    .heading-large {
+        font-size: 27px;
+    }
+
     .heading-medium {
-        font-size: 18px;
+        font-size: 18px !important;
+        margin-top: 1.25em;
+    }
+
+    .heading-secondary {
+        font-size: 18px !important;
+    }
+
+    .bold-small {
+        font-size: 16px
+    }
+
+    li {
+        font-size: 16px !important;
     }
 
     dt, dd {
-        font-size: 14px;
+        font-size: 14px !important;
     }
 
     dt {
