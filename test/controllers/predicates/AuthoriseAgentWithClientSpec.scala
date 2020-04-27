@@ -110,6 +110,25 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
               await(bodyOf(result)) shouldBe "welcome"
             }
           }
+
+          "client is MTDfB Exempt" should {
+
+            "return the result of the original code block" in new Test {
+
+              (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
+                .expects(*, *, *, *)
+                .returns(authResponse)
+
+              (mockReturnsService.getMandationStatus(_: String)(_: HeaderCarrier, _: ExecutionContext))
+                .expects(*, *, *)
+                .returns(mandationStatusResult("MTDfB Exempt"))
+
+              lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
+
+              status(result) shouldBe Status.OK
+              await(bodyOf(result)) shouldBe "welcome"
+            }
+          }
         }
 
         "agent does not have HMRC-AS-AGENT enrolment" should {

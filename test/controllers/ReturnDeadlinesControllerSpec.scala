@@ -190,6 +190,58 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
       }
     }
 
+    "for an MTDfB Exempt user (with the submit return feature enabled)" when {
+
+      "mandation status is in session" should {
+
+        lazy val result = {
+          mockConfig.features.submitReturnFeatures(true)
+          callAuthService(individualAuthResult)
+          callDateService()
+          callOpenObligations(exampleObligations)
+          callExtendedAudit
+          callServiceInfoPartialService
+          controller.returnDeadlines()(request(fakeRequest.withSession("mtdVatMandationStatus" -> "MTDfB Exempt")))
+        }
+
+        "return 200" in {
+          status(result) shouldBe Status.OK
+        }
+
+        "return the opt-out return deadlines page" in {
+          val document: Document = Jsoup.parse(bodyOf(result))
+          messages(document.getElementById("submit-return-link").text()) shouldBe "Submit VAT Return"
+        }
+      }
+
+      "mandation status is not in session" should {
+
+        lazy val result = {
+          mockConfig.features.submitReturnFeatures(true)
+          callAuthService(individualAuthResult)
+          callDateService()
+          callOpenObligations(exampleObligations)
+          callExtendedAudit
+          callServiceInfoPartialService
+          callMandationService(Right(MandationStatus("MTDfB Exempt")))
+          controller.returnDeadlines()(request())
+        }
+
+        "return 200" in {
+          status(result) shouldBe Status.OK
+        }
+
+        "return the opt-out return deadlines page" in {
+          val document: Document = Jsoup.parse(bodyOf(result))
+          messages(document.getElementById("submit-return-link").text()) shouldBe "Submit VAT Return"
+        }
+
+        "put the mandation status in the session" in {
+          session(result).get(SessionKeys.mtdVatMandationStatus) shouldBe Some("MTDfB Exempt")
+        }
+      }
+    }
+
     "for an MTDfB user (with the submit return feature enabled)" when {
 
       "mandation status is in session" should {

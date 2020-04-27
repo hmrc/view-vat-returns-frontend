@@ -19,7 +19,7 @@ package common
 object MandationStatuses {
 
   val nonMTDfB = "Non MTDfB"
-  val mandated = "MTDfB Mandated"
   val nonDigital = "Non Digital"
+  val mtdfbExempt = "MTDfB Exempt"
 
 }

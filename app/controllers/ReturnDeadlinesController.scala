@@ -109,7 +109,7 @@ class ReturnDeadlinesController @Inject()(mcc: MessagesControllerComponents,
                                                     (implicit user: User,
                                                      request: MessagesRequest[AnyContent]): Future[Result] = {
 
-    val submitStatuses : List[String] = List(NonMtdfb.mandationStatus, NonDigital.mandationStatus)
+    val submitStatuses : List[String] = List(NonMtdfb.mandationStatus, NonDigital.mandationStatus, MtdfbExempt.mandationStatus)
 
     def view(mandationStatus: String) = mandationStatus match {
       case status if submitStatuses.contains(status) =>
