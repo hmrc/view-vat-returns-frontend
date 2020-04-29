@@ -16,8 +16,9 @@
 
 package models
 
-import play.api.libs.json.{JsPath, Json, Reads, Writes}
+import play.api.libs.json.Json
 import play.api.libs.json._
+import common.MandationStatuses._
 
 case class MandationStatus (mandationStatus: String)
 
@@ -27,6 +28,8 @@ implicit val format: Format[MandationStatus] = Json.format[MandationStatus]
 
 }
 
-object NonMtdfb extends MandationStatus("Non MTDfB")
+object NonMtdfb extends MandationStatus(nonMTDfB)
 
-object NonDigital extends MandationStatus("Non Digital")
+object NonDigital extends MandationStatus(nonDigital)
+
+object MtdfbExempt extends MandationStatus(mtdfbExempt)

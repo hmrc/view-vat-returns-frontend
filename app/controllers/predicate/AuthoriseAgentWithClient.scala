@@ -83,7 +83,7 @@ class AuthoriseAgentWithClient @Inject()(enrolmentsAuthService: EnrolmentsAuthSe
                                    ignoreMandatedStatus: Boolean)
                                   (implicit request: MessagesRequest[AnyContent], hc: HeaderCarrier): Future[Result] = {
 
-    val permittedStatuses: List[String] = List(MandationStatuses.nonMTDfB, MandationStatuses.nonDigital)
+    val permittedStatuses: List[String] = List(MandationStatuses.nonMTDfB, MandationStatuses.nonDigital, MandationStatuses.mtdfbExempt)
 
     mandationStatusService.getMandationStatus(vrn) flatMap {
       case Right(MandationStatus(status)) if ignoreMandatedStatus || permittedStatuses.contains(status) =>
