@@ -18,16 +18,14 @@ package controllers
 
 import audit.AuditingService
 import audit.models.ViewVatReturnAuditModel
-import common.SessionKeys
 import config.AppConfig
 import javax.inject.{Inject, Singleton}
 import models._
-import models.customer.CustomerDetail
 import models.errors.NotFoundError
 import models.payments.Payment
 import models.viewModels.VatReturnViewModel
 import play.api.mvc._
-import play.twirl.api.{Html, HtmlFormat}
+import play.twirl.api.HtmlFormat
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
@@ -39,7 +37,6 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ReturnsController @Inject()(mcc: MessagesControllerComponents,
-                                  enrolmentsAuthService: EnrolmentsAuthService,
                                   returnsService: ReturnsService,
                                   subscriptionService: SubscriptionService,
                                   dateService: DateService,
@@ -62,8 +59,8 @@ class ReturnsController @Inject()(mcc: MessagesControllerComponents,
           val entityNameCall = subscriptionService.getUserDetails(user.vrn)
           val obligationCall = returnsService.getObligationWithMatchingPeriodKey(user.vrn, year, periodKey)
 
-          def financialDataCall(customerInfo: Option[CustomerDetail]): Future[Option[Payment]] = {
-            val isHybridUser = customerInfo.fold(false)(_.isPartialMigration)
+          def financialDataCall(customerInfo: Option[CustomerInformation]): Future[Option[Payment]] = {
+            val isHybridUser = customerInfo.exists(_.isPartialMigration)
             if (isHybridUser) Future.successful(None) else returnsService.getPayment(user.vrn, periodKey, Some(year))
           }
 
@@ -112,51 +109,21 @@ class ReturnsController @Inject()(mcc: MessagesControllerComponents,
         }
   }, ignoreMandatedStatus = true)
 
-  private def handleMandationStatus(customerDetail: Option[CustomerDetail],
-                                    obligation: VatReturnObligation,
-                                    returnDetails: VatReturnDetails,
-                                    isReturnsPageRequest: Boolean,
-                                    serviceInfoContent: Html)
-                                   (implicit user: User, request: MessagesRequest[AnyContent]): Future[Result] = {
-
-    def viewModel(isOptedOutUser: Boolean) = constructViewModel(
-      customerDetail,
-      obligation,
-      returnDetails,
-      isReturnsPageRequest
-    )
-
-    if(appConfig.features.submitReturnFeatures()) {
-      request.session.get(SessionKeys.mtdVatMandationStatus) match {
-        case Some(status) =>
-          val model = viewModel(status == NonMtdfb.mandationStatus)
-          auditEvent(isReturnsPageRequest, model)
-          Future.successful(Ok(vatReturnDetailsView(model, serviceInfoContent)))
-        case None =>
-          returnsService.getMandationStatus(user.vrn) map {
-            case Right(MandationStatus(status)) =>
-              val model = viewModel(status == NonMtdfb.mandationStatus)
-              auditEvent(isReturnsPageRequest, model)
-              Ok(vatReturnDetailsView(model, serviceInfoContent)).addingToSession(SessionKeys.mtdVatMandationStatus -> status)
-            case error =>
-              logWarn(s"[ReturnsController][handleMandationStatus] - getMandationStatus returned an Error: $error")
-              InternalServerError(technicalProblemView())
-        }
-      }
-    } else {
-      val model = viewModel(false)
-      auditEvent(isReturnsPageRequest, model)
-      Future.successful(Ok(vatReturnDetailsView(model, serviceInfoContent)))
-    }
-  }
-
   private[controllers] def renderResult(pageData: ReturnsControllerData,
                                         isReturnsPageRequest: Boolean, isNumericPeriodKey: Boolean)
                                        (implicit req: MessagesRequest[AnyContent], user: User): Future[Result] = {
     (pageData.vatReturnResult, pageData.obligation, pageData.payment) match {
       case (Right(vatReturn), Some(ob), payment) =>
         val returnDetails = returnsService.constructReturnDetailsModel(vatReturn, payment)
-        handleMandationStatus(pageData.customerInfo, ob, returnDetails, isReturnsPageRequest, pageData.serviceInfoContent)
+        def viewModel = constructViewModel(
+          pageData.customerInfo,
+          ob,
+          returnDetails,
+          isReturnsPageRequest
+        )
+        val model = viewModel
+        auditEvent(isReturnsPageRequest, model)
+        Future.successful(Ok(vatReturnDetailsView(model, pageData.serviceInfoContent)))
       case (Left(NotFoundError), _, _) =>
         checkIfComingFromSubmissionConfirmation(isNumericPeriodKey)
       case (Right(_), None, _) =>
@@ -205,7 +172,7 @@ class ReturnsController @Inject()(mcc: MessagesControllerComponents,
     auditService.audit(ViewVatReturnAuditModel(user, data), auditPath)
   }
 
-  private[controllers] def constructViewModel(customerDetail: Option[CustomerDetail],
+  private[controllers] def constructViewModel(customerDetail: Option[CustomerInformation],
                                               obligation: VatReturnObligation,
                                               returnDetails: VatReturnDetails,
                                               isReturnsPageRequest: Boolean): VatReturnViewModel = {
@@ -213,7 +180,7 @@ class ReturnsController @Inject()(mcc: MessagesControllerComponents,
     val amountToShow: BigDecimal = returnDetails.vatReturn.netVatDue
 
     VatReturnViewModel(
-      entityName = customerDetail.fold(Option.empty[String])(detail => Some(detail.entityName)),
+      entityName = customerDetail.fold[Option[String]](None)(detail => detail.entityName),
       periodFrom = obligation.periodFrom,
       periodTo = obligation.periodTo,
       dueDate = obligation.due,
@@ -236,5 +203,4 @@ class ReturnsController @Inject()(mcc: MessagesControllerComponents,
     val numericPeriodKeyRegex = """^([0-9]{4})$"""
     periodKey.matches(numericPeriodKeyRegex)
   }
-
 }

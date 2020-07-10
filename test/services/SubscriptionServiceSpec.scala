@@ -16,9 +16,9 @@
 
 package services
 
+import common.TestModels.customerInformationMax
 import connectors.VatSubscriptionConnector
 import controllers.ControllerBaseSpec
-import models.customer.CustomerDetail
 import models.errors.BadRequestError
 import models.CustomerInformation
 import uk.gov.hmrc.http.HeaderCarrier
@@ -37,132 +37,31 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
     implicit val hc: HeaderCarrier = HeaderCarrier()
   }
 
-  "Calling .getEntityName" when {
+  "Calling .getUserDetails" when {
 
-    "the connector retrieves a trading name" should {
+    "the connector retrieves customer details" should {
 
-      "return the trading name" in new Test {
-        val exampleCustomerInfo: CustomerInformation = CustomerInformation(
-          Some("My organisation name"),
-          Some("John"),
-          Some("Smith"),
-          Some("My trading name"),
-          hasFlatRateSchemeYes,
-          Some(true),
-          None
-        )
+      "return the details" in new Test {
 
         (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
           .expects(*, *, *)
-          .returns(Future.successful(Right(exampleCustomerInfo)))
+          .returns(Future.successful(Right(customerInformationMax)))
 
-        lazy val result: Option[CustomerDetail] = await(service.getUserDetails(vrn))
+        lazy val result: Option[CustomerInformation] = await(service.getUserDetails(vrn))
 
-        result shouldBe Some(CustomerDetail("My trading name", hasFlatRateSchemeYes, isPartialMigration = true, None))
-      }
-    }
-
-    "the connector does not retrieve a trading name or organisation name" should {
-
-      "return the first and last name" in new Test {
-        val exampleCustomerInfo: CustomerInformation = CustomerInformation(
-          None,
-          Some("John"),
-          Some("Smith"),
-          None,
-          hasFlatRateSchemeNo,
-          Some(false),
-          None
-        )
-
-        (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
-          .expects(*, *, *)
-          .returns(Future.successful(Right(exampleCustomerInfo)))
-
-        val result: Option[CustomerDetail] = await(service.getUserDetails(vrn))
-
-        result shouldBe Some(CustomerDetail("John Smith", hasFlatRateSchemeNo, isPartialMigration = false, None))
-      }
-    }
-
-    "the connector does not retrieve a trading name, but receives both organisation name and first/last names" should {
-
-      "return the organisation name" in new Test {
-        val exampleCustomerInfo: CustomerInformation = CustomerInformation(
-          Some("My organisation name"),
-          Some("John"),
-          Some("Smith"),
-          None,
-          hasFlatRateSchemeNo,
-          Some(false),
-          None
-        )
-
-        (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
-          .expects(*, *, *)
-          .returns(Future.successful(Right(exampleCustomerInfo)))
-
-        val result: Option[CustomerDetail] = await(service.getUserDetails(vrn))
-
-        result shouldBe Some(CustomerDetail("My organisation name", hasFlatRateSchemeNo, isPartialMigration = false, None))
-      }
-    }
-
-    "the connector does not retrieve a trading name or a first and last name" should {
-
-      "return the organisation name" in new Test {
-        val exampleCustomerInfo: CustomerInformation = CustomerInformation(
-          Some("My organisation name"),
-          None,
-          None,
-          None,
-          hasFlatRateSchemeNo,
-          Some(true),
-          None
-        )
-
-        (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
-          .expects(*, *, *)
-          .returns(Future.successful(Right(exampleCustomerInfo)))
-
-        val result: Option[CustomerDetail] = await(service.getUserDetails(vrn))
-
-        result shouldBe Some(CustomerDetail("My organisation name", hasFlatRateSchemeNo, isPartialMigration = true, None))
-      }
-    }
-
-
-    "the connector does not retrieve an 'isPartialMigration' flag" should {
-
-      "return a model with 'isPartialMigration' defaulted to false" in new Test {
-        val exampleCustomerInfo: CustomerInformation = CustomerInformation(
-          None,
-          Some("John"),
-          Some("Smith"),
-          None,
-          hasFlatRateSchemeNo,
-          None,
-          None
-        )
-
-        (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
-          .expects(*, *, *)
-          .returns(Future.successful(Right(exampleCustomerInfo)))
-
-        val result: Option[CustomerDetail] = await(service.getUserDetails(vrn))
-
-        result shouldBe Some(CustomerDetail("John Smith", hasFlatRateSchemeNo, isPartialMigration = false, None))
+        result shouldBe Some(customerInformationMax)
       }
     }
 
     "the connector returns an error" should {
 
       "return None" in new Test {
+
         (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
           .expects(*, *, *)
           .returns(Future.successful(Left(BadRequestError("", ""))))
 
-        val result: Option[CustomerDetail] = await(service.getUserDetails(vrn))
+        val result: Option[CustomerInformation] = await(service.getUserDetails(vrn))
 
         result shouldBe None
       }

@@ -19,9 +19,9 @@ package controllers.predicate
 import common._
 import config.AppConfig
 import javax.inject.{Inject, Singleton}
-import models.{MandationStatus, User}
+import models.User
 import play.api.mvc._
-import services.{EnrolmentsAuthService, ReturnsService}
+import services.{EnrolmentsAuthService, SubscriptionService}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.allEnrolments
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
@@ -33,7 +33,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class AuthoriseAgentWithClient @Inject()(enrolmentsAuthService: EnrolmentsAuthService,
-                                         mandationStatusService: ReturnsService,
+                                         subscriptionService: SubscriptionService,
                                          mcc: MessagesControllerComponents,
                                          unauthorisedView: UnauthorisedView)
                                         (implicit appConfig: AppConfig,
@@ -83,17 +83,17 @@ class AuthoriseAgentWithClient @Inject()(enrolmentsAuthService: EnrolmentsAuthSe
                                    ignoreMandatedStatus: Boolean)
                                   (implicit request: MessagesRequest[AnyContent], hc: HeaderCarrier): Future[Result] = {
 
-    val permittedStatuses: List[String] = List(MandationStatuses.nonMTDfB, MandationStatuses.nonDigital, MandationStatuses.mtdfbExempt)
+    val permittedStatuses: List[String] =
+      List(MandationStatuses.nonMTDfB, MandationStatuses.nonDigital, MandationStatuses.mtdfbExempt)
 
-    mandationStatusService.getMandationStatus(vrn) flatMap {
-      case Right(MandationStatus(status)) if ignoreMandatedStatus || permittedStatuses.contains(status) =>
+    subscriptionService.getUserDetails(vrn) flatMap {
+      case Some(details) if ignoreMandatedStatus || permittedStatuses.contains(details.mandationStatus) =>
         val user = User(vrn, arn = Some(arn))
         block(request)(user)
-      case Right(_) =>
+      case Some(_) =>
         logDebug("[AuthPredicate][checkMandationStatus] - Agent acting for MTDfB client")
         Future.successful(Redirect(appConfig.agentClientActionUrl))
-      case Left(error) =>
-        logWarn(s"[AuthPredicate][checkMandationStatus] - Error returned from mandationStatusService: $error")
+      case None =>
         Future.successful(InternalServerError)
     }
   }

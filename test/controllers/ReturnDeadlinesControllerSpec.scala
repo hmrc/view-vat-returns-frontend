@@ -19,6 +19,7 @@ package controllers
 import java.time.LocalDate
 
 import common.SessionKeys
+import common.TestModels._
 import models._
 import models.errors.ObligationError
 import org.jsoup.Jsoup
@@ -34,7 +35,7 @@ import scala.concurrent.Future
 
 class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
 
-  val obligation = VatReturnObligation(
+  val obligation: VatReturnObligation = VatReturnObligation(
     LocalDate.parse("2017-01-01"),
     LocalDate.parse("2017-12-31"),
     LocalDate.parse("2018-01-31"),
@@ -49,8 +50,8 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
 
   def controller: ReturnDeadlinesController = new ReturnDeadlinesController(
     mcc,
-    enrolmentsAuthService,
     mockVatReturnService,
+    mockSubscriptionService,
     mockAuthorisedController,
     mockDateService,
     mockServiceInfoService,
@@ -119,7 +120,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
           callOpenObligations(exampleObligations)
           callExtendedAudit
           callServiceInfoPartialService
-          callMandationService(Right(MandationStatus("Non MTDfB")))
+          callSubscriptionService(Some(customerInformationNonMTDfB))
           controller.returnDeadlines()(request())
         }
 
@@ -171,7 +172,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
           callOpenObligations(exampleObligations)
           callExtendedAudit
           callServiceInfoPartialService
-          callMandationService(Right(MandationStatus("Non Digital")))
+          callSubscriptionService(Some(customerInformationNonDigital))
           controller.returnDeadlines()(request())
         }
 
@@ -223,7 +224,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
           callOpenObligations(exampleObligations)
           callExtendedAudit
           callServiceInfoPartialService
-          callMandationService(Right(MandationStatus("MTDfB Exempt")))
+          callSubscriptionService(Some(customerInformationMTDfBExempt))
           controller.returnDeadlines()(request())
         }
 
@@ -275,7 +276,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
           callOpenObligations(exampleObligations)
           callExtendedAudit
           callServiceInfoPartialService
-          callMandationService(Right(MandationStatus("MTDfB Mandated")))
+          callSubscriptionService(Some(customerInformationMax))
           controller.returnDeadlines()(request())
         }
 
@@ -289,7 +290,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
         }
 
         "put the mandation status in the session " in {
-          session(result).get(SessionKeys.mtdVatMandationStatus) shouldBe Some("MTDfB Mandated")
+          session(result).get(SessionKeys.mtdVatMandationStatus) shouldBe Some("MTDfB")
         }
       }
     }
@@ -326,7 +327,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
         callDateService()
         callOpenObligations(exampleObligations)
         callExtendedAudit
-        callMandationService(Right(MandationStatus("Non MTDfB")))
+        callSubscriptionService(Some(customerInformationNonMTDfB))
         controller.returnDeadlines()(request(fakeRequestWithClientsVRN))
       }
 
@@ -354,7 +355,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
           callOpenObligations(emptyObligations)
           callFulfilledObligations(emptyObligations)
           callExtendedAudit
-          callMandationService(Right(MandationStatus("Non MTDfB")))
+          callSubscriptionService(Some(customerInformationNonMTDfB))
           controller.returnDeadlines()(request(fakeRequestWithClientsVRN))
         }
 
@@ -377,7 +378,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
           callDateService()
           callOpenObligations(Left(ObligationError))
           callExtendedAudit
-          callMandationService(Right(MandationStatus("Non MTDfB")))
+          callSubscriptionService(Some(customerInformationNonMTDfB))
           controller.returnDeadlines()(request(fakeRequestWithClientsVRN))
         }
 

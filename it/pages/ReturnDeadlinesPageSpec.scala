@@ -23,7 +23,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.http.Status
 import play.api.libs.ws.{WSRequest, WSResponse}
-import stubs.{AuthStub, CustomerInfoStub, SubmitReturnStub, VatObligationsStub}
+import stubs.{AuthStub, CustomerInfoStub, VatObligationsStub}
 
 class ReturnDeadlinesPageSpec extends IntegrationBaseSpec {
 
@@ -52,7 +52,7 @@ class ReturnDeadlinesPageSpec extends IntegrationBaseSpec {
     "return 200" in new Test {
       override def setupStubs(): StubMapping = {
         AuthStub.authorised()
-        CustomerInfoStub.stubCustomerInfo()
+        CustomerInfoStub.stubCustomerInfo
         obligationsStub.stubOutstandingObligations
       }
 
@@ -82,7 +82,7 @@ class ReturnDeadlinesPageSpec extends IntegrationBaseSpec {
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
           obligationsStub.stubOutstandingObligations
-          SubmitReturnStub.stubNonMtdfbMandationInfo
+          CustomerInfoStub.stubOptedOutUser
         }
 
         val response: WSResponse = await(request().get())
@@ -94,7 +94,7 @@ class ReturnDeadlinesPageSpec extends IntegrationBaseSpec {
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
           obligationsStub.stubOutstandingObligations
-          SubmitReturnStub.stubNonMtdfbMandationInfo
+          CustomerInfoStub.stubOptedOutUser
         }
 
         val response: WSResponse = await(request().get())
@@ -115,7 +115,7 @@ class ReturnDeadlinesPageSpec extends IntegrationBaseSpec {
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
           obligationsStub.stubOutstandingObligations
-          SubmitReturnStub.stubMtdfbMandationInfo
+          CustomerInfoStub.stubCustomerInfo
         }
 
         val response: WSResponse = await(request().get())
@@ -127,7 +127,7 @@ class ReturnDeadlinesPageSpec extends IntegrationBaseSpec {
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
           obligationsStub.stubOutstandingObligations
-          SubmitReturnStub.stubMtdfbMandationInfo
+          CustomerInfoStub.stubCustomerInfo
         }
 
         val response: WSResponse = await(request().get())
@@ -142,7 +142,7 @@ class ReturnDeadlinesPageSpec extends IntegrationBaseSpec {
         override def setupStubs(): StubMapping = {
           AuthStub.authorised()
           obligationsStub.stubOutstandingObligations
-          SubmitReturnStub.stubMandationError
+          CustomerInfoStub.stubErrorFromApi
         }
 
         val response: WSResponse = await(request().get())

@@ -26,7 +26,6 @@ import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
 import controllers.predicate.AuthoriseAgentWithClient
 import controllers.AuthorisedController
 import models.Obligation.Status
-import models.customer.CustomerDetail
 import models.payments.Payment
 import models.{Obligation, _}
 import org.scalamock.scalatest.MockFactory
@@ -70,7 +69,7 @@ trait MockAuth extends UnitSpec with GuiceOneAppPerSuite with BeforeAndAfterEach
 
   val mockAuthorisedAgentWithClient: AuthoriseAgentWithClient = new AuthoriseAgentWithClient(
     enrolmentsAuthService,
-    mockVatReturnService,
+    mockSubscriptionService,
     mcc,
     unauthorisedView
   )
@@ -86,11 +85,6 @@ trait MockAuth extends UnitSpec with GuiceOneAppPerSuite with BeforeAndAfterEach
     (mockDateService.now: () => LocalDate)
       .stubs()
       .returns(response)
-
-  def callMandationService(response: ServiceResponse[MandationStatus]): Any =
-    (mockVatReturnService.getMandationStatus(_: String)(_: HeaderCarrier, _: ExecutionContext))
-    .expects(*, *, *)
-    .returns(Future.successful(response))
 
   def callObligationsForYear(response: ServiceResponse[VatReturnObligations]): Any =
     (mockVatReturnService.getReturnObligationsForYear(_: String, _: Int, _: Obligation.Status.Value)
@@ -148,7 +142,7 @@ trait MockAuth extends UnitSpec with GuiceOneAppPerSuite with BeforeAndAfterEach
       .expects(*, *, *, *)
       .returns(Future.successful(response))
 
-  def callSubscriptionService(response: Option[CustomerDetail]): Any =
+  def callSubscriptionService(response: Option[CustomerInformation]): Any =
     (mockSubscriptionService.getUserDetails(_: String)(_: HeaderCarrier, _: ExecutionContext))
       .expects(*, *, *)
       .returns(Future.successful(response))

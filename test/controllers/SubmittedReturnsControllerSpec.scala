@@ -18,7 +18,7 @@ package controllers
 
 import java.time.LocalDate
 
-import common.TestModels.customerDetailMax
+import common.TestModels.customerInformationMax
 import models._
 import models.errors.ObligationError
 import models.viewModels.{ReturnObligationsViewModel, VatReturnsViewModel}
@@ -51,7 +51,6 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
 
   def controller: SubmittedReturnsController = new SubmittedReturnsController(
     mcc,
-    enrolmentsAuthService,
     mockVatReturnService,
     mockAuthorisedController,
     mockDateService,
@@ -64,7 +63,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
   lazy val fakeRequestWithEmptyDate: FakeRequest[AnyContentAsEmpty.type] =
     fakeRequest.withSession("customerMigratedToETMPDate" -> "")
 
-  val exampleMigrationDate = Some(LocalDate.parse("2018-01-01"))
+  val exampleMigrationDate: Option[LocalDate] = Some(LocalDate.parse("2018-01-01"))
 
   "Calling the .redirect action" when {
 
@@ -105,7 +104,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
         callObligationsForYear(exampleObligations(2018))
         callObligationsForYear(exampleObligations(2017))
         callServiceInfoPartialService
-        callSubscriptionService(Some(customerDetailMax))
+        callSubscriptionService(Some(customerInformationMax))
         controller.submittedReturns(request())
       }
 
@@ -131,10 +130,10 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
           callExtendedAudit
           callAuthService(agentAuthResult)
           callAuthServiceEnrolmentsOnly(Enrolments(agentEnrolment))
-          callMandationService(Right(MandationStatus("Non MTDfB")))
           callObligationsForYear(exampleObligations(2018))
           callObligationsForYear(exampleObligations(2017))
-          callSubscriptionService(Some(customerDetailMax))
+          callSubscriptionService(Some(customerInformationMax))
+          callSubscriptionService(Some(customerInformationMax))
           controller.submittedReturns(request(fakeRequestWithClientsVRN))
         }
 
@@ -205,7 +204,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
         callServiceInfoPartialService
         callObligationsForYear(Left(ObligationError))
         callObligationsForYear(Left(ObligationError))
-        callSubscriptionService(Some(customerDetailMax))
+        callSubscriptionService(Some(customerInformationMax))
         controller.submittedReturns(request())
       }
 
@@ -355,7 +354,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
       "the account details service returns a successful result" should {
 
         lazy val result = {
-          callSubscriptionService(Some(customerDetailMax))
+          callSubscriptionService(Some(customerInformationMax))
           controller.getMigratedToETMPDate(request(), user)
         }
 

@@ -21,7 +21,6 @@ import javax.inject.{Inject, Singleton}
 import config.AppConfig
 import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
 import models.CustomerInformation
-import models.MandationStatus
 import services.MetricsService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
@@ -34,12 +33,11 @@ class VatSubscriptionConnector @Inject()(http: HttpClient,
                                          appConfig: AppConfig,
                                          metrics: MetricsService) {
 
-  private[connectors] def customerInfoUrl(vrn: String): String = s"${appConfig.vatSubscriptionBaseUrl}/vat-subscription/$vrn/full-information"
+  private[connectors] def customerInfoUrl(vrn: String): String =
+    s"${appConfig.vatSubscriptionBaseUrl}/vat-subscription/$vrn/full-information"
 
-  private[connectors] def mandationStatusUrl(vrn: String): String = s"${appConfig.vatSubscriptionBaseUrl}/vat-subscription/$vrn/mandation-status"
-
-
-  def getCustomerInfo(vrn: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[CustomerInformation]] = {
+  def getCustomerInfo(vrn: String)
+                     (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[CustomerInformation]] = {
 
     import connectors.httpParsers.CustomerInfoHttpParser.CustomerInfoReads
 
@@ -55,22 +53,4 @@ class VatSubscriptionConnector @Inject()(http: HttpClient,
         httpError
     }
   }
-
-  def getMandationStatusInfo(vrn: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[MandationStatus]] = {
-
-    import connectors.httpParsers.MandationInfoHttpParser.MandationInfoReads
-
-    val timer = metrics.getCustomerInfoTimer.time()
-
-    http.GET(mandationStatusUrl(vrn)).map {
-      case mandationInfo@Right(_) =>
-        timer.stop()
-        mandationInfo
-      case httpError@Left(error) =>
-        logWarn("VatSubscriptionConnector received error: " + error.message)
-        httpError
-    }
-  }
-
-
 }

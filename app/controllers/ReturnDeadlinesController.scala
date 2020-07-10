@@ -20,6 +20,7 @@ import java.time.LocalDate
 
 import audit.AuditingService
 import audit.models.ViewOpenVatObligationsAuditModel
+import common.MandationStatuses._
 import common.SessionKeys
 import config.AppConfig
 import javax.inject.{Inject, Singleton}
@@ -27,7 +28,7 @@ import models.viewModels.ReturnDeadlineViewModel
 import models._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, MessagesRequest, Request, Result}
 import play.twirl.api.{Html, HtmlFormat}
-import services.{DateService, EnrolmentsAuthService, ReturnsService, ServiceInfoService}
+import services.{DateService, ReturnsService, ServiceInfoService, SubscriptionService}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendController
 import utils.LoggerUtil.logWarn
 import views.html.errors.TechnicalProblemView
@@ -37,8 +38,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ReturnDeadlinesController @Inject()(mcc: MessagesControllerComponents,
-                                          enrolmentsAuthService: EnrolmentsAuthService,
                                           returnsService: ReturnsService,
+                                          subscriptionService: SubscriptionService,
                                           authorisedController: AuthorisedController,
                                           dateService: DateService,
                                           serviceInfoService: ServiceInfoService,
@@ -109,7 +110,7 @@ class ReturnDeadlinesController @Inject()(mcc: MessagesControllerComponents,
                                                     (implicit user: User,
                                                      request: MessagesRequest[AnyContent]): Future[Result] = {
 
-    val submitStatuses : List[String] = List(NonMtdfb.mandationStatus, NonDigital.mandationStatus, MtdfbExempt.mandationStatus)
+    val submitStatuses : List[String] = List(nonMTDfB, nonDigital, mtdfbExempt)
 
     def view(mandationStatus: String) = mandationStatus match {
       case status if submitStatuses.contains(status) =>
@@ -122,11 +123,10 @@ class ReturnDeadlinesController @Inject()(mcc: MessagesControllerComponents,
       request.session.get(SessionKeys.mtdVatMandationStatus) match {
         case Some(status) => Future.successful(Ok(view(status)))
         case None =>
-          returnsService.getMandationStatus(user.vrn) map {
-            case Right(MandationStatus(status)) =>
-              Ok(view(status)).addingToSession(SessionKeys.mtdVatMandationStatus -> status)
-            case error =>
-              logWarn(s"[ReturnObligationsController][handleMandationStatus] - getMandationStatus returned an Error: $error")
+          subscriptionService.getUserDetails(user.vrn) map {
+            case Some(details) =>
+              Ok(view(details.mandationStatus)).addingToSession(SessionKeys.mtdVatMandationStatus -> details.mandationStatus)
+            case None =>
               InternalServerError(technicalProblemView())
           }
       }

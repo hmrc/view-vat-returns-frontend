@@ -16,12 +16,11 @@
 
 package models
 
-import models.customer.CustomerDetail
 import models.payments.Payment
 import play.twirl.api.Html
 
 case class ReturnsControllerData(vatReturnResult: ServiceResponse[VatReturn],
-                                 customerInfo: Option[CustomerDetail],
+                                 customerInfo: Option[CustomerInformation],
                                  payment: Option[Payment],
                                  obligation: Option[VatReturnObligation],
                                  serviceInfoContent: Html)

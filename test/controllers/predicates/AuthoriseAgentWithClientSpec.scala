@@ -16,14 +16,13 @@
 
 package controllers.predicates
 
+import common.TestModels._
 import controllers.ControllerBaseSpec
 import controllers.predicate.AuthoriseAgentWithClient
-import models.errors.MandationStatusError
-import models.{MandationStatus, ServiceResponse}
 import play.api.http.Status
 import play.api.mvc.{AnyContent, MessagesRequest, Request, Result}
 import play.api.mvc.Results.Ok
-import services.{EnrolmentsAuthService, ReturnsService}
+import services.EnrolmentsAuthService
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.Retrieval
@@ -37,11 +36,8 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
   private trait Test {
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
     val mockEnrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
-    val mockReturnsService: ReturnsService = mock[ReturnsService]
-    val mandationStatusResult: String => Future[ServiceResponse[MandationStatus]]
-    = mandationStatus => Future.successful(Right(MandationStatus(mandationStatus)))
 
-    lazy val authResponse = Enrolments(
+    lazy val authResponse: Enrolments = Enrolments(
       Set(
         Enrolment(
           "HMRC-AS-AGENT",
@@ -53,16 +49,15 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
 
     lazy val mockAgentPredicate: AuthoriseAgentWithClient = new AuthoriseAgentWithClient(
       mockEnrolmentsAuthService,
-      mockReturnsService,
+      mockSubscriptionService,
       mcc,
       unauthorisedView
     )
 
-    def target(request: Request[AnyContent], ignoreMandatedStatus: Boolean = false): Future[Result] = mockAgentPredicate.authoriseAsAgent({
-      implicit request =>
-        implicit user =>
-          Ok("welcome")
-    }, ignoreMandatedStatus)(new MessagesRequest[AnyContent](request, mcc.messagesApi))
+    def target(request: Request[AnyContent], ignoreMandatedStatus: Boolean = false): Future[Result] =
+      mockAgentPredicate.authoriseAsAgent({ implicit request =>
+        implicit user => Ok("welcome")
+      }, ignoreMandatedStatus)(new MessagesRequest[AnyContent](request, mcc.messagesApi))
   }
 
   "AgentPredicate .authoriseAsAgent" when {
@@ -81,9 +76,7 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
                 .expects(*, *, *, *)
                 .returns(authResponse)
 
-              (mockReturnsService.getMandationStatus(_: String)(_: HeaderCarrier, _: ExecutionContext))
-                .expects(*, *, *)
-                .returns(mandationStatusResult("Non MTDfB"))
+              callSubscriptionService(Some(customerInformationNonMTDfB))
 
               lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
 
@@ -100,9 +93,7 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
                 .expects(*, *, *, *)
                 .returns(authResponse)
 
-              (mockReturnsService.getMandationStatus(_: String)(_: HeaderCarrier, _: ExecutionContext))
-                .expects(*, *, *)
-                .returns(mandationStatusResult("Non Digital"))
+              callSubscriptionService(Some(customerInformationNonDigital))
 
               lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
 
@@ -119,9 +110,7 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
                 .expects(*, *, *, *)
                 .returns(authResponse)
 
-              (mockReturnsService.getMandationStatus(_: String)(_: HeaderCarrier, _: ExecutionContext))
-                .expects(*, *, *)
-                .returns(mandationStatusResult("MTDfB Exempt"))
+              callSubscriptionService(Some(customerInformationMTDfBExempt))
 
               lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
 
@@ -135,7 +124,7 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
 
           "return 403" in new Test {
 
-            val otherEnrolment = Enrolments(
+            val otherEnrolment: Enrolments = Enrolments(
               Set(
                 Enrolment(
                   "OTHER-ENROLMENT",
@@ -179,9 +168,7 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
             .expects(*, *, *, *)
             .returns(authResponse)
 
-          (mockReturnsService.getMandationStatus(_: String)(_: HeaderCarrier, _: ExecutionContext))
-            .expects(*, *, *)
-            .returns(mandationStatusResult("MTDfB Mandated"))
+          callSubscriptionService(Some(customerInformationMax))
 
           lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
 
@@ -195,44 +182,24 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
             .expects(*, *, *, *)
             .returns(authResponse)
 
-          (mockReturnsService.getMandationStatus(_: String)(_: HeaderCarrier, _: ExecutionContext))
-            .expects(*, *, *)
-            .returns(mandationStatusResult("MTDfB Mandated"))
+          callSubscriptionService(Some(customerInformationMax))
 
-          lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"), ignoreMandatedStatus = true)
+          lazy val result: Future[Result] =
+            target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"), ignoreMandatedStatus = true)
 
           await(status(result)) shouldBe Status.OK
           await(bodyOf(result)) shouldBe "welcome"
         }
-
-        "redirect to agent-client-lookup agent access page if 'ignoreMandatedStatus' is true, but mandation status is incorrect" in new Test {
-
-          (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
-            .expects(*, *, *, *)
-            .returns(authResponse)
-
-          (mockReturnsService.getMandationStatus(_: String)(_: HeaderCarrier, _: ExecutionContext))
-            .expects(*, *, *)
-            .returns(mandationStatusResult("MTDfB Different Mandated Status"))
-
-          lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
-
-          await(status(result)) shouldBe Status.SEE_OTHER
-          redirectLocation(result) shouldBe Some(mockConfig.agentClientActionUrl)
-        }
-
       }
 
-      "an error is returned from the mandation status call" should {
+      "an error is returned from the customer info call" should {
 
         "throw an internal server error" in new Test {
           (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
             .expects(*, *, *, *)
             .returns(authResponse)
 
-          (mockReturnsService.getMandationStatus(_: String)(_: HeaderCarrier, _: ExecutionContext))
-            .expects(*, *, *)
-            .returns(Left(MandationStatusError))
+          callSubscriptionService(None)
 
           lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
 

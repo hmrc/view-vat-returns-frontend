@@ -24,8 +24,16 @@ case class CustomerInformation(organisationName: Option[String],
                                lastName: Option[String],
                                tradingName: Option[String],
                                hasFlatRateScheme: Boolean,
-                               isPartialMigration: Option[Boolean],
-                               customerMigratedToETMPDate: Option[String])
+                               isPartialMigration: Boolean,
+                               customerMigratedToETMPDate: Option[String],
+                               mandationStatus: String) {
+
+  val entityName: Option[String] = (firstName, lastName, organisationName, tradingName) match {
+    case (Some(firstName), Some(lastName), None, None) => Some(s"$firstName $lastName")
+    case (None, None, organisationName, None) => organisationName
+    case _ => tradingName
+  }
+}
 
 object CustomerInformation {
 
@@ -35,7 +43,8 @@ object CustomerInformation {
     (JsPath \ "customerDetails" \ "lastName").readNullable[String].orElse(Reads.pure(None)) and
     (JsPath \ "customerDetails" \ "tradingName").readNullable[String].orElse(Reads.pure(None)) and
     (JsPath \ "flatRateScheme").readNullable[JsValue].orElse(Reads.pure(None)).map(_.isDefined) and
-    (JsPath \\ "isPartialMigration").readNullable[Boolean] and
-    (JsPath \\ "customerMigratedToETMPDate").readNullable[String]
+    (JsPath \\ "isPartialMigration").readNullable[Boolean].map(_.contains(true)) and
+    (JsPath \\ "customerMigratedToETMPDate").readNullable[String] and
+    (JsPath \ "mandationStatus").read[String]
   )(CustomerInformation.apply _)
 }

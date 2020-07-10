@@ -27,7 +27,7 @@ object TestJson {
       "lastName" -> "Jones",
       "tradingName" -> "Cheapo Clothing",
       "isPartialMigration" -> false,
-      "customerMigratedToETMPDate" -> "2018-01-01"
+      "customerMigratedToETMPDate" -> "2017-01-01"
     ),
     "ppob" -> Json.obj(
       "address" -> Json.obj(
@@ -39,6 +39,7 @@ object TestJson {
       "FRSPercentage" -> 59.99,
       "limitedCostTrader" -> true
     ),
-    "primaryMainCode" -> "10410"
+    "primaryMainCode" -> "10410",
+    "mandationStatus" -> "MTDfB"
   )
 }

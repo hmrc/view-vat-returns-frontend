@@ -28,4 +28,44 @@ class CustomerInformationSpec extends UnitSpec {
       customerInfoJsonMax.as[CustomerInformation] shouldBe customerInformationMax
     }
   }
+
+  ".getEntityName" when {
+
+    "trading name and organisation name are missing" should {
+
+      "return the first and last name" in {
+        val customerInfo = customerInformationMax.copy(tradingName = None, organisationName = None)
+
+        customerInfo.entityName shouldBe customerInfo.firstName.map(_ + " " + customerInfo.lastName.getOrElse("fail"))
+      }
+    }
+
+    "trading name and individual names are missing" should {
+
+      "return the organisation name" in {
+        val customerInfo = customerInformationMax.copy(tradingName = None, firstName = None, lastName = None)
+
+        customerInfo.entityName shouldBe customerInfo.organisationName
+      }
+    }
+
+    "all names are populated" should {
+
+      "return the trading name" in {
+        val customerInfo = customerInformationMax
+
+        customerInfo.entityName shouldBe customerInfo.tradingName
+      }
+    }
+
+    "no names are populated" should {
+
+      "return None" in {
+        val customerInfo =
+          customerInformationMax.copy(tradingName = None, organisationName = None, firstName = None, lastName = None)
+
+        customerInfo.entityName shouldBe None
+      }
+    }
+  }
 }
