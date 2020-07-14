@@ -18,7 +18,6 @@ package services
 
 import javax.inject.{Inject, Singleton}
 import connectors.VatSubscriptionConnector
-import models.customer.CustomerDetail
 import models.CustomerInformation
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -27,24 +26,10 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class SubscriptionService @Inject()(connector: VatSubscriptionConnector) {
 
-  def getUserDetails(vrn: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[CustomerDetail]] = {
+  def getUserDetails(vrn: String)
+                    (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[CustomerInformation]] =
     connector.getCustomerInfo(vrn).map {
-
-      case Right(CustomerInformation(None, None, None, None, _, _, _)) => None
-
-      case Right(model) =>
-
-        val entityName: String = (model.firstName, model.lastName, model.organisationName, model.tradingName) match {
-          case (_, _, _, Some(tradingName)) => tradingName
-          case (_, _, Some(organisationName), _) => organisationName
-          case (Some(firstName), Some(lastName), _, _) => s"$firstName $lastName"
-        }
-
-        val isPartialMigration: Boolean = model.isPartialMigration.contains(true)
-
-        Some(CustomerDetail(entityName, model.hasFlatRateScheme, isPartialMigration, model.customerMigratedToETMPDate))
-
+      case Right(details) => Some(details)
       case Left(_) => None
     }
-  }
 }

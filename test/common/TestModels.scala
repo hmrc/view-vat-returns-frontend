@@ -16,22 +16,23 @@
 
 package common
 
+import common.MandationStatuses._
 import models.CustomerInformation
-import models.customer.CustomerDetail
 
 object TestModels {
 
-  val customerInformationMax = CustomerInformation(
+  val customerInformationMax: CustomerInformation = CustomerInformation(
     Some("Cheapo Clothing Ltd"),
     Some("Betty"),
     Some("Jones"),
     Some("Cheapo Clothing"),
     hasFlatRateScheme = true,
-    Some(false),
-    Some("2018-01-01")
+    isPartialMigration = false,
+    Some("2017-01-01"),
+    mtdfb
   )
 
-  val customerDetailMax = CustomerDetail(
-    "Cheapo Clothing", hasFlatRateScheme = true, isPartialMigration = true, Some("2017-01-01")
-  )
+  val customerInformationNonMTDfB: CustomerInformation = customerInformationMax.copy(mandationStatus = nonMTDfB)
+  val customerInformationNonDigital: CustomerInformation = customerInformationMax.copy(mandationStatus = nonDigital)
+  val customerInformationMTDfBExempt: CustomerInformation = customerInformationMax.copy(mandationStatus = mtdfbExempt)
 }

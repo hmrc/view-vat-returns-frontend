@@ -40,7 +40,6 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class SubmittedReturnsController @Inject()(mcc: MessagesControllerComponents,
-                                           enrolmentsAuthService: EnrolmentsAuthService,
                                            returnsService: ReturnsService,
                                            authorisedController: AuthorisedController,
                                            dateService: DateService,

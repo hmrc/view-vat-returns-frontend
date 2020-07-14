@@ -17,6 +17,7 @@
 package connectors
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import common.MandationStatuses.mtdfb
 import helpers.IntegrationBaseSpec
 import models.CustomerInformation
 import models.errors.ServerSideError
@@ -37,7 +38,7 @@ class VatSubscriptionConnectorISpec extends IntegrationBaseSpec {
     "the API returns a valid response" should {
 
       "provide a user's information" in new Test {
-        override def setupStubs(): StubMapping = CustomerInfoStub.stubCustomerInfo()
+        override def setupStubs(): StubMapping = CustomerInfoStub.stubCustomerInfo
 
         setupStubs()
         val expected = Right(CustomerInformation(
@@ -46,8 +47,9 @@ class VatSubscriptionConnectorISpec extends IntegrationBaseSpec {
           Some("Vatreturn"),
           Some("Cheapo Clothing"),
           hasFlatRateScheme = true,
-          Some(true),
-          Some("2018-01-01")
+          isPartialMigration = true,
+          Some("2018-01-01"),
+          mtdfb
         ))
         private val result = await(connector.getCustomerInfo("999999999"))
 
@@ -69,5 +71,4 @@ class VatSubscriptionConnectorISpec extends IntegrationBaseSpec {
       }
     }
   }
-
 }

@@ -18,9 +18,9 @@ package controllers
 
 import java.time.LocalDate
 
+import common.TestModels.customerInformationNonMTDfB
 import models._
-import models.customer.CustomerDetail
-import models.errors.{MandationStatusError, NotFoundError, VatReturnError}
+import models.errors.{NotFoundError, VatReturnError}
 import models.payments.Payment
 import models.viewModels.VatReturnViewModel
 import org.jsoup.Jsoup
@@ -42,7 +42,6 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
   def controller: ReturnsController = new ReturnsController(
     mcc,
-    enrolmentsAuthService,
     mockVatReturnService,
     mockSubscriptionService,
     mockDateService,
@@ -57,7 +56,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
   def setupCommonSuccessMocks(): Any = {
     callObligationWithMatchingPeriodKey(Some(exampleObligation))
     callVatReturnPayment(Some(examplePayment))
-    callSubscriptionService(exampleCustomerDetail)
+    callSubscriptionService(Some(customerInformationNonMTDfB))
     callAudit
     callDateService()
   }
@@ -75,9 +74,6 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     545645
   )
 
-  val exampleCustomerDetail: Option[CustomerDetail] =
-    Some(CustomerDetail("Cheapo Clothing", hasFlatRateScheme = true, isPartialMigration = false, None))
-
   val examplePayment: Payment = Payment(
     "VAT",
     LocalDate.parse("2017-01-01"),
@@ -87,7 +83,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     "#001"
   )
 
-  val exampleObligation = VatReturnObligation(
+  val exampleObligation: VatReturnObligation = VatReturnObligation(
     LocalDate.parse("2017-01-01"),
     LocalDate.parse("2017-02-01"),
     LocalDate.parse("2017-02-02"),
@@ -96,7 +92,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     "#001"
   )
 
-  val exampleVatReturnDetails =
+  val exampleVatReturnDetails: VatReturnDetails =
     VatReturnDetails(exampleVatReturn, moneyOwed = true, oweHmrc = Some(true), Some(examplePayment))
 
 
@@ -114,7 +110,6 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
             setupCommonSuccessMocks()
             callServiceInfoPartialService
             callConstructReturnDetailsModel(exampleVatReturnDetails)
-            callMandationService(Right(MandationStatus("Non MTDfB")))
             controller.vatReturn(2018, "#001")(request())
           }
 
@@ -177,56 +172,6 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
             messages(Jsoup.parse(bodyOf(result)).select("h1").text) shouldBe "This return is not available"
           }
         }
-
-        "mandation status call returns an error" should {
-
-          lazy val result = {
-            callAuthService(individualAuthResult)
-            callVatReturn(Right(exampleVatReturn))
-            setupCommonSuccessMocks()
-            callServiceInfoPartialService
-            callConstructReturnDetailsModel(exampleVatReturnDetails)
-            callMandationService(Left(MandationStatusError))
-            controller.vatReturn(2018, "#001")(request())
-          }
-
-          "return 500" in {
-            status(result) shouldBe Status.INTERNAL_SERVER_ERROR
-          }
-        }
-      }
-
-      "mandation status is in session" should {
-
-        lazy val result = {
-          callAuthService(individualAuthResult)
-          callVatReturn(Right(exampleVatReturn))
-          setupCommonSuccessMocks()
-          callServiceInfoPartialService
-          callConstructReturnDetailsModel(exampleVatReturnDetails)
-          controller.vatReturn(2018, "#001")(request(fakeRequest.withSession("mtdVatMandationStatus" -> "Non MTDfB")))
-        }
-
-        "not make a call to retrieve mandation status" in {
-          status(result) shouldBe Status.OK
-        }
-      }
-
-      "submit return feature switch is off" should {
-
-        lazy val result = {
-          mockConfig.features.submitReturnFeatures(false)
-          callAuthService(individualAuthResult)
-          callVatReturn(Right(exampleVatReturn))
-          setupCommonSuccessMocks()
-          callServiceInfoPartialService
-          callConstructReturnDetailsModel(exampleVatReturnDetails)
-          controller.vatReturn(2018, "#001")(request())
-        }
-
-        "not make a call to retrieve mandation status" in {
-          status(result) shouldBe Status.OK
-        }
       }
     }
 
@@ -242,8 +187,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
             callVatReturn(Right(exampleVatReturn))
             setupCommonSuccessMocks()
             callConstructReturnDetailsModel(exampleVatReturnDetails)
-            callMandationService(Right(MandationStatus("Non MTDfB")))
-            callMandationService(Right(MandationStatus("Non MTDfB")))
+            callSubscriptionService(Some(customerInformationNonMTDfB))
             controller.vatReturn(2018, "#001")(request(fakeRequestWithClientsVRN))
           }
 
@@ -384,7 +328,6 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
             setupCommonSuccessMocks()
             callServiceInfoPartialService
             callConstructReturnDetailsModel(exampleVatReturnDetails)
-            callMandationService(Right(MandationStatus("Non MTDfB")))
             controller.vatReturnViaPayments("#001")(request())
           }
 
@@ -495,8 +438,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
             callVatReturn(Right(exampleVatReturn))
             setupCommonSuccessMocks()
             callConstructReturnDetailsModel(exampleVatReturnDetails)
-            callMandationService(Right(MandationStatus("Non MTDfB")))
-            callMandationService(Right(MandationStatus("Non MTDfB")))
+            callSubscriptionService(Some(customerInformationNonMTDfB))
             controller.vatReturnViaPayments("#001")(request(fakeRequestWithClientsVRN))
           }
 
@@ -614,7 +556,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       (mockDateService.now: () => LocalDate).stubs().returns(LocalDate.parse("2018-05-01"))
 
       lazy val result: VatReturnViewModel = controller.constructViewModel(
-        exampleCustomerDetail,
+        Some(customerInformationNonMTDfB),
         exampleObligation,
         exampleVatReturnDetails,
         isReturnsPageRequest = true
@@ -633,7 +575,6 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         callConstructReturnDetailsModel(exampleVatReturnDetails)
         callDateService()
         callAudit
-        callMandationService(Right(MandationStatus("Non MTDfB")))
         controller.renderResult(data, isReturnsPageRequest = true, isNumericPeriodKey = false)(request(), user)
       }
 

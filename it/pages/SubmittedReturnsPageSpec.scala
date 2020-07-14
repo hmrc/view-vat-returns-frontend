@@ -48,7 +48,7 @@ class SubmittedReturnsPageSpec extends IntegrationBaseSpec {
         "return 200" in new Test {
           override def setupStubs(): StubMapping = {
             AuthStub.authorised()
-            CustomerInfoStub.stubCustomerInfo()
+            CustomerInfoStub.stubCustomerInfo
             obligationsStub.stub2018Obligations
           }
 

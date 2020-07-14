@@ -19,7 +19,7 @@ package services
 import java.time.LocalDate
 
 import javax.inject.{Inject, Singleton}
-import connectors.{FinancialDataConnector, VatObligationsConnector, VatReturnsConnector, VatSubscriptionConnector}
+import connectors.{FinancialDataConnector, VatObligationsConnector, VatReturnsConnector}
 import models.Obligation.Status
 import models.payments.{Payment, Payments}
 import models._
@@ -29,8 +29,9 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ReturnsService @Inject()(vatObligationsConnector: VatObligationsConnector, financialDataConnector: FinancialDataConnector,
-                               vatReturnConnector: VatReturnsConnector, vatSubscriptionConnector: VatSubscriptionConnector) {
+class ReturnsService @Inject()(vatObligationsConnector: VatObligationsConnector,
+                               financialDataConnector: FinancialDataConnector,
+                               vatReturnConnector: VatReturnsConnector) {
 
   def getVatReturn(vrn: String, periodKey: String)
                   (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ServiceResponse[VatReturn]] =
@@ -102,12 +103,5 @@ class ReturnsService @Inject()(vatObligationsConnector: VatObligationsConnector,
       _.outstandingAmount > 0
     }
     VatReturnDetails(vatReturn, moneyOwed, oweHmrc, payment)
-  }
-
-  def getMandationStatus(vrn: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ServiceResponse[MandationStatus]] = {
-    vatSubscriptionConnector.getMandationStatusInfo(vrn) map {
-      case Right(manStatus) => Right(manStatus)
-      case Left(_) => Left(MandationStatusError)
-    }
   }
 }

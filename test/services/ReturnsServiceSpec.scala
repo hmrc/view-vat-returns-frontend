@@ -37,8 +37,7 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
     val service = new ReturnsService(
       mockVatObligationsConnector,
       mockFinancialDataApiConnector,
-      mockVatReturnsConnector,
-      mockVatSubscriptionConnector
+      mockVatReturnsConnector
     )
     implicit val hc: HeaderCarrier = HeaderCarrier()
 
@@ -64,7 +63,7 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
       "#003"
     )
 
-    val exampleObligations = VatReturnObligations(
+    val exampleObligations: VatReturnObligations = VatReturnObligations(
       Seq(
         VatReturnObligation(
           LocalDate.parse("2017-01-01"),
@@ -213,7 +212,7 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
 
     "return the obligation with the matching period key" in new Test {
 
-      val expected = VatReturnObligation(
+      val expected: VatReturnObligation = VatReturnObligation(
         LocalDate.parse("2017-01-01"),
         LocalDate.parse("2018-12-31"),
         LocalDate.parse("2018-01-31"),
@@ -303,37 +302,6 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
       }
 
       await(result) shouldBe Right(exampleObligations)
-    }
-  }
-
-
-  "Calling the .getMandationStatus function" when {
-
-    val mandationStatusReturned: MandationStatus = MandationStatus("3")
-
-    "the user is not mandated" should {
-
-      "return a status" in new Test {
-        (mockVatSubscriptionConnector.getMandationStatusInfo(_: String)
-        (_: HeaderCarrier, _: ExecutionContext))
-          .expects(*, *, *)
-          .returns(Future.successful(Right(mandationStatusReturned)))
-        val mandationStatusResponse: ServiceResponse[MandationStatus] = await(service.getMandationStatus("123456789"))
-        mandationStatusResponse shouldBe Right(mandationStatusReturned)
-      }
-    }
-
-    "the connector call fails" should {
-
-      "return None" in new Test {
-        (mockVatSubscriptionConnector.getMandationStatusInfo(_: String)
-        (_: HeaderCarrier, _: ExecutionContext))
-          .expects(*, *, *)
-          .returns(Future.successful(Left(ServerSideError("", ""))))
-        val mandationStatusResponse: ServiceResponse[MandationStatus] = await(service.getMandationStatus("123456789"))
-
-        mandationStatusResponse shouldBe Left(MandationStatusError)
-      }
     }
   }
 }
