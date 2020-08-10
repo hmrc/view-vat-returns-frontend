@@ -22,7 +22,6 @@ import common.EnrolmentKeys._
 import common.SessionKeys.{clientVrn, migrationToETMP}
 import mocks.MockAuth
 import models.User
-import play.api.i18n.MessagesApi
 import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, MessagesRequest}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual}

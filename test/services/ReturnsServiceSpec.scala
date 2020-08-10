@@ -20,13 +20,12 @@ import java.time.LocalDate
 
 import connectors.{FinancialDataConnector, VatReturnsConnector}
 import controllers.ControllerBaseSpec
-import models.{User, _}
 import models.Obligation.Status
+import models.errors.{ObligationError, ServerSideError}
 import models.payments.{Payment, Payments}
-import models.errors.{MandationStatusError, ObligationError, ServerSideError}
+import models._
 import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.{ExecutionContext, Future}
 
 class ReturnsServiceSpec extends ControllerBaseSpec {
@@ -294,7 +293,6 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
   "Calling .getPreviousFulfilledObligations" should {
 
     "return obligations" in new Test {
-      implicit val user: User = User("999999999")
 
       lazy val result: ServiceResponse[VatReturnObligations] = {
         callObligationsConnector(Right(exampleObligations))

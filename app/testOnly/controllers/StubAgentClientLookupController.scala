@@ -22,7 +22,7 @@ import javax.inject.Inject
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import testOnly.forms.StubAgentClientLookupForm
 import testOnly.views.html.{AgentActionView, AgentClientLookupView, AgentClientUnauthView}
-import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 class StubAgentClientLookupController @Inject()(mcc: MessagesControllerComponents,
                                                 agentClientLookupView: AgentClientLookupView,

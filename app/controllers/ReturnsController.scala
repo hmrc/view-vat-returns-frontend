@@ -28,7 +28,7 @@ import play.api.mvc._
 import play.twirl.api.HtmlFormat
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import utils.LoggerUtil.logWarn
 import views.html.errors.{NotFoundView, PreMtdReturnView, TechnicalProblemView}
 import views.html.returns.VatReturnDetailsView

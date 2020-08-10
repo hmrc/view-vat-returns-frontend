@@ -25,7 +25,7 @@ import models.VatReturn
 import play.api.http.HeaderNames
 import services.MetricsService
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads}
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.http.HttpClient
 import utils.LoggerUtil.logWarn
 
 import scala.concurrent.{ExecutionContext, Future}

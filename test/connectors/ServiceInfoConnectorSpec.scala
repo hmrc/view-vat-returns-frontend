@@ -22,7 +22,7 @@ import play.api.http.Status
 import play.api.i18n.MessagesApi
 import play.twirl.api.Html
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads}
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.http.HttpClient
 import uk.gov.hmrc.play.partials.HtmlPartial
 import uk.gov.hmrc.play.partials.HtmlPartial.{Failure, Success}
 import views.html.templates.BtaNavigationLinks
@@ -34,7 +34,7 @@ class ServiceInfoConnectorSpec extends ControllerBaseSpec {
   private trait Test {
     val hcForPartials: VatHeaderCarrierForPartialsConverter = inject[VatHeaderCarrierForPartialsConverter]
     val btaNavigationLinks: BtaNavigationLinks = inject[BtaNavigationLinks]
-    val validHtml = Html("<nav>BTA LINK</nav>")
+    val validHtml: Html = Html("<nav>BTA LINK</nav>")
     val result :Future[HtmlPartial] = Future.successful(Success(None,validHtml))
     val httpClient: HttpClient = mock[HttpClient]
     lazy val connector: ServiceInfoConnector = {

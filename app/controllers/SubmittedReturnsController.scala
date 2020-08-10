@@ -31,7 +31,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import play.twirl.api.HtmlFormat
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import utils.LoggerUtil.logWarn
 import views.html.errors.SubmittedReturnsErrorView
 import views.html.returns.SubmittedReturnsView
@@ -51,8 +51,8 @@ class SubmittedReturnsController @Inject()(mcc: MessagesControllerComponents,
                                            auditService: AuditingService,
                                            ec: ExecutionContext) extends FrontendController(mcc) {
 
-  def redirect(year: Int): Action[AnyContent] = authorisedController.authorisedAction({ implicit request =>
-    implicit user =>
+  def redirect(year: Int): Action[AnyContent] = authorisedController.authorisedAction({ _ =>
+    _ =>
       Future(MovedPermanently(controllers.routes.SubmittedReturnsController.submittedReturns().url))
   }, ignoreMandatedStatus = true)
 

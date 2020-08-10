@@ -55,8 +55,8 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
     )
 
     def target(request: Request[AnyContent], ignoreMandatedStatus: Boolean = false): Future[Result] =
-      mockAgentPredicate.authoriseAsAgent({ implicit request =>
-        implicit user => Ok("welcome")
+      mockAgentPredicate.authoriseAsAgent({ _ =>
+        _ => Ok("welcome")
       }, ignoreMandatedStatus)(new MessagesRequest[AnyContent](request, mcc.messagesApi))
   }
 

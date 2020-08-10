@@ -27,7 +27,8 @@ import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.play.test.UnitSpec
 import common.SessionKeys
 
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
+
 
 class ViewBaseSpec extends UnitSpec with GuiceOneAppPerSuite with Injecting {
 
@@ -67,7 +68,7 @@ class ViewBaseSpec extends UnitSpec with GuiceOneAppPerSuite with Injecting {
   }
 
   def elementAttributes(cssSelector: String)(implicit document: Document): Map[String, String] = {
-    val attributes = element(cssSelector).attributes.asList().toList
+    val attributes = element(cssSelector).attributes.asList().asScala.toList
     attributes.map(attribute => (attribute.getKey, attribute.getValue)).toMap
   }
 

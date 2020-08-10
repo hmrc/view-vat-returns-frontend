@@ -29,7 +29,7 @@ import models._
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, MessagesRequest, Request, Result}
 import play.twirl.api.{Html, HtmlFormat}
 import services.{DateService, ReturnsService, ServiceInfoService, SubscriptionService}
-import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import utils.LoggerUtil.logWarn
 import views.html.errors.TechnicalProblemView
 import views.html.returns.{NoUpcomingReturnDeadlinesView, OptOutReturnDeadlinesView, ReturnDeadlinesView}

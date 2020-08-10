@@ -24,7 +24,7 @@ import play.api.mvc._
 import services.{EnrolmentsAuthService, SubscriptionService}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.allEnrolments
-import uk.gov.hmrc.play.bootstrap.controller.FrontendController
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.LoggerUtil._
 import views.html.errors.UnauthorisedView

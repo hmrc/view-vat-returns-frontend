@@ -19,13 +19,13 @@ package config
 import java.net.URLEncoder
 import java.util.Base64
 
-import javax.inject.{Inject, Singleton}
 import config.features.Features
-import play.api.mvc.Call
-import play.api.Configuration
-import uk.gov.hmrc.play.binders.ContinueUrl
 import config.{ConfigKeys => Keys}
+import javax.inject.{Inject, Singleton}
+import play.api.Configuration
 import play.api.i18n.Lang
+import play.api.mvc.Call
+import uk.gov.hmrc.play.bootstrap.binders.SafeRedirectUrl
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 trait AppConfig {
@@ -102,7 +102,7 @@ class FrontendAppConfig @Inject()(implicit configuration: Configuration, sc: Ser
   override lazy val shutterPage: String = sc.getString(Keys.whitelistShutterPage)
 
   private lazy val signInBaseUrl: String = sc.getString(Keys.signInBaseUrl)
-  private lazy val signInContinueUrl: String = ContinueUrl(vatDetailsUrl).encodedUrl
+  private lazy val signInContinueUrl: String = SafeRedirectUrl(vatDetailsUrl).encodedUrl
   private lazy val signInOrigin = sc.getString("appName")
   override lazy val signInUrl: String = s"$signInBaseUrl?continue=$signInContinueUrl&origin=$signInOrigin"
 
@@ -175,17 +175,17 @@ class FrontendAppConfig @Inject()(implicit configuration: Configuration, sc: Ser
   private val host: String = sc.getString(Keys.host)
 
   override def feedbackUrl(redirect: String): String = s"$contactHost/contact/beta-feedback" +
-    s"?service=$contactFormServiceIdentifier&backUrl=${ContinueUrl(host + redirect).encodedUrl}"
+    s"?service=$contactFormServiceIdentifier&backUrl=${SafeRedirectUrl(host + redirect).encodedUrl}"
 
   private lazy val vatAgentClientLookupFrontendUrl: String =
     sc.getString(Keys.vatAgentClientLookupFrontendHost) + sc.getString(Keys.vatAgentClientLookupFrontendUrl)
 
   override lazy val agentClientLookupUrl: String => String = uri =>
-    vatAgentClientLookupFrontendUrl + s"?redirectUrl=${ContinueUrl(sc.getString(Keys.host) + uri).encodedUrl}"
+    vatAgentClientLookupFrontendUrl + s"?redirectUrl=${SafeRedirectUrl(sc.getString(Keys.host) + uri).encodedUrl}"
 
   override lazy val agentClientUnauthorisedUrl: String => String  = uri =>
     sc.getString(Keys.vatAgentClientLookupFrontendHost) + sc.getString(Keys.vatAgentClientLookupUnauthorisedUrl) +
-      s"?redirectUrl=${ContinueUrl(sc.getString(Keys.host) + uri).encodedUrl}"
+      s"?redirectUrl=${SafeRedirectUrl(sc.getString(Keys.host) + uri).encodedUrl}"
 
   override lazy val agentClientActionUrl: String =
     sc.getString(Keys.vatAgentClientLookupFrontendHost) + sc.getString(Keys.vatAgentClientLookupActionUrl)

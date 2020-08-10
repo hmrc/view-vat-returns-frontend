@@ -23,7 +23,7 @@ import models.payments.Payments
 import services.{DateService, MetricsService}
 import utils.LoggerUtil.logWarn
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import uk.gov.hmrc.http.HttpClient
 
 import scala.concurrent.{ExecutionContext, Future}
 
