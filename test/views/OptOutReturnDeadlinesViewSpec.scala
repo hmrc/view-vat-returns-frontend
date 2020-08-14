@@ -18,7 +18,6 @@ package views
 
 import java.time.LocalDate
 
-import models.User
 import models.viewModels.ReturnDeadlineViewModel
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -168,28 +167,6 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
       "not show a 'Submit VAT Return' link" in {
         elementAsOpt("#submit-return-link") shouldBe None
       }
-    }
-
-    "user is an agent" should {
-
-      val singleDeadline = Seq(
-        ReturnDeadlineViewModel(
-          LocalDate.parse("2018-02-02"),
-          LocalDate.parse("2018-01-01"),
-          periodTo = LocalDate.parse("2018-01-01"),
-          periodKey = "18CC"
-        )
-      )
-
-      val currentDate = LocalDate.parse("2018-01-02")
-
-      lazy val view = injectedView(singleDeadline, currentDate)(request,
-        messages,
-        mockConfig,
-        User("", arn = Some(""))
-      )
-
-      lazy implicit val document: Document = Jsoup.parse(view.body)
     }
   }
 

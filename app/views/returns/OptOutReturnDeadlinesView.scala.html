@@ -30,7 +30,6 @@
   serviceInfoContent: Html = HtmlFormat.empty)(
   implicit request: Request[_], messages: Messages, appConfig: config.AppConfig, user: User)
 
-@gaPrefix = @{if(user.isAgent) "agent_" else ""}
 
 @mainTemplate(
   title = messages("returnDeadlines.submitReturn.title"),

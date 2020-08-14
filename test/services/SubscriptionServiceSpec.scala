@@ -19,11 +19,10 @@ package services
 import common.TestModels.customerInformationMax
 import connectors.VatSubscriptionConnector
 import controllers.ControllerBaseSpec
-import models.errors.BadRequestError
 import models.CustomerInformation
+import models.errors.BadRequestError
 import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.{ExecutionContext, Future}
 
 class SubscriptionServiceSpec extends ControllerBaseSpec {
