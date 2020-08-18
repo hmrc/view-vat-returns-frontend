@@ -17,7 +17,6 @@
 package config
 
 import java.net.URLEncoder
-import java.util.Base64
 
 import config.features.Features
 import config.{ConfigKeys => Keys}
@@ -32,10 +31,6 @@ trait AppConfig {
   val appName:String
   val reportAProblemPartialUrl: String
   val reportAProblemNonJSUrl: String
-  val whitelistEnabled: Boolean
-  val whitelistedIps: Seq[String]
-  val whitelistExcludedPaths: Seq[Call]
-  val shutterPage: String
   val signInUrl: String
   val features: Features
   val portalUrl: String => String
@@ -90,16 +85,6 @@ class FrontendAppConfig @Inject()(implicit configuration: Configuration, sc: Ser
   override lazy val reportAProblemNonJSUrl: String =
     s"$contactHost/contact/problem_reports_nonjs?service=$contactFormServiceIdentifier"
   override lazy val feedbackFormPartialUrl: String = s"$contactFrontendService/contact/beta-feedback/form"
-
-  private def whitelistConfig(key: String): Seq[String] = Some(new String(Base64.getDecoder
-    .decode(sc.getString(key)), "UTF-8"))
-    .map(_.split(",")).getOrElse(Array.empty).toSeq
-
-  override lazy val whitelistEnabled: Boolean = sc.getBoolean(Keys.whitelistEnabled)
-  override lazy val whitelistedIps: Seq[String] = whitelistConfig(Keys.whitelistedIps)
-  override lazy val whitelistExcludedPaths: Seq[Call]
-  = whitelistConfig(Keys.whitelistExcludedPaths).map(path => Call("GET", path))
-  override lazy val shutterPage: String = sc.getString(Keys.whitelistShutterPage)
 
   private lazy val signInBaseUrl: String = sc.getString(Keys.signInBaseUrl)
   private lazy val signInContinueUrl: String = SafeRedirectUrl(vatDetailsUrl).encodedUrl
