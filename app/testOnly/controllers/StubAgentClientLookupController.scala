@@ -21,13 +21,13 @@ import config.AppConfig
 import javax.inject.Inject
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import testOnly.forms.StubAgentClientLookupForm
-import testOnly.views.html.{AgentActionView, AgentClientLookupView, AgentClientUnauthView}
+import testOnly.views.html.{AgentHubView, AgentClientLookupView, AgentClientUnauthView}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 class StubAgentClientLookupController @Inject()(mcc: MessagesControllerComponents,
                                                 agentClientLookupView: AgentClientLookupView,
                                                 agentClientUnauthView: AgentClientUnauthView,
-                                                agentActionView: AgentActionView)
+                                                agentHubView: AgentHubView)
                                                (implicit appConfig: AppConfig) extends FrontendController(mcc) {
 
   def show(redirectUrl: String): Action[AnyContent] = Action { implicit request =>
@@ -39,8 +39,8 @@ class StubAgentClientLookupController @Inject()(mcc: MessagesControllerComponent
       .removingFromSession(SessionKeys.clientVrn)
   }
 
-  def agentAction: Action[AnyContent] = Action { implicit request =>
-    Ok(agentActionView())
+  def agentHub: Action[AnyContent] = Action { implicit request =>
+    Ok(agentHubView())
   }
 
   def post: Action[AnyContent] = Action { implicit request =>

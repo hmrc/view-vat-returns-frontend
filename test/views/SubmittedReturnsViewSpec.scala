@@ -566,14 +566,9 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
       elementText(Selectors.tabFour) should include("Previous returns")
     }
 
-    "display a 'change client' link" in {
-      document.getElementById("changeClient").text() shouldBe "Change client"
-      document.getElementById("changeClient").attr("href") shouldBe mockConfig.agentClientLookupUrl(mockConfig.agentClientActionUrl)
-    }
-
-    "display a 'finish' button" in {
-      document.getElementById("finish").text() shouldBe "Finish"
-      document.getElementById("finish").attr("href") shouldBe mockConfig.agentClientActionUrl
+    "display a 'Back to client's details' button" in {
+      document.getElementById("finish").text() shouldBe "Back to client’s details"
+      document.getElementById("finish").attr("href") shouldBe mockConfig.agentClientHubUrl
     }
   }
 }

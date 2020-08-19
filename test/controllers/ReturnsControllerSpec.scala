@@ -222,7 +222,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
           }
 
           status(result) shouldBe Status.SEE_OTHER
-          redirectLocation(result) shouldBe Some(mockConfig.agentClientActionUrl)
+          redirectLocation(result) shouldBe Some(mockConfig.agentClientHubUrl)
         }
       }
     }
@@ -471,7 +471,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
         "return 303" in {
           status(result) shouldBe Status.SEE_OTHER
-          redirectLocation(result) shouldBe Some(mockConfig.agentClientActionUrl)
+          redirectLocation(result) shouldBe Some(mockConfig.agentClientHubUrl)
         }
       }
     }

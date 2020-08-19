@@ -89,13 +89,8 @@
 
 @if(user.isAgent && appConfig.features.agentAccess()) {
   <p>
-    <a id="changeClient" href="@{appConfig.agentClientLookupUrl(appConfig.agentClientActionUrl)}">
-      @messages("submittedReturns.changeClient")
-    </a>
-  </p>
-  <p>
-    <a id="finish" class="btn button" role="button" href="@appConfig.agentClientActionUrl">
-      @messages("submittedReturns.finish")
+    <a id="finish" class="btn button" role="button" href="@appConfig.agentClientHubUrl">
+      @messages("submittedReturns.back")
     </a>
   </p>
 }

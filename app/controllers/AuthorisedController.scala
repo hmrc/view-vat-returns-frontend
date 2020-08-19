@@ -50,7 +50,7 @@ class AuthorisedController @Inject()(enrolmentsAuthService: EnrolmentsAuthServic
             agentWithClientPredicate.authoriseAsAgent(block, ignoreMandatedStatus)
           } else {
             logDebug("[AuthorisedController][authorisedAction] User is agent and agent access is forbidden. Redirecting to Agent Action page.")
-            Future.successful(Redirect(appConfig.agentClientActionUrl))
+            Future.successful(Redirect(appConfig.agentClientHubUrl))
           }
         case enrolments ~ Some(_) => authorisedAsNonAgent(block, enrolments)
         case _ =>
