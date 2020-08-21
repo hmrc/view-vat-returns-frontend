@@ -28,10 +28,6 @@ class MockAppConfig(val runModeConfiguration: Configuration, val mode: Mode = Mo
   override val appName: String = "view-vat-returns-frontend"
   override val reportAProblemPartialUrl: String = ""
   override val reportAProblemNonJSUrl: String = ""
-  override val whitelistEnabled: Boolean = false
-  override val whitelistedIps: Seq[String] = Seq("")
-  override val whitelistExcludedPaths: Seq[Call] = Nil
-  override val shutterPage: String = "https://www.tax.service.gov.uk/shutter/vat-through-software"
   override val signInUrl: String = ""
   override val features: Features = new Features(runModeConfiguration)
   override val portalUrl: String => String = (vrn: String) => s"/portal-url/$vrn"
