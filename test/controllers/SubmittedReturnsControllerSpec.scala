@@ -162,8 +162,8 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
           status(result) shouldBe Status.SEE_OTHER
         }
 
-        "redirect to Agent Action page" in {
-          redirectLocation(result) shouldBe Some(mockConfig.agentClientActionUrl)
+        "redirect to Agent Hub page" in {
+          redirectLocation(result) shouldBe Some(mockConfig.agentClientHubUrl)
         }
       }
     }

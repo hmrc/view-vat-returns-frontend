@@ -92,7 +92,7 @@ class AuthoriseAgentWithClient @Inject()(enrolmentsAuthService: EnrolmentsAuthSe
         block(request)(user)
       case Some(_) =>
         logDebug("[AuthPredicate][checkMandationStatus] - Agent acting for MTDfB client")
-        Future.successful(Redirect(appConfig.agentClientActionUrl))
+        Future.successful(Redirect(appConfig.agentClientHubUrl))
       case None =>
         Future.successful(InternalServerError)
     }

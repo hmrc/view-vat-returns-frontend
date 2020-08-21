@@ -104,8 +104,7 @@ submittedReturns.activePrevious = Currently viewing previous returns
 submittedReturns.inactivePrevious = View previous returns
 submittedReturns.previousReturns = Previous returns
 submittedReturns.finalReturn = Final return
-submittedReturns.changeClient = Change client
-submittedReturns.finish = Finish
+submittedReturns.back = Back to client’s details
 submittedReturns.backToTop = Back to top
 
 returnDeadlines.title = Return deadlines

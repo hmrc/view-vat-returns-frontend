@@ -11,12 +11,12 @@
 
 # Add all the application routes to the prod.routes file
 
-GET        /vat-through-software/vat-returns/test-only/feature-switch          @testOnly.controllers.FeatureSwitchController.featureSwitch
-POST       /vat-through-software/vat-returns/test-only/feature-switch          @testOnly.controllers.FeatureSwitchController.submitFeatureSwitch
+GET        /vat-through-software/vat-returns/test-only/feature-switch               @testOnly.controllers.FeatureSwitchController.featureSwitch
+POST       /vat-through-software/vat-returns/test-only/feature-switch               @testOnly.controllers.FeatureSwitchController.submitFeatureSwitch
 
 GET        /vat-through-software/vat-returns/test-only/vacluf-stub                  testOnly.controllers.StubAgentClientLookupController.show(redirectUrl: String)
 GET        /vat-through-software/vat-returns/test-only/vacluf-stub-unauth           testOnly.controllers.StubAgentClientLookupController.unauth(redirectUrl: String)
 POST       /vat-through-software/vat-returns/test-only/vacluf-stub                  testOnly.controllers.StubAgentClientLookupController.post
-GET        /vat-through-software/vat-returns/test-only/vacluf-stub-agent-action     testOnly.controllers.StubAgentClientLookupController.agentAction
+GET        /vat-through-software/vat-returns/test-only/vacluf-stub-agent-hub        testOnly.controllers.StubAgentClientLookupController.agentHub
 
-->         /                          prod.Routes
+->         /                                                                        prod.Routes

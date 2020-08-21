@@ -70,7 +70,7 @@ trait AppConfig {
   def feedbackUrl(redirect: String): String
   val agentClientLookupUrl: String => String
   val agentClientUnauthorisedUrl: String => String
-  val agentClientActionUrl: String
+  val agentClientHubUrl: String
   val accessibilityLinkUrl: String
 }
 
@@ -173,8 +173,8 @@ class FrontendAppConfig @Inject()(implicit configuration: Configuration, sc: Ser
     sc.getString(Keys.vatAgentClientLookupFrontendHost) + sc.getString(Keys.vatAgentClientLookupUnauthorisedUrl) +
       s"?redirectUrl=${SafeRedirectUrl(sc.getString(Keys.host) + uri).encodedUrl}"
 
-  override lazy val agentClientActionUrl: String =
-    sc.getString(Keys.vatAgentClientLookupFrontendHost) + sc.getString(Keys.vatAgentClientLookupActionUrl)
+  override lazy val agentClientHubUrl: String =
+    sc.getString(Keys.vatAgentClientLookupFrontendHost) + sc.getString(Keys.vatAgentClientLookupHubUrl)
 
   override val accessibilityLinkUrl: String = sc.getString(ConfigKeys.vatSummaryBase) + sc.getString(ConfigKeys.vatSummaryAccessibilityUrl)
 }

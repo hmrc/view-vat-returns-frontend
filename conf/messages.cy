@@ -130,8 +130,7 @@ submittedReturns.activePrevious = Yn edrych ar hyn o bryd ar Ffurflenni TAW blae
 submittedReturns.inactivePrevious = Bwrw golwg dros Ffurflenni TAW blaenorol
 submittedReturns.previousReturns = Ffurflenni TAW blaenorol
 submittedReturns.finalReturn = Ffurflen TAW derfynol
-submittedReturns.changeClient = Newid cleient
-submittedReturns.finish = Gorffen
+submittedReturns.back = Yn ôl i fanylion y cleient
 submittedReturns.backToTop = Nôl i’r brig
 
 returnDeadlines.title = Dyddiadau cau ar gyfer cyflwyno

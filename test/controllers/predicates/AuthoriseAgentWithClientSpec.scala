@@ -173,7 +173,7 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
           lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
 
           await(status(result)) shouldBe Status.SEE_OTHER
-          redirectLocation(result) shouldBe Some(mockConfig.agentClientActionUrl)
+          redirectLocation(result) shouldBe Some(mockConfig.agentClientHubUrl)
         }
 
         "correctly redirect if 'ignoreMandatedStatus' is set to true" in new Test {
