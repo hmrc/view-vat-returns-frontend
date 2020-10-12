@@ -17,7 +17,6 @@
 package config
 
 import java.net.URLEncoder
-import java.util.Base64
 
 import config.features.Features
 import config.{ConfigKeys => Keys}
@@ -72,6 +71,7 @@ trait AppConfig {
   val agentClientUnauthorisedUrl: String => String
   val agentClientHubUrl: String
   val accessibilityLinkUrl: String
+  val trackingConsentUrl: String
 }
 
 @Singleton
@@ -157,6 +157,8 @@ class FrontendAppConfig @Inject()(implicit configuration: Configuration, sc: Ser
 
   override val routeToSwitchLanguage: String => Call =
     (lang: String) => controllers.routes.LanguageController.switchLanguage(lang)
+
+  val trackingConsentUrl: String = sc.getString(Keys.trackingConsentUrl)
 
   private val host: String = sc.getString(Keys.host)
 
