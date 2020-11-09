@@ -63,7 +63,7 @@ class MockAppConfig(val runModeConfiguration: Configuration, val mode: Mode = Mo
     "english" -> Lang("en"),
     "cymraeg" -> Lang("cy")
   )
-  override val trackingConsentUrl: String = "/tracking"
+  override val gtmContainer: String = "x"
   override val routeToSwitchLanguage: String => Call =
     (lang: String) => controllers.routes.LanguageController.switchLanguage(lang)
   override val submitVatReturnBase: String = "submitReturnBase"

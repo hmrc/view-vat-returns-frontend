@@ -63,7 +63,7 @@ object ConfigKeys {
   val vatAgentClientLookupHubUrl: String = "vat-agent-client-lookup-frontend.agentHubUrl"
   val vatAgentClientLookupUnauthorisedUrl: String = "vat-agent-client-lookup-frontend.unauthorisedUrl"
 
-  val trackingConsentUrl: String = "tracking-consent-frontend.url"
+  val gtmContainer: String = "tracking-consent-frontend.gtm.container"
 
   val reportVatErrorUrl: String = "reportVatErrorUrl"
 

@@ -16,12 +16,12 @@
 
 @import layouts.GovUkTemplate
 @import play.twirl.api.HtmlFormat
-@import uk.gov.hmrc.play.views.html.layouts.{Head, HeaderNav, Footer, ServiceInfo, MainContentHeader, MainContent, Sidebar, Article, FooterLinks}
+@import uk.gov.hmrc.play.views.html.layouts.{HeadWithTrackingConsent, HeaderNav, Footer, ServiceInfo, MainContentHeader, MainContent, Sidebar, Article, FooterLinks}
 @import uk.gov.hmrc.play.views.html.helpers.ReportAProblemLink
 @import views.html.templates.UserResearchBanner
 
 @this(userResearchBanner: UserResearchBanner,
-      head: Head,
+      headWithTrackingConsent: HeadWithTrackingConsent,
       headerNav: HeaderNav,
       footer: Footer,
       serviceInfo: ServiceInfo,
@@ -54,9 +54,6 @@
 }
 
 @scriptElement = {
-  <!--[if !IE]>-->
-  <script type="text/javascript" src="@appConfig.trackingConsentUrl"></script>
-  <!--<![endif]-->
 
   <script type="text/javascript" src='@routes.Assets.at("javascript/vat-v1.1.js")'></script>
 
@@ -76,9 +73,10 @@
 }
 
 @headContent = {
-  @head(
+  @headWithTrackingConsent(
     linkElem = Some(linksElement),
-    headScripts = None
+    headScripts = None,
+    nonce = None
   )
   <meta name="format-detection" content="telephone=no" />
 }
@@ -175,4 +173,4 @@
   )
 }
 
-@hmrcGovUkTemplate(Some(pageTitle), bodyClasses)(headContent, bodyEnd, insideHeader, afterHeader, footerTop, Some(footerLinksContent), true)(content)
+@hmrcGovUkTemplate(Some(pageTitle), bodyClasses)(headContent, bodyEnd, insideHeader, afterHeader, footerTop, Some(footerLinksContent), nav = true)(content)
