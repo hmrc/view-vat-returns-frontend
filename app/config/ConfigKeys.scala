@@ -34,6 +34,7 @@ object ConfigKeys {
   val submitReturnFeatures: String = "features.submitReturnFeatures.enabled"
   val agentAccessFeature: String = "features.agentAccess.enabled"
   val enablePrintPastReturns: String = "features.printPastReturns.enabled"
+  val niProtocolFeature: String = "features.niProtocol.enabled"
 
   val finalReturnPeriodKey: String = "final-return.periodKey"
 

@@ -33,7 +33,8 @@ object FeatureSwitchForm {
       ConfigKeys.useLanguageSelectorFeature -> boolean,
       ConfigKeys.submitReturnFeatures -> boolean,
       ConfigKeys.agentAccessFeature -> boolean,
-      ConfigKeys.enablePrintPastReturns -> boolean
+      ConfigKeys.enablePrintPastReturns -> boolean,
+      ConfigKeys.niProtocolFeature -> boolean
   )(FeatureSwitchModel.apply)(FeatureSwitchModel.unapply)
   )
 }

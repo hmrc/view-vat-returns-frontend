@@ -39,7 +39,8 @@ class FeatureSwitchController @Inject()(mcc: MessagesControllerComponents,
         useLanguageSelector = appConfig.features.useLanguageSelector(),
         submitReturnFeatures = appConfig.features.submitReturnFeatures(),
         agentAccessEnabled = appConfig.features.agentAccess(),
-        enablePrintPastReturns = appConfig.features.enablePrintPastReturns()
+        enablePrintPastReturns = appConfig.features.enablePrintPastReturns(),
+        niProtocolEnabled = appConfig.features.niProtocolEnabled()
       )
     )))
   }
@@ -61,6 +62,7 @@ class FeatureSwitchController @Inject()(mcc: MessagesControllerComponents,
     appConfig.features.submitReturnFeatures(model.submitReturnFeatures)
     appConfig.features.agentAccess(model.agentAccessEnabled)
     appConfig.features.enablePrintPastReturns(model.enablePrintPastReturns)
+    appConfig.features.niProtocolEnabled(model.niProtocolEnabled)
     Redirect(routes.FeatureSwitchController.featureSwitch())
   }
 }
