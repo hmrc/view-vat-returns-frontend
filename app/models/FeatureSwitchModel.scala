@@ -24,4 +24,5 @@ case class FeatureSwitchModel(userResearchBannerEnabled: Boolean,
                               useLanguageSelector: Boolean,
                               submitReturnFeatures: Boolean,
                               agentAccessEnabled: Boolean,
-                              enablePrintPastReturns: Boolean)
+                              enablePrintPastReturns: Boolean,
+                              niProtocolEnabled: Boolean)
