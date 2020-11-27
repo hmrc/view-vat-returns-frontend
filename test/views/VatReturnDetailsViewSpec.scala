@@ -77,7 +77,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
 
   val currentYear: Int = 2018
 
-  val vatReturnViewModel = VatReturnViewModel(
+  val vatReturnViewModel: VatReturnViewModel = VatReturnViewModel(
     Some("Cheapo Clothing"),
     LocalDate.parse("2017-01-01"),
     LocalDate.parse("2017-03-31"),
@@ -108,7 +108,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
     isHybridUser = false
   )
 
-  "Rendering the vat return details page from the returns route with flat rate scheme" should {
+  "Rendering the vat return details page from the returns route with flat rate scheme and NI protocol feature enabled" should {
 
     lazy val view = injectedView(vatReturnViewModel)
     lazy implicit val document: Document = Jsoup.parse(view.body)
@@ -178,14 +178,14 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
     "have the correct row descriptions in the table" in {
       val expectedDescriptions = Array(
         "VAT you charged on sales and other supplies",
-        "VAT you owe on goods purchased from EC countries and brought into the UK",
+        "VAT due in this period on intra-community acquisitions of goods made in Northern Ireland from EU Member States",
         "VAT you owe before deductions (this is the total of box 1 and 2)",
         "VAT you have claimed back",
         "Return total",
         "Total value of sales and other supplies, including VAT",
         "Total value of purchases and other expenses, excluding VAT",
-        "Total value of supplied goods to EC countries and related costs (excluding VAT)",
-        "Total value of goods purchased from EC countries and brought into the UK, as well as any related costs (excluding VAT)"
+        "Total value of intra-community dispatches of goods and related costs (excluding VAT) from Northern Ireland to EU Member States",
+        "Total value of intra-community acquisitions of goods and related costs (excluding VAT) from Northern Ireland to EU Member States"
       )
       expectedDescriptions.indices.foreach(i => elementText(Selectors.boxDescription(Selectors.boxes(i))) shouldBe
         expectedDescriptions(i))
@@ -625,6 +625,31 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
 
     "have the breadcrumb heading of 'Final return" in {
       elementText(Selectors.currentPage) shouldBe "Final return"
+    }
+  }
+
+  "Rendering the VAT return details page when the NI protocol feature is disabled" should {
+
+    lazy val view = {
+      mockConfig.features.niProtocolEnabled(false)
+      injectedView(vatReturnViewModel)
+    }
+    lazy implicit val document: Document = Jsoup.parse(view.body)
+
+    "have the correct row descriptions in the table" in {
+      val expectedDescriptions = Array(
+        "VAT you charged on sales and other supplies",
+        "VAT you owe on goods purchased from EC countries and brought into the UK",
+        "VAT you owe before deductions (this is the total of box 1 and 2)",
+        "VAT you have claimed back",
+        "Return total",
+        "Total value of sales and other supplies, including VAT",
+        "Total value of purchases and other expenses, excluding VAT",
+        "Total value of supplied goods to EC countries and related costs (excluding VAT)",
+        "Total value of goods purchased from EC countries and brought into the UK, as well as any related costs (excluding VAT)"
+      )
+      expectedDescriptions.indices.foreach(i => elementText(Selectors.boxDescription(Selectors.boxes(i))) shouldBe
+        expectedDescriptions(i))
     }
   }
 }
