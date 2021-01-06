@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,12 +26,18 @@ case class CustomerInformation(organisationName: Option[String],
                                hasFlatRateScheme: Boolean,
                                isPartialMigration: Boolean,
                                customerMigratedToETMPDate: Option[String],
+                               hybridToFullMigrationDate: Option[String],
                                mandationStatus: String) {
 
   val entityName: Option[String] = (firstName, lastName, organisationName, tradingName) match {
     case (Some(firstName), Some(lastName), None, None) => Some(s"$firstName $lastName")
     case (None, None, organisationName, None) => organisationName
     case _ => tradingName
+  }
+
+  def extractDate: Option[String] = hybridToFullMigrationDate match {
+    case Some(_) => hybridToFullMigrationDate
+    case _ => customerMigratedToETMPDate
   }
 }
 
@@ -45,6 +51,7 @@ object CustomerInformation {
     (JsPath \ "flatRateScheme").readNullable[JsValue].orElse(Reads.pure(None)).map(_.isDefined) and
     (JsPath \\ "isPartialMigration").readNullable[Boolean].map(_.contains(true)) and
     (JsPath \\ "customerMigratedToETMPDate").readNullable[String] and
+    (JsPath \\ "hybridToFullMigrationDate").readNullable[String] and
     (JsPath \ "mandationStatus").read[String]
   )(CustomerInformation.apply _)
 }

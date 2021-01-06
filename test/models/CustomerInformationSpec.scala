@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,4 +68,32 @@ class CustomerInformationSpec extends UnitSpec {
       }
     }
   }
+
+  ".getExtractDate" when {
+
+    "hybridToFullMigrationDate is available" should {
+
+      "return the date from hybridToFullMigrationDate" in {
+          val customerInfo = customerInformationMax
+          customerInfo.extractDate shouldBe customerInfo.hybridToFullMigrationDate
+      }
+    }
+
+    "hybridToFullMigrationDate is missing" should {
+
+       "return customerMigratedToETMPDate" in {
+        val customerInfo = customerInformationMax.copy(hybridToFullMigrationDate = None)
+        customerInfo.extractDate shouldBe customerInfo.customerMigratedToETMPDate
+       }
+    }
+
+    "hybridToFullMigrationDate and customerMigratedToETMPDate are unavailable" should {
+
+      "return customerMigratedToETMPDate" in {
+        val customerInfo = customerInformationMax.copy(customerMigratedToETMPDate = None, hybridToFullMigrationDate = None)
+        customerInfo.extractDate shouldBe customerInfo.customerMigratedToETMPDate
+        }
+      }
+
+    }
 }
