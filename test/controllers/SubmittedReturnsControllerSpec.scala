@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -335,44 +335,27 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
 
   "Calling .getMigratedToETMPDate" when {
 
-    "the ETMP migration date is already in session" should {
+    "the account details service returns a successful result" should {
+
+      lazy val result = {
+        callSubscriptionService(Some(customerInformationMax))
+        controller.getMigratedToETMPDate(request(), user)
+      }
 
       "return the date" in {
-        await(controller.getMigratedToETMPDate(request(fakeRequestWithSession), user)) shouldBe exampleMigrationDate
+        await(result) shouldBe Some(LocalDate.parse("2017-01-01"))
       }
     }
 
-    "an empty value is in session" should {
+    "the account details service returns a failure" should {
+
+      lazy val result = {
+        callSubscriptionService(None)
+        controller.getMigratedToETMPDate(request(), user)
+      }
 
       "return None" in {
-        await(controller.getMigratedToETMPDate(request(fakeRequestWithEmptyDate), user)) shouldBe None
-      }
-    }
-
-    "no value is in session" when {
-
-      "the account details service returns a successful result" should {
-
-        lazy val result = {
-          callSubscriptionService(Some(customerInformationMax))
-          controller.getMigratedToETMPDate(request(), user)
-        }
-
-        "return the date" in {
-          await(result) shouldBe Some(LocalDate.parse("2017-01-01"))
-        }
-      }
-
-      "the account details service returns a failure" should {
-
-        lazy val result = {
-          callSubscriptionService(None)
-          controller.getMigratedToETMPDate(request(), user)
-        }
-
-        "return None" in {
-          await(result) shouldBe None
-        }
+        await(result) shouldBe None
       }
     }
   }

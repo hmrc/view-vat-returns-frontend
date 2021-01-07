@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,8 @@ object CustomerInfoStub extends WireMockMethods {
       "lastName" -> "Vatreturn",
       "tradingName" -> "Cheapo Clothing",
       "isPartialMigration" -> true,
-      "customerMigratedToETMPDate" -> "2018-01-01"
+      "customerMigratedToETMPDate" -> "2018-01-01",
+      "hybridToFullMigrationDate" -> "2018-01-01"
     ),
     "ppob" -> Json.obj(
       "address" -> Json.obj(

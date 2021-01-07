@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,7 @@ class VatSubscriptionConnectorISpec extends IntegrationBaseSpec {
           Some("Cheapo Clothing"),
           hasFlatRateScheme = true,
           isPartialMigration = true,
+          Some("2018-01-01"),
           Some("2018-01-01"),
           mtdfb
         ))

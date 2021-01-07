@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -125,14 +125,10 @@ class SubmittedReturnsController @Inject()(mcc: MessagesControllerComponents,
   }
 
   private[controllers] def getMigratedToETMPDate(implicit request: Request[_], user: User): Future[Option[LocalDate]] =
-    request.session.get(SessionKeys.migrationToETMP) match {
-      case Some(date) if date.nonEmpty => Future.successful(Some(LocalDate.parse(date)))
-      case Some(_) => Future.successful(None)
-      case None => subscriptionService.getUserDetails(user.vrn) map {
-        case Some(details) => details.customerMigratedToETMPDate.map(LocalDate.parse)
+      subscriptionService.getUserDetails(user.vrn) map {
+        case Some(details) => details.extractDate.map(LocalDate.parse)
         case None => None
       }
-    }
 
   private[controllers] def customerMigratedWithin15M(migrationDate: Option[LocalDate]): Boolean =
     migrationDate match {

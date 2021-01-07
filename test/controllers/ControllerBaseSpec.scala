@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package controllers
 import akka.actor.ActorSystem
 import akka.stream.{ActorMaterializer, Materializer}
 import common.EnrolmentKeys._
-import common.SessionKeys.{clientVrn, migrationToETMP}
+import common.SessionKeys.clientVrn
 import mocks.MockAuth
 import models.User
 import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, MessagesRequest}
@@ -50,8 +50,7 @@ class ControllerBaseSpec extends MockAuth {
 
   lazy val fakeRequestWithSession: FakeRequest[AnyContentAsEmpty.type] = fakeRequest.withSession(
     GovUkSessionKeys.lastRequestTimestamp -> "1498236506662",
-    GovUkSessionKeys.authToken -> "Bearer Token",
-    migrationToETMP -> "2018-01-01"
+    GovUkSessionKeys.authToken -> "Bearer Token"
   )
 
   lazy val fakeRequestWithClientsVRN: FakeRequest[AnyContentAsEmpty.type] = fakeRequest.withSession(clientVrn -> vrn)
