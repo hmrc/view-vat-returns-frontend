@@ -16,7 +16,7 @@
 
 package models
 
-import common.TestModels.customerInformationMax
+import common.TestModels.{customerInformationMax, customerDetailsInsolvent}
 import common.TestJson.customerInfoJsonMax
 import uk.gov.hmrc.play.test.UnitSpec
 
@@ -96,4 +96,21 @@ class CustomerInformationSpec extends UnitSpec {
       }
 
     }
+
+  "calling .isInsolventWithoutAccess" should {
+
+    "return true when the user is insolvent and not continuing to trade" in {
+      customerDetailsInsolvent.isInsolventWithoutAccess shouldBe true
+    }
+
+    "return false when the user is insolvent but is continuing to trade" in {
+      customerDetailsInsolvent.copy(continueToTrade = Some(true)).isInsolventWithoutAccess shouldBe false
+    }
+
+    "return false when the user is not insolvent, regardless of the continueToTrade flag" in {
+      customerInformationMax.isInsolventWithoutAccess shouldBe false
+      customerInformationMax.copy(continueToTrade = Some(false)).isInsolventWithoutAccess shouldBe false
+      customerInformationMax.copy(continueToTrade = None).isInsolventWithoutAccess shouldBe false
+    }
+  }
 }
