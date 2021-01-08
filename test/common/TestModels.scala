@@ -26,6 +26,8 @@ object TestModels {
     Some("Betty"),
     Some("Jones"),
     Some("Cheapo Clothing"),
+    isInsolvent = false,
+    Some(true),
     hasFlatRateScheme = true,
     isPartialMigration = false,
     Some("2017-01-01"),

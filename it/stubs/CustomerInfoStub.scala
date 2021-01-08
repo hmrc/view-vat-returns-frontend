@@ -44,6 +44,8 @@ object CustomerInfoStub extends WireMockMethods {
       "firstName" -> "Vincent",
       "lastName" -> "Vatreturn",
       "tradingName" -> "Cheapo Clothing",
+      "isInsolvent" -> false,
+      "continueToTrade" -> true,
       "isPartialMigration" -> true,
       "customerMigratedToETMPDate" -> "2018-01-01",
       "hybridToFullMigrationDate" -> "2018-01-01"

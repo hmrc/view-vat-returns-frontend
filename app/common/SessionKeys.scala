@@ -19,4 +19,5 @@ package common
 object SessionKeys {
   val mtdVatMandationStatus: String = "mtdVatMandationStatus"
   val clientVrn: String = "CLIENT_VRN"
+  val insolventWithoutAccessKey: String = "insolventWithoutAccess"
 }

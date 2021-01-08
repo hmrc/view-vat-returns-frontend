@@ -19,10 +19,12 @@ package controllers
 import akka.actor.ActorSystem
 import akka.stream.{ActorMaterializer, Materializer}
 import common.EnrolmentKeys._
+import common.SessionKeys
 import common.SessionKeys.clientVrn
 import mocks.MockAuth
 import models.User
-import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, MessagesRequest}
+import play.api.http.Status
+import play.api.mvc._
 import play.api.test.FakeRequest
 import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual}
 import uk.gov.hmrc.auth.core.retrieve.~
@@ -45,13 +47,16 @@ class ControllerBaseSpec extends MockAuth {
 
   lazy val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
   def request(request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()): MessagesRequest[AnyContentAsEmpty.type] =
-    new MessagesRequest[AnyContentAsEmpty.type](request, mcc.messagesApi)
+    new MessagesRequest[AnyContentAsEmpty.type](request.withSession(SessionKeys.insolventWithoutAccessKey -> "false"), mcc.messagesApi)
   implicit val user: User = User(vrn)
 
   lazy val fakeRequestWithSession: FakeRequest[AnyContentAsEmpty.type] = fakeRequest.withSession(
     GovUkSessionKeys.lastRequestTimestamp -> "1498236506662",
     GovUkSessionKeys.authToken -> "Bearer Token"
   )
+
+  lazy val insolventRequest: FakeRequest[AnyContentAsEmpty.type] =
+    FakeRequest().withSession(SessionKeys.insolventWithoutAccessKey -> "true")
 
   lazy val fakeRequestWithClientsVRN: FakeRequest[AnyContentAsEmpty.type] = fakeRequest.withSession(clientVrn -> vrn)
 
@@ -79,5 +84,19 @@ class ControllerBaseSpec extends MockAuth {
   override def beforeEach(): Unit = {
     mockConfig.features.submitReturnFeatures(false)
     mockConfig.features.agentAccess(true)
+  }
+
+  def insolvencyCheck(controllerAction: Action[AnyContent]): Unit = {
+
+    "the user is insolvent and not continuing to trade" should {
+
+      "return 403 (Forbidden)" in {
+        val result = {
+          callAuthService(individualAuthResult)
+          controllerAction(insolventRequest)
+        }
+        status(result) shouldBe Status.FORBIDDEN
+      }
+    }
   }
 }

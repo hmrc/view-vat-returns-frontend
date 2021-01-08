@@ -23,6 +23,8 @@ case class CustomerInformation(organisationName: Option[String],
                                firstName: Option[String],
                                lastName: Option[String],
                                tradingName: Option[String],
+                               isInsolvent: Boolean,
+                               continueToTrade: Option[Boolean],
                                hasFlatRateScheme: Boolean,
                                isPartialMigration: Boolean,
                                customerMigratedToETMPDate: Option[String],
@@ -39,6 +41,11 @@ case class CustomerInformation(organisationName: Option[String],
     case Some(_) => hybridToFullMigrationDate
     case _ => customerMigratedToETMPDate
   }
+
+  val isInsolventWithoutAccess: Boolean = continueToTrade match {
+    case Some(false) => isInsolvent
+    case _ => false
+  }
 }
 
 object CustomerInformation {
@@ -48,6 +55,8 @@ object CustomerInformation {
     (JsPath \ "customerDetails" \ "firstName").readNullable[String].orElse(Reads.pure(None)) and
     (JsPath \ "customerDetails" \ "lastName").readNullable[String].orElse(Reads.pure(None)) and
     (JsPath \ "customerDetails" \ "tradingName").readNullable[String].orElse(Reads.pure(None)) and
+    (JsPath \ "customerDetails" \ "isInsolvent").read[Boolean] and
+    (JsPath \ "customerDetails" \ "continueToTrade").readNullable[Boolean] and
     (JsPath \ "flatRateScheme").readNullable[JsValue].orElse(Reads.pure(None)).map(_.isDefined) and
     (JsPath \\ "isPartialMigration").readNullable[Boolean].map(_.contains(true)) and
     (JsPath \\ "customerMigratedToETMPDate").readNullable[String] and

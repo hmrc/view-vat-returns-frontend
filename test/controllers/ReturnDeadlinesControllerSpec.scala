@@ -441,6 +441,8 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
         messages(document.select("h1").text) shouldBe "Sorry, there is a problem with the service"
       }
     }
+
+    insolvencyCheck(controller.returnDeadlines())
   }
 
   "The .noUpcomingObligationsAction function" when {

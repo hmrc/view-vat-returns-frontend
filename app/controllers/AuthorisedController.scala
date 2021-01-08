@@ -16,11 +16,11 @@
 
 package controllers
 
-import common.{EnrolmentKeys => Keys}
+import common.{EnrolmentKeys => Keys, SessionKeys}
 import config.AppConfig
 import models.User
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, MessagesRequest, Result}
-import services.EnrolmentsAuthService
+import services.{EnrolmentsAuthService, SubscriptionService}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
@@ -34,6 +34,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class AuthorisedController @Inject()(enrolmentsAuthService: EnrolmentsAuthService,
+                                     subscriptionService: SubscriptionService,
                                      agentWithClientPredicate: AuthoriseAgentWithClient,
                                      mcc: MessagesControllerComponents,
                                      unauthorisedView: UnauthorisedView)
@@ -80,7 +81,21 @@ class AuthorisedController @Inject()(enrolmentsAuthService: EnrolmentsAuthServic
 
           val user = User(vrn, status == Keys.activated, containsNonMtdVat)
 
-          block(request)(user)
+          request.session.get(SessionKeys.insolventWithoutAccessKey) match {
+            case Some("true") => Future.successful(Forbidden(unauthorisedView()))
+            case Some("false") => block(request)(user)
+            case _ => subscriptionService.getUserDetails(user.vrn).flatMap {
+              case Some(details) if details.isInsolventWithoutAccess =>
+                logDebug("[AuthorisedController][authorisedAsNonAgent] - User is insolvent and not continuing to trade")
+                Future.successful(Forbidden(unauthorisedView()).addingToSession(SessionKeys.insolventWithoutAccessKey -> "true"))
+              case Some(_) =>
+                logDebug("[AuthorisedController][authorisedAsNonAgent] - Authenticated as principle")
+                block(request)(user).map(result => result.addingToSession(SessionKeys.insolventWithoutAccessKey -> "false"))
+              case _ =>
+                logDebug("[AuthorisedController][authorisedAsNonAgent] - Failure obtaining insolvency status from Customer Info API")
+                Future.successful(InternalServerError)
+            }
+          }
 
       } getOrElse {
         logWarn("[AuthPredicate][authoriseAsNonAgent] Non-agent with invalid VRN")

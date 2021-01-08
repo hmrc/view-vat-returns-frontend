@@ -26,6 +26,8 @@ object TestJson {
       "firstName" -> "Betty",
       "lastName" -> "Jones",
       "tradingName" -> "Cheapo Clothing",
+      "isInsolvent" -> false,
+      "continueToTrade" -> true,
       "isPartialMigration" -> false,
       "customerMigratedToETMPDate" -> "2017-01-01",
       "hybridToFullMigrationDate" -> "2017-01-01"
