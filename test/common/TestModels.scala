@@ -26,12 +26,16 @@ object TestModels {
     Some("Betty"),
     Some("Jones"),
     Some("Cheapo Clothing"),
+    isInsolvent = false,
+    Some(true),
     hasFlatRateScheme = true,
     isPartialMigration = false,
     Some("2017-01-01"),
     Some("2017-01-01"),
     mtdfb
   )
+
+  val customerDetailsInsolvent: CustomerInformation = customerInformationMax.copy(isInsolvent = true, continueToTrade = Some(false))
 
   val customerInformationNonMTDfB: CustomerInformation = customerInformationMax.copy(mandationStatus = nonMTDfB)
   val customerInformationNonDigital: CustomerInformation = customerInformationMax.copy(mandationStatus = nonDigital)

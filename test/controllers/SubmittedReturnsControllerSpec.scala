@@ -18,6 +18,7 @@ package controllers
 
 import java.time.LocalDate
 
+import common.SessionKeys
 import common.TestModels.customerInformationMax
 import models._
 import models.errors.ObligationError
@@ -71,7 +72,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
 
       lazy val result = {
         callAuthService(individualAuthResult)
-        controller.redirect(2020)(fakeRequest)
+        controller.redirect(2020)(fakeRequest.withSession(SessionKeys.insolventWithoutAccessKey -> "false"))
       }
 
       s"redirect the user to ${controllers.routes.SubmittedReturnsController.submittedReturns().url}" in {
@@ -91,6 +92,8 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
         status(result) shouldBe FORBIDDEN
       }
     }
+
+    insolvencyCheck(controller.redirect(2020))
   }
 
   "Calling the .submittedReturns action" when {
@@ -217,6 +220,8 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
         messages(document.select("h1").first().text()) shouldBe "Sorry, there is a problem with the service"
       }
     }
+
+    insolvencyCheck(controller.submittedReturns)
   }
 
   "Calling .getValidYears" when {

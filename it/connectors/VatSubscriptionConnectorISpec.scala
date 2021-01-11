@@ -46,6 +46,8 @@ class VatSubscriptionConnectorISpec extends IntegrationBaseSpec {
           Some("Vincent"),
           Some("Vatreturn"),
           Some("Cheapo Clothing"),
+          isInsolvent = false,
+          Some(true),
           hasFlatRateScheme = true,
           isPartialMigration = true,
           Some("2018-01-01"),

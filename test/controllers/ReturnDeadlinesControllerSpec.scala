@@ -63,27 +63,99 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
 
   "Calling the .returnDeadlines action" when {
 
-    "A user is logged in and enrolled to HMRC-MTD-VAT" should {
+    "A user is logged in and enrolled to HMRC-MTD-VAT" when {
 
-      lazy val result = {
-        callAuthService(individualAuthResult)
-        callDateService()
-        callOpenObligations(exampleObligations)
-        callExtendedAudit
-        callServiceInfoPartialService
-        controller.returnDeadlines()(request())
+      "they have a value of 'true' in session for their insolvency status" should {
+
+        lazy val result = {
+          callAuthService(individualAuthResult)
+          controller.returnDeadlines()(insolventRequest)
+        }
+
+        "the value is 'true' (insolvent user not continuing to trade)" should {
+
+          "return Forbidden (403)" in {
+            status(result) shouldBe Status.FORBIDDEN
+          }
+        }
       }
 
-      "return 200" in {
-        status(result) shouldBe Status.OK
+      "they do not have a value in session for their insolvency status" when {
+
+        "they are insolvent and not continuing to trade" should {
+
+          lazy val result = {
+            callAuthService(individualAuthResult)
+            callSubscriptionService(Some(customerInformationMax.copy(isInsolvent = true, continueToTrade = Some(false))))
+            controller.returnDeadlines()(fakeRequest)
+          }
+
+          "return Forbidden (403)" in {
+            status(result) shouldBe Status.FORBIDDEN
+          }
+
+          "add the insolvent flag to the session" in {
+            session(result).get(SessionKeys.insolventWithoutAccessKey) shouldBe Some("true")
+          }
+        }
       }
 
-      "return HTML" in {
-        contentType(result) shouldBe Some("text/html")
+      "they are permitted to trade" should {
+
+        lazy val result = {
+          callAuthService(individualAuthResult)
+          callSubscriptionService(Some(customerInformationMax.copy(isInsolvent = true)))
+          callOpenObligations(exampleObligations)
+          callDateService()
+          callServiceInfoPartialService
+          callExtendedAudit
+          controller.returnDeadlines()(fakeRequest)
+        }
+
+        "return OK (200)" in {
+          status(result) shouldBe Status.OK
+        }
+
+        "add the insolvent flag to the session" in {
+          session(result).get(SessionKeys.insolventWithoutAccessKey) shouldBe Some("false")
+        }
       }
 
-      "return charset of utf-8" in {
-        charset(result) shouldBe Some("utf-8")
+      "there is an error returned from the customer information API" should {
+
+        lazy val result = {
+          callAuthService(individualAuthResult)
+          callSubscriptionService(None)
+          controller.returnDeadlines()(fakeRequest)
+        }
+
+        "return Internal Server Error (500)" in {
+          status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+        }
+      }
+
+      "they have a value of 'false' in session for their insolvency status" should {
+
+        lazy val result = {
+          callAuthService(individualAuthResult)
+          callDateService()
+          callOpenObligations(exampleObligations)
+          callExtendedAudit
+          callServiceInfoPartialService
+          controller.returnDeadlines()(request())
+        }
+
+        "return 200" in {
+          status(result) shouldBe Status.OK
+        }
+
+        "return HTML" in {
+          contentType(result) shouldBe Some("text/html")
+        }
+
+        "return charset of utf-8" in {
+          charset(result) shouldBe Some("utf-8")
+        }
       }
     }
 
@@ -441,6 +513,8 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
         messages(document.select("h1").text) shouldBe "Sorry, there is a problem with the service"
       }
     }
+
+    insolvencyCheck(controller.returnDeadlines())
   }
 
   "The .noUpcomingObligationsAction function" when {

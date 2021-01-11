@@ -76,6 +76,7 @@ trait MockAuth extends UnitSpec with GuiceOneAppPerSuite with BeforeAndAfterEach
 
   val mockAuthorisedController: AuthorisedController = new AuthorisedController(
     enrolmentsAuthService,
+    mockSubscriptionService,
     mockAuthorisedAgentWithClient,
     mcc,
     unauthorisedView

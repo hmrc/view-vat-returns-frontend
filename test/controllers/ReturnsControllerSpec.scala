@@ -312,6 +312,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       }
     }
 
+    insolvencyCheck(controller.vatReturn(2018, "#001"))
   }
 
   "Calling the .vatReturnViaPayments action" when {
@@ -533,6 +534,8 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
       }
     }
+
+    insolvencyCheck(controller.vatReturnViaPayments("#001"))
   }
 
   "Calling .constructViewModel" should {
