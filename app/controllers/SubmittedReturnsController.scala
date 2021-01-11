@@ -20,7 +20,6 @@ import java.time.{LocalDate, Period}
 
 import audit.AuditingService
 import audit.models.ViewSubmittedVatObligationsAuditModel
-import common.SessionKeys
 import config.AppConfig
 import javax.inject.{Inject, Singleton}
 import models.viewModels.{ReturnObligationsViewModel, VatReturnsViewModel}
