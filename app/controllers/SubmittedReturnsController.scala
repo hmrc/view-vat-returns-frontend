@@ -17,13 +17,13 @@
 package controllers
 
 import java.time.{LocalDate, Period}
-
 import audit.AuditingService
 import audit.models.ViewSubmittedVatObligationsAuditModel
 import config.AppConfig
+
 import javax.inject.{Inject, Singleton}
 import models.viewModels.{ReturnObligationsViewModel, VatReturnsViewModel}
-import models.{ServiceResponse, User}
+import models.{MigrationDateModel, ServiceResponse, User}
 import models.errors.ObligationError
 import models.Obligation.Status.Fulfilled
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
@@ -61,8 +61,8 @@ class SubmittedReturnsController @Inject()(mcc: MessagesControllerComponents,
     implicit user =>
       for {
         serviceInfoContent <- if (user.isAgent) Future.successful(HtmlFormat.empty) else serviceInfoService.getServiceInfoPartial
-        migrationDate <- getMigratedToETMPDate
-        obligationsResult <- getReturnObligations(migrationDate)
+        migrationDates <- getMigrationDates
+        obligationsResult <- getReturnObligations(migrationDates)
       } yield {
         obligationsResult match {
           case Right(model) =>
@@ -81,11 +81,11 @@ class SubmittedReturnsController @Inject()(mcc: MessagesControllerComponents,
       case _ => Seq(currentYear, currentYear - 1, currentYear - 2)
     }
 
-  private[controllers] def getReturnObligations(migrationDate: Option[LocalDate])
+  private[controllers] def getReturnObligations(migrationDatesModel: MigrationDateModel)
                                                (implicit user: User,
                                                 hc: HeaderCarrier): Future[ServiceResponse[VatReturnsViewModel]] = {
 
-    val years = getValidYears(migrationDate)
+    val years = getValidYears(migrationDatesModel.migratedToETMPDate)
 
     for {
       obligationsResult <- Future.sequence(years.map { year =>
@@ -100,7 +100,7 @@ class SubmittedReturnsController @Inject()(mcc: MessagesControllerComponents,
         case result =>
 
           val obligations = result.flatMap(_.right.toSeq).flatMap(_.obligations)
-          val migratedWithin15Months = customerMigratedWithin15M(migrationDate)
+          val migratedWithin15Months = customerMigratedWithin15M(migrationDatesModel.hybridToFullDate)
 
           auditService.extendedAudit(
             ViewSubmittedVatObligationsAuditModel(user, obligations),
@@ -123,10 +123,12 @@ class SubmittedReturnsController @Inject()(mcc: MessagesControllerComponents,
     }
   }
 
-  private[controllers] def getMigratedToETMPDate(implicit request: Request[_], user: User): Future[Option[LocalDate]] =
+  private[controllers] def getMigrationDates(implicit request: Request[_], user: User): Future[MigrationDateModel] =
       subscriptionService.getUserDetails(user.vrn) map {
-        case Some(details) => details.extractDate.map(LocalDate.parse)
-        case None => None
+        case Some(details) =>
+          MigrationDateModel(details.customerMigratedToETMPDate.map(LocalDate.parse), details.extractDate.map(LocalDate.parse))
+        case None =>
+          MigrationDateModel(None, None)
       }
 
   private[controllers] def customerMigratedWithin15M(migrationDate: Option[LocalDate]): Boolean =

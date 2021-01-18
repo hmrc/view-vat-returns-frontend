@@ -30,7 +30,7 @@ object TestJson {
       "continueToTrade" -> true,
       "isPartialMigration" -> false,
       "customerMigratedToETMPDate" -> "2017-01-01",
-      "hybridToFullMigrationDate" -> "2017-01-01"
+      "hybridToFullMigrationDate" -> "2017-02-02"
     ),
     "ppob" -> Json.obj(
       "address" -> Json.obj(
