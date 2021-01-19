@@ -31,7 +31,21 @@ object TestModels {
     hasFlatRateScheme = true,
     isPartialMigration = false,
     Some("2017-01-01"),
-    Some("2017-01-01"),
+    Some("2017-02-02"),
+    mtdfb
+  )
+
+  val customerInformationMin: CustomerInformation = CustomerInformation(
+    None,
+    None,
+    None,
+    None,
+    isInsolvent = false,
+    None,
+    hasFlatRateScheme = false,
+    isPartialMigration = false,
+    None,
+    None,
     mtdfb
   )
 

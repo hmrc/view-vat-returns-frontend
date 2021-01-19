@@ -17,9 +17,8 @@
 package controllers
 
 import java.time.LocalDate
-
 import common.SessionKeys
-import common.TestModels.customerInformationMax
+import common.TestModels.{customerInformationMax, customerInformationMin}
 import models._
 import models.errors.ObligationError
 import models.viewModels.{ReturnObligationsViewModel, VatReturnsViewModel}
@@ -64,7 +63,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
   lazy val fakeRequestWithEmptyDate: FakeRequest[AnyContentAsEmpty.type] =
     fakeRequest.withSession("customerMigratedToETMPDate" -> "")
 
-  val exampleMigrationDate: Option[LocalDate] = Some(LocalDate.parse("2018-01-01"))
+  val exampleMigrationDateModel: MigrationDateModel = MigrationDateModel(Some(LocalDate.parse("2018-01-01")), None)
 
   "Calling the .redirect action" when {
 
@@ -230,7 +229,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
 
       lazy val result = {
         callDateService()
-        controller.getValidYears(exampleMigrationDate)
+        controller.getValidYears(Some(LocalDate.parse("2018-01-01")))
       }
 
       "return a sequence containing one service call" in {
@@ -271,7 +270,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
         callDateService()
         callObligationsForYear(exampleObligations(2018))
         callExtendedAudit
-        controller.getReturnObligations(exampleMigrationDate)
+        controller.getReturnObligations(exampleMigrationDateModel)
       }
 
       val expectedModel = VatReturnsViewModel(
@@ -295,7 +294,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
       lazy val result = {
         callDateService()
         callObligationsForYear(Left(ObligationError))
-        controller.getReturnObligations(exampleMigrationDate)
+        controller.getReturnObligations(exampleMigrationDateModel)
       }
 
       "return an ObligationError" in {
@@ -338,17 +337,29 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
     }
   }
 
-  "Calling .getMigratedToETMPDate" when {
+  "Calling .getMigrationDates" when {
 
-    "the account details service returns a successful result" should {
+    "the account details service returns both migration dates" should {
 
       lazy val result = {
         callSubscriptionService(Some(customerInformationMax))
-        controller.getMigratedToETMPDate(request(), user)
+        controller.getMigrationDates(request(), user)
       }
 
-      "return the date" in {
-        await(result) shouldBe Some(LocalDate.parse("2017-01-01"))
+      "return the correct date model" in {
+        await(result) shouldBe MigrationDateModel(Some(LocalDate.parse("2017-01-01")), Some(LocalDate.parse("2017-02-02")))
+      }
+    }
+
+    "the account details service returns no migration dates" should {
+
+      lazy val result = {
+        callSubscriptionService(Some(customerInformationMin))
+        controller.getMigrationDates(request(), user)
+      }
+
+      "return the correct date model" in {
+        await(result) shouldBe MigrationDateModel(None, None)
       }
     }
 
@@ -356,11 +367,11 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
 
       lazy val result = {
         callSubscriptionService(None)
-        controller.getMigratedToETMPDate(request(), user)
+        controller.getMigrationDates(request(), user)
       }
 
-      "return None" in {
-        await(result) shouldBe None
+      "return the correct date model" in {
+        await(result) shouldBe MigrationDateModel(None, None)
       }
     }
   }
