@@ -71,7 +71,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
 
       lazy val result = {
         callAuthService(individualAuthResult)
-        controller.redirect(2020)(fakeRequest.withSession(SessionKeys.insolventWithoutAccessKey -> "false"))
+        controller.redirect(2020)(fakeRequest.withSession(SessionKeys.insolventWithoutAccessKey -> "false", SessionKeys.futureInsolvencyDate -> "false"))
       }
 
       s"redirect the user to ${controllers.routes.SubmittedReturnsController.submittedReturns().url}" in {

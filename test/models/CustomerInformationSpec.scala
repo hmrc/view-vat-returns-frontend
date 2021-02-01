@@ -16,11 +16,12 @@
 
 package models
 
-import common.TestModels.{customerInformationMax, customerDetailsInsolvent}
+import java.time.LocalDate
+import common.TestModels._
 import common.TestJson.customerInfoJsonMax
-import uk.gov.hmrc.play.test.UnitSpec
+import mocks.MockAuth
 
-class CustomerInformationSpec extends UnitSpec {
+class CustomerInformationSpec extends MockAuth {
 
   "A CustomerInformation object" should {
 
@@ -111,6 +112,30 @@ class CustomerInformationSpec extends UnitSpec {
       customerInformationMax.isInsolventWithoutAccess shouldBe false
       customerInformationMax.copy(continueToTrade = Some(false)).isInsolventWithoutAccess shouldBe false
       customerInformationMax.copy(continueToTrade = None).isInsolventWithoutAccess shouldBe false
+    }
+  }
+
+  "calling .insolvencyDateFutureUserBlocked" should {
+
+    val date  = LocalDate.parse("2018-05-01")
+
+    "return true when the user has a future insolvency date" in {
+      callDateService()
+      customerInformationFutureInsolvent.insolvencyDateFutureUserBlocked(date) shouldBe true
+    }
+    "return false when the user has a current or past insolvency date" in {
+      callDateService()
+      customerInformationFutureInsolvent.copy(insolvencyDate = Some("2018-05-01")).insolvencyDateFutureUserBlocked(date) shouldBe false
+    }
+    "return false when the user is type 7, 12, 13, 14" in {
+      Seq("07","12","13","14").foreach{insolventType =>
+        callDateService()
+        customerInformationFutureInsolvent.copy(insolvencyType = Some(insolventType)).insolvencyDateFutureUserBlocked(date) shouldBe false
+      }
+    }
+    "return false when the user is not insolvent" in {
+      callDateService()
+      customerInformationMax.insolvencyDateFutureUserBlocked(date) shouldBe false
     }
   }
 }

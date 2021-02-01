@@ -42,7 +42,7 @@ import uk.gov.hmrc.auth.core.{AffinityGroup, AuthConnector, Enrolments}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.tools.Stubs.stubMessagesControllerComponents
 import uk.gov.hmrc.play.test.UnitSpec
-import views.html.errors.UnauthorisedView
+import views.html.errors.{TechnicalProblemView, UnauthorisedView}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -64,6 +64,7 @@ trait MockAuth extends UnitSpec with GuiceOneAppPerSuite with BeforeAndAfterEach
   val mockVatSubscriptionConnector: VatSubscriptionConnector = mock[VatSubscriptionConnector]
 
   val unauthorisedView: UnauthorisedView = inject[UnauthorisedView]
+  val technicalView: TechnicalProblemView = inject[TechnicalProblemView]
 
   val enrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
 
@@ -71,7 +72,9 @@ trait MockAuth extends UnitSpec with GuiceOneAppPerSuite with BeforeAndAfterEach
     enrolmentsAuthService,
     mockSubscriptionService,
     mcc,
-    unauthorisedView
+    unauthorisedView,
+    technicalView,
+    mockDateService
   )
 
   val mockAuthorisedController: AuthorisedController = new AuthorisedController(
@@ -79,7 +82,9 @@ trait MockAuth extends UnitSpec with GuiceOneAppPerSuite with BeforeAndAfterEach
     mockSubscriptionService,
     mockAuthorisedAgentWithClient,
     mcc,
-    unauthorisedView
+    unauthorisedView,
+    technicalView,
+    mockDateService
   )
 
   def callDateService(response: LocalDate = LocalDate.parse("2018-05-01")): Any =

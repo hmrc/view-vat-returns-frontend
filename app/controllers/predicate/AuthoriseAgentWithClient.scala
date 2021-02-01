@@ -19,15 +19,16 @@ package controllers.predicate
 import common._
 import config.AppConfig
 import javax.inject.{Inject, Singleton}
-import models.User
+import models.{CustomerInformation, User}
+import play.api.Logger
 import play.api.mvc._
-import services.{EnrolmentsAuthService, SubscriptionService}
+import services.{DateService, EnrolmentsAuthService, SubscriptionService}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.allEnrolments
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.LoggerUtil._
-import views.html.errors.UnauthorisedView
+import views.html.errors.{TechnicalProblemView, UnauthorisedView}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -35,7 +36,9 @@ import scala.concurrent.{ExecutionContext, Future}
 class AuthoriseAgentWithClient @Inject()(enrolmentsAuthService: EnrolmentsAuthService,
                                          subscriptionService: SubscriptionService,
                                          mcc: MessagesControllerComponents,
-                                         unauthorisedView: UnauthorisedView)
+                                         unauthorisedView: UnauthorisedView,
+                                         technicalProblemView: TechnicalProblemView,
+                                         dateService: DateService)
                                         (implicit appConfig: AppConfig,
                                          ec: ExecutionContext) extends FrontendController(mcc) {
 
@@ -56,7 +59,7 @@ class AuthoriseAgentWithClient @Inject()(enrolmentsAuthService: EnrolmentsAuthSe
               enrolments.enrolments.collectFirst {
                 case Enrolment(EnrolmentKeys.agentEnrolmentKey, EnrolmentIdentifier(_, arn) :: _, EnrolmentKeys.activated, _) => arn
               } match {
-                case Some(arn) => checkMandationStatus(block, vrn, arn, ignoreMandatedStatus)
+                case Some(arn) => checkMandationStatus(block(request), vrn, arn, ignoreMandatedStatus)
                 case None =>
                   logDebug("[AuthPredicate][authoriseAsAgent] - Agent with no HMRC-AS-AGENT enrolment. Rendering unauthorised view.")
                   Future.successful(Forbidden(unauthorisedView()))
@@ -77,7 +80,7 @@ class AuthoriseAgentWithClient @Inject()(enrolmentsAuthService: EnrolmentsAuthSe
   }
 
 
-  private def checkMandationStatus(block: MessagesRequest[AnyContent] => User => Future[Result],
+  private def checkMandationStatus(block: User => Future[Result],
                                    vrn: String,
                                    arn: String,
                                    ignoreMandatedStatus: Boolean)
@@ -89,12 +92,22 @@ class AuthoriseAgentWithClient @Inject()(enrolmentsAuthService: EnrolmentsAuthSe
     subscriptionService.getUserDetails(vrn) flatMap {
       case Some(details) if ignoreMandatedStatus || permittedStatuses.contains(details.mandationStatus) =>
         val user = User(vrn, arn = Some(arn))
-        block(request)(user)
+        insolvencySubscriptionCallAgent(user, block, details)
       case Some(_) =>
-        logDebug("[AuthPredicate][checkMandationStatus] - Agent acting for MTDfB client")
+        logDebug("[AuthorisedAgentWithClient][checkMandationStatus] - Agent acting for MTDfB client")
         Future.successful(Redirect(appConfig.agentClientHubUrl))
       case None =>
-        Future.successful(InternalServerError)
+        Future.successful(InternalServerError(technicalProblemView()))
     }
   }
+
+  private def insolvencySubscriptionCallAgent(user: User, block: User => Future[Result], details: CustomerInformation)
+                                             (implicit request: MessagesRequest[AnyContent]): Future[Result] =
+    if (details.insolvencyDateFutureUserBlocked(dateService.now())) {
+      Logger.warn("[AuthorisedAgentWithClient][insolvencySubscriptionCallAgent] - Client has a future insolvencyDate, throwing ISE")
+      Future.successful(InternalServerError(technicalProblemView()))
+    } else {
+      Logger.debug("[AuthorisedAgentWithClient][insolvencySubscriptionCallAgent] - Authenticated as agent")
+      block(user)
+    }
 }

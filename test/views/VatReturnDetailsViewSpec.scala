@@ -110,7 +110,10 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
 
   "Rendering the vat return details page from the returns route with flat rate scheme and NI protocol feature enabled" should {
 
-    lazy val view = injectedView(vatReturnViewModel)
+    lazy val view = {
+      mockConfig.features.niProtocolEnabled(true)
+      injectedView(vatReturnViewModel)
+    }
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct document title" in {

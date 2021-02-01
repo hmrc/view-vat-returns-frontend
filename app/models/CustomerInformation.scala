@@ -18,6 +18,7 @@ package models
 
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
+import java.time.LocalDate
 
 case class CustomerInformation(organisationName: Option[String],
                                firstName: Option[String],
@@ -25,6 +26,8 @@ case class CustomerInformation(organisationName: Option[String],
                                tradingName: Option[String],
                                isInsolvent: Boolean,
                                continueToTrade: Option[Boolean],
+                               insolvencyType: Option[String],
+                               insolvencyDate: Option[String],
                                hasFlatRateScheme: Boolean,
                                isPartialMigration: Boolean,
                                customerMigratedToETMPDate: Option[String],
@@ -46,6 +49,13 @@ case class CustomerInformation(organisationName: Option[String],
     case Some(false) => isInsolvent
     case _ => false
   }
+
+  def insolvencyDateFutureUserBlocked(today: LocalDate): Boolean =
+    (isInsolvent, insolvencyType,insolvencyDate, continueToTrade) match {
+      case (_, Some(inType),_,_) if Seq("07","12","13","14").contains(inType) => false
+      case (true, Some(_), Some(date), Some(true)) if LocalDate.parse(date).isAfter(today) => true
+      case _ => false
+    }
 }
 
 object CustomerInformation {
@@ -57,6 +67,8 @@ object CustomerInformation {
     (JsPath \ "customerDetails" \ "tradingName").readNullable[String].orElse(Reads.pure(None)) and
     (JsPath \ "customerDetails" \ "isInsolvent").read[Boolean] and
     (JsPath \ "customerDetails" \ "continueToTrade").readNullable[Boolean] and
+    (JsPath \ "customerDetails" \ "insolvencyType").readNullable[String] and
+    (JsPath \ "customerDetails" \ "insolvencyDate").readNullable[String] and
     (JsPath \ "flatRateScheme").readNullable[JsValue].orElse(Reads.pure(None)).map(_.isDefined) and
     (JsPath \\ "isPartialMigration").readNullable[Boolean].map(_.contains(true)) and
     (JsPath \\ "customerMigratedToETMPDate").readNullable[String] and
