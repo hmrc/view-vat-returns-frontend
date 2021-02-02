@@ -28,6 +28,8 @@ object TestJson {
       "tradingName" -> "Cheapo Clothing",
       "isInsolvent" -> false,
       "continueToTrade" -> true,
+      "insolvencyType" -> "01",
+      "insolvencyDate" -> "2018-01-01",
       "isPartialMigration" -> false,
       "customerMigratedToETMPDate" -> "2017-01-01",
       "hybridToFullMigrationDate" -> "2017-02-02"

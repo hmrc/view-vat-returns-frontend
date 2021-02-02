@@ -28,6 +28,8 @@ object TestModels {
     Some("Cheapo Clothing"),
     isInsolvent = false,
     Some(true),
+    Some("01"),
+    Some("2018-01-01"),
     hasFlatRateScheme = true,
     isPartialMigration = false,
     Some("2017-01-01"),
@@ -42,6 +44,8 @@ object TestModels {
     None,
     isInsolvent = false,
     None,
+    None,
+    None,
     hasFlatRateScheme = false,
     isPartialMigration = false,
     None,
@@ -50,7 +54,7 @@ object TestModels {
   )
 
   val customerDetailsInsolvent: CustomerInformation = customerInformationMax.copy(isInsolvent = true, continueToTrade = Some(false))
-
+  val customerInformationFutureInsolvent: CustomerInformation= customerInformationMax.copy(isInsolvent = true, insolvencyDate = Some("2018-05-02"))
   val customerInformationNonMTDfB: CustomerInformation = customerInformationMax.copy(mandationStatus = nonMTDfB)
   val customerInformationNonDigital: CustomerInformation = customerInformationMax.copy(mandationStatus = nonDigital)
   val customerInformationMTDfBExempt: CustomerInformation = customerInformationMax.copy(mandationStatus = mtdfbExempt)

@@ -87,6 +87,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
           lazy val result = {
             callAuthService(individualAuthResult)
             callSubscriptionService(Some(customerInformationMax.copy(isInsolvent = true, continueToTrade = Some(false))))
+            callDateService()
             controller.returnDeadlines()(fakeRequest)
           }
 

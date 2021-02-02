@@ -18,7 +18,6 @@ package controllers.predicates
 
 import common.TestModels._
 import controllers.ControllerBaseSpec
-import controllers.predicate.AuthoriseAgentWithClient
 import play.api.http.Status
 import play.api.mvc.{AnyContent, MessagesRequest, Request, Result}
 import play.api.mvc.Results.Ok
@@ -33,32 +32,12 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
 
-  private trait Test {
-    val mockAuthConnector: AuthConnector = mock[AuthConnector]
-    val mockEnrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
-
-    lazy val authResponse: Enrolments = Enrolments(
-      Set(
-        Enrolment(
-          "HMRC-AS-AGENT",
-          Seq(EnrolmentIdentifier("AgentReferenceNumber", "XARN1234567")),
-          "Activated"
-        )
-      )
-    )
-
-    lazy val mockAgentPredicate: AuthoriseAgentWithClient = new AuthoriseAgentWithClient(
-      mockEnrolmentsAuthService,
-      mockSubscriptionService,
-      mcc,
-      unauthorisedView
-    )
+    lazy val authResponse: Enrolments = Enrolments(agentEnrolment)
 
     def target(request: Request[AnyContent], ignoreMandatedStatus: Boolean = false): Future[Result] =
-      mockAgentPredicate.authoriseAsAgent({ _ =>
+      mockAuthorisedAgentWithClient.authoriseAsAgent({ _ =>
         _ => Ok("welcome")
       }, ignoreMandatedStatus)(new MessagesRequest[AnyContent](request, mcc.messagesApi))
-  }
 
   "AgentPredicate .authoriseAsAgent" when {
 
@@ -70,13 +49,11 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
 
           "client is Non MTDfB" should {
 
-            "return the result of the original code block" in new Test {
+            "return the result of the original code block" in {
 
-              (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
-                .expects(*, *, *, *)
-                .returns(authResponse)
-
+              callAuthServiceEnrolmentsOnly(authResponse)
               callSubscriptionService(Some(customerInformationNonMTDfB))
+              callDateService()
 
               lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
 
@@ -87,13 +64,11 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
 
           "client is Non Digital" should {
 
-            "return the result of the original code block" in new Test {
+            "return the result of the original code block" in {
 
-              (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
-                .expects(*, *, *, *)
-                .returns(authResponse)
-
+              callAuthServiceEnrolmentsOnly(authResponse)
               callSubscriptionService(Some(customerInformationNonDigital))
+              callDateService()
 
               lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
 
@@ -104,13 +79,11 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
 
           "client is MTDfB Exempt" should {
 
-            "return the result of the original code block" in new Test {
+            "return the result of the original code block" in {
 
-              (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
-                .expects(*, *, *, *)
-                .returns(authResponse)
-
+              callAuthServiceEnrolmentsOnly(authResponse)
               callSubscriptionService(Some(customerInformationMTDfBExempt))
+              callDateService()
 
               lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
 
@@ -118,36 +91,47 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
               await(bodyOf(result)) shouldBe "welcome"
             }
           }
-        }
 
-        "agent does not have HMRC-AS-AGENT enrolment" should {
+          "client with a future insolvency date" should {
 
-          "return 403" in new Test {
+            "return an Internal Server Error (500) " in {
 
-            val otherEnrolment: Enrolments = Enrolments(
-              Set(
-                Enrolment(
-                  "OTHER-ENROLMENT",
-                  Seq(EnrolmentIdentifier("AA", "AA")),
-                  "Activated"
+              lazy val result = {
+                callAuthServiceEnrolmentsOnly(authResponse)
+                callSubscriptionService(Some(customerInformationFutureInsolvent))
+                callDateService()
+                target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"), ignoreMandatedStatus = true)
+              }
+              status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+            }
+          }
+
+          "agent does not have HMRC-AS-AGENT enrolment" should {
+
+            "return 403" in {
+
+              val otherEnrolment: Enrolments = Enrolments(
+                Set(
+                  Enrolment(
+                    "OTHER-ENROLMENT",
+                    Seq(EnrolmentIdentifier("AA", "AA")),
+                    "Activated"
+                  )
                 )
               )
-            )
 
-            (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
-              .expects(*, *, *, *)
-              .returns(Future.successful(otherEnrolment))
+              callAuthServiceEnrolmentsOnly(Future.successful(otherEnrolment))
 
-            lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
+              lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
 
-            status(result) shouldBe Status.FORBIDDEN
+              status(result) shouldBe Status.FORBIDDEN
+            }
           }
         }
-      }
 
-      "agent does not have delegated enrolment for VRN" should {
+        "agent does not have delegated enrolment for VRN" should {
 
-        "redirect to agent-client-lookup unauthorised page" in new Test {
+          "redirect to agent-client-lookup unauthorised page" in {
 
           (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
             .expects(*, *, *, *)
@@ -155,83 +139,77 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
 
           lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
 
-          await(status(result)) shouldBe Status.SEE_OTHER
-          redirectLocation(result) shouldBe Some(mockConfig.agentClientUnauthorisedUrl("/"))
-        }
-      }
-
-      "client does not have the correct mandation status" should {
-
-        "redirect to agent-client-lookup agent access page" in new Test {
-
-          (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
-            .expects(*, *, *, *)
-            .returns(authResponse)
-
-          callSubscriptionService(Some(customerInformationMax))
-
-          lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
-
-          await(status(result)) shouldBe Status.SEE_OTHER
-          redirectLocation(result) shouldBe Some(mockConfig.agentClientHubUrl)
+            await(status(result)) shouldBe Status.SEE_OTHER
+            redirectLocation(result) shouldBe Some(mockConfig.agentClientUnauthorisedUrl("/"))
+          }
         }
 
-        "correctly redirect if 'ignoreMandatedStatus' is set to true" in new Test {
+        "client does not have the correct mandation status" should {
 
-          (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
-            .expects(*, *, *, *)
-            .returns(authResponse)
+          "redirect to agent-client-lookup agent access page" in {
 
-          callSubscriptionService(Some(customerInformationMax))
+            callAuthServiceEnrolmentsOnly(authResponse)
+            callSubscriptionService(Some(customerInformationMax))
 
-          lazy val result: Future[Result] =
-            target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"), ignoreMandatedStatus = true)
+            lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
 
-          await(status(result)) shouldBe Status.OK
-          await(bodyOf(result)) shouldBe "welcome"
-        }
-      }
+            await(status(result)) shouldBe Status.SEE_OTHER
+            redirectLocation(result) shouldBe Some(mockConfig.agentClientHubUrl)
+          }
 
-      "an error is returned from the customer info call" should {
+          "correctly redirect if 'ignoreMandatedStatus' is set to true" in {
 
-        "throw an internal server error" in new Test {
-          (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
-            .expects(*, *, *, *)
-            .returns(authResponse)
+            callAuthServiceEnrolmentsOnly(authResponse)
+            callSubscriptionService(Some(customerInformationMax))
+            callDateService()
 
-          callSubscriptionService(None)
+            lazy val result: Future[Result] =
+              target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"), ignoreMandatedStatus = true)
 
-          lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
-
-          await(status(result)) shouldBe Status.INTERNAL_SERVER_ERROR
+            await(status(result)) shouldBe Status.OK
+            await(bodyOf(result)) shouldBe "welcome"
+          }
         }
 
-      }
+        "an error is returned from the customer info call" should {
 
-      "user has no session" should {
+          "throw an internal server error" in {
 
-        "redirect to sign in" in new Test {
+            callAuthServiceEnrolmentsOnly(authResponse)
+            callSubscriptionService(None)
+
+            lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
+
+            await(status(result)) shouldBe Status.INTERNAL_SERVER_ERROR
+          }
+
+        }
+
+        "user has no session" should {
+
+          "redirect to sign in" in {
 
           (mockAuthConnector.authorise(_: Predicate, _: Retrieval[_])(_: HeaderCarrier, _: ExecutionContext))
             .expects(*, *, *, *)
             .returns(Future.failed(MissingBearerToken()))
 
-          lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
+            lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
 
-          status(result) shouldBe Status.SEE_OTHER
-          redirectLocation(result) shouldBe Some(mockConfig.signInUrl)
+            status(result) shouldBe Status.SEE_OTHER
+            redirectLocation(result) shouldBe Some(mockConfig.signInUrl)
+          }
         }
       }
-    }
 
-    "CLIENT_VRN is not in session" should {
+      "CLIENT_VRN is not in session" should {
 
-      "redirect to agent-client lookup VRN lookup page" in new Test {
+        "redirect to agent-client lookup VRN lookup page" in {
 
-        lazy val result: Future[Result] = target(fakeRequest)
+          lazy val result: Future[Result] = target(fakeRequest)
 
-        status(result) shouldBe Status.SEE_OTHER
-        redirectLocation(result) shouldBe Some(mockConfig.agentClientLookupUrl("/"))
+          status(result) shouldBe Status.SEE_OTHER
+          redirectLocation(result) shouldBe Some(mockConfig.agentClientLookupUrl("/"))
+        }
       }
     }
   }

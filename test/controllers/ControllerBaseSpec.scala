@@ -26,6 +26,7 @@ import models.User
 import play.api.http.Status
 import play.api.mvc._
 import play.api.test.FakeRequest
+import services.EnrolmentsAuthService
 import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual}
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.auth.core.{AffinityGroup, Enrolment, EnrolmentIdentifier, Enrolments}
@@ -47,14 +48,14 @@ class ControllerBaseSpec extends MockAuth {
 
   lazy val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
   def request(request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()): MessagesRequest[AnyContentAsEmpty.type] =
-    new MessagesRequest[AnyContentAsEmpty.type](request.withSession(SessionKeys.insolventWithoutAccessKey -> "false"), mcc.messagesApi)
+    new MessagesRequest[AnyContentAsEmpty.type](request.withSession(SessionKeys.insolventWithoutAccessKey -> "false",
+      SessionKeys.futureInsolvencyDate -> "false"), mcc.messagesApi)
   implicit val user: User = User(vrn)
 
   lazy val fakeRequestWithSession: FakeRequest[AnyContentAsEmpty.type] = fakeRequest.withSession(
     GovUkSessionKeys.lastRequestTimestamp -> "1498236506662",
     GovUkSessionKeys.authToken -> "Bearer Token"
   )
-
   lazy val insolventRequest: FakeRequest[AnyContentAsEmpty.type] =
     FakeRequest().withSession(SessionKeys.insolventWithoutAccessKey -> "true")
 
