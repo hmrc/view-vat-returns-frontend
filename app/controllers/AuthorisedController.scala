@@ -59,7 +59,7 @@ class AuthorisedController @Inject()(enrolmentsAuthService: EnrolmentsAuthServic
       case enrolments ~ Some(_) => authorisedAsNonAgent(block, enrolments)
       case _ =>
         logWarn("[AuthorisedController][authorisedAction] - Missing affinity group")
-        Future.successful(InternalServerError)
+        Future.successful(InternalServerError(technicalProblemView()))
     } recoverWith {
       case _: NoActiveSession => Future.successful(Redirect(appConfig.signInUrl))
       case _: InsufficientEnrolments =>
@@ -86,14 +86,14 @@ class AuthorisedController @Inject()(enrolmentsAuthService: EnrolmentsAuthServic
 
           (request.session.get(SessionKeys.insolventWithoutAccessKey), request.session.get(SessionKeys.futureInsolvencyDate)) match {
             case (Some("true"), _) => Future.successful(Forbidden)
-            case (Some("false"), Some("true")) => Future.successful(InternalServerError)
+            case (Some("false"), Some("true")) => Future.successful(InternalServerError(technicalProblemView()))
             case (Some("false"), Some("false")) => block(request)(user)
             case _ => insolvencySubscriptionCall(user, block(request))
           }
 
       } getOrElse {
         logWarn("[AuthorisedController][authoriseAsNonAgent] Non-agent with invalid VRN")
-        Future.successful(InternalServerError)
+        Future.successful(InternalServerError(technicalProblemView()))
       }
     } else {
       logDebug("[AuthorisedController][authoriseAsNonAgent] Non-agent with no HMRC-MTD-VAT enrolment. Rendering unauthorised view.")
@@ -130,6 +130,6 @@ class AuthorisedController @Inject()(enrolmentsAuthService: EnrolmentsAuthServic
         }
       case _ =>
         Logger.warn("[AuthorisedController][insolvencySubscriptionCall] - Failure obtaining insolvency status from Customer Info API")
-        Future.successful(InternalServerError)
+        Future.successful(InternalServerError(technicalProblemView()))
     }
 }
