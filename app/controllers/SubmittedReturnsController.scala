@@ -17,13 +17,13 @@
 package controllers
 
 import java.time.{LocalDate, Period}
+
 import audit.AuditingService
 import audit.models.ViewSubmittedVatObligationsAuditModel
 import config.AppConfig
-
 import javax.inject.{Inject, Singleton}
 import models.viewModels.{ReturnObligationsViewModel, VatReturnsViewModel}
-import models.{MigrationDateModel, ServiceResponse, User}
+import models.{CustomerInformation, MigrationDateModel, ServiceResponse, User}
 import models.errors.ObligationError
 import models.Obligation.Status.Fulfilled
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
@@ -60,13 +60,15 @@ class SubmittedReturnsController @Inject()(mcc: MessagesControllerComponents,
   def submittedReturns: Action[AnyContent] = authorisedController.authorisedAction({ implicit request =>
     implicit user =>
       for {
+        customerDetails <- subscriptionService.getUserDetails(user.vrn)
+        showInsolvencyContent = showInsolventContent(customerDetails)
         serviceInfoContent <- if (user.isAgent) Future.successful(HtmlFormat.empty) else serviceInfoService.getServiceInfoPartial
-        migrationDates <- getMigrationDates
+        migrationDates = getMigrationDates(customerDetails)
         obligationsResult <- getReturnObligations(migrationDates)
       } yield {
         obligationsResult match {
           case Right(model) =>
-            Ok(submittedReturnsView(model, serviceInfoContent))
+            Ok(submittedReturnsView(model, showInsolvencyContent, serviceInfoContent))
           case Left(error) =>
             logWarn("[ReturnObligationsController][submittedReturns] error: " + error.toString)
             InternalServerError(submittedReturnsErrorView(user))
@@ -123,13 +125,13 @@ class SubmittedReturnsController @Inject()(mcc: MessagesControllerComponents,
     }
   }
 
-  private[controllers] def getMigrationDates(implicit request: Request[_], user: User): Future[MigrationDateModel] =
-      subscriptionService.getUserDetails(user.vrn) map {
-        case Some(details) =>
-          MigrationDateModel(details.customerMigratedToETMPDate.map(LocalDate.parse), details.extractDate.map(LocalDate.parse))
-        case None =>
-          MigrationDateModel(None, None)
-      }
+  private[controllers] def getMigrationDates(customerInfo: Option[CustomerInformation]): MigrationDateModel =
+    customerInfo match {
+      case Some(details) =>
+        MigrationDateModel(details.customerMigratedToETMPDate.map(LocalDate.parse), details.extractDate.map(LocalDate.parse))
+      case None =>
+        MigrationDateModel(None, None)
+    }
 
   private[controllers] def customerMigratedWithin15M(migrationDate: Option[LocalDate]): Boolean =
     migrationDate match {
@@ -138,5 +140,12 @@ class SubmittedReturnsController @Inject()(mcc: MessagesControllerComponents,
         val monthsSinceMigration = Math.abs(Period.between(dateService.now(), date).toTotalMonths)
         0 to prevReturnsMonthLimit contains monthsSinceMigration
       case None => false
+    }
+
+  private[controllers] def showInsolventContent(customerInfo: Option[CustomerInformation]): Boolean =
+    customerInfo match {
+      case Some(information) if information.isInsolvent =>
+        !information.exemptInsolvencyTypes.contains(information.insolvencyType.getOrElse(""))
+      case _ => false
     }
 }

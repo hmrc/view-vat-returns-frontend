@@ -342,8 +342,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
     "the account details service returns both migration dates" should {
 
       lazy val result = {
-        callSubscriptionService(Some(customerInformationMax))
-        controller.getMigrationDates(request(), user)
+        controller.getMigrationDates(Some(customerInformationMax))
       }
 
       "return the correct date model" in {
@@ -354,8 +353,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
     "the account details service returns no migration dates" should {
 
       lazy val result = {
-        callSubscriptionService(Some(customerInformationMin))
-        controller.getMigrationDates(request(), user)
+        controller.getMigrationDates(Some(customerInformationMin))
       }
 
       "return the correct date model" in {
@@ -366,8 +364,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
     "the account details service returns a failure" should {
 
       lazy val result = {
-        callSubscriptionService(None)
-        controller.getMigrationDates(request(), user)
+        controller.getMigrationDates(None)
       }
 
       "return the correct date model" in {

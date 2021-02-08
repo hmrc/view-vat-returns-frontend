@@ -47,6 +47,7 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
     val returnsHeading = "h2"
     val period = ".column-two-thirds p"
     val backLink = "#link-back"
+    val insolvencyContent = ".panel"
 
     def obligation(number: Int): String = s".list-bullet li:nth-of-type($number)"
 
@@ -58,9 +59,274 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
 
   "Rendering the Submitted Returns page with a HMRC-MTD-VAT enrolment" when {
 
-    "there is a single return year retrieved" when {
+    "the user is not insolvent" when {
 
-      "there are multiple returns for the year retrieved" should {
+      "there is a single return year retrieved" when {
+
+        "there are multiple returns for the year retrieved" should {
+
+          lazy val exampleReturns: Seq[ReturnObligationsViewModel] =
+            Seq(
+              ReturnObligationsViewModel(
+                LocalDate.parse("2018-01-01"),
+                LocalDate.parse("2018-03-31"),
+                "#001"
+              ),
+              ReturnObligationsViewModel(
+                LocalDate.parse("2018-04-01"),
+                LocalDate.parse("2018-06-30"),
+                "#002"
+              )
+            )
+
+          lazy val view: Html = injectedView(
+            VatReturnsViewModel(
+              returnYears = Seq(2018),
+              obligations = exampleReturns,
+              showPreviousReturnsTab = false,
+              vrn = vrn
+            ),
+            showInsolvencyContent = false
+          )
+
+          lazy implicit val document: Document = Jsoup.parse(view.body)
+
+          "have the correct document title" in {
+            document.title shouldBe "Submitted returns - Business tax account - GOV.UK"
+          }
+
+          "have the correct page heading" in {
+            elementText(Selectors.pageHeading) shouldBe "Submitted returns"
+          }
+
+          "render breadcrumbs which" should {
+
+            "have the text 'Business tax account'" in {
+              elementText(Selectors.btaBreadcrumb) shouldBe "Business tax account"
+            }
+
+            "link to BTA" in {
+              element(Selectors.btaBreadcrumbLink).attr("href") shouldBe "bta-url"
+            }
+
+            "have the text 'VAT'" in {
+              elementText(Selectors.vatBreadcrumb) shouldBe "Your VAT account"
+            }
+
+            "link to the VAT Details page" in {
+              element(Selectors.vatBreadcrumbLink).attr("href") shouldBe "vat-details-url"
+            }
+
+            "have the text 'Submitted returns'" in {
+              elementText(Selectors.submittedReturnsBreadcrumb) shouldBe "Submitted returns"
+            }
+          }
+
+          "not render back button" in {
+            an[TestFailedException] should be thrownBy element(Selectors.backLink)
+          }
+
+          "not display the insolvency content" in {
+            elementExtinct(Selectors.insolvencyContent)
+          }
+
+          "have the correct return heading" in {
+            elementText(Selectors.returnsHeading) shouldBe "2018 returns"
+          }
+
+          "have the correct period text" in {
+            elementText(Selectors.period) shouldBe "For the period:"
+          }
+
+          "contain the first return which" should {
+
+            "contains the correct obligation period text" in {
+              elementText(Selectors.obligation(1)) shouldBe "View return for the period 1 January to 31 March 2018"
+            }
+
+            "contains the correct link to view a specific return" in {
+              element(Selectors.obligationLink(1)).attr("href") shouldBe controllers.routes.ReturnsController.vatReturn(2018, "#001").url
+            }
+          }
+
+          "contain the second return which" should {
+
+            "contains the correct obligation period text" in {
+              elementText(Selectors.obligation(2)) shouldBe "View return for the period 1 April to 30 June 2018"
+            }
+
+            "contains the correct link to view a specific return" in {
+              element(Selectors.obligationLink(2)).attr("href") shouldBe controllers.routes.ReturnsController.vatReturn(2018, "#002").url
+            }
+          }
+
+          "have a single tab" in {
+            elementText(Selectors.tabOne) should include("2018")
+          }
+        }
+
+        "there is a final return for year of 2018" should {
+
+          val exampleReturn: Seq[ReturnObligationsViewModel] =
+            Seq(
+              ReturnObligationsViewModel(
+                LocalDate.parse("2018-01-01"),
+                LocalDate.parse("2018-12-31"),
+                mockConfig.finalReturnPeriodKey
+              )
+            )
+
+          lazy val view: Html = injectedView(
+            VatReturnsViewModel(
+              returnYears = Seq(2018),
+              obligations = exampleReturn,
+              showPreviousReturnsTab = false,
+              vrn = vrn
+            ),
+            showInsolvencyContent = false
+          )
+
+          lazy implicit val document: Document = Jsoup.parse(view.body)
+
+          "contain the first obligation" in {
+            elementText(Selectors.obligation(1)) shouldBe "View return for the period Final return"
+          }
+        }
+      }
+
+      "two return years are retrieved" should {
+
+        val returnYears = Seq(2020, 2019)
+
+        lazy val exampleReturns: Seq[ReturnObligationsViewModel] =
+          Seq(
+            ReturnObligationsViewModel(
+              LocalDate.parse("2020-01-01"),
+              LocalDate.parse("2020-03-31"),
+              "#001"
+            ),
+            ReturnObligationsViewModel(
+              LocalDate.parse("2020-04-01"),
+              LocalDate.parse("2020-06-30"),
+              "#002"
+            ),
+            ReturnObligationsViewModel(
+              LocalDate.parse("2019-01-01"),
+              LocalDate.parse("2019-03-31"),
+              "#001"
+            ),
+            ReturnObligationsViewModel(
+              LocalDate.parse("2019-04-01"),
+              LocalDate.parse("2019-06-30"),
+              "#002"
+            )
+          )
+
+        lazy val view = injectedView(
+          VatReturnsViewModel(returnYears, exampleReturns, showPreviousReturnsTab = false, vrn),
+          showInsolvencyContent = false
+        )
+
+        lazy implicit val document: Document = Jsoup.parse(view.body)
+
+        "have a tab for 2020" in {
+          elementText(Selectors.tabOne) should include("2020")
+        }
+
+        "have a tab for 2019" in {
+          elementText(Selectors.tabTwo) should include("2019")
+        }
+
+        "not display the previous returns tab" in {
+          elementAsOpt(Selectors.tabThree) shouldBe None
+        }
+      }
+
+      "more than 2 return years are retrieved" should {
+
+        val returnYears = Seq(2020, 2019, 2018)
+
+        lazy val exampleReturns: Seq[ReturnObligationsViewModel] =
+          Seq(
+            ReturnObligationsViewModel(
+              LocalDate.parse("2020-01-01"),
+              LocalDate.parse("2020-03-31"),
+              "#001"
+            ),
+            ReturnObligationsViewModel(
+              LocalDate.parse("2020-04-01"),
+              LocalDate.parse("2020-06-30"),
+              "#002"
+            ),
+            ReturnObligationsViewModel(
+              LocalDate.parse("2019-01-01"),
+              LocalDate.parse("2019-03-31"),
+              "#001"
+            ),
+            ReturnObligationsViewModel(
+              LocalDate.parse("2019-04-01"),
+              LocalDate.parse("2019-06-30"),
+              "#002"
+            ),
+            ReturnObligationsViewModel(
+              LocalDate.parse("2018-01-01"),
+              LocalDate.parse("2018-03-31"),
+              "#001"
+            ),
+            ReturnObligationsViewModel(
+              LocalDate.parse("2018-04-01"),
+              LocalDate.parse("2018-06-30"),
+              "#002"
+            )
+          )
+
+        lazy val view = injectedView(
+          VatReturnsViewModel(returnYears, exampleReturns, showPreviousReturnsTab = false, vrn),
+          showInsolvencyContent = false
+        )
+
+        lazy implicit val document: Document = Jsoup.parse(view.body)
+
+        "have a tab for 2020" in {
+          elementText(Selectors.tabOne) should include("2020")
+        }
+
+        "have a tab for 2019" in {
+          elementText(Selectors.tabTwo) should include("2019")
+        }
+
+        "have a tab for 2018" in {
+          elementText(Selectors.tabThree) should include("2018")
+        }
+
+        "not display the previous returns tab" in {
+          elementAsOpt(Selectors.tabFour) shouldBe None
+        }
+      }
+
+      "there are no returns for the year retrieved" should {
+
+        lazy val view = injectedView(
+          VatReturnsViewModel(Seq(2018), Seq(), showPreviousReturnsTab = false, vrn),
+          showInsolvencyContent = false
+        )
+
+        lazy implicit val document: Document = Jsoup.parse(view.body)
+
+        "have the correct return heading" in {
+          elementText(Selectors.returnsHeading) shouldBe "2018 returns"
+        }
+
+        "have the correct alternate content" in {
+          elementText(Selectors.noReturnsFound) shouldBe
+            "You have not submitted any returns using the new VAT service this year."
+        }
+      }
+    }
+
+    "the user is insolvent" when {
+
+      "there is return history to display" should {
 
         lazy val exampleReturns: Seq[ReturnObligationsViewModel] =
           Seq(
@@ -82,232 +348,34 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
             obligations = exampleReturns,
             showPreviousReturnsTab = false,
             vrn = vrn
-          )
+          ),
+          showInsolvencyContent = true
         )
 
         lazy implicit val document: Document = Jsoup.parse(view.body)
 
-        "have the correct document title" in {
-          document.title shouldBe "Submitted returns - Business tax account - GOV.UK"
-        }
-
-        "have the correct page heading" in {
-          elementText(Selectors.pageHeading) shouldBe "Submitted returns"
-        }
-
-        "render breadcrumbs which" should {
-
-          "have the text 'Business tax account'" in {
-            elementText(Selectors.btaBreadcrumb) shouldBe "Business tax account"
-          }
-
-          "link to BTA" in {
-            element(Selectors.btaBreadcrumbLink).attr("href") shouldBe "bta-url"
-          }
-
-          "have the text 'VAT'" in {
-            elementText(Selectors.vatBreadcrumb) shouldBe "Your VAT account"
-          }
-
-          "link to the VAT Details page" in {
-            element(Selectors.vatBreadcrumbLink).attr("href") shouldBe "vat-details-url"
-          }
-
-          "have the text 'Submitted returns'" in {
-            elementText(Selectors.submittedReturnsBreadcrumb) shouldBe "Submitted returns"
-          }
-        }
-
-        "not render back button" in {
-          an[TestFailedException] should be thrownBy element(Selectors.backLink)
-        }
-
-        "have the correct return heading" in {
-          elementText(Selectors.returnsHeading) shouldBe "2018 returns"
-        }
-
-        "have the correct period text" in {
-          elementText(Selectors.period) shouldBe "For the period:"
-        }
-
-        "contain the first return which" should {
-
-          "contains the correct obligation period text" in {
-            elementText(Selectors.obligation(1)) shouldBe "View return for the period 1 January to 31 March 2018"
-          }
-
-          "contains the correct link to view a specific return" in {
-            element(Selectors.obligationLink(1)).attr("href") shouldBe controllers.routes.ReturnsController.vatReturn(2018, "#001").url
-          }
-        }
-
-        "contain the second return which" should {
-
-          "contains the correct obligation period text" in {
-            elementText(Selectors.obligation(2)) shouldBe "View return for the period 1 April to 30 June 2018"
-          }
-
-          "contains the correct link to view a specific return" in {
-            element(Selectors.obligationLink(2)).attr("href") shouldBe controllers.routes.ReturnsController.vatReturn(2018, "#002").url
-          }
-        }
-
-        "have a single tab" in {
-          elementText(Selectors.tabOne) should include("2018")
+        "display the insolvency content" in {
+          elementText(Selectors.insolvencyContent) shouldBe "You cannot view returns made before the insolvency date."
         }
       }
 
-      "there is a final return for year of 2018" should {
-
-        val exampleReturn: Seq[ReturnObligationsViewModel] =
-          Seq(
-            ReturnObligationsViewModel(
-              LocalDate.parse("2018-01-01"),
-              LocalDate.parse("2018-12-31"),
-              mockConfig.finalReturnPeriodKey
-            )
-          )
+      "there is no return history to display" should {
 
         lazy val view: Html = injectedView(
           VatReturnsViewModel(
             returnYears = Seq(2018),
-            obligations = exampleReturn,
+            obligations = Seq(),
             showPreviousReturnsTab = false,
             vrn = vrn
-          )
+          ),
+          showInsolvencyContent = true
         )
 
         lazy implicit val document: Document = Jsoup.parse(view.body)
 
-        "contain the first obligation" in {
-          elementText(Selectors.obligation(1)) shouldBe "View return for the period Final return"
+        "not display the insolvency content" in {
+          elementExtinct(Selectors.insolvencyContent)
         }
-      }
-    }
-
-    "two return years are retrieved" should {
-
-      val returnYears = Seq(2020, 2019)
-
-      lazy val exampleReturns: Seq[ReturnObligationsViewModel] =
-        Seq(
-          ReturnObligationsViewModel(
-            LocalDate.parse("2020-01-01"),
-            LocalDate.parse("2020-03-31"),
-            "#001"
-          ),
-          ReturnObligationsViewModel(
-            LocalDate.parse("2020-04-01"),
-            LocalDate.parse("2020-06-30"),
-            "#002"
-          ),
-          ReturnObligationsViewModel(
-            LocalDate.parse("2019-01-01"),
-            LocalDate.parse("2019-03-31"),
-            "#001"
-          ),
-          ReturnObligationsViewModel(
-            LocalDate.parse("2019-04-01"),
-            LocalDate.parse("2019-06-30"),
-            "#002"
-          )
-        )
-
-      lazy val view = injectedView(
-        VatReturnsViewModel(returnYears, exampleReturns, showPreviousReturnsTab = false, vrn)
-      )
-
-      lazy implicit val document: Document = Jsoup.parse(view.body)
-
-      "have a tab for 2020" in {
-        elementText(Selectors.tabOne) should include("2020")
-      }
-
-      "have a tab for 2019" in {
-        elementText(Selectors.tabTwo) should include("2019")
-      }
-
-      "not display the previous returns tab" in {
-        elementAsOpt(Selectors.tabThree) shouldBe None
-      }
-    }
-
-    "more than 2 return years are retrieved" should {
-
-      val returnYears = Seq(2020, 2019, 2018)
-
-      lazy val exampleReturns: Seq[ReturnObligationsViewModel] =
-        Seq(
-          ReturnObligationsViewModel(
-            LocalDate.parse("2020-01-01"),
-            LocalDate.parse("2020-03-31"),
-            "#001"
-          ),
-          ReturnObligationsViewModel(
-            LocalDate.parse("2020-04-01"),
-            LocalDate.parse("2020-06-30"),
-            "#002"
-          ),
-          ReturnObligationsViewModel(
-            LocalDate.parse("2019-01-01"),
-            LocalDate.parse("2019-03-31"),
-            "#001"
-          ),
-          ReturnObligationsViewModel(
-            LocalDate.parse("2019-04-01"),
-            LocalDate.parse("2019-06-30"),
-            "#002"
-          ),
-          ReturnObligationsViewModel(
-            LocalDate.parse("2018-01-01"),
-            LocalDate.parse("2018-03-31"),
-            "#001"
-          ),
-          ReturnObligationsViewModel(
-            LocalDate.parse("2018-04-01"),
-            LocalDate.parse("2018-06-30"),
-            "#002"
-          )
-        )
-
-      lazy val view = injectedView(
-        VatReturnsViewModel(returnYears, exampleReturns, showPreviousReturnsTab = false, vrn)
-      )
-
-      lazy implicit val document: Document = Jsoup.parse(view.body)
-
-      "have a tab for 2020" in {
-        elementText(Selectors.tabOne) should include("2020")
-      }
-
-      "have a tab for 2019" in {
-        elementText(Selectors.tabTwo) should include("2019")
-      }
-
-      "have a tab for 2018" in {
-        elementText(Selectors.tabThree) should include("2018")
-      }
-
-      "not display the previous returns tab" in {
-        elementAsOpt(Selectors.tabFour) shouldBe None
-      }
-    }
-
-    "there are no returns for the year retrieved" should {
-
-      lazy val view = injectedView(
-        VatReturnsViewModel(Seq(2018), Seq(), showPreviousReturnsTab = false, vrn)
-      )
-
-      lazy implicit val document: Document = Jsoup.parse(view.body)
-
-      "have the correct return heading" in {
-        elementText(Selectors.returnsHeading) shouldBe "2018 returns"
-      }
-
-      "have the correct alternate content" in {
-        elementText(Selectors.noReturnsFound) shouldBe
-          "You have not submitted any returns using the new VAT service this year."
       }
     }
   }
@@ -338,7 +406,8 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
             obligations = exampleReturns,
             showPreviousReturnsTab = false,
             vrn = vrn
-          )
+          ),
+          showInsolvencyContent = false
         )(fakeRequestWithClientsVRN, messages, mockConfig, agentUser)
 
         lazy implicit val document: Document = Jsoup.parse(view.body)
@@ -385,7 +454,8 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
       "the current year is 2018" should {
 
         lazy val view = injectedView(
-          VatReturnsViewModel(returnYears, exampleReturns, showPreviousReturnsTab = true, vrn)
+          VatReturnsViewModel(returnYears, exampleReturns, showPreviousReturnsTab = true, vrn),
+          showInsolvencyContent = false
         )
 
         lazy implicit val document: Document = Jsoup.parse(view.body)
@@ -431,7 +501,8 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
           )
 
         lazy val view = injectedView(
-          VatReturnsViewModel(returnYears, exampleReturns, showPreviousReturnsTab = true, vrn)
+          VatReturnsViewModel(returnYears, exampleReturns, showPreviousReturnsTab = true, vrn),
+          showInsolvencyContent = false
         )
 
         lazy implicit val document: Document = Jsoup.parse(view.body)
@@ -492,7 +563,8 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
         )
 
       lazy val view = injectedView(
-        VatReturnsViewModel(returnYears, exampleReturns, showPreviousReturnsTab = true, vrn)
+        VatReturnsViewModel(returnYears, exampleReturns, showPreviousReturnsTab = true, vrn),
+        showInsolvencyContent = false
       )
 
       lazy implicit val document: Document = Jsoup.parse(view.body)
@@ -545,7 +617,8 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
     )
 
     lazy val view = injectedView(
-      VatReturnsViewModel(returnYears, exampleReturns, showPreviousReturnsTab = true, vrn)
+      VatReturnsViewModel(returnYears, exampleReturns, showPreviousReturnsTab = true, vrn),
+      showInsolvencyContent = false
     )(fakeRequestWithClientsVRN, messages, mockConfig, agentUser)
 
     lazy implicit val document: Document = Jsoup.parse(view.body)
