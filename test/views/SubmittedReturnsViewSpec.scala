@@ -324,58 +324,36 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
       }
     }
 
-    "the user is insolvent" when {
+    "the user is insolvent" should {
 
-      "there is return history to display" should {
-
-        lazy val exampleReturns: Seq[ReturnObligationsViewModel] =
-          Seq(
-            ReturnObligationsViewModel(
-              LocalDate.parse("2018-01-01"),
-              LocalDate.parse("2018-03-31"),
-              "#001"
-            ),
-            ReturnObligationsViewModel(
-              LocalDate.parse("2018-04-01"),
-              LocalDate.parse("2018-06-30"),
-              "#002"
-            )
+      lazy val exampleReturns: Seq[ReturnObligationsViewModel] =
+        Seq(
+          ReturnObligationsViewModel(
+            LocalDate.parse("2018-01-01"),
+            LocalDate.parse("2018-03-31"),
+            "#001"
+          ),
+          ReturnObligationsViewModel(
+            LocalDate.parse("2018-04-01"),
+            LocalDate.parse("2018-06-30"),
+            "#002"
           )
-
-        lazy val view: Html = injectedView(
-          VatReturnsViewModel(
-            returnYears = Seq(2018),
-            obligations = exampleReturns,
-            showPreviousReturnsTab = false,
-            vrn = vrn
-          ),
-          showInsolvencyContent = true
         )
 
-        lazy implicit val document: Document = Jsoup.parse(view.body)
+      lazy val view: Html = injectedView(
+        VatReturnsViewModel(
+          returnYears = Seq(2018),
+          obligations = exampleReturns,
+          showPreviousReturnsTab = false,
+          vrn = vrn
+        ),
+        showInsolvencyContent = true
+      )
 
-        "display the insolvency content" in {
-          elementText(Selectors.insolvencyContent) shouldBe "You cannot view returns made before the insolvency date."
-        }
-      }
+      lazy implicit val document: Document = Jsoup.parse(view.body)
 
-      "there is no return history to display" should {
-
-        lazy val view: Html = injectedView(
-          VatReturnsViewModel(
-            returnYears = Seq(2018),
-            obligations = Seq(),
-            showPreviousReturnsTab = false,
-            vrn = vrn
-          ),
-          showInsolvencyContent = true
-        )
-
-        lazy implicit val document: Document = Jsoup.parse(view.body)
-
-        "not display the insolvency content" in {
-          elementExtinct(Selectors.insolvencyContent)
-        }
+      "display the insolvency content" in {
+        elementText(Selectors.insolvencyContent) shouldBe "You cannot view returns made before the insolvency date."
       }
     }
   }

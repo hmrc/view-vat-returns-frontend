@@ -51,7 +51,7 @@
 
             <h1 id="top" class="heading-xlarge">@messages("submittedReturns.title")</h1>
 
-            @if(showInsolvencyContent && model.obligations.nonEmpty) {
+            @if(showInsolvencyContent) {
                 <div class="panel panel-border-wide form-group">@messages("submittedReturns.insolvencyNotice")</div>
             }
 
