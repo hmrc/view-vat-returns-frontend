@@ -26,6 +26,7 @@ import play.api.mvc.AnyContentAsEmpty
 import play.api.test.{FakeRequest, Injecting}
 import uk.gov.hmrc.play.test.UnitSpec
 import common.SessionKeys
+import org.scalatest.Assertion
 
 import scala.collection.JavaConverters._
 
@@ -70,6 +71,16 @@ class ViewBaseSpec extends UnitSpec with GuiceOneAppPerSuite with Injecting {
   def elementAttributes(cssSelector: String)(implicit document: Document): Map[String, String] = {
     val attributes = element(cssSelector).attributes.asList().asScala.toList
     attributes.map(attribute => (attribute.getKey, attribute.getValue)).toMap
+  }
+
+  def elementExtinct(cssSelector: String)(implicit document: Document): Assertion = {
+    val elements = document.select(cssSelector)
+
+    if (elements.size == 0) {
+      succeed
+    } else {
+      fail(s"Element with selector '$cssSelector' was found!")
+    }
   }
 
   def formatHtml(markup: String): String = Jsoup.parseBodyFragment(s"\n$markup\n").toString.trim

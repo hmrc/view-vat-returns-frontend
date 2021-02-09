@@ -24,7 +24,7 @@
       submittedReturnsTabs: SubmittedReturnsTabs,
       submittedReturnsTabsContent: SubmittedReturnsTabsContent)
 
-@(model: VatReturnsViewModel,
+@(model: VatReturnsViewModel, showInsolvencyContent: Boolean,
   serviceInfoContent: Html = HtmlFormat.empty)(
   implicit request: Request[_], messages: Messages, appConfig: config.AppConfig, user: User)
 
@@ -50,6 +50,10 @@
             }
 
             <h1 id="top" class="heading-xlarge">@messages("submittedReturns.title")</h1>
+
+            @if(showInsolvencyContent) {
+                <div class="panel panel-border-wide form-group">@messages("submittedReturns.insolvencyNotice")</div>
+            }
 
             <div class="tabbed">
                 @submittedReturnsTabs(years = model.returnYears, showPreviousReturnsTab = model.showPreviousReturnsTab)

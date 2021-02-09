@@ -135,6 +135,7 @@ submittedReturns.previousReturns = Ffurflenni TAW blaenorol
 submittedReturns.finalReturn = Ffurflen TAW derfynol
 submittedReturns.back = Yn ôl i fanylion y cleient
 submittedReturns.backToTop = Nôl i’r brig
+submittedReturns.insolvencyNotice = Ni allwch fwrw golwg dros Ffurflenni TAW a chyflwynwyd cyn dyddiad yr ansolfedd.
 
 returnDeadlines.title = Dyddiadau cau ar gyfer cyflwyno
 returnDeadlines.submitBy = Defnyddiwch eich meddalwedd cyfrifyddu i gyflwyno Ffurflen TAW erbyn:
