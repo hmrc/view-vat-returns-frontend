@@ -18,8 +18,7 @@ package controllers
 
 import common.SessionKeys
 import common.TestModels.{customerInformationFutureInsolvent, customerInformationMax}
-import play.api.mvc.{AnyContent, MessagesRequest, Request, Result}
-import services.EnrolmentsAuthService
+import play.api.mvc.{MessagesRequest, Request, Result}
 import play.api.http.Status
 import play.api.mvc.Results.Ok
 import play.api.mvc.AnyContent

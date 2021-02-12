@@ -17,11 +17,15 @@
 package models
 
 import java.time.LocalDate
+
 import common.TestModels._
 import common.TestJson.customerInfoJsonMax
 import mocks.MockAuth
 
 class CustomerInformationSpec extends MockAuth {
+
+  val exemptInsolvencyTypes: Seq[String] = customerInformationMax.exemptInsolvencyTypes
+  val blockedInsolvencyTypes: Seq[String] = customerInformationMax.blockedInsolvencyTypes
 
   "A CustomerInformation object" should {
 
@@ -75,17 +79,17 @@ class CustomerInformationSpec extends MockAuth {
     "hybridToFullMigrationDate is available" should {
 
       "return the date from hybridToFullMigrationDate" in {
-          val customerInfo = customerInformationMax
-          customerInfo.extractDate shouldBe customerInfo.hybridToFullMigrationDate
+        val customerInfo = customerInformationMax
+        customerInfo.extractDate shouldBe customerInfo.hybridToFullMigrationDate
       }
     }
 
     "hybridToFullMigrationDate is missing" should {
 
-       "return customerMigratedToETMPDate" in {
+      "return customerMigratedToETMPDate" in {
         val customerInfo = customerInformationMax.copy(hybridToFullMigrationDate = None)
         customerInfo.extractDate shouldBe customerInfo.customerMigratedToETMPDate
-       }
+      }
     }
 
     "hybridToFullMigrationDate and customerMigratedToETMPDate are unavailable" should {
@@ -93,25 +97,53 @@ class CustomerInformationSpec extends MockAuth {
       "return customerMigratedToETMPDate" in {
         val customerInfo = customerInformationMax.copy(customerMigratedToETMPDate = None, hybridToFullMigrationDate = None)
         customerInfo.extractDate shouldBe customerInfo.customerMigratedToETMPDate
+      }
+    }
+
+  }
+
+  "calling .isInsolventWithoutAccess" when {
+
+    "the user is insolvent and has an exempt insolvency type" should {
+
+      "return false" in {
+        exemptInsolvencyTypes.foreach { value =>
+          customerDetailsInsolvent.copy(insolvencyType = Some(value)).isInsolventWithoutAccess shouldBe false
+        }
+      }
+    }
+
+    "the user is insolvent and has a blocked insolvency type" should {
+
+      "return true" in {
+        blockedInsolvencyTypes.foreach { value =>
+          customerDetailsInsolvent.copy(insolvencyType = Some(value)).isInsolventWithoutAccess shouldBe true
+        }
+      }
+    }
+
+    "the user is insolvent and has an insolvency type with no associated rules" when {
+
+      "the user is continuing to trade" should {
+
+        "return false" in {
+          customerDetailsInsolvent.copy(continueToTrade = Some(true)).isInsolventWithoutAccess shouldBe false
         }
       }
 
+      "the user is not continuing to trade" should {
+
+        "return true" in {
+          customerDetailsInsolvent.isInsolventWithoutAccess shouldBe true
+        }
+      }
     }
 
-  "calling .isInsolventWithoutAccess" should {
+    "the user is not insolvent" should {
 
-    "return true when the user is insolvent and not continuing to trade" in {
-      customerDetailsInsolvent.isInsolventWithoutAccess shouldBe true
-    }
-
-    "return false when the user is insolvent but is continuing to trade" in {
-      customerDetailsInsolvent.copy(continueToTrade = Some(true)).isInsolventWithoutAccess shouldBe false
-    }
-
-    "return false when the user is not insolvent, regardless of the continueToTrade flag" in {
-      customerInformationMax.isInsolventWithoutAccess shouldBe false
-      customerInformationMax.copy(continueToTrade = Some(false)).isInsolventWithoutAccess shouldBe false
-      customerInformationMax.copy(continueToTrade = None).isInsolventWithoutAccess shouldBe false
+      "return false" in {
+        customerInformationMax.isInsolventWithoutAccess shouldBe false
+      }
     }
   }
 
@@ -119,7 +151,7 @@ class CustomerInformationSpec extends MockAuth {
 
     val date  = LocalDate.parse("2018-05-01")
 
-    "return true when the user has a future insolvency date" in {
+    "return true when the user is insolvent and has a future insolvency date" in {
       callDateService()
       customerInformationFutureInsolvent.insolvencyDateFutureUserBlocked(date) shouldBe true
     }
@@ -127,10 +159,10 @@ class CustomerInformationSpec extends MockAuth {
       callDateService()
       customerInformationFutureInsolvent.copy(insolvencyDate = Some("2018-05-01")).insolvencyDateFutureUserBlocked(date) shouldBe false
     }
-    "return false when the user is type 7, 12, 13, 14" in {
-      Seq("07","12","13","14").foreach{insolventType =>
+    "return false when the user is of an exempt insolvency type, regardless of other flags" in {
+      exemptInsolvencyTypes.foreach { value =>
         callDateService()
-        customerInformationFutureInsolvent.copy(insolvencyType = Some(insolventType)).insolvencyDateFutureUserBlocked(date) shouldBe false
+        customerInformationFutureInsolvent.copy(insolvencyType = Some(value)).insolvencyDateFutureUserBlocked(date) shouldBe false
       }
     }
     "return false when the user is not insolvent" in {

@@ -19,10 +19,9 @@ package controllers.predicate
 import common._
 import config.AppConfig
 import javax.inject.{Inject, Singleton}
-import models.{CustomerInformation, User}
-import play.api.Logger
+import models.User
 import play.api.mvc._
-import services.{DateService, EnrolmentsAuthService, SubscriptionService}
+import services.{EnrolmentsAuthService, SubscriptionService}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.allEnrolments
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -37,8 +36,7 @@ class AuthoriseAgentWithClient @Inject()(enrolmentsAuthService: EnrolmentsAuthSe
                                          subscriptionService: SubscriptionService,
                                          mcc: MessagesControllerComponents,
                                          unauthorisedView: UnauthorisedView,
-                                         technicalProblemView: TechnicalProblemView,
-                                         dateService: DateService)
+                                         technicalProblemView: TechnicalProblemView)
                                         (implicit appConfig: AppConfig,
                                          ec: ExecutionContext) extends FrontendController(mcc) {
 
@@ -59,7 +57,7 @@ class AuthoriseAgentWithClient @Inject()(enrolmentsAuthService: EnrolmentsAuthSe
               enrolments.enrolments.collectFirst {
                 case Enrolment(EnrolmentKeys.agentEnrolmentKey, EnrolmentIdentifier(_, arn) :: _, EnrolmentKeys.activated, _) => arn
               } match {
-                case Some(arn) => checkMandationStatus(block(request), vrn, arn, ignoreMandatedStatus)
+                case Some(arn) => checkMandationStatus(block, vrn, arn, ignoreMandatedStatus)
                 case None =>
                   logDebug("[AuthPredicate][authoriseAsAgent] - Agent with no HMRC-AS-AGENT enrolment. Rendering unauthorised view.")
                   Future.successful(Forbidden(unauthorisedView()))
@@ -80,7 +78,7 @@ class AuthoriseAgentWithClient @Inject()(enrolmentsAuthService: EnrolmentsAuthSe
   }
 
 
-  private def checkMandationStatus(block: User => Future[Result],
+  private def checkMandationStatus(block: MessagesRequest[AnyContent] => User => Future[Result],
                                    vrn: String,
                                    arn: String,
                                    ignoreMandatedStatus: Boolean)
@@ -92,7 +90,7 @@ class AuthoriseAgentWithClient @Inject()(enrolmentsAuthService: EnrolmentsAuthSe
     subscriptionService.getUserDetails(vrn) flatMap {
       case Some(details) if ignoreMandatedStatus || permittedStatuses.contains(details.mandationStatus) =>
         val user = User(vrn, arn = Some(arn))
-        insolvencySubscriptionCallAgent(user, block, details)
+        block(request)(user)
       case Some(_) =>
         logDebug("[AuthorisedAgentWithClient][checkMandationStatus] - Agent acting for MTDfB client")
         Future.successful(Redirect(appConfig.agentClientHubUrl))
@@ -100,14 +98,4 @@ class AuthoriseAgentWithClient @Inject()(enrolmentsAuthService: EnrolmentsAuthSe
         Future.successful(InternalServerError(technicalProblemView()))
     }
   }
-
-  private def insolvencySubscriptionCallAgent(user: User, block: User => Future[Result], details: CustomerInformation)
-                                             (implicit request: MessagesRequest[AnyContent]): Future[Result] =
-    if (details.insolvencyDateFutureUserBlocked(dateService.now())) {
-      Logger.warn("[AuthorisedAgentWithClient][insolvencySubscriptionCallAgent] - Client has a future insolvencyDate, throwing ISE")
-      Future.successful(InternalServerError(technicalProblemView()))
-    } else {
-      Logger.debug("[AuthorisedAgentWithClient][insolvencySubscriptionCallAgent] - Authenticated as agent")
-      block(user)
-    }
 }
