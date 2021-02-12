@@ -21,7 +21,6 @@ import controllers.ControllerBaseSpec
 import play.api.http.Status
 import play.api.mvc.{AnyContent, MessagesRequest, Request, Result}
 import play.api.mvc.Results.Ok
-import services.EnrolmentsAuthService
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.Retrieval
@@ -53,7 +52,6 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
 
               callAuthServiceEnrolmentsOnly(authResponse)
               callSubscriptionService(Some(customerInformationNonMTDfB))
-              callDateService()
 
               lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
 
@@ -68,7 +66,6 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
 
               callAuthServiceEnrolmentsOnly(authResponse)
               callSubscriptionService(Some(customerInformationNonDigital))
-              callDateService()
 
               lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
 
@@ -83,26 +80,11 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
 
               callAuthServiceEnrolmentsOnly(authResponse)
               callSubscriptionService(Some(customerInformationMTDfBExempt))
-              callDateService()
 
               lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
 
               status(result) shouldBe Status.OK
               await(bodyOf(result)) shouldBe "welcome"
-            }
-          }
-
-          "client with a future insolvency date" should {
-
-            "return an Internal Server Error (500) " in {
-
-              lazy val result = {
-                callAuthServiceEnrolmentsOnly(authResponse)
-                callSubscriptionService(Some(customerInformationFutureInsolvent))
-                callDateService()
-                target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"), ignoreMandatedStatus = true)
-              }
-              status(result) shouldBe Status.INTERNAL_SERVER_ERROR
             }
           }
 
@@ -161,7 +143,6 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
 
             callAuthServiceEnrolmentsOnly(authResponse)
             callSubscriptionService(Some(customerInformationMax))
-            callDateService()
 
             lazy val result: Future[Result] =
               target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"), ignoreMandatedStatus = true)

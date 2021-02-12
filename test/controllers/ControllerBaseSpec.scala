@@ -26,7 +26,6 @@ import models.User
 import play.api.http.Status
 import play.api.mvc._
 import play.api.test.FakeRequest
-import services.EnrolmentsAuthService
 import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual}
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.auth.core.{AffinityGroup, Enrolment, EnrolmentIdentifier, Enrolments}
