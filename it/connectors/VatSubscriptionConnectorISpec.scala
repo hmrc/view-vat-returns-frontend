@@ -54,6 +54,7 @@ class VatSubscriptionConnectorISpec extends IntegrationBaseSpec {
           isPartialMigration = true,
           Some("2018-01-01"),
           Some("2018-01-01"),
+          Some("2018-01-01"),
           mtdfb
         ))
         private val result = await(connector.getCustomerInfo("999999999"))

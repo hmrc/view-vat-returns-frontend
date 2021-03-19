@@ -32,8 +32,9 @@ object TestModels {
     Some("2018-01-01"),
     hasFlatRateScheme = true,
     isPartialMigration = false,
+    Some("2018-01-01"),
+    Some("2018-02-02"),
     Some("2017-01-01"),
-    Some("2017-02-02"),
     mtdfb
   )
 
@@ -48,6 +49,7 @@ object TestModels {
     None,
     hasFlatRateScheme = false,
     isPartialMigration = false,
+    None,
     None,
     None,
     mtdfb

@@ -32,6 +32,7 @@ case class CustomerInformation(organisationName: Option[String],
                                isPartialMigration: Boolean,
                                customerMigratedToETMPDate: Option[String],
                                hybridToFullMigrationDate: Option[String],
+                               effectiveRegistrationDate: Option[String],
                                mandationStatus: String) {
 
   val entityName: Option[String] = (firstName, lastName, organisationName, tradingName) match {
@@ -78,6 +79,7 @@ object CustomerInformation {
     (JsPath \\ "isPartialMigration").readNullable[Boolean].map(_.contains(true)) and
     (JsPath \\ "customerMigratedToETMPDate").readNullable[String] and
     (JsPath \\ "hybridToFullMigrationDate").readNullable[String] and
+    (JsPath \ "customerDetails" \ "effectiveRegistrationDate").readNullable[String] and
     (JsPath \ "mandationStatus").read[String]
   )(CustomerInformation.apply _)
 }

@@ -50,7 +50,8 @@ object CustomerInfoStub extends WireMockMethods {
       "insolvencyType" -> "01",
       "insolvencyDate" -> "2018-01-01",
       "customerMigratedToETMPDate" -> "2018-01-01",
-      "hybridToFullMigrationDate" -> "2018-01-01"
+      "hybridToFullMigrationDate" -> "2018-01-01",
+      "effectiveRegistrationDate" -> "2018-01-01"
     ),
     "ppob" -> Json.obj(
       "address" -> Json.obj(
