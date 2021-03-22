@@ -26,7 +26,7 @@ import models.viewModels.{ReturnObligationsViewModel, VatReturnsViewModel}
 import models.{CustomerInformation, MigrationDateModel, ServiceResponse, User}
 import models.errors.ObligationError
 import models.Obligation.Status.Fulfilled
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import play.twirl.api.HtmlFormat
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
@@ -87,7 +87,7 @@ class SubmittedReturnsController @Inject()(mcc: MessagesControllerComponents,
                                                (implicit user: User,
                                                 hc: HeaderCarrier): Future[ServiceResponse[VatReturnsViewModel]] = {
 
-    val years = getValidYears(migrationDatesModel.migratedToETMPDate)
+    val years = getValidYears(migrationDatesModel.vatRegistrationDate)
 
     for {
       obligationsResult <- Future.sequence(years.map { year =>
@@ -102,7 +102,7 @@ class SubmittedReturnsController @Inject()(mcc: MessagesControllerComponents,
         case result =>
 
           val obligations = result.flatMap(_.right.toSeq).flatMap(_.obligations)
-          val migratedWithin15Months = customerMigratedWithin15M(migrationDatesModel.hybridToFullDate)
+          val migratedWithin15Months = customerMigratedWithin15M(migrationDatesModel.migrationDate)
 
           auditService.extendedAudit(
             ViewSubmittedVatObligationsAuditModel(user, obligations),
@@ -128,7 +128,7 @@ class SubmittedReturnsController @Inject()(mcc: MessagesControllerComponents,
   private[controllers] def getMigrationDates(customerInfo: Option[CustomerInformation]): MigrationDateModel =
     customerInfo match {
       case Some(details) =>
-        MigrationDateModel(details.customerMigratedToETMPDate.map(LocalDate.parse), details.extractDate.map(LocalDate.parse))
+        MigrationDateModel(details.effectiveRegistrationDate.map(LocalDate.parse), details.extractDate.map(LocalDate.parse))
       case None =>
         MigrationDateModel(None, None)
     }

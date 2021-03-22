@@ -18,4 +18,4 @@ package models
 
 import java.time.LocalDate
 
-case class MigrationDateModel(migratedToETMPDate: Option[LocalDate], hybridToFullDate: Option[LocalDate])
+case class MigrationDateModel(vatRegistrationDate: Option[LocalDate], migrationDate: Option[LocalDate])

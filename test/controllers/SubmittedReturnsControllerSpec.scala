@@ -25,8 +25,7 @@ import models.viewModels.{ReturnObligationsViewModel, VatReturnsViewModel}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.http.Status
-import play.api.mvc.{AnyContentAsEmpty, Result}
-import play.api.test.FakeRequest
+import play.api.mvc.Result
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core._
 import views.html.errors.SubmittedReturnsErrorView
@@ -59,9 +58,6 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
     inject[SubmittedReturnsView],
     inject[SubmittedReturnsErrorView]
   )
-
-  lazy val fakeRequestWithEmptyDate: FakeRequest[AnyContentAsEmpty.type] =
-    fakeRequest.withSession("customerMigratedToETMPDate" -> "")
 
   val exampleMigrationDateModel: MigrationDateModel = MigrationDateModel(Some(LocalDate.parse("2018-01-01")), None)
 
@@ -97,29 +93,69 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
 
   "Calling the .submittedReturns action" when {
 
-    "a user is logged in and enrolled to HMRC-MTD-VAT" should {
+    "a user is logged in and enrolled to HMRC-MTD-VAT" when {
 
-      lazy val result = {
-        callDateService()
-        callExtendedAudit
-        callAuthService(individualAuthResult)
-        callObligationsForYear(exampleObligations(2018))
-        callObligationsForYear(exampleObligations(2017))
-        callServiceInfoPartialService
-        callSubscriptionService(Some(customerInformationMax))
-        controller.submittedReturns(request())
+      "the user's VAT registration date is in the previous year (2017)" should {
+
+        lazy val result = {
+          callDateService()
+          callExtendedAudit
+          callAuthService(individualAuthResult)
+          callObligationsForYear(exampleObligations(2018))
+          callObligationsForYear(exampleObligations(2017))
+          callServiceInfoPartialService
+          callSubscriptionService(Some(customerInformationMax))
+          controller.submittedReturns(request())
+        }
+
+        "return 200" in {
+          status(result) shouldBe Status.OK
+        }
+
+        "return HTML" in {
+          contentType(result) shouldBe Some("text/html")
+        }
+
+        "return charset of utf-8" in {
+          charset(result) shouldBe Some("utf-8")
+        }
+
+        "return tabs for current year (2018) and previous year (2017)" in {
+          val body = await(bodyOf(result))
+          body should include ("""<a href="#2018"""")
+          body should include ("""<a href="#2017"""")
+        }
       }
 
-      "return 200" in {
-        status(result) shouldBe Status.OK
-      }
+      "the user's VAT registration date is in the current year (2018)" should {
 
-      "return HTML" in {
-        contentType(result) shouldBe Some("text/html")
-      }
+        lazy val result = {
+          callDateService()
+          callExtendedAudit
+          callAuthService(individualAuthResult)
+          callObligationsForYear(exampleObligations(2018))
+          callServiceInfoPartialService
+          callSubscriptionService(Some(customerInformationMax.copy(effectiveRegistrationDate = Some("2018-01-01"))))
+          controller.submittedReturns(request())
+        }
 
-      "return charset of utf-8" in {
-        charset(result) shouldBe Some("utf-8")
+        "return 200" in {
+          status(result) shouldBe Status.OK
+        }
+
+        "return HTML" in {
+          contentType(result) shouldBe Some("text/html")
+        }
+
+        "return charset of utf-8" in {
+          charset(result) shouldBe Some("utf-8")
+        }
+
+        "return a tab for current year (2018) but not previous year (2017)" in {
+          val body = await(bodyOf(result))
+          body should include ("""<a href="#2018"""")
+          body shouldNot include ("""<a href="#2017"""")
+        }
       }
     }
 
@@ -346,7 +382,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
       }
 
       "return the correct date model" in {
-        await(result) shouldBe MigrationDateModel(Some(LocalDate.parse("2017-01-01")), Some(LocalDate.parse("2017-02-02")))
+        await(result) shouldBe MigrationDateModel(Some(LocalDate.parse("2017-01-01")), Some(LocalDate.parse("2018-02-02")))
       }
     }
 

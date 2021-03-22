@@ -31,8 +31,9 @@ object TestJson {
       "insolvencyType" -> "01",
       "insolvencyDate" -> "2018-01-01",
       "isPartialMigration" -> false,
-      "customerMigratedToETMPDate" -> "2017-01-01",
-      "hybridToFullMigrationDate" -> "2017-02-02"
+      "customerMigratedToETMPDate" -> "2018-01-01",
+      "hybridToFullMigrationDate" -> "2018-02-02",
+      "effectiveRegistrationDate" -> "2017-01-01"
     ),
     "ppob" -> Json.obj(
       "address" -> Json.obj(
