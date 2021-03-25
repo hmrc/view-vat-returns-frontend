@@ -23,73 +23,68 @@
 @this(mainTemplate: MainTemplate,
       navigationBreadcrumb: NavigationBreadcrumb,
       displayDate: DisplayDate,
-      displayDateRange: DisplayDateRange)
+      displayDateRange: DisplayDateRange,
+      govukBackLink: GovukBackLink)
 
 @(deadlines: Seq[ReturnDeadlineViewModel],
-  currentDate: LocalDate,
-  serviceInfoContent: Html = HtmlFormat.empty)(
-  implicit request: Request[_], messages: Messages, appConfig: config.AppConfig, user: User)
+    currentDate: LocalDate,
+    serviceInfoContent: Html = HtmlFormat.empty)(
+    implicit request: Request[_], messages: Messages, appConfig: config.AppConfig, user: User)
 
 
 @mainTemplate(
-  title = messages("returnDeadlines.submitReturn.title"),
-  serviceInfoContent = serviceInfoContent,
-  user = Some(user)
+    pageTitle = messages("returnDeadlines.submitReturn.title"),
+    serviceInfoContent = serviceInfoContent,
+    user = Some(user)
 ) {
 
-  @if(!user.isAgent) {
-    @navigationBreadcrumb(Map(
-      appConfig.btaHomeUrl -> messages("breadcrumbs.bta"),
-      appConfig.vatDetailsUrl -> messages("breadcrumbs.vat")),
-      currentPage = messages("returnDeadlines.submitReturn.title")
-    )
-  }
+    @if(!user.isAgent) {
+        @navigationBreadcrumb(Map(
+                appConfig.btaHomeUrl -> messages("breadcrumbs.bta"),
+                appConfig.vatDetailsUrl -> messages("breadcrumbs.vat")),
+            currentPage = messages("returnDeadlines.submitReturn.title")
+        )
+    }
 
-  <div class="grid-row">
-    <div class="column-two-thirds">
+    @if(user.isAgent) {
+        @govukBackLink(BackLink(href = appConfig.agentClientHubUrl))
+    }
 
-      @if(user.isAgent) {
-          <a id="link-back" class="link-back" href='@appConfig.agentClientHubUrl'>@messages("base.back")</a>
-      }
-
-      <h1 class="heading-xlarge">@messages("returnDeadlines.submitReturn.title")</h1>
-      <div class="form-group">
-        <ul class="list">
-        @for(deadline <- deadlines){
-          <li class="section divider--bottom">
-            <p>
-              <span class="bold-medium">
-                @messages("returnDeadlines.submitReturn.returnDeadline")
-                @displayDate(deadline.due)
-              </span>
-              @if(deadline.overdue) {
-                <span>
-                  <strong class="task-overdue">@messages("common.overdue")</strong>
-                </span>
-              }
-              <span class="form-hint">
-                @if(deadline.isFinalReturn) {
-                  @messages("returnDeadlines.finalReturn")
-                } else {
-                  @messages("returnDeadlines.periodEnding", displayDateRange(deadline.periodFrom, deadline.periodTo))
-                }
-              </span>
+    <h1 class="govuk-heading-xl">@messages("returnDeadlines.submitReturn.title")</h1>
+    <div class="govuk-form-group">
+        <ul class="govuk-list">
+            @for(deadline <- deadlines){
+                    <p>
+                        <p class="govuk-body-l govuk-!-font-weight-bold govuk-!-margin-bottom-0">
+                            @messages("returnDeadlines.submitReturn.returnDeadline")
+                            @displayDate(deadline.due)
+                        </p>
+                        @if(deadline.overdue) {
+                            <span>
+                                <strong class="task-overdue">@messages("common.overdue")</strong>
+                            </span>
+                        }
+                        <p class="govuk-body govuk-!-margin-bottom-0 govuk-hint">
+                            @if(deadline.isFinalReturn) {
+                                @messages("returnDeadlines.finalReturn")
+                            } else {
+                                @messages("returnDeadlines.periodEnding", displayDateRange(deadline.periodFrom, deadline.periodTo))
+                            }
+                        </p>
 
 
-              @if(currentDate.isAfter(deadline.periodTo)) {
-                <a href="@{appConfig.submitVatHonestyDeclaration(deadline.periodKey)}"
-                  id="submit-return-link">@messages("returnDeadlines.submitReturn")
-                </a>
-              } else {
-                <span>
-                  @messages("returnDeadlines.submitReturn.futureReturn", displayDate(deadline.periodTo.plusDays(1), showYear = false))
-                </span>
-              }
-            </p>
-          </li>
-        }
+                        @if(currentDate.isAfter(deadline.periodTo)) {
+                            <a href="@{appConfig.submitVatHonestyDeclaration(deadline.periodKey)}"
+                                id="submit-return-link">@messages("returnDeadlines.submitReturn")
+                            </a>
+                        } else {
+                            <span>
+                                @messages("returnDeadlines.submitReturn.futureReturn", displayDate(deadline.periodTo.plusDays(1), showYear = false))
+                            </span>
+                        }
+                    </p>
+                <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+            }
         </ul>
-      </div>
     </div>
-  </div>
 }

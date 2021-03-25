@@ -17,7 +17,7 @@
 package controllers.predicate
 
 import common._
-import config.AppConfig
+import config.{AppConfig, ServiceErrorHandler}
 import javax.inject.{Inject, Singleton}
 import models.User
 import play.api.mvc._
@@ -27,7 +27,7 @@ import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.allEnrolments
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.LoggerUtil._
-import views.html.errors.{TechnicalProblemView, UnauthorisedView}
+import views.html.errors.UnauthorisedView
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -36,7 +36,7 @@ class AuthoriseAgentWithClient @Inject()(enrolmentsAuthService: EnrolmentsAuthSe
                                          subscriptionService: SubscriptionService,
                                          mcc: MessagesControllerComponents,
                                          unauthorisedView: UnauthorisedView,
-                                         technicalProblemView: TechnicalProblemView)
+                                         errorHandler: ServiceErrorHandler)
                                         (implicit appConfig: AppConfig,
                                          ec: ExecutionContext) extends FrontendController(mcc) {
 
@@ -95,7 +95,7 @@ class AuthoriseAgentWithClient @Inject()(enrolmentsAuthService: EnrolmentsAuthSe
         logDebug("[AuthorisedAgentWithClient][checkMandationStatus] - Agent acting for MTDfB client")
         Future.successful(Redirect(appConfig.agentClientHubUrl))
       case None =>
-        Future.successful(InternalServerError(technicalProblemView()))
+        Future.successful(errorHandler.showInternalServerError)
     }
   }
 }

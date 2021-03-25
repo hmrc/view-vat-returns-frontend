@@ -29,7 +29,7 @@
   implicit request: Request[_],messages: Messages, appConfig: config.AppConfig, user: User)
 
 @mainTemplate(
-    title = messages("returnDeadlines.title"),
+    pageTitle = messages("returnDeadlines.title"),
     serviceInfoContent = serviceInfoContent,
     user = Some(user)
 ) {
@@ -40,48 +40,47 @@
     currentPage = messages("returnDeadlines.title")
   )
 
-  <div class="grid-row">
-    <div class="column-two-thirds">
-      <h1 class="heading-xlarge">@messages("returnDeadlines.title")</h1>
-        <p aria-hidden="true">@messages("returnDeadlines.submitBy")</p>
+    <h1 class="govuk-heading-xl">@messages("returnDeadlines.title")</h1>
+    <p class="govuk-body govuk-!-margin-bottom-7" aria-hidden="true">@messages("returnDeadlines.submitBy")</p>
 
-        <div class="form-group">
-          <ul class="list">
-            @for(deadline <- deadlines){
-            <li class="section divider--bottom">
-              <p>
-                <span class="visually-hidden">@messages("returnDeadlines.submitBy")</span>
-                <span class="bold-medium">@displayDate(deadline.due)</span>
-                @if(deadline.overdue) {
-                  <span>
-                    <strong class="task-overdue">@messages("common.overdue")</strong>
-                  </span>
-                }
-                <span class="form-hint">
-                  @if(deadline.isFinalReturn) {
-                    @messages("returnDeadlines.finalReturn")
-                  } else {
-                    @messages("returnDeadlines.periodEnding", displayDateRange(deadline.periodFrom, deadline.periodTo))
-                  }
-                </span>
-              </p>
-            </li>
+    <div class="govuk-form-group">
+      <ul class="govuk-list">
+        @for(deadline <- deadlines){
+            <span class="govuk-visually-hidden">@messages("returnDeadlines.submitBy")</span>
+            <p class="govuk-body-l govuk-!-font-weight-bold govuk-!-margin-bottom-0">
+                @displayDate(deadline.due)
+            </p>
+            @if(deadline.overdue) {
+              <span>
+                <strong class="task-overdue">@messages("common.overdue")</strong>
+              </span>
             }
-          </ul>
-        </div>
-
-        <details>
-
-          <summary><span class="summary">@messages("returnDeadlines.howToSubmit")</span></summary>
-
-          <div class="panel panel-border-narrow">
-            <ul class="list list-number">
-              <li><a href="@appConfig.govUkCommercialSoftwareUrl" target="_blank">@messages("returnDeadlines.softwareOne")</a> @messages("returnDeadlines.softwareTwo")</li>
-              <li>@messages("returnDeadlines.vatRecords")</li>
-              <li>@messages("returnDeadlines.sendReturns")</li>
-            </ul>
-          </div>
-        </details>
+            <p class="govuk-body govuk-!-margin-bottom-0 govuk-hint">
+              @if(deadline.isFinalReturn) {
+                @messages("returnDeadlines.finalReturn")
+              } else {
+                @messages("returnDeadlines.periodEnding", displayDateRange(deadline.periodFrom, deadline.periodTo))
+              }
+            </p>
+          <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+        }
+      </ul>
     </div>
-  </div>
+
+    <details class="govuk-details" data-module="govuk-details">
+
+      <summary class="govuk-details__summary">
+          <span class="govuk-details__summary-text">
+            @messages("returnDeadlines.howToSubmit")
+          </span>
+      </summary>
+
+      <div class="govuk-details__text">
+        <ol class="govuk-list govuk-list--number">
+          <li><a href="@appConfig.govUkCommercialSoftwareUrl" class="govuk-link" rel="noreferrer noopener" target="_blank">@messages("returnDeadlines.softwareOne")</a> @messages("returnDeadlines.softwareTwo")</li>
+          <li>@messages("returnDeadlines.vatRecords")</li>
+          <li>@messages("returnDeadlines.sendReturns")</li>
+        </ol>
+      </div>
+    </details>
 }

@@ -15,35 +15,111 @@
  *@
 
 @import play.twirl.api.HtmlFormat
-@import uk.gov.hmrc.play.views.html.layouts.{Article, Sidebar}
-
-@this(govukWrapper: GovukWrapper, article: Article, sidebar: Sidebar)
-
-@(title: String,
-  sidebarLinks: Option[Html] = None,
-  contentHeader: Option[Html] = None,
-  bodyClasses: Option[String] = None,
-  mainClass: Option[String] = Some("full-width"),
-  showLogout: Boolean = true,
-  feedbackOnSignOut: Boolean = true,
-  serviceInfoContent: Html = HtmlFormat.empty,
-  user: Option[User] = None)(mainContent: Html)(implicit appConfig: config.AppConfig, request : Request[_], messages: Messages)
+@import config.AppConfig
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers._
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.header.Header
+@import uk.gov.hmrc.play.views.html.layouts.TrackingConsentSnippet
+@import models.User
 
 
-@sidebarContent = {
-  @if(sidebarLinks.isDefined) {
-    @sidebar(sidebarLinks.get, Some("sidebar"))
-  }
+@this(govukLayout: GovukLayout,
+        govukHeader: GovukHeader,
+        govukPhaseBanner: GovukPhaseBanner,
+        hmrcReportTechnicalIssue: HmrcReportTechnicalIssue,
+        hmrcLanguageSelect: HmrcLanguageSelect,
+        hmrcTimeoutDialog: HmrcTimeoutDialog,
+        hmrcStandardFooter: HmrcStandardFooter,
+        trackingConsentSnippet: TrackingConsentSnippet)
+
+@(pageTitle: String,
+        showSignOut: Boolean = true,
+        feedbackOnSignOut: Boolean = true,
+        serviceInfoContent: Html = HtmlFormat.empty,
+        user: Option[User] = None)(mainContent: Html)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+
+@titleServiceName = @{
+    user.fold(messages("navTitle.makingTaxDigitalForVat"))(u => if(u.isAgent) messages("navTitle.agent") else messages("navTitle.nonAgent"))
 }
 
-@govukWrapper(appConfig = appConfig,
-              title = title,
-              mainClass = mainClass,
-              bodyClasses = bodyClasses,
-              sidebar = sidebarContent,
-              contentHeader = contentHeader,
-              mainBody = article(mainContent),
-              serviceInfoContent = serviceInfoContent,
-              showLogout = showLogout,
-              feedbackOnSignOut = feedbackOnSignOut,
-              user = user)
+@scripts = {
+    <script src='@routes.Assets.at("lib/govuk-frontend/govuk/all.js")'></script>
+    <script src='@routes.Assets.at("lib/hmrc-frontend/hmrc/all.js")'></script>
+    <script type="text/javascript" src='@routes.Assets.at("javascript/btalinks.js")'></script>
+
+    <script>window.GOVUKFrontend.initAll();</script>
+    <script>window.HMRCFrontend.initAll();</script>
+}
+
+@phaseBannerContent = {
+    @messages("banner.newService")
+    <a id="beta-banner-feedback" class="govuk-link" href="@appConfig.@appConfig.feedbackUrl(request.uri)">
+        @messages("banner.feedback")</a>
+    @messages("banner.feedbackImprove")
+}
+
+@beforeContentHtml = {
+    @govukPhaseBanner(PhaseBanner(
+        tag = Some(Tag(content = Text(messages("banner.phaseName")))),
+        content = HtmlContent(phaseBannerContent)
+    ))
+    @serviceInfoContent
+    @hmrcLanguageSelect(LanguageSelect(
+        language = if (messages.lang.language == "en") En else Cy,
+        languageLinks =
+            En -> appConfig.routeToSwitchLanguage("english").url,
+            Cy -> appConfig.routeToSwitchLanguage("cymraeg").url
+    ))
+}
+
+@head = {
+    @trackingConsentSnippet(nonce = None)
+    <link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/application.css")' media="all">
+    <link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/print.css?v=0.1")'>
+    <link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/btalinks.css")'>
+
+    @if(showSignOut) {
+        @hmrcTimeoutDialog(TimeoutDialog(
+            timeout = Some(appConfig.timeoutPeriod),
+            countdown = Some(appConfig.timeoutCountdown),
+            signOutUrl = Some(routes.SignOutController.signOut(feedbackOnSignOut).url),
+            keepAliveUrl = Some("#"),
+            signOutButtonText = Some(messages("base.signOut"))
+        ))
+    }
+}
+
+@header = @{
+    govukHeader(Header(
+        serviceName = Some(titleServiceName),
+        navigation =
+            if(showSignOut)
+                Some(Seq(HeaderNavigation(
+                    text = Some(messages("base.signOut")),
+                    href = Some(routes.SignOutController.signOut(feedbackOnSignOut).url)
+                )))
+            else None
+    ))
+}
+
+@getHelpHtml = @{hmrcReportTechnicalIssue(ReportTechnicalIssue(
+    serviceCode = appConfig.contactFormServiceIdentifier,
+    language = if (messages.lang.code == "cy") Cy else En
+    ))
+}
+
+@fullContent = {
+
+    <div id="content" class="govuk-!-margin-bottom-6">
+        @mainContent
+    </div>
+    @getHelpHtml
+}
+
+@govukLayout(
+    pageTitle = Some(messages("base.pageTitle", pageTitle, titleServiceName)),
+    headBlock = Some(head),
+    headerBlock = Some(header),
+    beforeContentBlock = Some(beforeContentHtml),
+    footerBlock = Some(hmrcStandardFooter(accessibilityStatementUrl = Some(appConfig.accessibilityLinkUrl))),
+    scriptsBlock = Some(scripts)
+)(fullContent)

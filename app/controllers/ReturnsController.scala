@@ -18,7 +18,7 @@ package controllers
 
 import audit.AuditingService
 import audit.models.ViewVatReturnAuditModel
-import config.AppConfig
+import config.{AppConfig, ServiceErrorHandler}
 import javax.inject.{Inject, Singleton}
 import models._
 import models.errors.NotFoundError
@@ -30,7 +30,7 @@ import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import utils.LoggerUtil.logWarn
-import views.html.errors.{NotFoundView, PreMtdReturnView, TechnicalProblemView}
+import views.html.errors.PreMtdReturnView
 import views.html.returns.VatReturnDetailsView
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -42,9 +42,8 @@ class ReturnsController @Inject()(mcc: MessagesControllerComponents,
                                   dateService: DateService,
                                   serviceInfoService: ServiceInfoService,
                                   authorisedController: AuthorisedController,
-                                  notFoundView: NotFoundView,
                                   vatReturnDetailsView: VatReturnDetailsView,
-                                  technicalProblemView: TechnicalProblemView,
+                                  errorHandler: ServiceErrorHandler,
                                   preMtdReturnView: PreMtdReturnView)
                                  (implicit val appConfig: AppConfig,
                                   auditService: AuditingService,
@@ -75,7 +74,7 @@ class ReturnsController @Inject()(mcc: MessagesControllerComponents,
 
         } else {
           logWarn(s"[ReturnsController][vatReturn] - The given period key was invalid - `$periodKey`")
-          Future.successful(NotFound(notFoundView()))
+          Future.successful(errorHandler.showNotFoundError)
         }
   }, ignoreMandatedStatus = true)
 
@@ -105,7 +104,7 @@ class ReturnsController @Inject()(mcc: MessagesControllerComponents,
 
         } else {
           logWarn(s"[ReturnsController][vatReturnViaPayments] - The given period key was invalid - `$periodKey`")
-          Future.successful(NotFound(notFoundView()))
+          Future.successful(errorHandler.showNotFoundError)
         }
   }, ignoreMandatedStatus = true)
 
@@ -128,10 +127,10 @@ class ReturnsController @Inject()(mcc: MessagesControllerComponents,
         checkIfComingFromSubmissionConfirmation(isNumericPeriodKey)
       case (Right(_), None, _) =>
         logWarn("[ReturnsController][renderResult] error: render required a valid obligation but none was returned")
-        Future.successful(InternalServerError(technicalProblemView()))
+        Future.successful(errorHandler.showInternalServerError)
       case _ =>
         logWarn("[ReturnsController][renderResult] error: Unknown error")
-        Future.successful(InternalServerError(technicalProblemView()))
+        Future.successful(errorHandler.showInternalServerError)
     }
   }
 
@@ -150,10 +149,10 @@ class ReturnsController @Inject()(mcc: MessagesControllerComponents,
         Redirect(routes.SubmittedReturnsController.submittedReturns()).removingFromSession("submissionYear", "inSessionPeriodKey")
       )
     } else {
-      if(preMtdReturn) {
+      if(!preMtdReturn) {
         Future.successful(NotFound(preMtdReturnView(user)))
       } else {
-        Future.successful(NotFound(notFoundView()))
+        Future.successful(errorHandler.showNotFoundError)
       }
     }
   }

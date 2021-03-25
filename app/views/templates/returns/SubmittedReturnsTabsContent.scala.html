@@ -34,11 +34,10 @@
   </p>
 }
 
+
 @for(year <- model.returnYears) {
-  <section @if(javascriptEnabled){id="@year" class="tabcontent" role="tabpanel"} else {id="nonJS-@year"}>
-
-    <h2>@messages("submittedReturns.yearReturns", year.toString)</h2>
-
+  <div class="govuk-tabs__panel" id="@year">
+    <h2 class="govuk-heading-1">@messages("submittedReturns.yearReturns", year.toString)</h2>
     @if(model.obligations.isEmpty) {
 
       <p>@messages("submittedReturns.noSubmitted")</p>
@@ -52,39 +51,34 @@
       }
 
       <ul class="list list-bullet">
-        @for(obligation <- model.obligations.filter(_.periodTo.getYear.toString.contains(year.toString))) {
-          <li>
-            <a href="@controllers.routes.ReturnsController.vatReturn(obligation.periodTo.getYear, obligation.periodKey)">
+      @for(obligation <- model.obligations.filter(_.periodTo.getYear.toString.contains(year.toString))) {
+        <li>
+          <a href="@controllers.routes.ReturnsController.vatReturn(obligation.periodTo.getYear, obligation.periodKey)">
             <span class="visually-hidden">@messages("submittedReturns.periodPrefix")</span>
             @if(obligation.isFinalObligation) {
               @messages("submittedReturns.finalReturn")
             } else {
               @displayDateRange(obligation.periodFrom, obligation.periodTo)
             }
-            </a>
-          </li>
-        }
+          </a>
+        </li>
+      }
       </ul>
     }
-  </section>
+  </div>
 }
+
 
 @if(model.showPreviousReturnsTab) {
 
-  <section
-    @if(javascriptEnabled) {
-      id="previous-returns" class="tabcontent" role="tabpanel"
-    } else {
-      id="nonJS-previous-returns"
-    }
-  >
-    <h2>@messages("submittedReturns.previousReturns")</h2>
+  <div class="govuk-tabs__panel" id="previous-returns">
+    <h2 class="govuk-heading-1">@messages("submittedReturns.previousReturns")</h2>
     <p id="previous-one">
       @messages("submittedReturns.previousReturnsOne")
       <a target="_blank" href="@appConfig.portalUrl(model.vrn)">
       @messages("submittedReturns.previousReturnsTwo")</a>.
     </p>
-  </section>
+  </div>
 }
 
 @if(user.isAgent && appConfig.features.agentAccess()) {

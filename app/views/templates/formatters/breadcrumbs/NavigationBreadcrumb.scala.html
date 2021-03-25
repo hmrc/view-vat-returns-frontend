@@ -18,11 +18,11 @@
 
 @(links: Map[String, String], currentPage: String)
 
-<div class="breadcrumbs soft--top">
-    <ol class="push--top">
+<div class="govuk-breadcrumbs govuk-!-margin-bottom-9">
+    <ol class="govuk-breadcrumbs__list">
         @links.map {
-            case (key, value) => { <li><a href="@key">@value</a></li> }
+            case (key, value) => { <li class="govuk-breadcrumbs__list-item"><a class="govuk-breadcrumbs__link" href="@key">@value</a></li> }
         }
-        <li aria-current="page">@currentPage</li>
+        <li class="govuk-breadcrumbs__list-item" aria-current="page">@currentPage</li>
     </ol>
 </div>
