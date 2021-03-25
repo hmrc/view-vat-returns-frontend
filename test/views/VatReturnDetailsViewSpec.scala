@@ -180,15 +180,15 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
 
     "have the correct row descriptions in the table" in {
       val expectedDescriptions = Array(
-        "VAT you charged on sales and other supplies",
-        "VAT due in this period on intra-community acquisitions of goods made in Northern Ireland from EU Member States",
-        "VAT you owe before deductions (this is the total of box 1 and 2)",
-        "VAT you have claimed back",
-        "Return total",
+        "VAT due in the period on sales and other outputs",
+        "VAT due in the period on acquisitions of goods made in Northern Ireland from EU Member States",
+        "Total VAT due (this is the total of box 1 and 2)",
+        "VAT reclaimed in the period on purchases and other inputs (including acquisitions in Northern Ireland from EU member states)",
+        "Net VAT to pay to HMRC or reclaim (this is the difference between box 3 and 4)",
         "Total value of sales and other supplies, including VAT",
-        "Total value of purchases and other expenses, excluding VAT",
-        "Total value of intra-community dispatches of goods and related costs (excluding VAT) from Northern Ireland to EU Member States",
-        "Total value of intra-community acquisitions of goods and related costs (excluding VAT) from Northern Ireland to EU Member States"
+        "Total value of purchases and all other inputs excluding any VAT",
+        "Total value of dispatches of goods and related costs (excluding VAT) from Northern Ireland to EU Member States",
+        "Total value of acquisitions of goods and related costs (excluding VAT) made in Northern Ireland from EU Member States"
       )
       expectedDescriptions.indices.foreach(i => elementText(Selectors.boxDescription(Selectors.boxes(i))) shouldBe
         expectedDescriptions(i))
@@ -394,10 +394,6 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
       elementText(Selectors.extraInformationText) shouldBe
         "You need to pay this bill by 6 April 2017. It can take up to 7 days to show that you have made a payment."
     }
-
-    "have the correct box 5 description in the table" in {
-      elementText(Selectors.boxDescription(Selectors.boxes(4))) shouldBe "Return total"
-    }
   }
 
   "Rendering the vat return details page when HMRC owe money on the return" should {
@@ -449,10 +445,6 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
     "have the correct information text under the heading" in {
       elementText(Selectors.extraInformationText) shouldBe "It can take up to 30 days for you to receive a repayment."
     }
-
-    "have the correct box 5 description in the table" in {
-      elementText(Selectors.boxDescription(Selectors.boxes(4))) shouldBe "Return total"
-    }
   }
 
   "Rendering the vat return details page when HMRC have paid what they owe on the return" should {
@@ -499,10 +491,6 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
 
     "have the correct subheading" in {
       elementText(Selectors.subHeading) shouldBe "Return total: £1,000 You owe HMRC: £0"
-    }
-
-    "have the correct box 5 description in the table" in {
-      elementText(Selectors.boxDescription(Selectors.boxes(4))) shouldBe "Return total"
     }
   }
 
