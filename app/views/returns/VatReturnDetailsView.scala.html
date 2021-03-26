@@ -116,7 +116,7 @@
         <div class="form-group">
           <div class="grid-row" id="box-one">
             <dt class="column-one-quarter form-hint">@messages("yourVatReturn.boxOne")</dt>
-            <dd class="column-one-half form-hint">@messages("yourVatReturn.boxOneDescription")</dd>
+            <dd class="column-one-half form-hint">@messages(s"yourVatReturn.boxOneDescription$niProtocolSuffix")</dd>
             <dd class="column-one-quarter form-hint text--right">@displayMoney(vatReturnViewModel.vatReturnDetails.vatReturn.vatDueSales)</dd>
           </div>
           <div class="grid-row" id="box-two">
@@ -128,12 +128,12 @@
         <div class="form-group">
           <div class="grid-row" id="box-three">
             <dt class="column-one-quarter form-hint">@messages("yourVatReturn.boxThree")</dt>
-            <dd class="column-one-half form-hint">@messages("yourVatReturn.boxThreeDescription")</dd>
+            <dd class="column-one-half form-hint">@messages(s"yourVatReturn.boxThreeDescription$niProtocolSuffix")</dd>
             <dd class="column-one-quarter form-hint text--right">@displayMoney(vatReturnViewModel.vatReturnDetails.vatReturn.totalVatDue)</dd>
           </div>
           <div class="grid-row" id="box-four">
             <dt class="column-one-quarter form-hint">@messages("yourVatReturn.boxFour")</dt>
-            <dd class="column-one-half form-hint">@messages("yourVatReturn.boxFourDescription")</dd>
+            <dd class="column-one-half form-hint">@messages(s"yourVatReturn.boxFourDescription$niProtocolSuffix")</dd>
             <dd class="column-one-quarter form-hint text--right" style="white-space:nowrap">
               <span aria-hidden="true">&minus;</span>
               @displayMoney(vatReturnViewModel.vatReturnDetails.vatReturn.vatReclaimedCurrentPeriod.abs)
@@ -144,7 +144,7 @@
           <div class="grid-row" id="box-five">
             <dt class="column-one-quarter"><strong class="bold-small">@messages("yourVatReturn.boxFive")</strong></dt>
             <dd class="column-one-half">
-              <strong class="bold-small">@messages("yourVatReturn.returnTotal")</strong>
+              <strong class="bold-small">@messages(s"yourVatReturn.boxFiveDescription$niProtocolSuffix")</strong>
             </dd>
             <dd class="column-one-quarter text--right">
               <strong class="bold-small">
@@ -178,7 +178,7 @@
         </div>
         <div class="grid-row" id="box-seven">
           <dt class="column-one-quarter form-hint">@messages("yourVatReturn.boxSeven")</dt>
-          <dd class="column-one-half form-hint">@messages("yourVatReturn.boxSevenDescription")</dd>
+          <dd class="column-one-half form-hint">@messages(s"yourVatReturn.boxSevenDescription$niProtocolSuffix")</dd>
           <dd class="column-one-quarter form-hint text--right">@displayMoney(vatReturnViewModel.vatReturnDetails.vatReturn.totalValuePurchasesExVAT)</dd>
         </div>
         <div class="grid-row" id="box-eight">
