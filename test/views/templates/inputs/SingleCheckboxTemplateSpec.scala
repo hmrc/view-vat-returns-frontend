@@ -38,9 +38,9 @@ class SingleCheckboxTemplateSpec extends TemplateBaseSpec {
 
       val expectedMarkup = Html(
         s"""
-           |<div class="multiple-choice">
-           |    <input id="$fieldName" name="$fieldName" type="checkbox" value="true" checked>
-           |    <label for="$fieldName">$label</label>
+           |<div class="govuk-checkboxes__item">
+           |    <input class="govuk-checkboxes__input" id="$fieldName" name="$fieldName" type="checkbox" value="true" checked>
+           |    <label class="govuk-label govuk-checkboxes__label" for="$fieldName"> $label </label>
            |</div>
            |""".stripMargin
       )
@@ -59,9 +59,9 @@ class SingleCheckboxTemplateSpec extends TemplateBaseSpec {
 
       val expectedMarkup = Html(
         s"""
-           |<div class="multiple-choice">
-           |    <input id="$fieldName" name="$fieldName" type="checkbox" value="true">
-           |    <label for="$fieldName">$label</label>
+           |<div class="govuk-checkboxes__item">
+           |    <input class="govuk-checkboxes__input" id="$fieldName" name="$fieldName" type="checkbox" value="true">
+           |    <label class="govuk-label govuk-checkboxes__label" for="$fieldName"> $label </label>
            |</div>
            |""".stripMargin
       )
@@ -79,9 +79,9 @@ class SingleCheckboxTemplateSpec extends TemplateBaseSpec {
 
       val expectedMarkup = Html(
         s"""
-           |<div class="multiple-choice">
-           |    <input id="$fieldName" name="$fieldName" type="checkbox" value="true">
-           |    <label for="$fieldName">$label</label>
+           |<div class="govuk-checkboxes__item">
+           |    <input class="govuk-checkboxes__input" id="$fieldName" name="$fieldName" type="checkbox" value="true">
+           |    <label class="govuk-label govuk-checkboxes__label" for="$fieldName"> $label </label>
            |</div>
            |""".stripMargin
       )

@@ -35,11 +35,11 @@ class NavigationBreadcrumbTemplateSpec extends TemplateBaseSpec {
 
     val expectedMarkup = Html(
       s"""
-         |<div class="breadcrumbs soft--top">
-         |    <ol class="push--top">
-         |        <li><a href="/link-url1">link text1</a></li>
-         |        <li><a href="/link-url2">link text2</a></li>
-         |        <li aria-current="page">$currentPage</li>
+         |<div class="govuk-breadcrumbs govuk-!-margin-bottom-9">
+         |    <ol class="govuk-breadcrumbs__list">
+         |        <li class="govuk-breadcrumbs__list-item"><a class="govuk-breadcrumbs__link" href="/link-url1">link text1</a></li>
+         |        <li class="govuk-breadcrumbs__list-item"><a class="govuk-breadcrumbs__link" href="/link-url2">link text2</a></li>
+         |        <li class="govuk-breadcrumbs__list-item" aria-current="page">$currentPage</li>
          |    </ol>
          |</div>
       """.stripMargin

@@ -68,7 +68,7 @@ class ReturnDeadlinesPageSpec extends IntegrationBaseSpec {
 
       val response: WSResponse = await(request().get())
       lazy implicit val document: Document = Jsoup.parse(response.body)
-      val deadlineSelector = ".list li.divider--bottom"
+      val deadlineSelector = "hr.govuk-section-break"
       document.select(deadlineSelector).size() shouldBe 1
     }
   }
@@ -99,7 +99,7 @@ class ReturnDeadlinesPageSpec extends IntegrationBaseSpec {
 
         val response: WSResponse = await(request().get())
         lazy implicit val document: Document = Jsoup.parse(response.body)
-        val deadlineSelector = ".list li.divider--bottom"
+        val deadlineSelector = "hr.govuk-section-break"
 
         document.select(deadlineSelector).size() shouldBe 1
         document.getElementById("submit-return-link").text() shouldBe "Submit VAT Return"
@@ -132,7 +132,7 @@ class ReturnDeadlinesPageSpec extends IntegrationBaseSpec {
 
         val response: WSResponse = await(request().get())
         lazy implicit val document: Document = Jsoup.parse(response.body)
-        val deadlineSelector = ".list li.divider--bottom"
+        val deadlineSelector = "hr.govuk-section-break"
         document.select(deadlineSelector).size() shouldBe 1
         document.getElementById("submit-return-link") shouldBe null
       }

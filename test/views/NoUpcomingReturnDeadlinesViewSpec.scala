@@ -30,15 +30,15 @@ class NoUpcomingReturnDeadlinesViewSpec extends ViewBaseSpec {
   object Selectors {
     val pageHeading = "#content h1"
 
-    val btaBreadcrumb = "div.breadcrumbs li:nth-of-type(1)"
-    val btaBreadCrumbLink = "div.breadcrumbs li:nth-of-type(1) a"
-    val vatDetailsBreadCrumb = "div.breadcrumbs li:nth-of-type(2)"
-    val vatDetailsBreadcrumbLink = "div.breadcrumbs li:nth-of-type(2) a"
-    val returnDeadlinesBreadCrumb = "div.breadcrumbs li:nth-of-type(3)"
+    val btaBreadcrumb = "div.govuk-breadcrumbs li:nth-of-type(1)"
+    val btaBreadCrumbLink = "div.govuk-breadcrumbs li:nth-of-type(1) a"
+    val vatDetailsBreadCrumb = "div.govuk-breadcrumbs li:nth-of-type(2)"
+    val vatDetailsBreadcrumbLink = "div.govuk-breadcrumbs li:nth-of-type(2) a"
+    val returnDeadlinesBreadCrumb = "div.govuk-breadcrumbs li:nth-of-type(3)"
 
-    val noReturnsNextDeadline = "p.lede"
-    val noReturnsDueNoObligations = "article > p:nth-child(3)"
-    val noReturnsDue = "article > p:nth-child(4)"
+    val noReturnsNextDeadline = "p.govuk-body"
+    val noReturnsDueNoObligations = "p:nth-child(3)"
+    val noReturnsDue = "p:nth-child(4)"
   }
 
   "Rendering the Return deadlines page with no fulfilled obligations" should {

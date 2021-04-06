@@ -46,23 +46,25 @@
     <div class="govuk-form-group">
       <ul class="govuk-list">
         @for(deadline <- deadlines){
-            <span class="govuk-visually-hidden">@messages("returnDeadlines.submitBy")</span>
-            <p class="govuk-body-l govuk-!-font-weight-bold govuk-!-margin-bottom-0">
-                @displayDate(deadline.due)
-            </p>
-            @if(deadline.overdue) {
-              <span>
-                <strong class="task-overdue">@messages("common.overdue")</strong>
-              </span>
-            }
-            <p class="govuk-body govuk-!-margin-bottom-0 govuk-hint">
-              @if(deadline.isFinalReturn) {
-                @messages("returnDeadlines.finalReturn")
-              } else {
-                @messages("returnDeadlines.periodEnding", displayDateRange(deadline.periodFrom, deadline.periodTo))
-              }
-            </p>
-          <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+            <li>
+                <span class="govuk-visually-hidden">@messages("returnDeadlines.submitBy")</span>
+                <p class="govuk-body-l govuk-!-font-weight-bold govuk-!-margin-bottom-0">
+                    @displayDate(deadline.due)
+                </p>
+                @if(deadline.overdue) {
+                  <span>
+                    <strong class="task-overdue">@messages("common.overdue")</strong>
+                  </span>
+                }
+                <p class="govuk-body govuk-!-margin-bottom-0 govuk-hint">
+                  @if(deadline.isFinalReturn) {
+                    @messages("returnDeadlines.finalReturn")
+                  } else {
+                    @messages("returnDeadlines.periodEnding", displayDateRange(deadline.periodFrom, deadline.periodTo))
+                  }
+                </p>
+              <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+            </li>
         }
       </ul>
     </div>

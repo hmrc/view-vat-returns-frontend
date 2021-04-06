@@ -20,41 +20,28 @@
 
 @this(displayDateRange: DisplayDateRange)
 
-@(model: VatReturnsViewModel, javascriptEnabled: Boolean)(implicit messages: Messages, appConfig: AppConfig, user: User)
-
-@if(!javascriptEnabled) {
-  <p>
-    @model.returnYears.map { year =>
-      <a href="#nonJS-@year">@year</a> @if(model.returnYears.lastOption.getOrElse(0) != year){|}
-    }
-
-    @if(model.showPreviousReturnsTab) {
-      | <a href="#nonJS-previous-returns">@messages("submittedReturns.previousReturns")</a>
-    }
-  </p>
-}
-
+@(model: VatReturnsViewModel)(implicit messages: Messages, appConfig: AppConfig, user: User)
 
 @for(year <- model.returnYears) {
-  <div class="govuk-tabs__panel" id="@year">
-    <h2 class="govuk-heading-1">@messages("submittedReturns.yearReturns", year.toString)</h2>
+  <div class="govuk-tabs__panel @if(year != model.returnYears.head){govuk-tabs__panel--hidden}" id="@year">
+    <h2 class="govuk-heading-m">@messages("submittedReturns.yearReturns", year.toString)</h2>
     @if(model.obligations.isEmpty) {
 
-      <p>@messages("submittedReturns.noSubmitted")</p>
+      <p class="govuk-body">@messages("submittedReturns.noSubmitted")</p>
 
     } else {
 
       @if(model.obligations.exists(_.periodTo.getYear.toString.contains(year.toString))) {
-        <p aria-hidden="true">@messages("submittedReturns.period")</p>
+        <p class="govuk-body" aria-hidden="true">@messages("submittedReturns.period")</p>
       } else {
-        <p>@messages("submittedReturns.noSubmitted")</p>
+        <p class="govuk-body">@messages("submittedReturns.noSubmitted")</p>
       }
 
-      <ul class="list list-bullet">
+      <ul class="govuk-list govuk-list--bullet">
       @for(obligation <- model.obligations.filter(_.periodTo.getYear.toString.contains(year.toString))) {
         <li>
-          <a href="@controllers.routes.ReturnsController.vatReturn(obligation.periodTo.getYear, obligation.periodKey)">
-            <span class="visually-hidden">@messages("submittedReturns.periodPrefix")</span>
+          <a class="govuk-body govuk-link" href="@controllers.routes.ReturnsController.vatReturn(obligation.periodTo.getYear, obligation.periodKey)">
+            <span class="govuk-visually-hidden">@messages("submittedReturns.periodPrefix")</span>
             @if(obligation.isFinalObligation) {
               @messages("submittedReturns.finalReturn")
             } else {
@@ -87,15 +74,4 @@
       @messages("submittedReturns.back")
     </a>
   </p>
-}
-
-
-@if(!javascriptEnabled) {
-  <div>
-    <a href="#top" class="back-to-top-link">
-      <svg class="arrow input--radio-inline" width="13" height="15" viewBox="0 -5 13 15">
-        <path fill="currentColor" d="M6.5 0L0 6.5 1.4 8l4-4v12.7h2V4l4.3 4L13 6.4z"></path>
-      </svg><span>@messages("submittedReturns.backToTop")</span>
-    </a>
-  </div>
 }

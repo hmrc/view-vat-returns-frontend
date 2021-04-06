@@ -28,8 +28,8 @@ class PreMtdReturnViewSpec extends ViewBaseSpec {
 
   object Selectors {
     val heading = "h1"
-    val text = "#content > article > div > div > p"
-    val link = "#content > article > div > div > p:nth-child(3) > a"
+    val text = "#content > div > div > p"
+    val link = "#content > div > div > p:nth-child(3) > a"
   }
 
   private val userWithNonMtdVat = User("111111111", hasNonMtdVat = true)

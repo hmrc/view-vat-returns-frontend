@@ -47,7 +47,7 @@
         <a id="link-back" class="govuk-back-link" href='@appConfig.agentClientHubUrl'>@messages("base.back")</a>
     }
 
-    <h1 id="top" class="govuk-heading-l">@messages("submittedReturns.title")</h1>
+    <h1 id="top" class="govuk-heading-xl">@messages("submittedReturns.title")</h1>
 
     @if(showInsolvencyContent) {
         <div class="panel panel-border-wide form-group">@messages("submittedReturns.insolvencyNotice")</div>
@@ -56,10 +56,6 @@
     <div class="govuk-tabs" data-module="govuk-tabs">
         <h2 class="govuk-tabs__title">Contents</h2>
         @submittedReturnsTabs(years = model.returnYears, showPreviousReturnsTab = model.showPreviousReturnsTab)
-        @submittedReturnsTabsContent(model, javascriptEnabled = true)
+        @submittedReturnsTabsContent(model)
     </div>
-
-    <noscript>
-        @submittedReturnsTabsContent(model, javascriptEnabled = false)
-    </noscript>
 }

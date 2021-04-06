@@ -149,7 +149,7 @@ class ReturnsController @Inject()(mcc: MessagesControllerComponents,
         Redirect(routes.SubmittedReturnsController.submittedReturns()).removingFromSession("submissionYear", "inSessionPeriodKey")
       )
     } else {
-      if(!preMtdReturn) {
+      if(preMtdReturn) {
         Future.successful(NotFound(preMtdReturnView(user)))
       } else {
         Future.successful(errorHandler.showNotFoundError)

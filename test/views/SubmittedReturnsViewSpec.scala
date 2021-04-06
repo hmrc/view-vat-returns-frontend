@@ -33,25 +33,25 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
     val pageHeading = "h1"
     val secondaryHeading = "h2"
     val previousReturnsHeading = "#previous-returns > h2"
-    val btaBreadcrumb = "div.breadcrumbs li:nth-of-type(1)"
+    val btaBreadcrumb = "div.govuk-breadcrumbs li:nth-of-type(1)"
     val btaBreadcrumbLink = s"$btaBreadcrumb a"
-    val vatBreadcrumb = "div.breadcrumbs li:nth-of-type(2)"
+    val vatBreadcrumb = "div.govuk-breadcrumbs li:nth-of-type(2)"
     val vatBreadcrumbLink = s"$vatBreadcrumb a"
-    val submittedReturnsBreadcrumb = "div.breadcrumbs li:nth-of-type(3)"
+    val submittedReturnsBreadcrumb = "div.govuk-breadcrumbs li:nth-of-type(3)"
     val submitThroughSoftwareLink = "div > div > a"
-    val noReturnsFound = ".column-two-thirds p"
-    val tabOne = "#content > article > div.grid-row > div > div > ul > li:nth-child(1) > a"
-    val tabTwo = "#content > article > div.grid-row > div > div > ul > li:nth-child(2) > a"
-    val tabThree = "#content > article > div.grid-row > div > div > ul > li:nth-child(3) > a"
-    val tabFour = "#content > article > div.grid-row > div > div > ul > li:nth-child(4) > a"
-    val returnsHeading = "h2"
-    val period = ".column-two-thirds p"
+    val noReturnsFound = ".govuk-tabs__panel > p"
+    val tabOne = "#content > div.govuk-tabs > ul > li:nth-child(1) > a"
+    val tabTwo = "#content > div.govuk-tabs > ul > li:nth-child(2) > a"
+    val tabThree = "#content > div.govuk-tabs > ul > li:nth-child(3) > a"
+    val tabFour = "#content > div.govuk-tabs > ul > li:nth-child(4) > a"
+    val returnsHeading = "div.govuk-tabs__panel > h2.govuk-heading-m"
+    val period = "div.govuk-tabs__panel > p.govuk-body"
     val backLink = "#link-back"
     val insolvencyContent = ".panel"
 
-    def obligation(number: Int): String = s".list-bullet li:nth-of-type($number)"
+    def obligation(number: Int): String = s".govuk-list--bullet li:nth-of-type($number)"
 
-    def obligationLink(number: Int): String = s".list-bullet li:nth-of-type($number) > a"
+    def obligationLink(number: Int): String = s".govuk-list--bullet li:nth-of-type($number) > a"
 
     val previousReturnsText = "#previous-one"
     val previousReturnsLink = "#previous-one a:nth-of-type(1)"
@@ -162,6 +162,7 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
 
           "have a single tab" in {
             elementText(Selectors.tabOne) should include("2018")
+            elementExtinct(Selectors.tabTwo)
           }
         }
 

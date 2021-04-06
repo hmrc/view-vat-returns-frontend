@@ -29,22 +29,22 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
 
   object Selectors {
     val pageHeading = "#content h1"
-    val submitThroughSoftware = "#content > article > div > div > p"
+    val submitThroughSoftware = "#content > p.govuk-body"
     val howToDoThis = "details > summary > span"
-    val downloadSoftware = ".list-number li:nth-child(1)"
-    val vatRecords = ".list-number li:nth-child(2)"
-    val sendReturns = ".list-number li:nth-child(3)"
+    val downloadSoftware = ".govuk-list--number li:nth-child(1)"
+    val vatRecords = ".govuk-list--number li:nth-child(2)"
+    val sendReturns = ".govuk-list--number li:nth-child(3)"
 
-    val firstDeadlineDueDate = ".list li:nth-of-type(1)"
-    val firstDeadlinePeriod = ".list li:nth-of-type(1) .form-hint"
-    val secondDeadlineDueDate = ".list li:nth-of-type(2)"
-    val secondDeadlinePeriod = ".list li:nth-of-type(2) .form-hint"
+    val firstDeadlineDueDate = ".govuk-list li:nth-of-type(1)"
+    val firstDeadlinePeriod = ".govuk-list li:nth-of-type(1) .govuk-hint"
+    val secondDeadlineDueDate = ".govuk-list li:nth-of-type(2)"
+    val secondDeadlinePeriod = ".govuk-list li:nth-of-type(2) .govuk-hint"
 
-    val btaBreadcrumb = "div.breadcrumbs li:nth-of-type(1)"
-    val btaBreadCrumbLink = "div.breadcrumbs li:nth-of-type(1) a"
-    val vatDetailsBreadCrumb = "div.breadcrumbs li:nth-of-type(2)"
-    val vatDetailsBreadcrumbLink = "div.breadcrumbs li:nth-of-type(2) a"
-    val returnDeadlinesBreadCrumb = "div.breadcrumbs li:nth-of-type(3)"
+    val btaBreadcrumb = "div.govuk-breadcrumbs li:nth-of-type(1)"
+    val btaBreadCrumbLink = "div.govuk-breadcrumbs li:nth-of-type(1) a"
+    val vatDetailsBreadCrumb = "div.govuk-breadcrumbs li:nth-of-type(2)"
+    val vatDetailsBreadcrumbLink = "div.govuk-breadcrumbs li:nth-of-type(2) a"
+    val returnDeadlinesBreadCrumb = "div.govuk-breadcrumbs li:nth-of-type(3)"
 
     val overdueLabel = ".task-overdue"
   }
@@ -115,7 +115,7 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
     }
 
     "have a link to govuk commercial software page" in {
-      document.select("div > ul > li > a").first().attr("href") shouldBe "https://www.gov.uk/guidance/software-for-sending-income-tax-updates"
+      document.select(s"${Selectors.downloadSoftware} > a").first().attr("href") shouldBe "https://www.gov.uk/guidance/software-for-sending-income-tax-updates"
     }
 
     "have the correct message regarding VAT records in the hint box" in {

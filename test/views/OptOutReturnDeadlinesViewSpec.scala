@@ -36,21 +36,21 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
     val vatRecords = ".list-number li:nth-child(2)"
     val sendReturns = ".list-number li:nth-child(3)"
 
-    val firstDeadlineDueDate = ".list li:nth-of-type(1)"
-    val firstDeadlinePeriod = ".list li:nth-of-type(1) .form-hint"
-    val secondDeadlineDueDate = ".list li:nth-of-type(2)"
-    val secondDeadlinePeriod = ".list li:nth-of-type(2) .form-hint"
+    val firstDeadlineDueDate = ".govuk-list li:nth-of-type(1)"
+    val firstDeadlinePeriod = ".govuk-list li:nth-of-type(1) .govuk-hint"
+    val secondDeadlineDueDate = ".govuk-list li:nth-of-type(2)"
+    val secondDeadlinePeriod = ".govuk-list li:nth-of-type(2) .govuk-hint"
 
-    val btaBreadcrumb = "div.breadcrumbs li:nth-of-type(1)"
-    val btaBreadCrumbLink = "div.breadcrumbs li:nth-of-type(1) a"
-    val vatDetailsBreadCrumb = "div.breadcrumbs li:nth-of-type(2)"
-    val vatDetailsBreadcrumbLink = "div.breadcrumbs li:nth-of-type(2) a"
-    val returnDeadlinesBreadCrumb = "div.breadcrumbs li:nth-of-type(3)"
+    val btaBreadcrumb = "div.govuk-breadcrumbs li:nth-of-type(1)"
+    val btaBreadCrumbLink = "div.govuk-breadcrumbs li:nth-of-type(1) a"
+    val vatDetailsBreadCrumb = "div.govuk-breadcrumbs li:nth-of-type(2)"
+    val vatDetailsBreadcrumbLink = "div.govuk-breadcrumbs li:nth-of-type(2) a"
+    val returnDeadlinesBreadCrumb = "div.govuk-breadcrumbs li:nth-of-type(3)"
 
-    val backLink = "#link-back"
+    val backLink = ".govuk-back-link"
 
     val overdueLabel = ".task-overdue"
-    val cannotSubmitText = "li > p > span:nth-child(3)"
+    val cannotSubmitText = "li > span:nth-child(3)"
   }
 
   "Rendering the Opted-Out Return deadlines page with a single deadline" when {

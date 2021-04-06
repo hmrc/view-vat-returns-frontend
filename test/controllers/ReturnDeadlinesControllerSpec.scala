@@ -28,7 +28,6 @@ import play.api.http.Status
 import play.api.test.Helpers.{charset, contentType, _}
 import play.twirl.api.Html
 import uk.gov.hmrc.auth.core.{User => _, _}
-import views.html.errors.TechnicalProblemView
 import views.html.returns.{NoUpcomingReturnDeadlinesView, OptOutReturnDeadlinesView, ReturnDeadlinesView}
 
 import scala.concurrent.Future
@@ -55,7 +54,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
     mockAuthorisedController,
     mockDateService,
     mockServiceInfoService,
-    inject[TechnicalProblemView],
+    errorHandler,
     inject[NoUpcomingReturnDeadlinesView],
     inject[ReturnDeadlinesView],
     inject[OptOutReturnDeadlinesView]
@@ -387,7 +386,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
 
       "return the no returns view" in {
         val document: Document = Jsoup.parse(bodyOf(result))
-        messages(document.select("article > p:nth-child(3)").text.takeWhile(_ != ' ')) shouldBe
+        messages(document.select("#content > p:nth-child(3)").text.takeWhile(_ != ' ')) shouldBe
           "You do not have any returns due right now."
       }
     }
@@ -438,7 +437,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
 
         "return the no returns view" in {
           val document: Document = Jsoup.parse(bodyOf(result))
-          messages(document.select("article > p:nth-child(3)").text.takeWhile(_ != ' ')) shouldBe
+          messages(document.select("#content > p:nth-child(3)").text.takeWhile(_ != ' ')) shouldBe
             "You do not have any returns due right now."
         }
       }
