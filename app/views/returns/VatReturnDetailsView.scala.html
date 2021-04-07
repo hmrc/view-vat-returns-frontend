@@ -115,7 +115,7 @@
       <dl class="govuk-summary-list govuk-summary-list--no-border">
         <div class="govuk-summary-list__row" id="box-one">
           <dt class="govuk-summary-list__key govuk-hint">@messages("yourVatReturn.boxOne")</dt>
-          <dd class="govuk-summary-list__value govuk-hint">@messages("yourVatReturn.boxOneDescription$niProtocolSuffix")</dd>
+          <dd class="govuk-summary-list__value govuk-hint">@messages(s"yourVatReturn.boxOneDescription$niProtocolSuffix")</dd>
           <dd class="govuk-summary-list__actions govuk-hint">@displayMoney(vatReturnViewModel.vatReturnDetails.vatReturn.vatDueSales)</dd>
         </div>
         <div class="govuk-summary-list__row" id="box-two">
@@ -125,12 +125,12 @@
         </div>
         <div class="govuk-summary-list__row" id="box-three">
           <dt class="govuk-summary-list__key govuk-hint">@messages("yourVatReturn.boxThree")</dt>
-          <dd class="govuk-summary-list__value govuk-hint">@messages("yourVatReturn.boxThreeDescription$niProtocolSuffix")</dd>
+          <dd class="govuk-summary-list__value govuk-hint">@messages(s"yourVatReturn.boxThreeDescription$niProtocolSuffix")</dd>
           <dd class="govuk-summary-list__actions govuk-hint">@displayMoney(vatReturnViewModel.vatReturnDetails.vatReturn.totalVatDue)</dd>
         </div>
         <div class="govuk-summary-list__row" id="box-four">
           <dt class="govuk-summary-list__key govuk-hint">@messages("yourVatReturn.boxFour")</dt>
-          <dd class="govuk-summary-list__value govuk-hint">@messages("yourVatReturn.boxFourDescription$niProtocolSuffix")</dd>
+          <dd class="govuk-summary-list__value govuk-hint">@messages(s"yourVatReturn.boxFourDescription$niProtocolSuffix")</dd>
           <dd class="govuk-summary-list__actions govuk-hint" style="white-space:nowrap">
             <span aria-hidden="true">&minus;</span>
             @displayMoney(vatReturnViewModel.vatReturnDetails.vatReturn.vatReclaimedCurrentPeriod.abs)
@@ -138,7 +138,7 @@
         </div>
         <div class="govuk-summary-list__row" id="box-five">
           <dt class="govuk-summary-list__key">@messages("yourVatReturn.boxFive")</dt>
-          <dd class="govuk-summary-list__value"><strong>@messages("yourVatReturn.boxFiveDescription$niProtocolSuffix")</strong></dd>
+          <dd class="govuk-summary-list__value"><strong>@messages(s"yourVatReturn.boxFiveDescription$niProtocolSuffix")</strong></dd>
           <dd class="govuk-summary-list__actions"><strong class="bold-small">
               <span class="govuk-visually-hidden">
                 @messages(
@@ -171,7 +171,7 @@
         </div>
         <div class="govuk-summary-list__row" id="box-seven">
           <dt class="govuk-summary-list__key govuk-hint">@messages("yourVatReturn.boxSeven")</dt>
-          <dd class="govuk-summary-list__value govuk-hint">@messages("yourVatReturn.boxSevenDescription$niProtocolSuffix")</dd>
+          <dd class="govuk-summary-list__value govuk-hint">@messages(s"yourVatReturn.boxSevenDescription$niProtocolSuffix")</dd>
           <dd class="govuk-summary-list__actions govuk-hint">@displayMoney(vatReturnViewModel.vatReturnDetails.vatReturn.totalValuePurchasesExVAT)</dd>
         </div>
         <div class="govuk-summary-list__row" id="box-eight">
