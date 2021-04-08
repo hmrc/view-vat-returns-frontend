@@ -619,8 +619,8 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
     }
 
     "display a 'Back to client's details' button" in {
-      document.getElementById("finish").text() shouldBe "Back to client’s details"
-      document.getElementById("finish").attr("href") shouldBe mockConfig.agentClientHubUrl
+      elementText("#finish") shouldBe "Back to client’s details"
+      element("#finish > a").attr("href") shouldBe mockConfig.agentClientHubUrl
     }
   }
 }

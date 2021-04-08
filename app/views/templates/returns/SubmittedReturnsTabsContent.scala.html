@@ -18,12 +18,12 @@
 @import models.viewModels.VatReturnsViewModel
 @import views.html.templates.formatters.dates.DisplayDateRange
 
-@this(displayDateRange: DisplayDateRange)
+@this(displayDateRange: DisplayDateRange, govukButton: GovukButton)
 
 @(model: VatReturnsViewModel)(implicit messages: Messages, appConfig: AppConfig, user: User)
 
 @for(year <- model.returnYears) {
-  <div class="govuk-tabs__panel @if(year != model.returnYears.head){govuk-tabs__panel--hidden}" id="@year">
+  <div class="govuk-tabs__panel" id="@year">
     <h2 class="govuk-heading-m">@messages("submittedReturns.yearReturns", year.toString)</h2>
     @if(model.obligations.isEmpty) {
 
@@ -59,19 +59,20 @@
 @if(model.showPreviousReturnsTab) {
 
   <div class="govuk-tabs__panel" id="previous-returns">
-    <h2 class="govuk-heading-1">@messages("submittedReturns.previousReturns")</h2>
-    <p id="previous-one">
+    <h2 class="govuk-heading-m">@messages("submittedReturns.previousReturns")</h2>
+    <p class="govuk-body" id="previous-one">
       @messages("submittedReturns.previousReturnsOne")
-      <a target="_blank" href="@appConfig.portalUrl(model.vrn)">
+      <a class="govuk-link" target="_blank" href="@appConfig.portalUrl(model.vrn)">
       @messages("submittedReturns.previousReturnsTwo")</a>.
     </p>
   </div>
 }
 
 @if(user.isAgent && appConfig.features.agentAccess()) {
-  <p>
-    <a id="finish" class="btn button" role="button" href="@appConfig.agentClientHubUrl">
-      @messages("submittedReturns.back")
-    </a>
+  <p id="finish">
+      @govukButton(Button(
+          href = Some(appConfig.agentClientHubUrl),
+          content = Text(messages("submittedReturns.back"))
+      ))
   </p>
 }
