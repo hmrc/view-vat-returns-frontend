@@ -29,7 +29,7 @@
 
             @if(user.hasNonMtdVat) {
                 <p class="govuk-body">
-                    <a href="@appConfig.portalUrl(user.vrn)">@messages("preMtdReturn.link")</a>
+                    <a class="govuk-link" href="@appConfig.portalUrl(user.vrn)">@messages("preMtdReturn.link")</a>
                 </p>
             }
         </div>
