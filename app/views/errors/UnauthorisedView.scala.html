@@ -23,5 +23,5 @@
   <h1 class="govuk-heading-l">@messages("unauthorised.title")</h1>
   <p class="govuk-body">@messages("unauthorised.signUpWithSoftware")</p>
   <p class="govuk-body">@messages("unauthorised.alreadySignedUp")</p>
-  <p class="govuk-body"><a href="@routes.SignOutController.signOut(authorised = false)">@messages("base.signOut")</a></p>
+  <p class="govuk-body"><a class="govuk-link" href="@routes.SignOutController.signOut(authorised = false)">@messages("base.signOut")</a></p>
 }

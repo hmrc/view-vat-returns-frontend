@@ -74,7 +74,7 @@
 
 
                         @if(currentDate.isAfter(deadline.periodTo)) {
-                            <a href="@{appConfig.submitVatHonestyDeclaration(deadline.periodKey)}"
+                            <a class="govuk-link" href="@{appConfig.submitVatHonestyDeclaration(deadline.periodKey)}"
                                 id="submit-return-link">@messages("returnDeadlines.submitReturn")
                             </a>
                         } else {
