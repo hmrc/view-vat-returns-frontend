@@ -29,31 +29,31 @@
   isHybridUser: Boolean)(implicit messages: Messages)
 
 @if(isHybridUser) {
-    <h2 class="heading-large">@messages("paymentStatus.returnTotal") @displayMoney(amount)</h2>
+    <h2 class="govuk-heading-l">@messages("paymentStatus.returnTotal") @displayMoney(amount)</h2>
 } else {
 
-    <p>@messages("paymentStatus.whatYouOweCalc")</p>
+    <p class="govuk-body">@messages("paymentStatus.whatYouOweCalc")</p>
 
     @(moneyOwed, oweHmrc, outstandingAmount) match {
         case (true, Some(false), Some(outstandingAmount)) => {
-            <p>@messages("paymentStatus.repaymentProcessing")</p>
-            <h2 class="heading-large">@messages("paymentStatus.returnTotal") @displayMoney(amount)
-                <span class="heading-medium">@messages("paymentStatus.hmrcOwesYou") @displayMoney(outstandingAmount.abs)</span>
-            </h2>
+            <p class="govuk-body">@messages("paymentStatus.repaymentProcessing")</p>
+            <h2 class="govuk-heading-l">@messages("paymentStatus.returnTotal") @displayMoney(amount)</h2>
+            <h3 class="govuk-heading-m">@messages("paymentStatus.hmrcOwesYou") @displayMoney(outstandingAmount.abs)</h3>
+
         }
         case (true, Some(true), Some(outstandingAmount)) => {
-            <p>@messages("paymentStatus.billToPay", displayDate(dueDate)) @messages("paymentStatus.paymentProcessing")</p>
-            <h2 class="heading-large">@messages("paymentStatus.returnTotal") @displayMoney(amount)
-                <span class="heading-medium">@messages("paymentStatus.youOweHmrc") @displayMoney(outstandingAmount)</span>
-            </h2>
+            <p class="govuk-body">@messages("paymentStatus.billToPay", displayDate(dueDate)) @messages("paymentStatus.paymentProcessing")</p>
+            <h2 class="govuk-heading-l">@messages("paymentStatus.returnTotal") @displayMoney(amount)</h2>
+            <h3 class="govuk-heading-m">@messages("paymentStatus.youOweHmrc") @displayMoney(outstandingAmount)</h3>
+
         }
         case (false, _, Some(outstandingAmount)) => {
-            <h2 class="heading-large">@messages("paymentStatus.returnTotal") @displayMoney(amount)
-                <span class="heading-medium">@messages("paymentStatus.youOweHmrc") @displayMoney(outstandingAmount)</span>
-            </h2>
+            <h2 class="govuk-heading-l ">@messages("paymentStatus.returnTotal") @displayMoney(amount)</h2>
+            <h3 class="govuk-heading-m">@messages("paymentStatus.youOweHmrc") @displayMoney(outstandingAmount)</h3>
+
         }
         case _ => {
-            <h2 class="heading-large">@messages("paymentStatus.returnTotal") @displayMoney(amount)</h2>
+            <h2 class="govuk-heading-l">@messages("paymentStatus.returnTotal") @displayMoney(amount)</h2>
         }
     }
 }

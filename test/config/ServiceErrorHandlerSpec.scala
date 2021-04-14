@@ -19,15 +19,15 @@ package config
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import views.ViewBaseSpec
-import views.html.errors.{NotFoundView, TechnicalProblemView}
+import views.html.errors.StandardErrorView
 
 class ServiceErrorHandlerSpec extends ViewBaseSpec {
 
-  val service: ServiceErrorHandler = new ServiceErrorHandler(messagesApi, inject[TechnicalProblemView], inject[NotFoundView])
+  val service: ServiceErrorHandler = new ServiceErrorHandler(messagesApi, inject[StandardErrorView])
 
   object Selectors {
     val pageHeading = "h1"
-    val message = ".lede"
+    val message = "p.govuk-body"
   }
 
   "Calling .notFoundTemplate" should {
@@ -39,30 +39,48 @@ class ServiceErrorHandlerSpec extends ViewBaseSpec {
       document.title shouldBe "Page not found - VAT - GOV.UK"
     }
 
-    "displays the correct page heading" in {
+    "display the correct page heading" in {
       elementText(Selectors.pageHeading) shouldBe "This page cannot be found"
     }
 
-    "displays the correct message" in {
+    "display the correct message" in {
       element(Selectors.message).text() shouldBe "Please check that you have entered the correct web address."
     }
   }
 
-  "Calling .standardErrorTemplate" should {
+  "Calling .internalServerErrorTemplate" should {
 
-    lazy val view = service.standardErrorTemplate("", "", "")
+    lazy val view = service.internalServerErrorTemplate
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "display the correct title" in {
       document.title shouldBe "There is a problem with the service - VAT - GOV.UK"
     }
 
-    "displays the correct page heading" in {
+    "display the correct page heading" in {
       elementText(Selectors.pageHeading) shouldBe "Sorry, there is a problem with the service"
     }
 
-    "displays the correct message" in {
+    "display the correct message" in {
       element(Selectors.message).text() shouldBe "Try again later."
+    }
+  }
+
+  "Calling .standardErrorTemplate" should {
+
+    lazy val view = service.standardErrorTemplate("errorTitle", "errorHeading", "errorMessage")
+    lazy implicit val document: Document = Jsoup.parse(view.body)
+
+    "display the correct title" in {
+      document.title shouldBe "errorTitle - VAT - GOV.UK"
+    }
+
+    "displays the correct page heading" in {
+      elementText(Selectors.pageHeading) shouldBe "errorHeading"
+    }
+
+    "displays the correct message" in {
+      element(Selectors.message).text() shouldBe "errorMessage"
     }
   }
 }

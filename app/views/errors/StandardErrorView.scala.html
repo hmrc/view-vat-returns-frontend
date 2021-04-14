@@ -14,17 +14,12 @@
  * limitations under the License.
  *@
 
-@this(govukWrapper: GovukWrapper)
+@this(mainTemplate: MainTemplate)
 
 @(pageTitle: String, heading: String, message: String)(
-  implicit appConfig: config.AppConfig, request: Request[_], messages: Messages, user: Option[User] = None)
+        implicit appConfig: config.AppConfig, request: Request[_], messages: Messages, user: Option[User] = None)
 
-@contentHeader = {
-  <h1>@heading</h1>
+@mainTemplate(pageTitle = messages(pageTitle)) {
+    <h1 class="govuk-heading-xl">@messages(heading)</h1>
+    <p class="govuk-body">@messages(message)</p>
 }
-
-@mainContent = {
-  <p class="lede">@message</p>
-}
-
-@govukWrapper(appConfig = appConfig, title = pageTitle, contentHeader = Some(contentHeader), mainBody = mainContent, user = user)

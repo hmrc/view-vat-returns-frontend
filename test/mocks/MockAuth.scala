@@ -20,7 +20,7 @@ import java.time.LocalDate
 
 import audit.AuditingService
 import audit.models.{AuditModel, ExtendedAuditModel}
-import config.AppConfig
+import config.{AppConfig, ServiceErrorHandler}
 import connectors.{VatObligationsConnector, VatSubscriptionConnector}
 import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
 import controllers.predicate.AuthoriseAgentWithClient
@@ -42,7 +42,7 @@ import uk.gov.hmrc.auth.core.{AffinityGroup, AuthConnector, Enrolments}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.tools.Stubs.stubMessagesControllerComponents
 import uk.gov.hmrc.play.test.UnitSpec
-import views.html.errors.{TechnicalProblemView, UnauthorisedView}
+import views.html.errors.UnauthorisedView
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -64,16 +64,17 @@ trait MockAuth extends UnitSpec with GuiceOneAppPerSuite with BeforeAndAfterEach
   val mockVatSubscriptionConnector: VatSubscriptionConnector = mock[VatSubscriptionConnector]
 
   val unauthorisedView: UnauthorisedView = inject[UnauthorisedView]
-  val technicalView: TechnicalProblemView = inject[TechnicalProblemView]
 
   val enrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
+
+  lazy val errorHandler: ServiceErrorHandler = app.injector.instanceOf[ServiceErrorHandler]
 
   val mockAuthorisedAgentWithClient: AuthoriseAgentWithClient = new AuthoriseAgentWithClient(
     enrolmentsAuthService,
     mockSubscriptionService,
     mcc,
     unauthorisedView,
-    technicalView
+    errorHandler
   )
 
   val mockAuthorisedController: AuthorisedController = new AuthorisedController(
@@ -82,7 +83,7 @@ trait MockAuth extends UnitSpec with GuiceOneAppPerSuite with BeforeAndAfterEach
     mockAuthorisedAgentWithClient,
     mcc,
     unauthorisedView,
-    technicalView,
+    errorHandler,
     mockDateService
   )
 

@@ -18,10 +18,10 @@
 
 @()(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
-@mainTemplate(title = messages("unauthorised.title"), feedbackOnSignOut = false) {
+@mainTemplate(pageTitle = messages("unauthorised.title"), feedbackOnSignOut = false) {
 
-  <h1>@messages("unauthorised.title")</h1>
-  <p>@messages("unauthorised.signUpWithSoftware")</p>
-  <p>@messages("unauthorised.alreadySignedUp")</p>
-  <p><a href="@routes.SignOutController.signOut(authorised = false)">@messages("base.signOut")</a></p>
+  <h1 class="govuk-heading-l">@messages("unauthorised.title")</h1>
+  <p class="govuk-body">@messages("unauthorised.signUpWithSoftware")</p>
+  <p class="govuk-body">@messages("unauthorised.alreadySignedUp")</p>
+  <p class="govuk-body"><a href="@routes.SignOutController.signOut(authorised = false)">@messages("base.signOut")</a></p>
 }

@@ -23,32 +23,34 @@
 
 @(form: Form[FeatureSwitchModel])(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
-@mainTemplate(title = "Feature switches") {
+@mainTemplate(pageTitle = "Feature switches") {
 
     @helper.form(action = testOnly.controllers.routes.FeatureSwitchController.submitFeatureSwitch) {
         @CSRF.formField
 
-        <div class="form-group">
-            <fieldset>
+        <div class="govuk-form-group">
+            <fieldset class="govuk-fieldset">
                 <legend>
-                    <h1 class="heading-medium">Features</h1>
+                    <h1 class="govuk-heading-m">Features</h1>
                 </legend>
+                <div class="govuk-checkboxes">
 
-                @singleCheckbox(form(ConfigKeys.userResearchBannerFeature), "User research banner")
-                @singleCheckbox(form(ConfigKeys.staticDateEnabledFeature), "Use static date (2018-05-01)")
-                @singleCheckbox(form(ConfigKeys.useVatReturnsService), "Ues vat-returns microservice")
-                @singleCheckbox(form(ConfigKeys.useVatObligationsService), "Use vat-obligations microservice")
-                @singleCheckbox(form(ConfigKeys.future2020DateEnabledFeature), "Static date set to 2020-05-01")
-                @singleCheckbox(form(ConfigKeys.useLanguageSelectorFeature), "Allow language selection")
-                @singleCheckbox(form(ConfigKeys.submitReturnFeatures), "Opted-out users - Submit Return enabled")
-                @singleCheckbox(form(ConfigKeys.agentAccessFeature), "Agent access enabled")
-                @singleCheckbox(form(ConfigKeys.enablePrintPastReturns), "Enable Print Past Returns")
-                @singleCheckbox(form(ConfigKeys.niProtocolFeature), "Enable updated VAT return labels for NI protocol")
+                    @singleCheckbox(form(ConfigKeys.userResearchBannerFeature), "User research banner")
+                    @singleCheckbox(form(ConfigKeys.staticDateEnabledFeature), "Use static date (2018-05-01)")
+                    @singleCheckbox(form(ConfigKeys.useVatReturnsService), "Ues vat-returns microservice")
+                    @singleCheckbox(form(ConfigKeys.useVatObligationsService), "Use vat-obligations microservice")
+                    @singleCheckbox(form(ConfigKeys.future2020DateEnabledFeature), "Static date set to 2020-05-01")
+                    @singleCheckbox(form(ConfigKeys.useLanguageSelectorFeature), "Allow language selection")
+                    @singleCheckbox(form(ConfigKeys.submitReturnFeatures), "Opted-out users - Submit Return enabled")
+                    @singleCheckbox(form(ConfigKeys.agentAccessFeature), "Agent access enabled")
+                    @singleCheckbox(form(ConfigKeys.enablePrintPastReturns), "Enable Print Past Returns")
+                    @singleCheckbox(form(ConfigKeys.niProtocolFeature), "Enable updated VAT return labels for NI protocol")
 
+                </div>
 
             </fieldset>
         </div>
 
-        <button class="button" type="submit" id="continue-button">Submit</button>
+        <button class="govuk-button" data-module="govuk-button" type="submit" id="continue-button">Submit</button>
     }
 }

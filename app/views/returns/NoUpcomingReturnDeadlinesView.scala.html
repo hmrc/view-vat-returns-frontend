@@ -26,7 +26,7 @@
   implicit request: Request[_],messages: Messages, appConfig: config.AppConfig, user: User)
 
 @mainTemplate(
-  title = messages("returnDeadlines.title"),
+  pageTitle = messages("returnDeadlines.title"),
   serviceInfoContent = serviceInfoContent,
   user = Some(user)
 ) {
@@ -37,14 +37,14 @@
     currentPage = messages("returnDeadlines.title")
   )
 
-  <h1 class="heading-xlarge">@messages("returnDeadlines.title")</h1>
+  <h1 class="govuk-heading-l">@messages("returnDeadlines.title")</h1>
   @lastObligation.map { obligation =>
-    <p class="lede">
+    <p class="govuk-body">
       @messages("returnDeadlines.receivedReturn", displayDateRange(obligation.periodFrom, obligation.periodTo))
     </p>
   }
 
-  <p>
+  <p class="govuk-body">
     @messages("returnDeadlines.noReturns")
     @messages("returnDeadlines.nextDeadline")
   </p>

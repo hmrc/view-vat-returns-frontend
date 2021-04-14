@@ -77,7 +77,7 @@ class SubmittedReturnsPageSpec extends IntegrationBaseSpec {
 
           lazy implicit val document: Document = Jsoup.parse(response.body)
 
-          val bulletPointSelector = ".tabbed section .list-bullet li"
+          val bulletPointSelector = ".govuk-list--bullet li a"
 
           document.select(bulletPointSelector).size() shouldBe 1
         }

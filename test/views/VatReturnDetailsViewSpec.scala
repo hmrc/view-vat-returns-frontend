@@ -38,11 +38,12 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
 
   object Selectors {
     val pageHeading = "#content h1"
-    val subHeading = "#content h2.heading-large"
-    val entityNameHeading = "#content h2.heading-medium"
-    val mainInformationText = "#content > article > section > span > p:nth-of-type(1)"
-    val extraInformationText = "#content > article > section > span > p:nth-of-type(2)"
-    val tableHeadingOne = "#content section:nth-of-type(1) h3"
+    val subHeadingP1 = "#content h2.govuk-heading-l"
+    val subHeadingP2 = "#content h3.govuk-heading-m"
+    val entityNameHeading = "#content h2.govuk-heading-m"
+    val mainInformationText = "#content > section > span > p:nth-of-type(1)"
+    val extraInformationText = "#content > section > span > p:nth-of-type(2)"
+    val tableHeadingOne = "#content section:nth-of-type(1) h3.govuk-heading-s"
     val tableHeadingTwo = "#content section:nth-of-type(2) h3"
 
     val boxes = List(
@@ -58,18 +59,18 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
     val helpBullet1 = "details li:nth-of-type(1)"
     val helpBullet2 = "details li:nth-of-type(2)"
 
-    val btaBreadcrumb = "div.breadcrumbs li:nth-of-type(1)"
-    val btaBreadcrumbLink = "div.breadcrumbs li:nth-of-type(1) a"
-    val vatBreadcrumb = "div.breadcrumbs li:nth-of-type(2)"
-    val vatBreadcrumbLink = "div.breadcrumbs li:nth-of-type(2) a"
-    val previousPageBreadcrumb = "div.breadcrumbs li:nth-of-type(3)"
-    val previousPageBreadcrumbLink = "div.breadcrumbs li:nth-of-type(3) a"
-    val currentPage = "div.breadcrumbs li:nth-of-type(4)"
+    val btaBreadcrumb = "ol.govuk-breadcrumbs__list li:nth-of-type(1)"
+    val btaBreadcrumbLink = "ol.govuk-breadcrumbs__list li:nth-of-type(1) a"
+    val vatBreadcrumb = "ol.govuk-breadcrumbs__list li:nth-of-type(2)"
+    val vatBreadcrumbLink = "ol.govuk-breadcrumbs__list li:nth-of-type(2) a"
+    val previousPageBreadcrumb = "ol.govuk-breadcrumbs__list li:nth-of-type(3)"
+    val previousPageBreadcrumbLink = "ol.govuk-breadcrumbs__list li:nth-of-type(3) a"
+    val currentPage = "ol.govuk-breadcrumbs__list li:nth-of-type(4)"
 
     val backLink = "#link-back"
 
     val gaTagElement = "#content ul"
-    val minusSymbol = "#box-four > dd.column-one-quarter.form-hint.text--right > span"
+    val minusSymbol = "#box-four > dd.govuk-summary-list__actions.govuk-hint > span"
 
     def boxTitle(box: String): String = s"$box > dt"
     def boxDescription(box: String): String = s"$box > dd:nth-of-type(1)"
@@ -158,7 +159,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
     }
 
     "have the correct subheading" in {
-      elementText(Selectors.subHeading) shouldBe "Return total: £1,000 You owe HMRC: £1,000"
+      elementText(Selectors.subHeadingP1) shouldBe "Return total: £1,000"
+      elementText(Selectors.subHeadingP2) shouldBe "You owe HMRC: £1,000"
     }
 
     "have the correct trading name" in {
@@ -199,7 +201,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
     }
 
     "have a print button" in {
-      element(".button").text() shouldBe "Print VAT Return"
+      element(".govuk-button").text() shouldBe "Print VAT Return"
     }
 
     "render the correct help revealing link text" in {
@@ -239,7 +241,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
       mockConfig.features.enablePrintPastReturns(false)
       lazy val view = injectedView(vatReturnViewModel)
       lazy implicit val document: Document = Jsoup.parse(view.body)
-      elementAsOpt(".button") shouldBe None
+      elementAsOpt(".govuk-button") shouldBe None
     }
   }
 
@@ -269,7 +271,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
     }
 
     "have a print button" in {
-      element(".button").text() shouldBe "Print VAT Return"
+      element(".govuk-button").text() shouldBe "Print VAT Return"
     }
   }
 
@@ -382,7 +384,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct subheading" in {
-      elementText(Selectors.subHeading) shouldBe "Return total: £1,000.25 You owe HMRC: £1,000"
+      elementText(Selectors.subHeadingP1) shouldBe "Return total: £1,000.25"
+      elementText(Selectors.subHeadingP2) shouldBe "You owe HMRC: £1,000"
     }
 
     "have the correct information text under the heading" in {
@@ -439,7 +442,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct subheading" in {
-      elementText(Selectors.subHeading) shouldBe "Return total: £1,000 HMRC owes you: £1,000"
+      elementText(Selectors.subHeadingP1) shouldBe "Return total: £1,000"
+      elementText(Selectors.subHeadingP2) shouldBe "HMRC owes you: £1,000"
     }
 
     "have the correct information text under the heading" in {
@@ -490,7 +494,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct subheading" in {
-      elementText(Selectors.subHeading) shouldBe "Return total: £1,000 You owe HMRC: £0"
+      elementText(Selectors.subHeadingP1) shouldBe "Return total: £1,000"
+      elementText(Selectors.subHeadingP2) shouldBe "You owe HMRC: £0"
     }
   }
 
@@ -530,7 +535,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct subheading" in {
-      elementText(Selectors.subHeading) shouldBe "Return total: £1,000"
+      elementText(Selectors.subHeadingP1) shouldBe "Return total: £1,000"
     }
   }
 

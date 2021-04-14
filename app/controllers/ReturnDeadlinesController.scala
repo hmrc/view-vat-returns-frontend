@@ -22,7 +22,7 @@ import audit.AuditingService
 import audit.models.ViewOpenVatObligationsAuditModel
 import common.MandationStatuses._
 import common.SessionKeys
-import config.AppConfig
+import config.{AppConfig, ServiceErrorHandler}
 import javax.inject.{Inject, Singleton}
 import models.viewModels.ReturnDeadlineViewModel
 import models._
@@ -31,7 +31,6 @@ import play.twirl.api.{Html, HtmlFormat}
 import services.{DateService, ReturnsService, ServiceInfoService, SubscriptionService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import utils.LoggerUtil.logWarn
-import views.html.errors.TechnicalProblemView
 import views.html.returns.{NoUpcomingReturnDeadlinesView, OptOutReturnDeadlinesView, ReturnDeadlinesView}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -43,7 +42,7 @@ class ReturnDeadlinesController @Inject()(mcc: MessagesControllerComponents,
                                           authorisedController: AuthorisedController,
                                           dateService: DateService,
                                           serviceInfoService: ServiceInfoService,
-                                          technicalProblemView: TechnicalProblemView,
+                                          errorHandler: ServiceErrorHandler,
                                           noUpcomingReturnDeadlinesView: NoUpcomingReturnDeadlinesView,
                                           returnDeadlinesView: ReturnDeadlinesView,
                                           optOutReturnDeadlinesView: OptOutReturnDeadlinesView)
@@ -87,7 +86,7 @@ class ReturnDeadlinesController @Inject()(mcc: MessagesControllerComponents,
           }
         case Left(error) =>
           logWarn("[ReturnObligationsController][returnDeadlines] error: " + error.toString)
-          Future.successful(InternalServerError(technicalProblemView()))
+          Future.successful(errorHandler.showInternalServerError)
       }
   }
 
@@ -101,7 +100,7 @@ class ReturnDeadlinesController @Inject()(mcc: MessagesControllerComponents,
         Ok(noUpcomingReturnDeadlinesView(Some(toReturnDeadlineViewModel(lastFulfilledObligation, currentDate)), serviceInfoContent))
       case Left(error) =>
         logWarn("[ReturnObligationsController][fulfilledObligationsAction] error: " + error.toString)
-        InternalServerError(technicalProblemView())
+        errorHandler.showInternalServerError
     }
   }
 
@@ -127,7 +126,7 @@ class ReturnDeadlinesController @Inject()(mcc: MessagesControllerComponents,
             case Some(details) =>
               Ok(view(details.mandationStatus)).addingToSession(SessionKeys.mtdVatMandationStatus -> details.mandationStatus)
             case None =>
-              InternalServerError(technicalProblemView())
+              errorHandler.showInternalServerError
           }
       }
     } else {

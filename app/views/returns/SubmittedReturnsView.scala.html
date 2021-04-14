@@ -29,7 +29,7 @@
   implicit request: Request[_], messages: Messages, appConfig: config.AppConfig, user: User)
 
 @mainTemplate(
-  title = messages("submittedReturns.title"),
+  pageTitle = messages("submittedReturns.title"),
   serviceInfoContent = serviceInfoContent,
   user = Some(user)
 ) {
@@ -43,28 +43,19 @@
         )
     }
 
-    <div class="grid-row">
-        <div class="column-two-thirds">
-            @if(user.isAgent) {
-                <a id="link-back" class="link-back" href='@appConfig.agentClientHubUrl'>@messages("base.back")</a>
-            }
+    @if(user.isAgent) {
+        <a id="link-back" class="govuk-back-link" href='@appConfig.agentClientHubUrl'>@messages("base.back")</a>
+    }
 
-            <h1 id="top" class="heading-xlarge">@messages("submittedReturns.title")</h1>
+    <h1 id="top" class="govuk-heading-xl">@messages("submittedReturns.title")</h1>
 
-            @if(showInsolvencyContent) {
-                <div class="panel panel-border-wide form-group">@messages("submittedReturns.insolvencyNotice")</div>
-            }
+    @if(showInsolvencyContent) {
+        <div class="panel panel-border-wide form-group">@messages("submittedReturns.insolvencyNotice")</div>
+    }
 
-            <div class="tabbed">
-                @submittedReturnsTabs(years = model.returnYears, showPreviousReturnsTab = model.showPreviousReturnsTab)
-                @submittedReturnsTabsContent(model, javascriptEnabled = true)
-            </div>
-
-            <noscript>
-                @submittedReturnsTabsContent(model, javascriptEnabled = false)
-            </noscript>
-
-        </div>
-
+    <div class="govuk-tabs" data-module="govuk-tabs">
+        <h2 class="govuk-tabs__title">Contents</h2>
+        @submittedReturnsTabs(years = model.returnYears, showPreviousReturnsTab = model.showPreviousReturnsTab)
+        @submittedReturnsTabsContent(model)
     </div>
 }

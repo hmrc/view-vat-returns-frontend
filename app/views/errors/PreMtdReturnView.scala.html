@@ -14,23 +14,24 @@
  * limitations under the License.
  *@
 
-@this(mainTemplate: MainTemplate)
+@this(mainTemplate: MainTemplate, govukBackLink: GovukBackLink)
 
 @(user: models.User)(implicit appConfig: config.AppConfig, request: Request[_], messages: Messages)
 
-@mainTemplate(title = messages("preMtdReturn.heading"), user = Some(user)) {
-  <a id="back" class="link-back" href="javascript:history.back()">@messages("base.back")</a>
-  <div class="grid-row">
-      <div class="column-two-thirds">
-          <h1 class="heading-large">@messages("preMtdReturn.heading")</h1>
-          <p>@messages("preMtdReturn.message")</p>
+@mainTemplate(pageTitle = messages("preMtdReturn.heading"), user = Some(user)) {
 
-          @if(user.hasNonMtdVat) {
-              <p>
-                  <a href="@appConfig.portalUrl(user.vrn)">@messages("preMtdReturn.link")</a>
-              </p>
-          }
+    @govukBackLink(BackLink(href = "javascript:history.back()"))
 
-      </div>
-</div>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-l">@messages("preMtdReturn.heading")</h1>
+            <p class="govuk-body">@messages("preMtdReturn.message")</p>
+
+            @if(user.hasNonMtdVat) {
+                <p class="govuk-body">
+                    <a href="@appConfig.portalUrl(user.vrn)">@messages("preMtdReturn.link")</a>
+                </p>
+            }
+        </div>
+    </div>
 }

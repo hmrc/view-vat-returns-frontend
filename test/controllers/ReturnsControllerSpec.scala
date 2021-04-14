@@ -28,7 +28,7 @@ import play.api.http.Status
 import play.api.test.Helpers._
 import play.twirl.api.Html
 import uk.gov.hmrc.auth.core.{Enrolments, InsufficientEnrolments, MissingBearerToken}
-import views.html.errors.{NotFoundView, PreMtdReturnView, TechnicalProblemView}
+import views.html.errors.PreMtdReturnView
 import views.html.returns.VatReturnDetailsView
 
 import scala.concurrent.Future
@@ -47,9 +47,8 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     mockDateService,
     mockServiceInfoService,
     mockAuthorisedController,
-    inject[NotFoundView],
     inject[VatReturnDetailsView],
-    inject[TechnicalProblemView],
+    errorHandler,
     inject[PreMtdReturnView]
   )
 

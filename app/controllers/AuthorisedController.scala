@@ -17,7 +17,7 @@
 package controllers
 
 import common.{SessionKeys, EnrolmentKeys => Keys}
-import config.AppConfig
+import config.{AppConfig, ServiceErrorHandler}
 import models.User
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, MessagesRequest, Result}
 import services.{DateService, EnrolmentsAuthService, SubscriptionService}
@@ -29,7 +29,7 @@ import controllers.predicate.AuthoriseAgentWithClient
 import javax.inject.{Inject, Singleton}
 import play.api.Logger
 import utils.LoggerUtil._
-import views.html.errors.{TechnicalProblemView, UnauthorisedView}
+import views.html.errors.UnauthorisedView
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -39,7 +39,7 @@ class AuthorisedController @Inject()(enrolmentsAuthService: EnrolmentsAuthServic
                                      agentWithClientPredicate: AuthoriseAgentWithClient,
                                      mcc: MessagesControllerComponents,
                                      unauthorisedView: UnauthorisedView,
-                                     technicalProblemView: TechnicalProblemView,
+                                     errorHandler: ServiceErrorHandler,
                                      dateService: DateService)
                                     (implicit appConfig: AppConfig,
                                      ec: ExecutionContext) extends FrontendController(mcc) {
@@ -59,7 +59,7 @@ class AuthorisedController @Inject()(enrolmentsAuthService: EnrolmentsAuthServic
       case enrolments ~ Some(_) => authorisedAsNonAgent(block, enrolments)
       case _ =>
         logWarn("[AuthorisedController][authorisedAction] - Missing affinity group")
-        Future.successful(InternalServerError(technicalProblemView()))
+        Future.successful(errorHandler.showInternalServerError)
     } recoverWith {
       case _: NoActiveSession => Future.successful(Redirect(appConfig.signInUrl))
       case _: InsufficientEnrolments =>
@@ -86,14 +86,14 @@ class AuthorisedController @Inject()(enrolmentsAuthService: EnrolmentsAuthServic
 
           (request.session.get(SessionKeys.insolventWithoutAccessKey), request.session.get(SessionKeys.futureInsolvencyDate)) match {
             case (Some("true"), _) => Future.successful(Forbidden)
-            case (Some("false"), Some("true")) => Future.successful(InternalServerError(technicalProblemView()))
+            case (Some("false"), Some("true")) => Future.successful(errorHandler.showInternalServerError)
             case (Some("false"), Some("false")) => block(request)(user)
             case _ => insolvencySubscriptionCall(user, block(request))
           }
 
       } getOrElse {
         logWarn("[AuthorisedController][authoriseAsNonAgent] Non-agent with invalid VRN")
-        Future.successful(InternalServerError(technicalProblemView()))
+        Future.successful(errorHandler.showInternalServerError)
       }
     } else {
       logDebug("[AuthorisedController][authoriseAsNonAgent] Non-agent with no HMRC-MTD-VAT enrolment. Rendering unauthorised view.")
@@ -117,7 +117,7 @@ class AuthorisedController @Inject()(enrolmentsAuthService: EnrolmentsAuthServic
           case (_, true) =>
             Logger.debug("[AuthorisedController][insolvencySubscriptionCall] - User has a future insolvencyDate, throwing ISE")
             Future.successful(
-              InternalServerError(technicalProblemView()).addingToSession(
+              errorHandler.showInternalServerError.addingToSession(
                 SessionKeys.insolventWithoutAccessKey -> "false",
                 SessionKeys.futureInsolvencyDate -> "true")
             )
@@ -130,6 +130,6 @@ class AuthorisedController @Inject()(enrolmentsAuthService: EnrolmentsAuthServic
         }
       case _ =>
         Logger.warn("[AuthorisedController][insolvencySubscriptionCall] - Failure obtaining insolvency status from Customer Info API")
-        Future.successful(InternalServerError(technicalProblemView()))
+        Future.successful(errorHandler.showInternalServerError)
     }
 }
