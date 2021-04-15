@@ -41,8 +41,28 @@ $hmrc-assets-path: "/vat-through-software/vat-returns/assets/lib/hmrc-frontend/h
   padding-top: 0.5em;
 }
 
+.badge {
+  display: inline-block;
+  min-width: 10px;
+  padding: 1px 8px 1px 8px;
+  font-size: 14px;
+  font-weight: 600;
+  background: #B10E1E;
+  color: #FFF;
+  text-align: center;
+  white-space: nowrap;
+  border-radius: 10px;
+}
+
 @media screen and (max-width: 900px) {
   #service-info-list > li > a {
     float: none;
   }
+}
+
+.js-enabled .govuk-header__menu-button {
+  display: none;
+}
+.js-enabled .govuk-header__navigation {
+  display: block;
 }
