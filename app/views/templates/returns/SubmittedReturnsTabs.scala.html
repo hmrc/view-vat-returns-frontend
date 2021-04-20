@@ -18,14 +18,10 @@
 
 @(years: Seq[Int], showPreviousReturnsTab: Boolean)(implicit messages: Messages)
 
-@generateHref(year: Int) = @{
-    year.toString.replaceFirst("2", """\\32 """)
-}
-
 <ul class="govuk-tabs__list">
   @for(year <- years) {
     <li class="govuk-tabs__list-item">
-      <a class="govuk-tabs__tab" href="#@generateHref(year)">
+      <a class="govuk-tabs__tab" href="#year-@{year}">
         @year
       </a>
     </li>

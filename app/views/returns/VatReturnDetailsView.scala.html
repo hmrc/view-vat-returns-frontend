@@ -17,7 +17,6 @@
 @import models.viewModels.VatReturnViewModel
 @import play.twirl.api.HtmlFormat
 @import utils.ImplicitDateFormatter._
-@import views.html.templates.ExpandingHelpSection
 @import views.html.templates.formatters.dates._
 @import views.html.templates.formatters.money._
 @import views.html.templates.formatters.breadcrumbs._
@@ -28,7 +27,8 @@
       displayDate: DisplayDate,
       displayDateRange: DisplayDateRange,
       displayMoney: DisplayMoney,
-      expandingHelpSection: ExpandingHelpSection,
+      govukDetails: GovukDetails,
+      govukBackLink: GovukBackLink,
       paymentStatus: PaymentStatus)
 
 @(vatReturnViewModel: VatReturnViewModel,
@@ -36,12 +36,17 @@
   implicit request: Request[_], messages: Messages, appConfig: config.AppConfig, user: User)
 
 @hiddenHelpTextContent = {
-  <p>@messages("yourVatReturn.helpLine")</p>
-  <ul class="list list-bullet">
+  <p class="govuk-body">@messages("yourVatReturn.helpLine")</p>
+  <ul class="govuk-list govuk-list--bullet">
     <li>@messages("yourVatReturn.bullet1")</li>
     <li>@messages("yourVatReturn.bullet2")</li>
   </ul>
-  <p>@messages("yourVatReturn.reportLink1") <a href="@appConfig.reportVatErrorUrl" class="govuk-link" rel="noreferrer noopener" target="_blank" id="reportVatErrorLink">@messages("yourVatReturn.reportLink2")</a> @messages("yourVatReturn.reportLink3")</p>
+  <p class="govuk-body">
+    @messages("yourVatReturn.reportLink1")
+    <a href="@appConfig.reportVatErrorUrl" class="govuk-link" rel="noreferrer noopener"
+       target="_blank" id="reportVatErrorLink">@messages("yourVatReturn.reportLink2")</a>
+    @messages("yourVatReturn.reportLink3")
+  </p>
 }
 
 @returnHeading(useShortDayFormat: Boolean) = {
@@ -76,7 +81,10 @@
 
 <section>
     @if(user.isAgent) {
-        <a id="link-back" class="govuk-back-link" href='@controllers.routes.SubmittedReturnsController.submittedReturns()'>@messages("base.back")</a>
+      @govukBackLink(BackLink(
+        href = controllers.routes.SubmittedReturnsController.submittedReturns().url,
+        content = Text(messages("base.back"))
+      ))
     }
 
     <h1 class="govuk-heading-xl">
@@ -90,16 +98,16 @@
         </span>
     </h1>
 
-    <span class="noprint">
-        @paymentStatus(
-          vatReturnViewModel.vatReturnDetails.vatReturn.netVatDue,
-          vatReturnViewModel.vatReturnDetails.payment.map(_.outstandingAmount),
-          vatReturnViewModel.dueDate,
-          vatReturnViewModel.vatReturnDetails.moneyOwed,
-          vatReturnViewModel.vatReturnDetails.oweHmrc,
-          vatReturnViewModel.isHybridUser
-        )
-    </span>
+    <div class="noprint">
+      @paymentStatus(
+        vatReturnViewModel.vatReturnDetails.vatReturn.netVatDue,
+        vatReturnViewModel.vatReturnDetails.payment.map(_.outstandingAmount),
+        vatReturnViewModel.dueDate,
+        vatReturnViewModel.vatReturnDetails.moneyOwed,
+        vatReturnViewModel.vatReturnDetails.oweHmrc,
+        vatReturnViewModel.isHybridUser
+      )
+    </div>
 
     <ul class="govuk-list govuk-!-padding-bottom-3">
       <li>@messages("yourVatReturn.returnDueDate") @displayDate(vatReturnViewModel.dueDate)</li>
@@ -187,16 +195,16 @@
       </dl>
     </section>
 
-    <span class="onlyprint">
-    @paymentStatus(
+    <div class="onlyprint">
+      @paymentStatus(
         vatReturnViewModel.vatReturnDetails.vatReturn.netVatDue,
         vatReturnViewModel.vatReturnDetails.payment.map(_.outstandingAmount),
         vatReturnViewModel.dueDate,
         vatReturnViewModel.vatReturnDetails.moneyOwed,
         vatReturnViewModel.vatReturnDetails.oweHmrc,
         vatReturnViewModel.isHybridUser
-    )
-    </span>
+      )
+    </div>
 
     @if(appConfig.features.enablePrintPastReturns()) {
       <div class="form-group">
@@ -206,9 +214,10 @@
       </div>
     }
 
-    <div class="form-group">
-      @expandingHelpSection(messages("yourVatReturn.helpTitle"), "vatReturn", "vatReturn", hiddenHelpTextContent)
-    </div>
+    @govukDetails(Details(
+      summary = Text(messages("yourVatReturn.helpTitle")),
+      content = HtmlContent(hiddenHelpTextContent)
+    ))
 
     <div class="onlyprint foot">@messages("yourVatReturn.footer", s"${currentDate.toLongDate}")</div>
 

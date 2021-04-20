@@ -41,8 +41,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
     val subHeadingP1 = "#content h2.govuk-heading-l"
     val subHeadingP2 = "#content h3.govuk-heading-m"
     val entityNameHeading = "#content h2.govuk-heading-m"
-    val mainInformationText = "#content > section > span > p:nth-of-type(1)"
-    val extraInformationText = "#content > section > span > p:nth-of-type(2)"
+    val mainInformationText = "#content > section > div > p:nth-of-type(1)"
+    val extraInformationText = "#content > section > div > p:nth-of-type(2)"
     val tableHeadingOne = "#content section:nth-of-type(1) h3.govuk-heading-s"
     val tableHeadingTwo = "#content section:nth-of-type(2) h3"
 
@@ -67,7 +67,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
     val previousPageBreadcrumbLink = "ol.govuk-breadcrumbs__list li:nth-of-type(3) a"
     val currentPage = "ol.govuk-breadcrumbs__list li:nth-of-type(4)"
 
-    val backLink = "#link-back"
+    val backLink = ".govuk-back-link"
 
     val gaTagElement = "#content ul"
     val minusSymbol = "#box-four > dd.govuk-summary-list__actions.govuk-hint > span"

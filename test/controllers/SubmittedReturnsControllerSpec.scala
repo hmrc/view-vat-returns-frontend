@@ -122,8 +122,8 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
 
         "return tabs for current year (2018) and previous year (2017)" in {
           val body = await(bodyOf(result))
-          body should include ("""<a class="govuk-tabs__tab" href="#\32 018"""")
-          body should include ("""<a class="govuk-tabs__tab" href="#\32 017"""")
+          body should include ("""<a class="govuk-tabs__tab" href="#year-2018"""")
+          body should include ("""<a class="govuk-tabs__tab" href="#year-2017"""")
         }
       }
 
@@ -153,8 +153,8 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
 
         "return a tab for current year (2018) but not previous year (2017)" in {
           val body = await(bodyOf(result))
-          body should include ("""<a class="govuk-tabs__tab" href="#\32 018"""")
-          body shouldNot include ("""<a class="govuk-tabs__tab" href="#\32 017"""")
+          body should include ("""<a class="govuk-tabs__tab" href="#year-2018"""")
+          body shouldNot include ("""<a class="govuk-tabs__tab" href="#year-2017"""")
         }
       }
     }
