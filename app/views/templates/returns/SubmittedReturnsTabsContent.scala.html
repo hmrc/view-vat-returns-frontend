@@ -23,7 +23,7 @@
 @(model: VatReturnsViewModel)(implicit messages: Messages, appConfig: AppConfig, user: User)
 
 @for(year <- model.returnYears) {
-  <div class="govuk-tabs__panel" id="@year">
+  <div class="govuk-tabs__panel" id="year-@year">
     <h2 class="govuk-heading-m">@messages("submittedReturns.yearReturns", year.toString)</h2>
     @if(model.obligations.isEmpty) {
 

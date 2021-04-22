@@ -22,7 +22,9 @@
 @this(mainTemplate: MainTemplate,
       navigationBreadcrumb: NavigationBreadcrumb,
       submittedReturnsTabs: SubmittedReturnsTabs,
-      submittedReturnsTabsContent: SubmittedReturnsTabsContent)
+      submittedReturnsTabsContent: SubmittedReturnsTabsContent,
+      govukInsetText: GovukInsetText,
+      govukBackLink: GovukBackLink)
 
 @(model: VatReturnsViewModel, showInsolvencyContent: Boolean,
   serviceInfoContent: Html = HtmlFormat.empty)(
@@ -44,17 +46,21 @@
     }
 
     @if(user.isAgent) {
-        <a id="link-back" class="govuk-back-link" href='@appConfig.agentClientHubUrl'>@messages("base.back")</a>
+      @govukBackLink(BackLink(
+        href = appConfig.agentClientHubUrl,
+        content = Text(messages("base.back"))
+      ))
     }
 
     <h1 id="top" class="govuk-heading-xl">@messages("submittedReturns.title")</h1>
 
     @if(showInsolvencyContent) {
-        <div class="panel panel-border-wide form-group">@messages("submittedReturns.insolvencyNotice")</div>
+      @govukInsetText(InsetText(
+        content = Text(messages("submittedReturns.insolvencyNotice"))
+      ))
     }
 
     <div class="govuk-tabs" data-module="govuk-tabs">
-        <h2 class="govuk-tabs__title">Contents</h2>
         @submittedReturnsTabs(years = model.returnYears, showPreviousReturnsTab = model.showPreviousReturnsTab)
         @submittedReturnsTabsContent(model)
     </div>

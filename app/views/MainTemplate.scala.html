@@ -23,19 +23,20 @@
 
 
 @this(govukLayout: GovukLayout,
-        govukHeader: GovukHeader,
-        govukPhaseBanner: GovukPhaseBanner,
-        hmrcReportTechnicalIssue: HmrcReportTechnicalIssue,
-        hmrcLanguageSelect: HmrcLanguageSelect,
-        hmrcTimeoutDialog: HmrcTimeoutDialog,
-        hmrcStandardFooter: HmrcStandardFooter,
-        trackingConsentSnippet: TrackingConsentSnippet)
+      govukHeader: GovukHeader,
+      govukPhaseBanner: GovukPhaseBanner,
+      hmrcReportTechnicalIssue: HmrcReportTechnicalIssue,
+      hmrcLanguageSelect: HmrcLanguageSelect,
+      hmrcTimeoutDialog: HmrcTimeoutDialog,
+      hmrcStandardFooter: HmrcStandardFooter,
+      trackingConsentSnippet: TrackingConsentSnippet,
+      userResearchBanner: HmrcUserResearchBanner)
 
 @(pageTitle: String,
-        showSignOut: Boolean = true,
-        feedbackOnSignOut: Boolean = true,
-        serviceInfoContent: Html = HtmlFormat.empty,
-        user: Option[User] = None)(mainContent: Html)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+  showSignOut: Boolean = true,
+  feedbackOnSignOut: Boolean = true,
+  serviceInfoContent: Html = HtmlFormat.empty,
+  user: Option[User] = None)(mainContent: Html)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
 @titleServiceName = @{
     user.fold(messages("navTitle.makingTaxDigitalForVat"))(u => if(u.isAgent) messages("navTitle.agent") else messages("navTitle.nonAgent"))
@@ -87,27 +88,33 @@
     }
 }
 
-@header = @{
-    govukHeader(Header(
-        serviceName = Some(titleServiceName),
-        navigation =
-            if(showSignOut)
-                Some(Seq(HeaderNavigation(
-                    text = Some(messages("base.signOut")),
-                    href = Some(routes.SignOutController.signOut(feedbackOnSignOut).url)
-                )))
-            else None
+@header = {
+  @govukHeader(Header(
+    serviceName = Some(titleServiceName),
+    navigation =
+        if(showSignOut)
+            Some(Seq(HeaderNavigation(
+                text = Some(messages("base.signOut")),
+                href = Some(routes.SignOutController.signOut(feedbackOnSignOut).url)
+            )))
+        else None
+  ))
+  @if(appConfig.features.userResearchBanner()) {
+    @userResearchBanner(UserResearchBanner(
+      language = if(messages.lang.code == "cy") Cy else En,
+      url = "https://signup.take-part-in-research.service.gov.uk/?utm_campaign=VATviewchange&utm_source=Other&utm_medium=other&t=HMRC&id=34"
     ))
+  }
 }
 
-@getHelpHtml = @{hmrcReportTechnicalIssue(ReportTechnicalIssue(
+@getHelpHtml = @{
+  hmrcReportTechnicalIssue(ReportTechnicalIssue(
     serviceCode = appConfig.contactFormServiceIdentifier,
-    language = if (messages.lang.code == "cy") Cy else En
-    ))
+    language = if(messages.lang.code == "cy") Cy else En
+  ))
 }
 
 @fullContent = {
-
     <div id="content" class="govuk-!-margin-bottom-6">
         @mainContent
     </div>

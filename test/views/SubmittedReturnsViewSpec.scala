@@ -46,8 +46,8 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
     val tabFour = "#content > div.govuk-tabs > ul > li:nth-child(4) > a"
     val returnsHeading = "div.govuk-tabs__panel > h2.govuk-heading-m"
     val period = "div.govuk-tabs__panel > p.govuk-body"
-    val backLink = "#link-back"
-    val insolvencyContent = ".panel"
+    val backLink = ".govuk-back-link"
+    val insolvencyContent = ".govuk-inset-text"
 
     def obligation(number: Int): String = s".govuk-list--bullet li:nth-of-type($number)"
 
