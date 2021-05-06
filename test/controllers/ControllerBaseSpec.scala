@@ -21,7 +21,6 @@ import akka.stream.{ActorMaterializer, Materializer}
 import common.EnrolmentKeys._
 import common.SessionKeys
 import common.SessionKeys.clientVrn
-import config.ServiceErrorHandler
 import mocks.MockAuth
 import models.User
 import play.api.http.Status
