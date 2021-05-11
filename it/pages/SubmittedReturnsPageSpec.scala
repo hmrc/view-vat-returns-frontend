@@ -34,9 +34,7 @@ class SubmittedReturnsPageSpec extends IntegrationBaseSpec {
       buildRequest("/submitted")
     }
 
-    val backendFeatureEnabled: Boolean =
-      app.configuration.underlying.getBoolean("features.useVatObligationsService.enabled")
-    val obligationsStub = new VatObligationsStub(backendFeatureEnabled)
+    val obligationsStub = new VatObligationsStub(true)
   }
 
   "Calling the returns route" when {

@@ -40,9 +40,7 @@ class ReturnDeadlinesPageSpec extends IntegrationBaseSpec {
       buildRequest("/return-deadlines")
     }
 
-    val backendFeatureEnabled: Boolean =
-      app.configuration.underlying.getBoolean("features.useVatObligationsService.enabled")
-    val obligationsStub = new VatObligationsStub(backendFeatureEnabled)
+    val obligationsStub = new VatObligationsStub(true)
   }
 
   lazy val mockAppConfig: FrontendAppConfig = app.injector.instanceOf[FrontendAppConfig]

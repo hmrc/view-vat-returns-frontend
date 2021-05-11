@@ -24,9 +24,7 @@ import stubs._
 
 class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
 
-  val obligationsFeatureEnabled: Boolean =
-    app.configuration.underlying.getBoolean("features.useVatObligationsService.enabled")
-  val obligationsStub = new VatObligationsStub(obligationsFeatureEnabled)
+  val obligationsStub = new VatObligationsStub(true)
 
   val returnsFeatureEnabled: Boolean =
     app.configuration.underlying.getBoolean("features.useVatReturnsService.enabled")
