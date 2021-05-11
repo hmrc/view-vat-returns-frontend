@@ -18,7 +18,6 @@ package models
 
 case class FeatureSwitchModel(userResearchBannerEnabled: Boolean,
                               staticDateEnabled: Boolean,
-                              future2020DateEnabled: Boolean,
                               useLanguageSelector: Boolean,
                               submitReturnFeatures: Boolean,
                               agentAccessEnabled: Boolean,

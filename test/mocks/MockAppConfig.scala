@@ -46,7 +46,6 @@ class MockAppConfig(val runModeConfiguration: Configuration, val mode: Mode = Mo
   override val feedbackFormPartialUrl: String = "BasefeedbackUrl"
   override val contactFormServiceIdentifier: String = "VATVC"
   override val staticDateValue: String = "2018-05-01"
-  override val future2020DateValue: String = "2020-05-01"
   override val finalReturnPeriodKey: String = "9999"
   override val accessibilityLinkUrl: String = "/accessibility-statement"
   override def surveyUrl(identifier: String): String = s"/some-survey-url/$identifier"
@@ -75,4 +74,3 @@ class MockAppConfig(val runModeConfiguration: Configuration, val mode: Mode = Mo
   override val agentClientHubUrl: String = "agent-client-agent-action"
 
 }
-

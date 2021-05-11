@@ -49,7 +49,6 @@ trait AppConfig {
   val feedbackFormPartialUrl: String
   val contactFormServiceIdentifier: String
   val staticDateValue: String
-  val future2020DateValue: String
   val finalReturnPeriodKey: String
   def surveyUrl(identifier: String): String
   def signOutUrl(identifier: String): String
@@ -127,7 +126,6 @@ class FrontendAppConfig @Inject()(implicit configuration: Configuration, sc: Ser
   override lazy val reportVatErrorUrl: String = sc.getString(Keys.reportVatErrorUrl)
 
   override lazy val staticDateValue: String = sc.getString(Keys.staticDateValue)
-  override lazy val future2020DateValue: String = sc.getString(Keys.future2020DateValue)
 
   override lazy val finalReturnPeriodKey: String = sc.getString(Keys.finalReturnPeriodKey)
 
