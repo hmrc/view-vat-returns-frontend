@@ -28,7 +28,6 @@ object ConfigKeys {
   val staticDateValue: String = "date-service.staticDate.value"
   val future2020DateValue: String = "date-service.futureDate.value"
   val useVatReturnsService: String = "features.useVatReturnsService.enabled"
-  val useVatObligationsService: String = "features.useVatObligationsService.enabled"
   val future2020DateEnabledFeature: String = "features.futureDate.enabled"
   val useLanguageSelectorFeature: String = "features.useLanguageSelector.enabled"
   val submitReturnFeatures: String = "features.submitReturnFeatures.enabled"

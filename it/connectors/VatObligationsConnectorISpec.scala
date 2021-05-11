@@ -34,9 +34,7 @@ class VatObligationsConnectorISpec extends IntegrationBaseSpec {
 
     val connector: VatObligationsConnector = app.injector.instanceOf[VatObligationsConnector]
     implicit val hc: HeaderCarrier = HeaderCarrier()
-    val backendFeatureEnabled: Boolean =
-      app.configuration.underlying.getBoolean("features.useVatObligationsService.enabled")
-    val obligationsStub = new VatObligationsStub(backendFeatureEnabled)
+    val obligationsStub = new VatObligationsStub(true)
   }
 
   "Calling getVatReturnObligations with a status of 'A'" should {
