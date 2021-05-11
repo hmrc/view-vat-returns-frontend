@@ -33,7 +33,6 @@ class FeatureSwitchController @Inject()(mcc: MessagesControllerComponents,
       FeatureSwitchModel(
         userResearchBannerEnabled = appConfig.features.userResearchBanner(),
         staticDateEnabled = appConfig.features.staticDateEnabled(),
-        enableVatReturnsService = appConfig.features.enableVatReturnsService(),
         enableVatObligationsService = appConfig.features.enableVatObligationsService(),
         future2020DateEnabled = appConfig.features.future2020DateEnabled(),
         useLanguageSelector = appConfig.features.useLanguageSelector(),
@@ -55,7 +54,6 @@ class FeatureSwitchController @Inject()(mcc: MessagesControllerComponents,
   def handleSuccess(model: FeatureSwitchModel): Result = {
     appConfig.features.userResearchBanner(model.userResearchBannerEnabled)
     appConfig.features.staticDateEnabled(model.staticDateEnabled)
-    appConfig.features.enableVatReturnsService(model.enableVatReturnsService)
     appConfig.features.enableVatObligationsService(model.enableVatObligationsService)
     appConfig.features.future2020DateEnabled(model.future2020DateEnabled)
     appConfig.features.useLanguageSelector(model.useLanguageSelector)
