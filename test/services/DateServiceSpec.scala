@@ -30,7 +30,6 @@ class DateServiceSpec extends ControllerBaseSpec {
 
       "return the static date specified in config" in {
         mockConfig.features.staticDateEnabled(true)
-        mockConfig.features.future2020DateEnabled(false)
 
         val result = service.now()
         val expected = LocalDate.parse("2018-05-01")
@@ -40,37 +39,10 @@ class DateServiceSpec extends ControllerBaseSpec {
 
     }
 
-    "the future date feature is enabled" should {
-
-      "return the future date specified in config" in {
-        mockConfig.features.staticDateEnabled(false)
-        mockConfig.features.future2020DateEnabled(true)
-
-        val result = service.now()
-        val expected = LocalDate.parse("2020-05-01")
-
-        result shouldEqual expected
-      }
-    }
-
-    "both the static and future date features are enabled" should {
-
-      "return today's date" in {
-        mockConfig.features.staticDateEnabled(true)
-        mockConfig.features.future2020DateEnabled(true)
-
-        val result = service.now()
-        val expected = LocalDate.now()
-
-        result shouldEqual expected
-      }
-    }
-
     "the static date feature is disabled" should {
 
       "return today's date" in {
         mockConfig.features.staticDateEnabled(false)
-        mockConfig.features.future2020DateEnabled(false)
 
         val result = service.now()
         val expected = LocalDate.now()

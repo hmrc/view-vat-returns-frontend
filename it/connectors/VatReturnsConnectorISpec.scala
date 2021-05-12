@@ -31,9 +31,7 @@ class VatReturnsConnectorISpec extends IntegrationBaseSpec {
 
     val connector: VatReturnsConnector = app.injector.instanceOf[VatReturnsConnector]
     implicit val hc: HeaderCarrier = HeaderCarrier()
-    val backendFeatureEnabled: Boolean =
-      app.configuration.underlying.getBoolean("features.useVatReturnsService.enabled")
-    val returnsStub = new VatReturnsStub(backendFeatureEnabled)
+    val returnsStub = new VatReturnsStub
   }
 
   "Calling getReturnDetails" when {

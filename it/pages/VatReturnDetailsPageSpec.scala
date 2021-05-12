@@ -26,9 +26,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
 
   val obligationsStub = new VatObligationsStub(true)
 
-  val returnsFeatureEnabled: Boolean =
-    app.configuration.underlying.getBoolean("features.useVatReturnsService.enabled")
-  val returnsStub = new VatReturnsStub(returnsFeatureEnabled)
+  val returnsStub = new VatReturnsStub
 
   private trait ReturnRouteTest {
     def setupStubs(): StubMapping

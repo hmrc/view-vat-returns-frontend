@@ -24,15 +24,10 @@ import javax.inject.{Inject, Singleton}
 class DateService @Inject()(appConfig: config.AppConfig) {
 
   def now(): LocalDate = {
-
-    val staticDateEnabled: Boolean = appConfig.features.staticDateEnabled()
-    val future2020DateEnabled: Boolean = appConfig.features.future2020DateEnabled()
-
-    (staticDateEnabled, future2020DateEnabled) match {
-      case (true, false) => LocalDate.parse(appConfig.staticDateValue)
-      case (false, true) => LocalDate.parse(appConfig.future2020DateValue)
-      case (false, false) => LocalDate.now()
-      case (true, true) => LocalDate.now()
+    if (appConfig.features.staticDateEnabled()) {
+      LocalDate.parse(appConfig.staticDateValue)
+    } else {
+      LocalDate.now()
     }
   }
 }

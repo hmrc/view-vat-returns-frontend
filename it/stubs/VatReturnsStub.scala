@@ -22,10 +22,9 @@ import models.errors.{ApiMultiError, ApiSingleError}
 import play.api.http.Status.{BAD_REQUEST, OK}
 import play.api.libs.json.{JsValue, Json}
 
-class VatReturnsStub(backendFeatureEnabled: Boolean) extends WireMockMethods {
+class VatReturnsStub extends WireMockMethods {
 
-  private val returnsUri =
-    if(backendFeatureEnabled) "/vat-returns/returns/vrn/(.+)" else "/([0-9]+)/returns/(.+)"
+  private val returnsUri = "/vat-returns/returns/vrn/(.+)"
 
   def stubSuccessfulVatReturn: StubMapping = {
     when(method = GET, uri = returnsUri)
