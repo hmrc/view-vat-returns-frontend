@@ -37,7 +37,6 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    mockConfig.features.submitReturnFeatures(true)
   }
 
   def controller: ReturnsController = new ReturnsController(
@@ -401,23 +400,6 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
           callServiceInfoPartialService
           callConstructReturnDetailsModel(exampleVatReturnDetails)
           controller.vatReturnViaPayments("#001")(request(fakeRequest.withSession("mtdVatMandationStatus" -> "Non MTDfB")))
-        }
-
-        "not make a call to retrieve mandation status" in {
-          status(result) shouldBe Status.OK
-        }
-      }
-
-      "submit return feature switch is off" should {
-
-        lazy val result = {
-          mockConfig.features.submitReturnFeatures(false)
-          callAuthService(individualAuthResult)
-          callVatReturn(Right(exampleVatReturn))
-          setupCommonSuccessMocks()
-          callServiceInfoPartialService
-          callConstructReturnDetailsModel(exampleVatReturnDetails)
-          controller.vatReturnViaPayments("#001")(request())
         }
 
         "not make a call to retrieve mandation status" in {

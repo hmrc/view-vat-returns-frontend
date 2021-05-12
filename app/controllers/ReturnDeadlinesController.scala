@@ -118,19 +118,15 @@ class ReturnDeadlinesController @Inject()(mcc: MessagesControllerComponents,
         returnDeadlinesView(obligations, serviceInfoContent)
     }
 
-    if (appConfig.features.submitReturnFeatures()) {
-      request.session.get(SessionKeys.mtdVatMandationStatus) match {
-        case Some(status) => Future.successful(Ok(view(status)))
-        case None =>
-          subscriptionService.getUserDetails(user.vrn) map {
-            case Some(details) =>
-              Ok(view(details.mandationStatus)).addingToSession(SessionKeys.mtdVatMandationStatus -> details.mandationStatus)
-            case None =>
-              errorHandler.showInternalServerError
-          }
-      }
-    } else {
-      Future.successful(Ok(returnDeadlinesView(obligations, serviceInfoContent)))
+    request.session.get(SessionKeys.mtdVatMandationStatus) match {
+      case Some(status) => Future.successful(Ok(view(status)))
+      case None =>
+        subscriptionService.getUserDetails(user.vrn) map {
+          case Some(details) =>
+            Ok(view(details.mandationStatus)).addingToSession(SessionKeys.mtdVatMandationStatus -> details.mandationStatus)
+          case None =>
+            errorHandler.showInternalServerError
+        }
     }
   }
 }
