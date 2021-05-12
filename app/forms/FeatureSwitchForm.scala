@@ -28,7 +28,6 @@ object FeatureSwitchForm {
       ConfigKeys.userResearchBannerFeature -> boolean,
       ConfigKeys.staticDateEnabledFeature -> boolean,
       ConfigKeys.useLanguageSelectorFeature -> boolean,
-      ConfigKeys.submitReturnFeatures -> boolean,
       ConfigKeys.agentAccessFeature -> boolean,
       ConfigKeys.enablePrintPastReturns -> boolean,
       ConfigKeys.niProtocolFeature -> boolean

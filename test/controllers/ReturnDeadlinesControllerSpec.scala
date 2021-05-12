@@ -109,6 +109,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
           callDateService()
           callServiceInfoPartialService
           callExtendedAudit
+          callSubscriptionService(Some(customerInformationMax.copy(isInsolvent = true)))
           controller.returnDeadlines()(fakeRequest)
         }
 
@@ -142,6 +143,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
           callOpenObligations(exampleObligations)
           callExtendedAudit
           callServiceInfoPartialService
+          callSubscriptionService(Some(customerInformationMax.copy(isInsolvent = false)))
           controller.returnDeadlines()(request())
         }
 
@@ -159,12 +161,11 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
       }
     }
 
-    "for a non-MTDfB user (with the submit return feature enabled)" when {
+    "for a non-MTDfB user" when {
 
       "mandation status is in session" should {
 
         lazy val result = {
-          mockConfig.features.submitReturnFeatures(true)
           callAuthService(individualAuthResult)
           callDateService()
           callOpenObligations(exampleObligations)
@@ -186,7 +187,6 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
       "mandation status is not in session" should {
 
         lazy val result = {
-          mockConfig.features.submitReturnFeatures(true)
           callAuthService(individualAuthResult)
           callDateService()
           callOpenObligations(exampleObligations)
@@ -211,12 +211,11 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
       }
     }
 
-    "for a non-Digital user (with the submit return feature enabled)" when {
+    "for a non-Digital user" when {
 
       "mandation status is in session" should {
 
         lazy val result = {
-          mockConfig.features.submitReturnFeatures(true)
           callAuthService(individualAuthResult)
           callDateService()
           callOpenObligations(exampleObligations)
@@ -238,7 +237,6 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
       "mandation status is not in session" should {
 
         lazy val result = {
-          mockConfig.features.submitReturnFeatures(true)
           callAuthService(individualAuthResult)
           callDateService()
           callOpenObligations(exampleObligations)
@@ -263,12 +261,11 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
       }
     }
 
-    "for an MTDfB Exempt user (with the submit return feature enabled)" when {
+    "for an MTDfB Exempt user" when {
 
       "mandation status is in session" should {
 
         lazy val result = {
-          mockConfig.features.submitReturnFeatures(true)
           callAuthService(individualAuthResult)
           callDateService()
           callOpenObligations(exampleObligations)
@@ -290,7 +287,6 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
       "mandation status is not in session" should {
 
         lazy val result = {
-          mockConfig.features.submitReturnFeatures(true)
           callAuthService(individualAuthResult)
           callDateService()
           callOpenObligations(exampleObligations)
@@ -315,12 +311,11 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
       }
     }
 
-    "for an MTDfB user (with the submit return feature enabled)" when {
+    "for an MTDfB user" when {
 
       "mandation status is in session" should {
 
         lazy val result = {
-          mockConfig.features.submitReturnFeatures(true)
           callAuthService(individualAuthResult)
           callDateService()
           callOpenObligations(exampleObligations)
@@ -342,7 +337,6 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
       "mandation status is not in session" should {
 
         lazy val result = {
-          mockConfig.features.submitReturnFeatures(true)
           callAuthService(individualAuthResult)
           callDateService()
           callOpenObligations(exampleObligations)
@@ -399,6 +393,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
         callDateService()
         callOpenObligations(exampleObligations)
         callExtendedAudit
+        callSubscriptionService(Some(customerInformationNonMTDfB))
         callSubscriptionService(Some(customerInformationNonMTDfB))
         controller.returnDeadlines()(request(fakeRequestWithClientsVRN))
       }

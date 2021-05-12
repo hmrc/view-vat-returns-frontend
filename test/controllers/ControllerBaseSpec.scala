@@ -82,7 +82,6 @@ class ControllerBaseSpec extends MockAuth {
   ))
 
   override def beforeEach(): Unit = {
-    mockConfig.features.submitReturnFeatures(false)
     mockConfig.features.agentAccess(true)
   }
 

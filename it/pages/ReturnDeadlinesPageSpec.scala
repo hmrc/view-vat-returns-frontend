@@ -28,7 +28,6 @@ import stubs.{AuthStub, CustomerInfoStub, VatObligationsStub}
 class ReturnDeadlinesPageSpec extends IntegrationBaseSpec {
 
   override def beforeEach(): Unit = {
-    mockAppConfig.features.submitReturnFeatures(false)
     super.beforeEach()
   }
 
@@ -71,82 +70,73 @@ class ReturnDeadlinesPageSpec extends IntegrationBaseSpec {
     }
   }
 
-  "When the submit-returns feature is enabled" when {
+  "When the user is a Non-MTDfB user" should {
 
-    "the user is a Non-MTDfB user" should {
-
-      "return 200" in new Test {
-        mockAppConfig.features.submitReturnFeatures(true)
-        override def setupStubs(): StubMapping = {
-          AuthStub.authorised()
-          obligationsStub.stubOutstandingObligations
-          CustomerInfoStub.stubOptedOutUser
-        }
-
-        val response: WSResponse = await(request().get())
-        response.status shouldBe Status.OK
+    "return 200" in new Test {
+      override def setupStubs(): StubMapping = {
+        AuthStub.authorised()
+        obligationsStub.stubOutstandingObligations
+        CustomerInfoStub.stubOptedOutUser
       }
 
-      "return the one deadline with submit link" in new Test {
-        mockAppConfig.features.submitReturnFeatures(true)
-        override def setupStubs(): StubMapping = {
-          AuthStub.authorised()
-          obligationsStub.stubOutstandingObligations
-          CustomerInfoStub.stubOptedOutUser
-        }
-
-        val response: WSResponse = await(request().get())
-        lazy implicit val document: Document = Jsoup.parse(response.body)
-        val deadlineSelector = "hr.govuk-section-break"
-
-        document.select(deadlineSelector).size() shouldBe 1
-        document.getElementById("submit-return-link").text() shouldBe "Submit VAT Return"
-        document.getElementById("submit-return-link").attr("href") shouldBe
-          "http://localhost:9147/vat-through-software/submit-vat-return/%23004/honesty-declaration"
-      }
+      val response: WSResponse = await(request().get())
+      response.status shouldBe Status.OK
     }
 
-    "the user is signed up to MTDfB" should {
-
-      "return 200" in new Test {
-        mockAppConfig.features.submitReturnFeatures(true)
-        override def setupStubs(): StubMapping = {
-          AuthStub.authorised()
-          obligationsStub.stubOutstandingObligations
-          CustomerInfoStub.stubCustomerInfo
-        }
-
-        val response: WSResponse = await(request().get())
-        response.status shouldBe Status.OK
+    "return the one deadline with submit link" in new Test {
+      override def setupStubs(): StubMapping = {
+        AuthStub.authorised()
+        obligationsStub.stubOutstandingObligations
+        CustomerInfoStub.stubOptedOutUser
       }
 
-      "return the one deadline with no submit link" in new Test {
-        mockAppConfig.features.submitReturnFeatures(true)
-        override def setupStubs(): StubMapping = {
-          AuthStub.authorised()
-          obligationsStub.stubOutstandingObligations
-          CustomerInfoStub.stubCustomerInfo
-        }
+      val response: WSResponse = await(request().get())
+      lazy implicit val document: Document = Jsoup.parse(response.body)
+      val deadlineSelector = "hr.govuk-section-break"
 
-        val response: WSResponse = await(request().get())
-        lazy implicit val document: Document = Jsoup.parse(response.body)
-        val deadlineSelector = "hr.govuk-section-break"
-        document.select(deadlineSelector).size() shouldBe 1
-        document.getElementById("submit-return-link") shouldBe null
+      document.select(deadlineSelector).size() shouldBe 1
+      document.getElementById("submit-return-link").text() shouldBe "Submit VAT Return"
+      document.getElementById("submit-return-link").attr("href") shouldBe
+        "http://localhost:9147/vat-through-software/submit-vat-return/%23004/honesty-declaration"
+    }
+  }
+
+  "When the user is signed up to MTDfB" should {
+
+    "return 200" in new Test {
+      override def setupStubs(): StubMapping = {
+        AuthStub.authorised()
+        obligationsStub.stubOutstandingObligations
+        CustomerInfoStub.stubCustomerInfo
       }
 
-      "return error status when an error is returned from Mandation status" in new Test {
-        mockAppConfig.features.submitReturnFeatures(true)
-        override def setupStubs(): StubMapping = {
-          AuthStub.authorised()
-          obligationsStub.stubOutstandingObligations
-          CustomerInfoStub.stubErrorFromApi
-        }
+      val response: WSResponse = await(request().get())
+      response.status shouldBe Status.OK
+    }
 
-        val response: WSResponse = await(request().get())
-        response.status shouldBe Status.INTERNAL_SERVER_ERROR
+    "return the one deadline with no submit link" in new Test {
+      override def setupStubs(): StubMapping = {
+        AuthStub.authorised()
+        obligationsStub.stubOutstandingObligations
+        CustomerInfoStub.stubCustomerInfo
       }
 
+      val response: WSResponse = await(request().get())
+      lazy implicit val document: Document = Jsoup.parse(response.body)
+      val deadlineSelector = "hr.govuk-section-break"
+      document.select(deadlineSelector).size() shouldBe 1
+      document.getElementById("submit-return-link") shouldBe null
+    }
+
+    "return error status when an error is returned from Mandation status" in new Test {
+      override def setupStubs(): StubMapping = {
+        AuthStub.authorised()
+        obligationsStub.stubOutstandingObligations
+        CustomerInfoStub.stubErrorFromApi
+      }
+
+      val response: WSResponse = await(request().get())
+      response.status shouldBe Status.INTERNAL_SERVER_ERROR
     }
 
   }
