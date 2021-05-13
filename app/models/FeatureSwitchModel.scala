@@ -18,7 +18,6 @@ package models
 
 case class FeatureSwitchModel(userResearchBannerEnabled: Boolean,
                               staticDateEnabled: Boolean,
-                              useLanguageSelector: Boolean,
                               agentAccessEnabled: Boolean,
                               enablePrintPastReturns: Boolean,
                               niProtocolEnabled: Boolean)

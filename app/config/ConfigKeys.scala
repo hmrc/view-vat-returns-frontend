@@ -26,7 +26,6 @@ object ConfigKeys {
   val userResearchBannerFeature: String = "features.userResearchBanner.enabled"
   val staticDateEnabledFeature: String = "features.staticDate.enabled"
   val staticDateValue: String = "date-service.staticDate.value"
-  val useLanguageSelectorFeature: String = "features.useLanguageSelector.enabled"
   val agentAccessFeature: String = "features.agentAccess.enabled"
   val enablePrintPastReturns: String = "features.printPastReturns.enabled"
   val niProtocolFeature: String = "features.niProtocol.enabled"
