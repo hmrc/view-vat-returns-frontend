@@ -27,7 +27,6 @@ object FeatureSwitchForm {
     mapping(
       ConfigKeys.userResearchBannerFeature -> boolean,
       ConfigKeys.staticDateEnabledFeature -> boolean,
-      ConfigKeys.useLanguageSelectorFeature -> boolean,
       ConfigKeys.agentAccessFeature -> boolean,
       ConfigKeys.enablePrintPastReturns -> boolean,
       ConfigKeys.niProtocolFeature -> boolean
