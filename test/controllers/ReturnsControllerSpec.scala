@@ -175,8 +175,6 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
     "user is an agent" when {
 
-      "agentAccess feature switch is on" when {
-
         "authorised" should {
 
           lazy val result = {
@@ -207,22 +205,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
             status(result) shouldBe Status.FORBIDDEN
           }
         }
-      }
 
-      "agentAccess feature switch is off" should {
-
-        "return 303" in {
-
-          lazy val result = {
-            mockConfig.features.agentAccess(false)
-            callAuthService(agentAuthResult)
-            controller.vatReturn(2018, "#001")(request(fakeRequestWithClientsVRN))
-          }
-
-          status(result) shouldBe Status.SEE_OTHER
-          redirectLocation(result) shouldBe Some(mockConfig.agentClientHubUrl)
-        }
-      }
     }
 
     "a user is not authorised" should {
@@ -410,8 +393,6 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
     "user is an agent" when {
 
-      "agentAccess feature switch is on" when {
-
         "authorised" should {
 
           lazy val result = {
@@ -441,21 +422,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
             status(result) shouldBe Status.FORBIDDEN
           }
         }
-      }
 
-      "agentAccess feature switch is off" should {
-
-        lazy val result = {
-          mockConfig.features.agentAccess(false)
-          callAuthService(agentAuthResult)
-          controller.vatReturnViaPayments("#001")(request(fakeRequestWithClientsVRN))
-        }
-
-        "return 303" in {
-          status(result) shouldBe Status.SEE_OTHER
-          redirectLocation(result) shouldBe Some(mockConfig.agentClientHubUrl)
-        }
-      }
     }
 
     "a user is not authorised" should {

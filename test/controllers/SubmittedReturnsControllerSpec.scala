@@ -161,7 +161,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
 
     "an agent logs into the service" when {
 
-      "agent access is enabled" should {
+      "the agent has access" should {
 
         lazy val result = {
           callDateService()
@@ -188,22 +188,6 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
         }
       }
 
-      "agent access is disabled" should {
-
-        lazy val result = {
-          mockConfig.features.agentAccess(false)
-          callAuthService(agentAuthResult)
-          controller.submittedReturns(request(fakeRequestWithClientsVRN))
-        }
-
-        "return 303 (SEE_OTHER)" in {
-          status(result) shouldBe Status.SEE_OTHER
-        }
-
-        "redirect to Agent Hub page" in {
-          redirectLocation(result) shouldBe Some(mockConfig.agentClientHubUrl)
-        }
-      }
     }
 
     "a user is not authorised" should {

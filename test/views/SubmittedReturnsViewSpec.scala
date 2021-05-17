@@ -566,9 +566,7 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
     }
   }
 
-  "Rendering the submitted returns page for an agent with the agentAccess feature enabled" should {
-
-    mockConfig.features.agentAccess(true)
+  "Rendering the submitted returns page for an agent" should {
 
     val returnYears = Seq(2020, 2019, 2018)
 

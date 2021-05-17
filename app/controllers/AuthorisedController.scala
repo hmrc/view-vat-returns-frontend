@@ -50,7 +50,7 @@ class AuthorisedController @Inject()(enrolmentsAuthService: EnrolmentsAuthServic
 
     enrolmentsAuthService.authorised.retrieve(Retrievals.allEnrolments and Retrievals.affinityGroup) {
       case _ ~ Some(AffinityGroup.Agent) =>
-        if (allowAgentAccess && appConfig.features.agentAccess()) {
+        if (allowAgentAccess) {
           agentWithClientPredicate.authoriseAsAgent(block, ignoreMandatedStatus)
         } else {
           logDebug("[AuthorisedController][authorisedAction] User is agent and agent access is forbidden. Redirecting to Agent Action page.")

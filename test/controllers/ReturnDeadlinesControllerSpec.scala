@@ -385,7 +385,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
       }
     }
 
-    "the user is an agent (with agentAccess enabled)" when {
+    "the user is an agent" when {
 
       lazy val result = {
         callAuthService(agentAuthResult)

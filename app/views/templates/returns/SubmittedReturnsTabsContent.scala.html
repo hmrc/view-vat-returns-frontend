@@ -68,7 +68,7 @@
   </div>
 }
 
-@if(user.isAgent && appConfig.features.agentAccess()) {
+@if(user.isAgent) {
   <p id="finish">
       @govukButton(Button(
           href = Some(appConfig.agentClientHubUrl),
