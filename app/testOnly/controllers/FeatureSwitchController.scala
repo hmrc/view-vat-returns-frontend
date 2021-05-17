@@ -33,7 +33,6 @@ class FeatureSwitchController @Inject()(mcc: MessagesControllerComponents,
       FeatureSwitchModel(
         userResearchBannerEnabled = appConfig.features.userResearchBanner(),
         staticDateEnabled = appConfig.features.staticDateEnabled(),
-        enablePrintPastReturns = appConfig.features.enablePrintPastReturns(),
         niProtocolEnabled = appConfig.features.niProtocolEnabled()
       )
     )))
@@ -49,7 +48,6 @@ class FeatureSwitchController @Inject()(mcc: MessagesControllerComponents,
   def handleSuccess(model: FeatureSwitchModel): Result = {
     appConfig.features.userResearchBanner(model.userResearchBannerEnabled)
     appConfig.features.staticDateEnabled(model.staticDateEnabled)
-    appConfig.features.enablePrintPastReturns(model.enablePrintPastReturns)
     appConfig.features.niProtocolEnabled(model.niProtocolEnabled)
     Redirect(routes.FeatureSwitchController.featureSwitch())
   }
