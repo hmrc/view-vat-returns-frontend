@@ -25,7 +25,6 @@ import play.api.Configuration
 class Features @Inject()(config: Configuration) {
   val userResearchBanner = new Feature(ConfigKeys.userResearchBannerFeature, config)
   val staticDateEnabled = new Feature(ConfigKeys.staticDateEnabledFeature, config)
-  val agentAccess = new Feature(ConfigKeys.agentAccessFeature, config)
   val enablePrintPastReturns = new Feature(ConfigKeys.enablePrintPastReturns, config)
   val niProtocolEnabled = new Feature(ConfigKeys.niProtocolFeature, config)
 }

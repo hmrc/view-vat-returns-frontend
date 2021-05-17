@@ -81,10 +81,6 @@ class ControllerBaseSpec extends MockAuth {
     Enrolments(agentEnrolment), Some(Agent)
   ))
 
-  override def beforeEach(): Unit = {
-    mockConfig.features.agentAccess(true)
-  }
-
   def insolvencyCheck(controllerAction: Action[AnyContent]): Unit = {
 
     "the user is insolvent and not continuing to trade" should {
