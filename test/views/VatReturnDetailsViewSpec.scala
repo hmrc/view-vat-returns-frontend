@@ -31,11 +31,6 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
 
   val injectedView: VatReturnDetailsView = inject[VatReturnDetailsView]
 
-  override def beforeEach(): Unit = {
-    super.beforeEach()
-    mockConfig.features.enablePrintPastReturns(true)
-  }
-
   object Selectors {
     val pageHeading = "#content h1"
     val subHeadingP1 = "#content h2.govuk-heading-l"
@@ -232,16 +227,6 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
 
     "render the correct help section second bullet point text" in {
       elementText(Selectors.helpBullet2) shouldBe "1% or less of your box 6 figure and below £50,000"
-    }
-  }
-
-  "Rendering the vat return details page from the returns route when the printPastReturn feature switch is off" should {
-
-    "not have a print button" in {
-      mockConfig.features.enablePrintPastReturns(false)
-      lazy val view = injectedView(vatReturnViewModel)
-      lazy implicit val document: Document = Jsoup.parse(view.body)
-      elementAsOpt(".govuk-button") shouldBe None
     }
   }
 

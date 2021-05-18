@@ -206,13 +206,11 @@
       )
     </div>
 
-    @if(appConfig.features.enablePrintPastReturns()) {
       <div class="form-group">
           <button class="govuk-button" data-module="govuk-button"
           onclick="javascript:window.print()">@messages("yourVatReturn.print")
           </button>
       </div>
-    }
 
     @govukDetails(Details(
       summary = Text(messages("yourVatReturn.helpTitle")),
