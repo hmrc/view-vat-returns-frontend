@@ -76,8 +76,8 @@ class SubmittedReturnsController @Inject()(mcc: MessagesControllerComponents,
       }
   }, ignoreMandatedStatus = true)
 
-  private[controllers] def getValidYears(migrationDate: Option[LocalDate]): Seq[Int] =
-    migrationDate match {
+  private[controllers] def getValidYears(registrationDate: Option[LocalDate]): Seq[Int] =
+    registrationDate match {
       case Some(date) if date.getYear == currentYear => Seq(currentYear)
       case Some(date) if date.getYear == currentYear - 1 => Seq(currentYear, currentYear - 1)
       case _ => Seq(currentYear, currentYear - 1, currentYear - 2)
@@ -118,7 +118,7 @@ class SubmittedReturnsController @Inject()(mcc: MessagesControllerComponents,
                 obligation.periodKey
               )
             ),
-            user.hasNonMtdVat && migratedWithin15Months,
+            user.hasNonMtdVat && (migratedWithin15Months || migrationDatesModel.migrationDate.isEmpty),
             user.vrn
           ))
       }

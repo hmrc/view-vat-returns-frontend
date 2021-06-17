@@ -18,7 +18,7 @@ package controllers
 
 import java.time.LocalDate
 import common.SessionKeys
-import common.TestModels.{customerInformationMax, customerInformationMin}
+import common.TestModels.{customerInformationMax, customerInformationMin, customerInformationNoMigDates}
 import models._
 import models.errors.ObligationError
 import models.viewModels.{ReturnObligationsViewModel, VatReturnsViewModel}
@@ -120,10 +120,11 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
           charset(result) shouldBe Some("utf-8")
         }
 
-        "return tabs for current year (2018) and previous year (2017)" in {
+        "return tabs for current year (2018) and previous year (2017) but not Previous Returns" in {
           val body = await(bodyOf(result))
           body should include ("""<a class="govuk-tabs__tab" href="#year-2018"""")
           body should include ("""<a class="govuk-tabs__tab" href="#year-2017"""")
+          body shouldNot include ("""<a class="govuk-tabs__tab" href="#previous-returns"""")
         }
       }
 
@@ -151,10 +152,42 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
           charset(result) shouldBe Some("utf-8")
         }
 
-        "return a tab for current year (2018) but not previous year (2017)" in {
+        "return a tab for current year (2018) but not previous year (2017) or Previous Returns" in {
           val body = await(bodyOf(result))
           body should include ("""<a class="govuk-tabs__tab" href="#year-2018"""")
           body shouldNot include ("""<a class="govuk-tabs__tab" href="#year-2017"""")
+          body shouldNot include ("""<a class="govuk-tabs__tab" href="#previous-returns"""")
+        }
+      }
+
+      "the user has the VATDEC enrolment and no migration dates" should {
+
+        lazy val result = {
+          callDateService()
+          callExtendedAudit
+          callAuthService(migratedUserAuthResult)
+          callObligationsForYear(exampleObligations(2018))
+          callObligationsForYear(exampleObligations(2017))
+          callServiceInfoPartialService
+          callSubscriptionService(Some(customerInformationNoMigDates))
+          controller.submittedReturns(request())
+        }
+
+        "return 200" in {
+          status(result) shouldBe Status.OK
+        }
+
+        "return HTML" in {
+          contentType(result) shouldBe Some("text/html")
+        }
+
+        "return charset of utf-8" in {
+          charset(result) shouldBe Some("utf-8")
+        }
+
+        "return a tab for Previous Returns" in {
+          val body = await(bodyOf(result))
+          body should include ("""<a class="govuk-tabs__tab" href="#previous-returns"""")
         }
       }
     }
