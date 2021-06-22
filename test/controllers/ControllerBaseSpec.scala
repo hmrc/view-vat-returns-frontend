@@ -66,6 +66,12 @@ class ControllerBaseSpec extends MockAuth {
     activated
   ))
 
+  val vatDecEnrolment: Set[Enrolment] = Set(Enrolment(
+    vatDecEnrolmentKey,
+    Seq(EnrolmentIdentifier(vatDecIdentifierId, vrn)),
+    activated
+  ))
+
   val agentEnrolment: Set[Enrolment] = Set(Enrolment(
     agentEnrolmentKey,
     Seq(EnrolmentIdentifier(agentIdentifierId, arn)),
@@ -75,6 +81,10 @@ class ControllerBaseSpec extends MockAuth {
 
   val individualAuthResult: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(new ~(
     Enrolments(mtdVatEnrolment), Some(Individual)
+  ))
+
+  val migratedUserAuthResult: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(new ~(
+    Enrolments(mtdVatEnrolment ++ vatDecEnrolment), Some(Individual)
   ))
 
   val agentAuthResult: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(new ~(
