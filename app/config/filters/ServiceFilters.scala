@@ -18,10 +18,9 @@ package config.filters
 
 import javax.inject.Inject
 
-import play.api.http.DefaultHttpFilters
-import uk.gov.hmrc.play.bootstrap.frontend.filters.FrontendFilters
+import play.api.http.{DefaultHttpFilters, EnabledFilters}
 
-class ServiceFilters @Inject()(defaultFilters: FrontendFilters)
+class ServiceFilters @Inject()(defaultFilters: EnabledFilters)
   extends DefaultHttpFilters(defaultFilters.filters :_*) {
 
 }
