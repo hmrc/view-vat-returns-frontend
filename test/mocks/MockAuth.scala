@@ -40,7 +40,6 @@ import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.{Retrieval, ~}
 import uk.gov.hmrc.auth.core.{AffinityGroup, AuthConnector, Enrolments}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.bootstrap.tools.Stubs.stubMessagesControllerComponents
 import uk.gov.hmrc.play.test.UnitSpec
 import views.html.errors.UnauthorisedView
 
@@ -51,7 +50,7 @@ trait MockAuth extends UnitSpec with GuiceOneAppPerSuite with BeforeAndAfterEach
   implicit val mockConfig: AppConfig = new MockAppConfig(app.configuration)
   implicit val ec: ExecutionContext = inject[ExecutionContext]
 
-  val mcc: MessagesControllerComponents = stubMessagesControllerComponents()
+  val mcc: MessagesControllerComponents = inject[MessagesControllerComponents]
   implicit lazy val messages: Messages = MessagesImpl(Lang("en-GB"), inject[MessagesApi])
 
   val mockAuthConnector: AuthConnector = mock[AuthConnector]
