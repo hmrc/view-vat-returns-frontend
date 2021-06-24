@@ -15,13 +15,9 @@
  */
 
 import uk.gov.hmrc.DefaultBuildSettings._
-import uk.gov.hmrc.SbtAutoBuildPlugin
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin._
-import uk.gov.hmrc.versioning.SbtGitVersioning
-import play.core.PlayVersion
 import play.sbt.routes.RoutesKeys
 import sbt.Tests.{Group, SubProcess}
-import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
 
 val appName: String = "view-vat-returns-frontend"
 lazy val appDependencies: Seq[ModuleID] = compile ++ test()
@@ -60,23 +56,20 @@ lazy val coverageSettings: Seq[Setting[_]] = {
 
 val compile = Seq(
   ws,
-  "uk.gov.hmrc" %% "bootstrap-frontend-play-26" % "3.4.0",
-  "uk.gov.hmrc" %% "govuk-template" % "5.66.0-play-26",
-  "uk.gov.hmrc" %% "play-ui" % "9.2.0-play-26",
+  "uk.gov.hmrc" %% "bootstrap-frontend-play-26" % "5.4.0",
+  "uk.gov.hmrc" %% "play-ui" % "9.6.0-play-26",
   "uk.gov.hmrc" %% "play-partials" % "7.1.0-play-26",
   "uk.gov.hmrc" %% "play-language" % "4.12.0-play-26",
   "com.typesafe.play" %% "play-json-joda" % "2.7.4",
-  "uk.gov.hmrc" %% "play-frontend-govuk" % "0.71.0-play-26",
-  "uk.gov.hmrc" %% "play-frontend-hmrc" % "0.57.0-play-26"
+  "uk.gov.hmrc" %% "play-frontend-govuk" % "0.77.0-play-26",
+  "uk.gov.hmrc" %% "play-frontend-hmrc" % "0.76.0-play-26"
 )
 
 def test(scope: String = "test, it"): Seq[ModuleID] = Seq(
   "uk.gov.hmrc" %% "hmrctest" % "3.10.0-play-26" % scope,
-  "uk.gov.hmrc" %% "bootstrap-play-26" % "1.14.0" % scope classifier "tests",
   "org.scalatest" %% "scalatest" % "3.0.1" % scope,
   "org.pegdown" % "pegdown" % "1.6.0" % scope,
   "org.jsoup" % "jsoup" % "1.10.3" % scope,
-  "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
   "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % scope,
   "org.scalamock" %% "scalamock-scalatest-support" % "3.6.0" % scope,
   "com.github.tomakehurst" % "wiremock-jre8" % "2.26.0" % scope
@@ -99,7 +92,7 @@ TwirlKeys.templateImports ++= Seq(
 )
 
 lazy val microservice = Project(appName, file("."))
-  .enablePlugins(Seq(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin) ++ plugins : _*)
+  .enablePlugins(Seq(play.sbt.PlayScala, SbtDistributablesPlugin) ++ plugins : _*)
   .disablePlugins(JUnitXmlReportPlugin)
   .settings(PlayKeys.playDefaultPort := 9151)
   .settings(coverageSettings: _*)
@@ -109,7 +102,7 @@ lazy val microservice = Project(appName, file("."))
   .settings(defaultSettings(): _*)
   .settings(majorVersion := 0)
   .settings(
-    scalaVersion := "2.12.11",
+    scalaVersion := "2.12.12",
     libraryDependencies ++= appDependencies,
     retrieveManaged := true,
     evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false)
@@ -122,7 +115,4 @@ lazy val microservice = Project(appName, file("."))
     addTestReportOption(IntegrationTest, "int-test-reports"),
     testGrouping in IntegrationTest := oneForkedJvmPerTest((definedTests in IntegrationTest).value),
     parallelExecution in IntegrationTest := false)
-  .settings(resolvers ++= Seq(
-    Resolver.bintrayRepo("hmrc", "releases"),
-    Resolver.jcenterRepo
-  ))
+
