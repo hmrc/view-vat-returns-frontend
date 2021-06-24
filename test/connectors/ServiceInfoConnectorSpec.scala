@@ -16,14 +16,13 @@
 
 package connectors
 
-import config.VatHeaderCarrierForPartialsConverter
 import controllers.ControllerBaseSpec
 import play.api.http.Status
 import play.api.i18n.MessagesApi
 import play.twirl.api.Html
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads}
 import uk.gov.hmrc.http.HttpClient
-import uk.gov.hmrc.play.partials.HtmlPartial
+import uk.gov.hmrc.play.partials.{HeaderCarrierForPartialsConverter, HtmlPartial}
 import uk.gov.hmrc.play.partials.HtmlPartial.{Failure, Success}
 import views.html.templates.BtaNavigationLinks
 
@@ -32,7 +31,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ServiceInfoConnectorSpec extends ControllerBaseSpec {
 
   private trait Test {
-    val hcForPartials: VatHeaderCarrierForPartialsConverter = inject[VatHeaderCarrierForPartialsConverter]
+    val hcForPartials: HeaderCarrierForPartialsConverter = inject[HeaderCarrierForPartialsConverter]
     val btaNavigationLinks: BtaNavigationLinks = inject[BtaNavigationLinks]
     val validHtml: Html = Html("<nav>BTA LINK</nav>")
     val result :Future[HtmlPartial] = Future.successful(Success(None,validHtml))
