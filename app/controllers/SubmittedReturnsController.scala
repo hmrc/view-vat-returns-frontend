@@ -21,6 +21,7 @@ import java.time.{LocalDate, Period}
 import audit.AuditingService
 import audit.models.ViewSubmittedVatObligationsAuditModel
 import config.AppConfig
+import controllers.predicate.DDInterruptPredicate
 import javax.inject.{Inject, Singleton}
 import models.viewModels.{ReturnObligationsViewModel, VatReturnsViewModel}
 import models.{CustomerInformation, MigrationDateModel, ServiceResponse, User}
@@ -45,12 +46,13 @@ class SubmittedReturnsController @Inject()(mcc: MessagesControllerComponents,
                                            serviceInfoService: ServiceInfoService,
                                            subscriptionService: SubscriptionService,
                                            submittedReturnsView: SubmittedReturnsView,
-                                           submittedReturnsErrorView: SubmittedReturnsErrorView)
+                                           submittedReturnsErrorView: SubmittedReturnsErrorView,
+                                           DDInterrupt: DDInterruptPredicate)
                                           (implicit appConfig: AppConfig,
                                            auditService: AuditingService,
                                            ec: ExecutionContext) extends FrontendController(mcc) {
 
-  def redirect(year: Int): Action[AnyContent] = authorisedController.authorisedAction({ _ =>
+  def redirect(year: Int): Action[AnyContent] = authorisedController.authorisedAction ({ _ =>
     _ =>
       Future(MovedPermanently(controllers.routes.SubmittedReturnsController.submittedReturns().url))
   }, ignoreMandatedStatus = true)
@@ -59,19 +61,21 @@ class SubmittedReturnsController @Inject()(mcc: MessagesControllerComponents,
 
   def submittedReturns: Action[AnyContent] = authorisedController.authorisedAction({ implicit request =>
     implicit user =>
-      for {
-        customerDetails <- subscriptionService.getUserDetails(user.vrn)
-        showInsolvencyContent = showInsolventContent(customerDetails)
-        serviceInfoContent <- if (user.isAgent) Future.successful(HtmlFormat.empty) else serviceInfoService.getServiceInfoPartial
-        migrationDates = getMigrationDates(customerDetails)
-        obligationsResult <- getReturnObligations(migrationDates)
-      } yield {
-        obligationsResult match {
-          case Right(model) =>
-            Ok(submittedReturnsView(model, showInsolvencyContent, serviceInfoContent))
-          case Left(error) =>
-            logWarn("[ReturnObligationsController][submittedReturns] error: " + error.toString)
-            InternalServerError(submittedReturnsErrorView(user))
+      DDInterrupt.interruptCheck { _ =>
+        for {
+          customerDetails <- subscriptionService.getUserDetails(user.vrn)
+          showInsolvencyContent = showInsolventContent(customerDetails)
+          serviceInfoContent <- if (user.isAgent) Future.successful(HtmlFormat.empty) else serviceInfoService.getServiceInfoPartial
+          migrationDates = getMigrationDates(customerDetails)
+          obligationsResult <- getReturnObligations(migrationDates)
+        } yield {
+          obligationsResult match {
+            case Right(model) =>
+              Ok(submittedReturnsView(model, showInsolvencyContent, serviceInfoContent))
+            case Left(error) =>
+              logWarn("[ReturnObligationsController][submittedReturns] error: " + error.toString)
+              InternalServerError(submittedReturnsErrorView(user))
+          }
         }
       }
   }, ignoreMandatedStatus = true)

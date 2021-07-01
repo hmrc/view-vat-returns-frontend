@@ -71,6 +71,7 @@ trait AppConfig {
   val agentClientHubUrl: String
   val accessibilityLinkUrl: String
   val gtmContainer: String
+  val vatSummaryBase: String
 }
 
 @Singleton
@@ -108,7 +109,7 @@ class FrontendAppConfig @Inject()(implicit configuration: Configuration, sc: Ser
   override lazy val btaManageAccountUrl: String = btaHomeUrl + sc.getString(Keys.businessTaxAccountManageAccountUrl)
   override lazy val btaHelpAndContactUrl: String = helpAndContactFrontendUrl + sc.getString(Keys.helpAndContactHelpUrl)
 
-  private lazy val vatSummaryBase: String = sc.getString(Keys.vatSummaryBase)
+  override lazy val vatSummaryBase: String = sc.getString(Keys.vatSummaryBase)
   override lazy val vatDetailsUrl: String = vatSummaryBase + sc.getString(Keys.vatDetailsUrl)
   override lazy val vatPaymentsUrl: String = vatSummaryBase + sc.getString(Keys.vatPaymentsUrl)
 

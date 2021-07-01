@@ -31,7 +31,7 @@ class SubmittedReturnsPageSpec extends IntegrationBaseSpec {
 
     def request(): WSRequest = {
       setupStubs()
-      buildRequest("/submitted")
+      buildRequest("/submitted",viewedDDInterrupt(Some("true")))
     }
 
     val obligationsStub = new VatObligationsStub(true)
@@ -52,7 +52,7 @@ class SubmittedReturnsPageSpec extends IntegrationBaseSpec {
 
           override def request(): WSRequest = {
             setupStubs()
-            buildRequest("/submitted")
+            buildRequest("/submitted",viewedDDInterrupt(Some("true")))
           }
 
           val response: WSResponse = await(request().get())
@@ -68,7 +68,7 @@ class SubmittedReturnsPageSpec extends IntegrationBaseSpec {
 
           override def request(): WSRequest = {
             setupStubs()
-            buildRequest("/submitted")
+            buildRequest("/submitted",viewedDDInterrupt(Some("true")))
           }
 
           val response: WSResponse = await(request().get())
