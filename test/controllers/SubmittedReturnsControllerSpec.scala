@@ -276,19 +276,20 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
     }
 
     insolvencyCheck(controller.submittedReturns)
-
-    lazy val result =  {
-      callAuthService(individualAuthResult)
-      callSubscriptionService(Some(customerInformationNonMTDfB))
-      callDateService()
-      controller.submittedReturns()(DDInterruptRequest)
-    }
-    "return a 303" in {
-      status(result) shouldBe Status.SEE_OTHER
-    }
-    "check the redirect location" in {
-      redirectLocation(result) shouldBe Some(mockConfig.vatSummaryBase + "/vat-through-software/direct-debit-interrupt?redirectUrl="
-        + mockConfig.selfHost + "/homepage")
+    "The user has no DD Interrupt Value in session" should {
+      lazy val result =  {
+        callAuthService(individualAuthResult)
+        callSubscriptionService(Some(customerInformationNonMTDfB))
+        callDateService()
+        controller.submittedReturns()(DDInterruptRequest)
+      }
+      "return a 303" in {
+        status(result) shouldBe Status.SEE_OTHER
+      }
+      "check the redirect location" in {
+        redirectLocation(result) shouldBe Some(mockConfig.vatSummaryBase + "/vat-through-software/direct-debit-interrupt?redirectUrl="
+          + mockConfig.selfHost + "/homepage")
+      }
     }
   }
 
