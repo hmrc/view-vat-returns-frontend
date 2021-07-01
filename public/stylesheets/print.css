@@ -98,4 +98,9 @@
         width: 50%;
     }
 
+  .govuk-summary-list:last-child div,
+  .card-full dl:last-child {
+    border-bottom: none;
+  }
+
 }
