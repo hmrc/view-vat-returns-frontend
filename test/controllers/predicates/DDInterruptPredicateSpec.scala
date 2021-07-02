@@ -47,8 +47,7 @@ class DDInterruptPredicateSpec extends ControllerBaseSpec {
         status(result) shouldBe Status.SEE_OTHER
       }
       "check the redirect location" in {
-        redirectLocation(result) shouldBe Some(mockConfig.vatSummaryBase + "/vat-through-software/direct-debit-interrupt?redirectUrl="
-          + mockConfig.selfHost + "/homepage")
+        redirectLocation(result) shouldBe Some(s"${mockConfig.directDebitInterruptUrl}?redirectUrl=${mockConfig.selfHost}/homepage")
       }
 
     }
