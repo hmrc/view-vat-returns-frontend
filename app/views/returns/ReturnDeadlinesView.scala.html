@@ -37,18 +37,20 @@
   </ol>
 }
 
-@mainTemplate(
-    pageTitle = messages("returnDeadlines.title"),
-    serviceInfoContent = serviceInfoContent,
-    user = Some(user)
-) {
-
-  @navigationBreadcrumb(Map(
+@navContent = @{
+  navigationBreadcrumb(Map(
     appConfig.btaHomeUrl -> messages("breadcrumbs.bta"),
     appConfig.vatDetailsUrl -> messages("breadcrumbs.vat")),
     currentPage = messages("returnDeadlines.title")
   )
+}
 
+@mainTemplate(
+  pageTitle = messages("returnDeadlines.title"),
+  backLinkContent = Some(navContent),
+  serviceInfoContent = serviceInfoContent,
+  user = Some(user)
+) {
     <h1 class="govuk-heading-xl">@messages("returnDeadlines.title")</h1>
     <p class="govuk-body govuk-!-margin-bottom-7" aria-hidden="true">@messages("returnDeadlines.submitBy")</p>
 
@@ -56,22 +58,22 @@
       <ul class="govuk-list">
         @for(deadline <- deadlines){
             <li>
-                <span class="govuk-visually-hidden">@messages("returnDeadlines.submitBy")</span>
-                <p class="govuk-body-l govuk-!-font-weight-bold govuk-!-margin-bottom-0">
-                    @displayDate(deadline.due)
-                </p>
-                @if(deadline.overdue) {
-                  <span>
-                    <strong class="task-overdue">@messages("common.overdue")</strong>
-                  </span>
+              <span class="govuk-visually-hidden">@messages("returnDeadlines.submitBy")</span>
+              <p class="govuk-body-l govuk-!-font-weight-bold govuk-!-margin-bottom-0">
+                @displayDate(deadline.due)
+              </p>
+              @if(deadline.overdue) {
+                <span>
+                  <strong class="task-overdue">@messages("common.overdue")</strong>
+                </span>
+              }
+              <p class="govuk-body govuk-!-margin-bottom-0 govuk-hint">
+                @if(deadline.isFinalReturn) {
+                  @messages("returnDeadlines.finalReturn")
+                } else {
+                  @messages("returnDeadlines.periodEnding", displayDateRange(deadline.periodFrom, deadline.periodTo))
                 }
-                <p class="govuk-body govuk-!-margin-bottom-0 govuk-hint">
-                  @if(deadline.isFinalReturn) {
-                    @messages("returnDeadlines.finalReturn")
-                  } else {
-                    @messages("returnDeadlines.periodEnding", displayDateRange(deadline.periodFrom, deadline.periodTo))
-                  }
-                </p>
+              </p>
               <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
             </li>
         }

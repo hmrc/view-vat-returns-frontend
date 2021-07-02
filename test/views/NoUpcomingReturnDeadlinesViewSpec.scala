@@ -36,9 +36,8 @@ class NoUpcomingReturnDeadlinesViewSpec extends ViewBaseSpec {
     val vatDetailsBreadcrumbLink = "div.govuk-breadcrumbs li:nth-of-type(2) a"
     val returnDeadlinesBreadCrumb = "div.govuk-breadcrumbs li:nth-of-type(3)"
 
-    val noReturnsNextDeadline = "p.govuk-body"
-    val noReturnsDueNoObligations = "p:nth-child(3)"
-    val noReturnsDue = "p:nth-child(4)"
+    val noReturnsNextDeadline = "#no-returns-next-deadline"
+    val noReturnsDue = "#no-returns"
   }
 
   "Rendering the Return deadlines page with no fulfilled obligations" should {
@@ -71,7 +70,7 @@ class NoUpcomingReturnDeadlinesViewSpec extends ViewBaseSpec {
     }
 
     "have the correct text for no deadlines with guidance" in {
-      elementText(Selectors.noReturnsDueNoObligations) shouldBe
+      elementText(Selectors.noReturnsDue) shouldBe
         "You do not have any returns due right now. Your next deadline will show here on the first day of your next" +
           " accounting period."
     }

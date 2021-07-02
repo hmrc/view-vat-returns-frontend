@@ -25,26 +25,29 @@
   serviceInfoContent: Html = HtmlFormat.empty)(
   implicit request: Request[_],messages: Messages, appConfig: config.AppConfig, user: User)
 
-@mainTemplate(
-  pageTitle = messages("returnDeadlines.title"),
-  serviceInfoContent = serviceInfoContent,
-  user = Some(user)
-) {
-
-  @navigationBreadcrumb(Map(
+@navContent = @{
+  navigationBreadcrumb(Map(
     appConfig.btaHomeUrl -> messages("breadcrumbs.bta"),
     appConfig.vatDetailsUrl -> messages("breadcrumbs.vat")),
     currentPage = messages("returnDeadlines.title")
   )
+}
+
+@mainTemplate(
+  pageTitle = messages("returnDeadlines.title"),
+  backLinkContent = Some(navContent),
+  serviceInfoContent = serviceInfoContent,
+  user = Some(user)
+) {
 
   <h1 class="govuk-heading-l">@messages("returnDeadlines.title")</h1>
   @lastObligation.map { obligation =>
-    <p class="govuk-body">
+    <p id="no-returns-next-deadline" class="govuk-body">
       @messages("returnDeadlines.receivedReturn", displayDateRange(obligation.periodFrom, obligation.periodTo))
     </p>
   }
 
-  <p class="govuk-body">
+  <p id="no-returns" class="govuk-body">
     @messages("returnDeadlines.noReturns")
     @messages("returnDeadlines.nextDeadline")
   </p>

@@ -18,20 +18,24 @@
 
 @(user: models.User)(implicit appConfig: config.AppConfig, request: Request[_], messages: Messages)
 
-@mainTemplate(pageTitle = messages("preMtdReturn.heading"), user = Some(user)) {
+@backLinkContent = {
+  @govukBackLink(BackLink(
+    content = Text(messages("base.back")),
+    href = routes.SubmittedReturnsController.submittedReturns.url
+  ))
+}
 
-    @govukBackLink(BackLink(href = "javascript:history.back()"))
+@mainTemplate(
+  pageTitle = messages("preMtdReturn.heading"),
+  backLinkContent = Some(backLinkContent),
+  user = Some(user),
+) {
+  <h1 class="govuk-heading-l">@messages("preMtdReturn.heading")</h1>
+  <p id="pre-mtd-p1" class="govuk-body">@messages("preMtdReturn.message")</p>
 
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds">
-            <h1 class="govuk-heading-l">@messages("preMtdReturn.heading")</h1>
-            <p class="govuk-body">@messages("preMtdReturn.message")</p>
-
-            @if(user.hasNonMtdVat) {
-                <p class="govuk-body">
-                    <a class="govuk-link" href="@appConfig.portalUrl(user.vrn)">@messages("preMtdReturn.link")</a>
-                </p>
-            }
-        </div>
-    </div>
+  @if(user.hasNonMtdVat) {
+      <p id="pre-mtd-link" class="govuk-body">
+          <a class="govuk-link" href="@appConfig.portalUrl(user.vrn)">@messages("preMtdReturn.link")</a>
+      </p>
+  }
 }

@@ -61,32 +61,33 @@
   if(appConfig.features.niProtocolEnabled()) ".niProtocol" else ""
 }
 
+@navContent = @{
+  if(user.isAgent) {
+    govukBackLink(BackLink(
+      href = controllers.routes.SubmittedReturnsController.submittedReturns().url,
+      content = Text(messages("base.back"))
+    ))
+  } else {
+    navigationBreadcrumb(
+      links = Map(
+        appConfig.btaHomeUrl -> messages("breadcrumbs.bta"),
+        appConfig.vatDetailsUrl -> messages("breadcrumbs.vat"),
+        if(vatReturnViewModel.showReturnsBreadcrumb) controllers.routes.SubmittedReturnsController.submittedReturns().url -> messages("submittedReturns.title")
+        else appConfig.vatPaymentsUrl -> messages("breadcrumbs.vatPayments")
+      ),
+      currentPage = returnHeading(useShortDayFormat = false).toString
+    )
+  }
+}
+
 @mainTemplate(
   pageTitle = messages("yourVatReturn.title") + returnHeading(useShortDayFormat = false),
+  backLinkContent = Some(navContent),
   serviceInfoContent = serviceInfoContent,
   user = Some(user)
 ) {
 
-    @if(!user.isAgent) {
-      @navigationBreadcrumb(
-        links = Map(
-          appConfig.btaHomeUrl -> messages("breadcrumbs.bta"),
-          appConfig.vatDetailsUrl -> messages("breadcrumbs.vat"),
-          if(vatReturnViewModel.showReturnsBreadcrumb) controllers.routes.SubmittedReturnsController.submittedReturns().url -> messages("submittedReturns.title")
-          else appConfig.vatPaymentsUrl -> messages("breadcrumbs.vatPayments")
-        ),
-        currentPage = returnHeading(useShortDayFormat = false).toString
-      )
-    }
-
-<section>
-    @if(user.isAgent) {
-      @govukBackLink(BackLink(
-        href = controllers.routes.SubmittedReturnsController.submittedReturns().url,
-        content = Text(messages("base.back"))
-      ))
-    }
-
+  <section>
     <h1 class="govuk-heading-xl">
         <span class="noprint">
             <span class="govuk-caption-xl">@messages("yourVatReturn.title")</span>
