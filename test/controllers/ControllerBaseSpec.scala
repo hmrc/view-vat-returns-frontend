@@ -21,6 +21,7 @@ import akka.stream.{ActorMaterializer, Materializer}
 import common.EnrolmentKeys._
 import common.SessionKeys
 import common.SessionKeys.clientVrn
+import controllers.predicate.DDInterruptPredicate
 import mocks.MockAuth
 import models.User
 import play.api.http.Status
@@ -41,14 +42,21 @@ class ControllerBaseSpec extends MockAuth {
   implicit val system: ActorSystem = ActorSystem()
   implicit val materializer: Materializer = ActorMaterializer()
   implicit val hc: HeaderCarrier = HeaderCarrier()
+  val ddInterruptPredicate: DDInterruptPredicate = new DDInterruptPredicate(
+    mcc
+  )
 
   def fakeRequestToPOSTWithSession(input: (String, String)*): FakeRequest[AnyContentAsFormUrlEncoded] =
     fakeRequestWithSession.withFormUrlEncodedBody(input: _*)
 
-  lazy val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
+  lazy val DDInterruptRequest: FakeRequest[AnyContentAsEmpty.type] =
+    FakeRequest("GET","/homepage")
+
+  lazy val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withSession(SessionKeys.viewedDDInterrupt -> "true")
+
   def request(request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()): MessagesRequest[AnyContentAsEmpty.type] =
     new MessagesRequest[AnyContentAsEmpty.type](request.withSession(SessionKeys.insolventWithoutAccessKey -> "false",
-      SessionKeys.futureInsolvencyDate -> "false"), mcc.messagesApi)
+      SessionKeys.futureInsolvencyDate -> "false", SessionKeys.viewedDDInterrupt -> "true"), mcc.messagesApi)
   implicit val user: User = User(vrn)
 
   lazy val fakeRequestWithSession: FakeRequest[AnyContentAsEmpty.type] = fakeRequest.withSession(

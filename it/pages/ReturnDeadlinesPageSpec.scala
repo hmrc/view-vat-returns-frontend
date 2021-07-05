@@ -36,7 +36,7 @@ class ReturnDeadlinesPageSpec extends IntegrationBaseSpec {
 
     def request(): WSRequest = {
       setupStubs()
-      buildRequest("/return-deadlines")
+      buildRequest("/return-deadlines",viewedDDInterrupt(Some("true")))
     }
 
     val obligationsStub = new VatObligationsStub(true)

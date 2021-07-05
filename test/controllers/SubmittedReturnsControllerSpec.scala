@@ -17,8 +17,9 @@
 package controllers
 
 import java.time.LocalDate
+
 import common.SessionKeys
-import common.TestModels.{customerInformationMax, customerInformationMin, customerInformationNoMigDates}
+import common.TestModels.{customerInformationMax, customerInformationMin, customerInformationNoMigDates, customerInformationNonMTDfB}
 import models._
 import models.errors.ObligationError
 import models.viewModels.{ReturnObligationsViewModel, VatReturnsViewModel}
@@ -56,7 +57,8 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
     mockServiceInfoService,
     mockSubscriptionService,
     inject[SubmittedReturnsView],
-    inject[SubmittedReturnsErrorView]
+    inject[SubmittedReturnsErrorView],
+    ddInterruptPredicate
   )
 
   val exampleMigrationDateModel: MigrationDateModel = MigrationDateModel(Some(LocalDate.parse("2018-01-01")), None)
@@ -274,6 +276,20 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
     }
 
     insolvencyCheck(controller.submittedReturns)
+    "The user has no DD Interrupt Value in session" should {
+      lazy val result =  {
+        callAuthService(individualAuthResult)
+        callSubscriptionService(Some(customerInformationNonMTDfB))
+        callDateService()
+        controller.submittedReturns()(DDInterruptRequest)
+      }
+      "return a 303" in {
+        status(result) shouldBe Status.SEE_OTHER
+      }
+      "check the redirect location" in {
+        redirectLocation(result) shouldBe Some(s"${mockConfig.directDebitInterruptUrl}?redirectUrl=${mockConfig.selfHost}/homepage")
+      }
+    }
   }
 
   "Calling .getValidYears" when {

@@ -23,6 +23,7 @@ import audit.models.ViewOpenVatObligationsAuditModel
 import common.MandationStatuses._
 import common.SessionKeys
 import config.{AppConfig, ServiceErrorHandler}
+import controllers.predicate.DDInterruptPredicate
 import javax.inject.{Inject, Singleton}
 import models.viewModels.ReturnDeadlineViewModel
 import models._
@@ -45,7 +46,8 @@ class ReturnDeadlinesController @Inject()(mcc: MessagesControllerComponents,
                                           errorHandler: ServiceErrorHandler,
                                           noUpcomingReturnDeadlinesView: NoUpcomingReturnDeadlinesView,
                                           returnDeadlinesView: ReturnDeadlinesView,
-                                          optOutReturnDeadlinesView: OptOutReturnDeadlinesView)
+                                          optOutReturnDeadlinesView: OptOutReturnDeadlinesView,
+                                          DDInterrupt: DDInterruptPredicate)
                                          (implicit appConfig: AppConfig,
                                           auditService: AuditingService,
                                           ec: ExecutionContext) extends FrontendController(mcc) {
@@ -66,27 +68,28 @@ class ReturnDeadlinesController @Inject()(mcc: MessagesControllerComponents,
   }
 
   def returnDeadlines(): Action[AnyContent] = authorisedController.authorisedAction { implicit request =>
-
     implicit user =>
-      val openObligations = returnsService.getOpenReturnObligations(user.vrn)
-      val currentDate = dateService.now()
+      DDInterrupt.interruptCheck { _ =>
+        val openObligations = returnsService.getOpenReturnObligations(user.vrn)
+        val currentDate = dateService.now()
 
-      openObligations.flatMap {
-        case Right(VatReturnObligations(obligations)) =>
-          serviceInfoCall().flatMap { serviceInfoContent =>
-            auditService.extendedAudit(
-              ViewOpenVatObligationsAuditModel(user, obligations),
-              routes.ReturnDeadlinesController.returnDeadlines().url
-            )
-            if (obligations.isEmpty) {
-              noUpcomingObligationsAction(serviceInfoContent, currentDate)
-            } else {
-              upcomingObligationsAction(obligations.map(toReturnDeadlineViewModel(_, currentDate)), serviceInfoContent)
+        openObligations.flatMap {
+          case Right(VatReturnObligations(obligations)) =>
+            serviceInfoCall().flatMap { serviceInfoContent =>
+              auditService.extendedAudit(
+                ViewOpenVatObligationsAuditModel(user, obligations),
+                routes.ReturnDeadlinesController.returnDeadlines().url
+              )
+              if (obligations.isEmpty) {
+                noUpcomingObligationsAction(serviceInfoContent, currentDate)
+              } else {
+                upcomingObligationsAction(obligations.map(toReturnDeadlineViewModel(_, currentDate)), serviceInfoContent)
+              }
             }
-          }
-        case Left(error) =>
-          logWarn("[ReturnObligationsController][returnDeadlines] error: " + error.toString)
-          Future.successful(errorHandler.showInternalServerError)
+          case Left(error) =>
+            logWarn("[ReturnObligationsController][returnDeadlines] error: " + error.toString)
+            Future.successful(errorHandler.showInternalServerError)
+        }
       }
   }
 

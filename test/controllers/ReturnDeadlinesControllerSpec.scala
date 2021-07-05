@@ -57,7 +57,8 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
     errorHandler,
     inject[NoUpcomingReturnDeadlinesView],
     inject[ReturnDeadlinesView],
-    inject[OptOutReturnDeadlinesView]
+    inject[OptOutReturnDeadlinesView],
+    ddInterruptPredicate
   )
 
   "Calling the .returnDeadlines action" when {
@@ -510,6 +511,20 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
     }
 
     insolvencyCheck(controller.returnDeadlines())
+    "The user has no DD Interrupt Value in session" should {
+      lazy val result =  {
+        callAuthService(individualAuthResult)
+        callSubscriptionService(Some(customerInformationNonMTDfB))
+        callDateService()
+        controller.returnDeadlines()(DDInterruptRequest)
+      }
+      "return a 303" in {
+        status(result) shouldBe Status.SEE_OTHER
+      }
+      "check the redirect location" in {
+        redirectLocation(result) shouldBe Some(s"${mockConfig.directDebitInterruptUrl}?redirectUrl=${mockConfig.selfHost}/homepage")
+      }
+    }
   }
 
   "The .noUpcomingObligationsAction function" when {
