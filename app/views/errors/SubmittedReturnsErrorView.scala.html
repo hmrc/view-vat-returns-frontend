@@ -20,14 +20,14 @@
 
 @mainTemplate(pageTitle = messages("technicalProblem.title"), user = Some(user)) {
 
-      <h1 class="govuk-heading-xl">@messages("technicalProblem.heading")</h1>
-      <p class="govuk-body">@messages("technicalProblem.message")</p>
+  <h1 class="govuk-heading-xl">@messages("technicalProblem.heading")</h1>
+  <p class="govuk-body">@messages("technicalProblem.message")</p>
 
-      @if(user.hasNonMtdVat) {
-        <p class="govuk-body">
-          @messages("submittedReturns.previousReturnsOne")
-          <a class="govuk-link" href="@appConfig.portalUrl(user.vrn)" >
-          @messages("submittedReturns.previousReturnsTwo")</a>.
-        </p>
-      }
+  @if(user.hasNonMtdVat) {
+    <p class="govuk-body">
+      @messages("submittedReturns.previousReturnsOne")
+      <a class="govuk-link" href="@appConfig.portalUrl(user.vrn)" >
+      @messages("submittedReturns.previousReturnsTwo")</a>.
+    </p>
+  }
 }

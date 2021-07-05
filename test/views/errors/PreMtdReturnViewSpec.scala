@@ -28,8 +28,9 @@ class PreMtdReturnViewSpec extends ViewBaseSpec {
 
   object Selectors {
     val heading = "h1"
-    val text = "#content > div > div > p"
-    val link = "#content > div > div > p:nth-child(3) > a"
+    val backlink = ".govuk-back-link"
+    val text = "#pre-mtd-p1"
+    val link = "#pre-mtd-link > a"
   }
 
   private val userWithNonMtdVat = User("111111111", hasNonMtdVat = true)
@@ -42,6 +43,17 @@ class PreMtdReturnViewSpec extends ViewBaseSpec {
 
     "have the correct document title" in {
       document.title shouldBe "This return is not available - Business tax account - GOV.UK"
+    }
+
+    "have a back link" that {
+
+      "has the correct text" in {
+        elementText(Selectors.backlink) shouldBe "Back"
+      }
+
+      "has the correct href" in {
+        element(Selectors.backlink).attr("href") shouldBe "/vat-through-software/vat-returns/submitted"
+      }
     }
 
     "have the correct document heading" in {

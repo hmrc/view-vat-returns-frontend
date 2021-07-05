@@ -33,6 +33,7 @@
       userResearchBanner: HmrcUserResearchBanner)
 
 @(pageTitle: String,
+  backLinkContent: Option[Html] = None,
   showSignOut: Boolean = true,
   feedbackOnSignOut: Boolean = true,
   serviceInfoContent: Html = HtmlFormat.empty,
@@ -59,17 +60,18 @@
 }
 
 @beforeContentHtml = {
-    @govukPhaseBanner(PhaseBanner(
-        tag = Some(Tag(content = Text(messages("banner.phaseName")))),
-        content = HtmlContent(phaseBannerContent)
-    ))
-    @serviceInfoContent
-    @hmrcLanguageSelect(LanguageSelect(
-        language = if (messages.lang.language == "en") En else Cy,
-        languageLinks =
-            En -> appConfig.routeToSwitchLanguage("english").url,
-            Cy -> appConfig.routeToSwitchLanguage("cymraeg").url
-    ))
+  @govukPhaseBanner(PhaseBanner(
+    tag = Some(Tag(content = Text(messages("banner.phaseName")))),
+    content = HtmlContent(phaseBannerContent)
+  ))
+  @serviceInfoContent
+  @hmrcLanguageSelect(LanguageSelect(
+    language = if (messages.lang.language == "en") En else Cy,
+    languageLinks =
+      En -> appConfig.routeToSwitchLanguage("english").url,
+      Cy -> appConfig.routeToSwitchLanguage("cymraeg").url
+  ))
+  @backLinkContent
 }
 
 @head = {
