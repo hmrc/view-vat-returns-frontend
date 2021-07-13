@@ -17,7 +17,6 @@
 package controllers
 
 import java.time.LocalDate
-
 import audit.AuditingService
 import audit.models.ViewOpenVatObligationsAuditModel
 import common.MandationStatuses._
@@ -33,7 +32,6 @@ import services.{DateService, ReturnsService, ServiceInfoService, SubscriptionSe
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import utils.LoggerUtil.logWarn
 import views.html.returns.{NoUpcomingReturnDeadlinesView, OptOutReturnDeadlinesView, ReturnDeadlinesView}
-
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton

@@ -17,7 +17,6 @@
 package controllers
 
 import java.time.{LocalDate, Period}
-
 import audit.AuditingService
 import audit.models.ViewSubmittedVatObligationsAuditModel
 import config.AppConfig
@@ -35,7 +34,6 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import utils.LoggerUtil.logWarn
 import views.html.errors.SubmittedReturnsErrorView
 import views.html.returns.SubmittedReturnsView
-
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton

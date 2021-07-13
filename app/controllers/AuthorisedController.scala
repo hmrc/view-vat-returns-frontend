@@ -30,7 +30,6 @@ import javax.inject.{Inject, Singleton}
 import play.api.Logger
 import utils.LoggerUtil._
 import views.html.errors.UnauthorisedView
-
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
