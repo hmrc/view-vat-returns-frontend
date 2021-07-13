@@ -32,7 +32,6 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import utils.LoggerUtil.logWarn
 import views.html.errors.PreMtdReturnView
 import views.html.returns.VatReturnDetailsView
-
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton

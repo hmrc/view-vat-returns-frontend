@@ -159,8 +159,3 @@ returnDeadlines.submitReturn = Cyflwyno Ffurflen TAW
 returnDeadlines.submitReturn.title = Cyflwyno Ffurflen TAW
 returnDeadlines.submitReturn.returnDeadline = Dyddiad cau ar gyfer cyflwyno
 returnDeadlines.submitReturn.futureReturn = Byddwch yn gallu cyflwyno’ch Ffurflen TAW o {0} ymlaen.
-
-banner.newService = Gwasanaeth newydd yw hwn – bydd eich
-banner.feedback = adborth
-banner.feedbackImprove = yn ein helpu i’w wella.
-banner.phaseName = BETA

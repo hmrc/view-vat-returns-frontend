@@ -17,19 +17,19 @@
 @import play.twirl.api.HtmlFormat
 @import config.AppConfig
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers._
-@import uk.gov.hmrc.govukfrontend.views.viewmodels.header.Header
-@import uk.gov.hmrc.play.views.html.layouts.TrackingConsentSnippet
 @import models.User
+@import uk.gov.hmrc.hmrcfrontend.views.config.StandardBetaBanner
 
 
 @this(govukLayout: GovukLayout,
       govukHeader: GovukHeader,
-      govukPhaseBanner: GovukPhaseBanner,
+      standardBetaBanner: StandardBetaBanner,
       hmrcReportTechnicalIssue: HmrcReportTechnicalIssue,
       hmrcLanguageSelect: HmrcLanguageSelect,
       hmrcTimeoutDialog: HmrcTimeoutDialog,
+      hmrcStandardHeader: HmrcStandardHeader,
       hmrcStandardFooter: HmrcStandardFooter,
-      trackingConsentSnippet: TrackingConsentSnippet,
+      hmrcTrackingConsentSnippet: HmrcTrackingConsentSnippet,
       userResearchBanner: HmrcUserResearchBanner)
 
 @(pageTitle: String,
@@ -52,18 +52,7 @@
     <script>window.HMRCFrontend.initAll();</script>
 }
 
-@phaseBannerContent = {
-    @messages("banner.newService")
-    <a id="beta-banner-feedback" class="govuk-link" href="@appConfig.@appConfig.feedbackUrl(request.uri)">
-        @messages("banner.feedback")</a>
-    @messages("banner.feedbackImprove")
-}
-
 @beforeContentHtml = {
-  @govukPhaseBanner(PhaseBanner(
-    tag = Some(Tag(content = Text(messages("banner.phaseName")))),
-    content = HtmlContent(phaseBannerContent)
-  ))
   @serviceInfoContent
   @hmrcLanguageSelect(LanguageSelect(
     language = if (messages.lang.language == "en") En else Cy,
@@ -75,38 +64,32 @@
 }
 
 @head = {
-    @trackingConsentSnippet(nonce = None)
+    @hmrcTrackingConsentSnippet()
     <link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/application.css")' media="all">
     <link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/print.css?v=0.1")'>
 
     @if(showSignOut) {
         @hmrcTimeoutDialog(TimeoutDialog(
-            timeout = Some(appConfig.timeoutPeriod),
-            countdown = Some(appConfig.timeoutCountdown),
-            signOutUrl = Some(routes.SignOutController.signOut(feedbackOnSignOut).url),
-            keepAliveUrl = Some("#"),
-            signOutButtonText = Some(messages("base.signOut"))
+          timeout = Some(appConfig.timeoutPeriod),
+          countdown = Some(appConfig.timeoutCountdown),
+          signOutUrl = Some(routes.SignOutController.signOut(feedbackOnSignOut).url),
+          keepAliveUrl = Some("#"),
+          signOutButtonText = Some(messages("base.signOut"))
         ))
     }
 }
 
 @header = {
-  @govukHeader(Header(
+
+  @hmrcStandardHeader(
     serviceName = Some(titleServiceName),
-    navigation =
-        if(showSignOut)
-            Some(Seq(HeaderNavigation(
-                text = Some(messages("base.signOut")),
-                href = Some(routes.SignOutController.signOut(feedbackOnSignOut).url)
-            )))
-        else None
-  ))
-  @if(appConfig.features.userResearchBanner()) {
-    @userResearchBanner(UserResearchBanner(
-      language = if(messages.lang.code == "cy") Cy else En,
-      url = "https://signup.take-part-in-research.service.gov.uk/?utm_campaign=VATviewchange&utm_source=Other&utm_medium=other&t=HMRC&id=34"
-    ))
-  }
+    signOutUrl = if(showSignOut) Some(routes.SignOutController.signOut(feedbackOnSignOut).url) else None,
+    userResearchBanner = if(appConfig.features.userResearchBanner()) Some(UserResearchBanner(
+        url = "https://signup.take-part-in-research.service.gov.uk/?utm_campaign=VATviewchange&utm_source=Other&utm_medium=other&t=HMRC&id=34"
+        )) else None,
+    phaseBanner = Some(standardBetaBanner(url = appConfig.feedbackUrl(request.uri))),
+    displayHmrcBanner = false
+  )
 }
 
 @getHelpHtml = @{
