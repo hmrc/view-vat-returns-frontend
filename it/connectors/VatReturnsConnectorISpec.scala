@@ -21,6 +21,7 @@ import helpers.IntegrationBaseSpec
 import models.errors.{ApiSingleError, BadRequestError, MultipleErrors}
 import models.VatReturn
 import play.api.libs.json.Json
+import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import stubs.VatReturnsStub
 import uk.gov.hmrc.http.HeaderCarrier
 

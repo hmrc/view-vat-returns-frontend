@@ -22,10 +22,11 @@ import models.payments.Payments
 import play.api.http.Status.{BAD_REQUEST, NOT_FOUND, OK}
 import play.api.libs.json.{JsArray, JsValue, Json}
 import uk.gov.hmrc.http.{HttpReads, HttpResponse}
-import scala.util.{Failure, Success, Try}
-import utils.LoggerUtil._
+import utils.LoggerUtil
 
-object PaymentsHttpParser extends ResponseHttpParsers {
+import scala.util.{Failure, Success, Try}
+
+object PaymentsHttpParser extends ResponseHttpParsers with LoggerUtil {
 
   implicit object PaymentsReads extends HttpReads[HttpGetResult[Payments]] {
     override def read(method: String, url: String, response: HttpResponse): HttpGetResult[Payments] = {
@@ -33,8 +34,8 @@ object PaymentsHttpParser extends ResponseHttpParsers {
         case OK => Try(removeNonVatReturnCharges(response.json).as[Payments]) match {
           case Success(model) => Right(model)
           case Failure(_) =>
-            logDebug(s"[PaymentsReads][read] Could not parse JSON. Received: ${response.json}")
-            logWarn("[PaymentsReads][read] Unexpected JSON received.")
+            logger.debug(s"[PaymentsReads][read] Could not parse JSON. Received: ${response.json}")
+            logger.warn("[PaymentsReads][read] Unexpected JSON received.")
             Left(UnexpectedJsonFormat)
         }
         case NOT_FOUND => Right(Payments(Seq.empty))

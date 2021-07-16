@@ -17,6 +17,7 @@
 package controllers
 
 import java.time.LocalDate
+
 import audit.AuditingService
 import audit.models.ViewOpenVatObligationsAuditModel
 import common.MandationStatuses._
@@ -24,14 +25,15 @@ import common.SessionKeys
 import config.{AppConfig, ServiceErrorHandler}
 import controllers.predicate.DDInterruptPredicate
 import javax.inject.{Inject, Singleton}
-import models.viewModels.ReturnDeadlineViewModel
 import models._
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, MessagesRequest, Request, Result}
+import models.viewModels.ReturnDeadlineViewModel
+import play.api.mvc._
 import play.twirl.api.{Html, HtmlFormat}
 import services.{DateService, ReturnsService, ServiceInfoService, SubscriptionService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import utils.LoggerUtil.logWarn
+import utils.LoggerUtil
 import views.html.returns.{NoUpcomingReturnDeadlinesView, OptOutReturnDeadlinesView, ReturnDeadlinesView}
+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -48,7 +50,7 @@ class ReturnDeadlinesController @Inject()(mcc: MessagesControllerComponents,
                                           DDInterrupt: DDInterruptPredicate)
                                          (implicit appConfig: AppConfig,
                                           auditService: AuditingService,
-                                          ec: ExecutionContext) extends FrontendController(mcc) {
+                                          ec: ExecutionContext) extends FrontendController(mcc) with LoggerUtil {
 
 
   private[controllers] def serviceInfoCall()(implicit user: User, req: Request[_]): Future[Html] = {
@@ -76,7 +78,7 @@ class ReturnDeadlinesController @Inject()(mcc: MessagesControllerComponents,
             serviceInfoCall().flatMap { serviceInfoContent =>
               auditService.extendedAudit(
                 ViewOpenVatObligationsAuditModel(user, obligations),
-                routes.ReturnDeadlinesController.returnDeadlines().url
+                routes.ReturnDeadlinesController.returnDeadlines.url
               )
               if (obligations.isEmpty) {
                 noUpcomingObligationsAction(serviceInfoContent, currentDate)
@@ -85,7 +87,7 @@ class ReturnDeadlinesController @Inject()(mcc: MessagesControllerComponents,
               }
             }
           case Left(error) =>
-            logWarn("[ReturnObligationsController][returnDeadlines] error: " + error.toString)
+            logger.warn("[ReturnObligationsController][returnDeadlines] error: " + error.toString)
             Future.successful(errorHandler.showInternalServerError)
         }
       }
@@ -100,7 +102,7 @@ class ReturnDeadlinesController @Inject()(mcc: MessagesControllerComponents,
         val lastFulfilledObligation: VatReturnObligation = returnsService.getLastObligation(obligations)
         Ok(noUpcomingReturnDeadlinesView(Some(toReturnDeadlineViewModel(lastFulfilledObligation, currentDate)), serviceInfoContent))
       case Left(error) =>
-        logWarn("[ReturnObligationsController][fulfilledObligationsAction] error: " + error.toString)
+        logger.warn("[ReturnObligationsController][fulfilledObligationsAction] error: " + error.toString)
         errorHandler.showInternalServerError
     }
   }

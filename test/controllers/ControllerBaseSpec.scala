@@ -17,16 +17,16 @@
 package controllers
 
 import akka.actor.ActorSystem
-import akka.stream.{ActorMaterializer, Materializer}
 import common.EnrolmentKeys._
 import common.SessionKeys
 import common.SessionKeys.clientVrn
 import controllers.predicate.DDInterruptPredicate
 import mocks.MockAuth
 import models.User
-import play.api.http.Status
+import play.api.http.Status.FORBIDDEN
 import play.api.mvc._
 import play.api.test.FakeRequest
+import play.api.test.Helpers.{defaultAwaitTimeout, status}
 import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual}
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.auth.core.{AffinityGroup, Enrolment, EnrolmentIdentifier, Enrolments}
@@ -40,7 +40,6 @@ class ControllerBaseSpec extends MockAuth {
   val arn = "XARN1234567"
 
   implicit val system: ActorSystem = ActorSystem()
-  implicit val materializer: Materializer = ActorMaterializer()
   implicit val hc: HeaderCarrier = HeaderCarrier()
   val ddInterruptPredicate: DDInterruptPredicate = new DDInterruptPredicate(
     mcc
@@ -108,7 +107,7 @@ class ControllerBaseSpec extends MockAuth {
           callAuthService(individualAuthResult)
           controllerAction(insolventRequest)
         }
-        status(result) shouldBe Status.FORBIDDEN
+        status(result) shouldBe FORBIDDEN
       }
     }
   }

@@ -16,10 +16,11 @@
 
 package app
 
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import uk.gov.hmrc.play.test.UnitSpec
 
-class RouteSpec extends UnitSpec with GuiceOneAppPerSuite {
+class RouteSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite {
 
   "The route for the submitted 9 box returns via the returns page route" should {
     "be /vat-through-software/vat-returns/submitted/2018/%23001" in {
@@ -37,13 +38,13 @@ class RouteSpec extends UnitSpec with GuiceOneAppPerSuite {
 
   "The route for the list of returns" should {
     "be /vat-through-software/vat-returns/submitted" in {
-      controllers.routes.SubmittedReturnsController.submittedReturns().url shouldBe "/vat-through-software/vat-returns/submitted"
+      controllers.routes.SubmittedReturnsController.submittedReturns.url shouldBe "/vat-through-software/vat-returns/submitted"
     }
   }
 
   "The route for the return deadlines" should {
     "be /vat-through-software/vat-returns/return-deadlines" in {
-      controllers.routes.ReturnDeadlinesController.returnDeadlines().url shouldBe "/vat-through-software/vat-returns/return-deadlines"
+      controllers.routes.ReturnDeadlinesController.returnDeadlines.url shouldBe "/vat-through-software/vat-returns/return-deadlines"
     }
   }
 }

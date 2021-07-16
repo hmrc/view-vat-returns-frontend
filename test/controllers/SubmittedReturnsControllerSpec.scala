@@ -36,7 +36,7 @@ import scala.concurrent.Future
 
 class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
 
-  def exampleObligations(year: Int): Future[ServiceResponse[VatReturnObligations]] = Right(
+  def exampleObligations(year: Int): ServiceResponse[VatReturnObligations] = Right(
     VatReturnObligations(Seq(VatReturnObligation(
       LocalDate.parse(s"$year-01-01"),
       LocalDate.parse(s"$year-12-31"),
@@ -72,7 +72,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
         controller.redirect(2020)(fakeRequest.withSession(SessionKeys.insolventWithoutAccessKey -> "false", SessionKeys.futureInsolvencyDate -> "false"))
       }
 
-      s"redirect the user to ${controllers.routes.SubmittedReturnsController.submittedReturns().url}" in {
+      s"redirect the user to ${controllers.routes.SubmittedReturnsController.submittedReturns.url}" in {
         status(result) shouldBe MOVED_PERMANENTLY
         redirectLocation(result) shouldBe Some("/vat-through-software/vat-returns/submitted")
       }
@@ -123,7 +123,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
         }
 
         "return tabs for current year (2018) and previous year (2017) but not Previous Returns" in {
-          val body = await(bodyOf(result))
+          val body = contentAsString(result)
           body should include ("""<a class="govuk-tabs__tab" href="#year-2018"""")
           body should include ("""<a class="govuk-tabs__tab" href="#year-2017"""")
           body shouldNot include ("""<a class="govuk-tabs__tab" href="#previous-returns"""")
@@ -155,7 +155,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
         }
 
         "return a tab for current year (2018) but not previous year (2017) or Previous Returns" in {
-          val body = await(bodyOf(result))
+          val body = contentAsString(result)
           body should include ("""<a class="govuk-tabs__tab" href="#year-2018"""")
           body shouldNot include ("""<a class="govuk-tabs__tab" href="#year-2017"""")
           body shouldNot include ("""<a class="govuk-tabs__tab" href="#previous-returns"""")
@@ -188,7 +188,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
         }
 
         "return a tab for Previous Returns" in {
-          val body = await(bodyOf(result))
+          val body = contentAsString(result)
           body should include ("""<a class="govuk-tabs__tab" href="#previous-returns"""")
         }
       }
@@ -255,7 +255,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
 
     "an error occurs upstream" should {
 
-      lazy val result: Result = {
+      lazy val result: Future[Result] = {
         callAuthService(individualAuthResult)
         callDateService()
         callServiceInfoPartialService
@@ -270,7 +270,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
       }
 
       "return the standard error view" in {
-        val document: Document = Jsoup.parse(bodyOf(result))
+        val document: Document = Jsoup.parse(contentAsString(result))
         messages(document.select("h1").first().text()) shouldBe "Sorry, there is a problem with the service"
       }
     }
@@ -302,7 +302,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
       }
 
       "return a sequence containing one service call" in {
-        await(result) shouldBe Seq(2018)
+        result shouldBe Seq(2018)
       }
     }
 
@@ -314,7 +314,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
       }
 
       "return a sequence containing one service call" in {
-        await(result) shouldBe Seq(2018, 2017)
+        result shouldBe Seq(2018, 2017)
       }
     }
 
@@ -326,7 +326,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
       }
 
       "return a sequence containing one service call" in {
-        await(result) shouldBe Seq(2018, 2017, 2016)
+        result shouldBe Seq(2018, 2017, 2016)
       }
     }
   }
@@ -339,7 +339,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
         callDateService()
         callObligationsForYear(exampleObligations(2018))
         callExtendedAudit
-        controller.getReturnObligations(exampleMigrationDateModel)
+        await(controller.getReturnObligations(exampleMigrationDateModel))
       }
 
       val expectedModel = VatReturnsViewModel(
@@ -354,7 +354,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
       )
 
       "return a VatReturnsViewModel with the correct information" in {
-        await(result) shouldBe Right(expectedModel)
+        result shouldBe Right(expectedModel)
       }
     }
 
@@ -363,11 +363,11 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
       lazy val result = {
         callDateService()
         callObligationsForYear(Left(ObligationError))
-        controller.getReturnObligations(exampleMigrationDateModel)
+        await(controller.getReturnObligations(exampleMigrationDateModel))
       }
 
       "return an ObligationError" in {
-        await(result) shouldBe Left(ObligationError)
+        result shouldBe Left(ObligationError)
       }
     }
   }
@@ -415,7 +415,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
       }
 
       "return the correct date model" in {
-        await(result) shouldBe MigrationDateModel(Some(LocalDate.parse("2017-01-01")), Some(LocalDate.parse("2018-02-02")))
+        result shouldBe MigrationDateModel(Some(LocalDate.parse("2017-01-01")), Some(LocalDate.parse("2018-02-02")))
       }
     }
 
@@ -426,7 +426,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
       }
 
       "return the correct date model" in {
-        await(result) shouldBe MigrationDateModel(None, None)
+        result shouldBe MigrationDateModel(None, None)
       }
     }
 
@@ -437,7 +437,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
       }
 
       "return the correct date model" in {
-        await(result) shouldBe MigrationDateModel(None, None)
+        result shouldBe MigrationDateModel(None, None)
       }
     }
   }

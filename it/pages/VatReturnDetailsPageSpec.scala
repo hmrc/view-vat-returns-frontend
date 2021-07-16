@@ -20,6 +20,7 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import helpers.IntegrationBaseSpec
 import play.api.http.Status
 import play.api.libs.ws.{WSRequest, WSResponse}
+import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import stubs._
 
 class VatReturnDetailsPageSpec extends IntegrationBaseSpec {

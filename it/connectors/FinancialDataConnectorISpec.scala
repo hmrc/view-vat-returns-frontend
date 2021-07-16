@@ -22,6 +22,7 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import helpers.IntegrationBaseSpec
 import models.errors.BadRequestError
 import models.payments.{Payment, Payments}
+import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import stubs.FinancialDataStub
 import uk.gov.hmrc.http.HeaderCarrier
 

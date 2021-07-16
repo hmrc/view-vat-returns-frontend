@@ -31,7 +31,7 @@ class FeatureSwitchControllerSpec extends ControllerBaseSpec {
     lazy val result = target.featureSwitch(fakeRequest.withCSRFToken)
 
     "return 200" in {
-      await(result.map(_.header.status)) shouldBe Status.OK
+      status(result) shouldBe Status.OK
     }
 
     "return HTML" in {
@@ -49,11 +49,11 @@ class FeatureSwitchControllerSpec extends ControllerBaseSpec {
       fakeRequest.withFormUrlEncodedBody("features.staticDate.enabled" -> "true").withCSRFToken)
 
     "return 303" in {
-      await(result.map(_.header.status)) shouldBe Status.SEE_OTHER
+      status(result) shouldBe Status.SEE_OTHER
     }
 
     "redirect the user to the feature switch page" in {
-      redirectLocation(result) shouldBe Some(routes.FeatureSwitchController.featureSwitch().url)
+      redirectLocation(result) shouldBe Some(routes.FeatureSwitchController.featureSwitch.url)
     }
   }
 }
