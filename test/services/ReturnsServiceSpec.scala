@@ -83,7 +83,7 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
         .expects(*, *, *, *)
         .returns(Future.successful(Right(exampleVatReturn)))
 
-      lazy val result: ServiceResponse[VatReturn] = await(service.getVatReturn(vrn, "#001"))
+      lazy val result: ServiceResponse[VatReturn] = service.getVatReturn(vrn, "#001").futureValue
 
       result shouldBe Right(exampleVatReturn)
     }
@@ -97,7 +97,7 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
 
         lazy val result: ServiceResponse[VatReturnObligations] = {
           callObligationsConnector(Right(exampleObligations))
-          await(service.getReturnObligationsForYear(vrn, 2017, Status.All))
+          service.getReturnObligationsForYear(vrn, 2017, Status.All).futureValue
         }
 
         result shouldBe Right(exampleObligations)
@@ -110,7 +110,7 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
 
         lazy val result: ServiceResponse[VatReturnObligations] = {
           callObligationsConnector(Left(ServerSideError("ERROR", "ERROR")))
-          await(service.getReturnObligationsForYear(vrn, 2018, Status.All))
+          service.getReturnObligationsForYear(vrn, 2018, Status.All).futureValue
         }
 
         result shouldBe Left(ObligationError)
@@ -156,7 +156,7 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
           .expects(*, *, *, *)
           .returns(Future.successful(Right(examplePayments)))
 
-        lazy val result: Option[Payment] = await(service.getPayment(vrn, "#003"))
+        lazy val result: Option[Payment] = service.getPayment(vrn, "#003").futureValue
 
         result shouldBe Some(examplePayment)
       }
@@ -171,7 +171,7 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
           .expects(*, *, *, *)
           .returns(Future.successful(Right(examplePayments)))
 
-        lazy val result: Option[Payment] = await(service.getPayment(vrn, "#003", Some(2019)))
+        lazy val result: Option[Payment] = service.getPayment(vrn, "#003", Some(2019)).futureValue
 
         result shouldBe Some(examplePayment)
       }
@@ -222,7 +222,7 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
 
       val result: Option[VatReturnObligation] = {
         callObligationsConnector(Right(obligations))
-        await(service.getObligationWithMatchingPeriodKey(vrn, 2018, "#001"))
+        service.getObligationWithMatchingPeriodKey(vrn, 2018, "#001").futureValue
       }
       result shouldBe Some(expected)
     }
@@ -231,7 +231,7 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
 
       val result: Option[VatReturnObligation] = {
         callObligationsConnector(Right(obligations))
-        await(service.getObligationWithMatchingPeriodKey(vrn, 2018, "#004"))
+        service.getObligationWithMatchingPeriodKey(vrn, 2018, "#004").futureValue
       }
       result shouldBe None
     }
@@ -297,9 +297,9 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
       lazy val result: ServiceResponse[VatReturnObligations] = {
         callObligationsConnector(Right(exampleObligations))
         service.getFulfilledObligations(vrn, LocalDate.parse("2018-01-01"))
-      }
+      }.futureValue
 
-      await(result) shouldBe Right(exampleObligations)
+      result shouldBe Right(exampleObligations)
     }
   }
 }

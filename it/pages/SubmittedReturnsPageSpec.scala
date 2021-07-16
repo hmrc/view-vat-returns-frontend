@@ -55,7 +55,7 @@ class SubmittedReturnsPageSpec extends IntegrationBaseSpec {
             buildRequest("/submitted",viewedDDInterrupt(Some("true")))
           }
 
-          val response: WSResponse = await(request().get())
+          val response: WSResponse = request().get().futureValue
           response.status shouldBe Status.OK
         }
 
@@ -71,7 +71,7 @@ class SubmittedReturnsPageSpec extends IntegrationBaseSpec {
             buildRequest("/submitted",viewedDDInterrupt(Some("true")))
           }
 
-          val response: WSResponse = await(request().get())
+          val response: WSResponse = request().get().futureValue
 
           lazy implicit val document: Document = Jsoup.parse(response.body)
 
@@ -98,7 +98,7 @@ class SubmittedReturnsPageSpec extends IntegrationBaseSpec {
           buildRequest("/submitted/2020")
         }
 
-        val response: WSResponse = await(request().get())
+        val response: WSResponse = request().get().futureValue
 
         response.status shouldBe 301
         response.header("Location") shouldBe Some("/vat-through-software/vat-returns/submitted")

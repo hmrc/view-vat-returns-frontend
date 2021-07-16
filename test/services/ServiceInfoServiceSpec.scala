@@ -37,7 +37,7 @@ class ServiceInfoServiceSpec extends ControllerBaseSpec {
         .expects(*, *)
         .returning(Future.successful(validHtml))
 
-      val result: Html = await(service.getServiceInfoPartial(fakeRequest, ec))
+      val result: Html = service.getServiceInfoPartial(fakeRequest, ec).futureValue
 
       result shouldBe validHtml
     }

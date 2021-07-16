@@ -16,22 +16,20 @@
 
 package connectors
 
-import javax.inject.{Inject, Singleton}
-
 import config.AppConfig
 import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
+import javax.inject.{Inject, Singleton}
 import models.CustomerInformation
 import services.MetricsService
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.HttpClient
-import utils.LoggerUtil.logWarn
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import utils.LoggerUtil
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class VatSubscriptionConnector @Inject()(http: HttpClient,
                                          appConfig: AppConfig,
-                                         metrics: MetricsService) {
+                                         metrics: MetricsService) extends LoggerUtil {
 
   private[connectors] def customerInfoUrl(vrn: String): String =
     s"${appConfig.vatSubscriptionBaseUrl}/vat-subscription/$vrn/full-information"
@@ -49,7 +47,7 @@ class VatSubscriptionConnector @Inject()(http: HttpClient,
         customerInfo
       case httpError@Left(error) =>
         metrics.getCustomerInfoCallFailureCounter.inc()
-        logWarn("VatSubscriptionConnector received error: " + error.message)
+        logger.warn("VatSubscriptionConnector received error: " + error.message)
         httpError
     }
   }

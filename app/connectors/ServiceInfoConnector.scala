@@ -17,15 +17,14 @@
 package connectors
 
 import config.AppConfig
-
 import javax.inject.{Inject, Singleton}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.Request
 import play.twirl.api.Html
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
-import uk.gov.hmrc.play.partials.{HeaderCarrierForPartialsConverter, HtmlPartial}
 import uk.gov.hmrc.play.partials.HtmlPartial.{HtmlPartialHttpReads, connectionExceptionsAsHtmlPartialFailure}
-import utils.LoggerUtil.logWarn
+import uk.gov.hmrc.play.partials.{HeaderCarrierForPartialsConverter, HtmlPartial}
+import utils.LoggerUtil
 import views.html.templates.BtaNavigationLinks
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -35,7 +34,10 @@ class ServiceInfoConnector @Inject()(http: HttpClient,
                                      hcForPartials: HeaderCarrierForPartialsConverter,
                                      btaNavigationLinks: BtaNavigationLinks)
                                     (implicit val messagesApi: MessagesApi,
-                                     appConfig: AppConfig) extends HtmlPartialHttpReads with I18nSupport {
+                                     appConfig: AppConfig)
+  extends HtmlPartialHttpReads
+    with I18nSupport
+    with LoggerUtil {
 
   lazy val btaUrl: String = appConfig.btaBaseUrl + "/business-account/partial/service-info"
 
@@ -45,7 +47,7 @@ class ServiceInfoConnector @Inject()(http: HttpClient,
       p.successfulContentOrElse(btaNavigationLinks())
     } recover {
       case _ =>
-        logWarn("[ServiceInfoConnector][getServiceInfoPartial] - Unexpected error retrieving service info partial")
+        logger.warn("[ServiceInfoConnector][getServiceInfoPartial] - Unexpected error retrieving service info partial")
         btaNavigationLinks()
     }
   }

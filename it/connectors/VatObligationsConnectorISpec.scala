@@ -64,10 +64,11 @@ class VatObligationsConnectorISpec extends IntegrationBaseSpec {
       ))
 
       setupStubs()
-      private val result = await(connector.getVatReturnObligations("123456789",
+      private val result = connector.getVatReturnObligations("123456789",
         Some(LocalDate.parse("2017-01-01")),
         Some(LocalDate.parse("2017-12-31")),
-        Status.All))
+        Status.All
+      ).futureValue
 
       result shouldBe expected
     }
@@ -92,10 +93,11 @@ class VatObligationsConnectorISpec extends IntegrationBaseSpec {
       ))
 
       setupStubs()
-      private val result = await(connector.getVatReturnObligations("123456789",
+      private val result = connector.getVatReturnObligations("123456789",
         Some(LocalDate.parse("2017-01-01")),
         Some(LocalDate.parse("2017-12-31")),
-        Status.Outstanding))
+        Status.Outstanding
+      ).futureValue
 
       result shouldBe expected
     }
@@ -120,10 +122,11 @@ class VatObligationsConnectorISpec extends IntegrationBaseSpec {
       ))
 
       setupStubs()
-      private val result = await(connector.getVatReturnObligations("123456789",
+      private val result = connector.getVatReturnObligations("123456789",
         Some(LocalDate.parse("2017-01-01")),
         Some(LocalDate.parse("2017-12-31")),
-        Status.Fulfilled))
+        Status.Fulfilled
+      ).futureValue
 
       result shouldBe expected
     }
@@ -140,10 +143,11 @@ class VatObligationsConnectorISpec extends IntegrationBaseSpec {
       ))
 
       setupStubs()
-      private val result = await(connector.getVatReturnObligations("123456789",
+      private val result = connector.getVatReturnObligations("123456789",
         Some(LocalDate.parse("2017-01-01")),
         Some(LocalDate.parse("2017-12-31")),
-        Status.Outstanding))
+        Status.Outstanding
+      ).futureValue
 
       result shouldBe expected
     }
@@ -160,10 +164,11 @@ class VatObligationsConnectorISpec extends IntegrationBaseSpec {
       ))
 
       setupStubs()
-      private val result = await(connector.getVatReturnObligations("123456789",
+      private val result = connector.getVatReturnObligations("123456789",
         Some(LocalDate.parse("2017-01-01")),
         Some(LocalDate.parse("2017-12-31")),
-        Status.Fulfilled))
+        Status.Fulfilled
+      ).futureValue
 
       result shouldBe expected
     }
@@ -180,10 +185,11 @@ class VatObligationsConnectorISpec extends IntegrationBaseSpec {
       ))
 
       setupStubs()
-      private val result = await(connector.getVatReturnObligations("123456789",
+      private val result = connector.getVatReturnObligations("123456789",
         Some(LocalDate.parse("2017-01-01")),
         Some(LocalDate.parse("2017-12-31")),
-        Status.Fulfilled))
+        Status.Fulfilled
+      ).futureValue
 
       result shouldEqual expected
     }
@@ -208,10 +214,11 @@ class VatObligationsConnectorISpec extends IntegrationBaseSpec {
       ))
 
       setupStubs()
-      private val result = await(connector.getVatReturnObligations("123456789",
+      private val result = connector.getVatReturnObligations("123456789",
         None,
         None,
-        Status.Outstanding))
+        Status.Outstanding
+      ).futureValue
 
       result shouldBe expected
     }
@@ -229,10 +236,11 @@ class VatObligationsConnectorISpec extends IntegrationBaseSpec {
       ))
 
       setupStubs()
-      private val result = await(connector.getVatReturnObligations("123456789",
+      private val result = connector.getVatReturnObligations("123456789",
         Some(LocalDate.parse("2017-01-01")),
         Some(LocalDate.parse("2017-12-31")),
-        Status.Fulfilled))
+        Status.Fulfilled
+      ).futureValue
 
       result shouldEqual expected
     }
@@ -249,10 +257,11 @@ class VatObligationsConnectorISpec extends IntegrationBaseSpec {
       ))
 
       setupStubs()
-      private val result = await(connector.getVatReturnObligations("123456789",
+      private val result = connector.getVatReturnObligations("123456789",
         Some(LocalDate.parse("2017-01-01")),
         Some(LocalDate.parse("2017-12-31")),
-        Status.Fulfilled))
+        Status.Fulfilled
+      ).futureValue
 
       result shouldEqual expected
     }
@@ -266,10 +275,11 @@ class VatObligationsConnectorISpec extends IntegrationBaseSpec {
       val errors = Seq(ApiSingleError("ERROR_1", "MESSAGE_1"), ApiSingleError("ERROR_2", "MESSAGE_2"))
       val expected = Left(MultipleErrors("BAD_REQUEST", Json.toJson(errors).toString()))
       setupStubs()
-      private val result = await(connector.getVatReturnObligations("123456789",
+      private val result = connector.getVatReturnObligations("123456789",
         Some(LocalDate.parse("2017-01-01")),
         Some(LocalDate.parse("2017-12-31")),
-        Status.Fulfilled))
+        Status.Fulfilled
+      ).futureValue
 
       result shouldBe expected
     }

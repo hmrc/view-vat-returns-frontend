@@ -18,10 +18,10 @@ package models
 
 import java.time.LocalDate
 
+import controllers.ControllerBaseSpec
 import play.api.libs.json.Json
-import uk.gov.hmrc.play.test.UnitSpec
 
-class VatReturnObligationSpec extends UnitSpec {
+class VatReturnObligationSpec extends ControllerBaseSpec {
 
   "An obligation" should {
 

@@ -29,9 +29,10 @@ import play.twirl.api.HtmlFormat
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import utils.LoggerUtil.logWarn
+import utils.LoggerUtil
 import views.html.errors.PreMtdReturnView
 import views.html.returns.VatReturnDetailsView
+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -46,7 +47,7 @@ class ReturnsController @Inject()(mcc: MessagesControllerComponents,
                                   preMtdReturnView: PreMtdReturnView)
                                  (implicit val appConfig: AppConfig,
                                   auditService: AuditingService,
-                                  ec: ExecutionContext) extends FrontendController(mcc) {
+                                  ec: ExecutionContext) extends FrontendController(mcc) with LoggerUtil {
 
   def vatReturn(year: Int, periodKey: String): Action[AnyContent] = authorisedController.authorisedAction ({
     implicit request =>
@@ -72,7 +73,7 @@ class ReturnsController @Inject()(mcc: MessagesControllerComponents,
             .flatMap(pageData => renderResult(pageData, isReturnsPageRequest, numericPeriodKey(periodKey)))
 
         } else {
-          logWarn(s"[ReturnsController][vatReturn] - The given period key was invalid - `$periodKey`")
+          logger.warn(s"[ReturnsController][vatReturn] - The given period key was invalid - `$periodKey`")
           Future.successful(errorHandler.showNotFoundError)
         }
   }, ignoreMandatedStatus = true)
@@ -102,7 +103,7 @@ class ReturnsController @Inject()(mcc: MessagesControllerComponents,
             .flatMap(pageData => renderResult(pageData, isReturnsPageRequest, numericPeriodKey(periodKey)))
 
         } else {
-          logWarn(s"[ReturnsController][vatReturnViaPayments] - The given period key was invalid - `$periodKey`")
+          logger.warn(s"[ReturnsController][vatReturnViaPayments] - The given period key was invalid - `$periodKey`")
           Future.successful(errorHandler.showNotFoundError)
         }
   }, ignoreMandatedStatus = true)
@@ -125,10 +126,10 @@ class ReturnsController @Inject()(mcc: MessagesControllerComponents,
       case (Left(NotFoundError), _, _) =>
         checkIfComingFromSubmissionConfirmation(isNumericPeriodKey)
       case (Right(_), None, _) =>
-        logWarn("[ReturnsController][renderResult] error: render required a valid obligation but none was returned")
+        logger.warn("[ReturnsController][renderResult] error: render required a valid obligation but none was returned")
         Future.successful(errorHandler.showInternalServerError)
       case _ =>
-        logWarn("[ReturnsController][renderResult] error: Unknown error")
+        logger.warn("[ReturnsController][renderResult] error: Unknown error")
         Future.successful(errorHandler.showInternalServerError)
     }
   }
@@ -140,12 +141,12 @@ class ReturnsController @Inject()(mcc: MessagesControllerComponents,
     val inSessionPeriodKey = req.session.get("inSessionPeriodKey")
 
     if(inSessionYear.nonEmpty && inSessionPeriodKey.nonEmpty) {
-      logWarn(
+      logger.warn(
         "[ReturnsController][checkIfComingFromSubmissionConfirmation] error: User has come from the submission confirmation page, " +
         "but their submission has not yet been processed."
       )
       Future.successful(
-        Redirect(routes.SubmittedReturnsController.submittedReturns()).removingFromSession("submissionYear", "inSessionPeriodKey")
+        Redirect(routes.SubmittedReturnsController.submittedReturns).removingFromSession("submissionYear", "inSessionPeriodKey")
       )
     } else {
       if(preMtdReturn) {

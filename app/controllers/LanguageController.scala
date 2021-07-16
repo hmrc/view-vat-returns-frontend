@@ -18,7 +18,6 @@ package controllers
 
 import config.AppConfig
 import javax.inject.{Inject, Singleton}
-import play.api.Play
 import play.api.i18n.{Lang, Langs}
 import play.api.mvc.{Action, AnyContent, Call, Flash, MessagesControllerComponents, RequestHeader}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -35,7 +34,7 @@ class LanguageController @Inject()(langs: Langs,
   def languageMap: Map[String, Lang] = appConfig.languageMap
 
   def getCurrentLang(implicit request: RequestHeader): Lang = {
-    val maybeLangFromCookie = request.cookies.get(Play.langCookieName).flatMap(c => Lang.get(c.value))
+    val maybeLangFromCookie = request.cookies.get(mcc.messagesApi.langCookieName).flatMap(c => Lang.get(c.value))
     maybeLangFromCookie.getOrElse(langs.preferred(request.acceptLanguages))
   }
 

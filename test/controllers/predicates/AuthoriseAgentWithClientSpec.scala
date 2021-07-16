@@ -35,7 +35,7 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
 
     def target(request: Request[AnyContent], ignoreMandatedStatus: Boolean = false): Future[Result] =
       mockAuthorisedAgentWithClient.authoriseAsAgent({ _ =>
-        _ => Ok("welcome")
+        _ => Future.successful(Ok("welcome"))
       }, ignoreMandatedStatus)(new MessagesRequest[AnyContent](request, mcc.messagesApi))
 
   "AgentPredicate .authoriseAsAgent" when {
@@ -56,7 +56,7 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
               lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
 
               status(result) shouldBe Status.OK
-              await(bodyOf(result)) shouldBe "welcome"
+              contentAsString(result) shouldBe "welcome"
             }
           }
 
@@ -70,7 +70,7 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
               lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
 
               status(result) shouldBe Status.OK
-              await(bodyOf(result)) shouldBe "welcome"
+              contentAsString(result) shouldBe "welcome"
             }
           }
 
@@ -84,7 +84,7 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
               lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
 
               status(result) shouldBe Status.OK
-              await(bodyOf(result)) shouldBe "welcome"
+              contentAsString(result) shouldBe "welcome"
             }
           }
 
@@ -102,7 +102,7 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
                 )
               )
 
-              callAuthServiceEnrolmentsOnly(Future.successful(otherEnrolment))
+              callAuthServiceEnrolmentsOnly(otherEnrolment)
 
               lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
 
@@ -121,7 +121,7 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
 
           lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
 
-            await(status(result)) shouldBe Status.SEE_OTHER
+            status(result) shouldBe Status.SEE_OTHER
             redirectLocation(result) shouldBe Some(mockConfig.agentClientUnauthorisedUrl("/"))
           }
         }
@@ -135,7 +135,7 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
 
             lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
 
-            await(status(result)) shouldBe Status.SEE_OTHER
+            status(result) shouldBe Status.SEE_OTHER
             redirectLocation(result) shouldBe Some(mockConfig.agentClientHubUrl)
           }
 
@@ -147,8 +147,8 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
             lazy val result: Future[Result] =
               target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"), ignoreMandatedStatus = true)
 
-            await(status(result)) shouldBe Status.OK
-            await(bodyOf(result)) shouldBe "welcome"
+            status(result) shouldBe Status.OK
+            contentAsString(result) shouldBe "welcome"
           }
         }
 
@@ -161,7 +161,7 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
 
             lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
 
-            await(status(result)) shouldBe Status.INTERNAL_SERVER_ERROR
+            status(result) shouldBe Status.INTERNAL_SERVER_ERROR
           }
 
         }

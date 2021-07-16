@@ -16,10 +16,10 @@
 
 package models
 
+import controllers.ControllerBaseSpec
 import play.api.libs.json.Json
-import uk.gov.hmrc.play.test.UnitSpec
 
-class VatReturnSpec extends UnitSpec {
+class VatReturnSpec extends ControllerBaseSpec {
 
   "A VAT Return" should {
 

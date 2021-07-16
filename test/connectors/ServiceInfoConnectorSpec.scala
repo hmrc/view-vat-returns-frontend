@@ -58,7 +58,7 @@ class ServiceInfoConnectorSpec extends ControllerBaseSpec {
 
       "return the fall back partial" in new Test {
         override val result: Future[Failure] = Future.successful(Failure(Some(Status.GATEWAY_TIMEOUT)))
-        await(connector.getServiceInfoPartial(fakeRequest, ec)) shouldBe btaNavigationLinks()
+        connector.getServiceInfoPartial(fakeRequest, ec).futureValue shouldBe btaNavigationLinks()
       }
     }
 
@@ -66,14 +66,14 @@ class ServiceInfoConnectorSpec extends ControllerBaseSpec {
 
       "return the fall back partial" in new Test {
         override val result: Future[Failure] = Future.successful(Failure(Some(Status.INTERNAL_SERVER_ERROR)))
-        await(connector.getServiceInfoPartial(fakeRequest, ec)) shouldBe btaNavigationLinks()
+        connector.getServiceInfoPartial(fakeRequest, ec).futureValue shouldBe btaNavigationLinks()
       }
     }
 
     "a successful response is returned" should {
 
       "return the Bta partial" in new Test {
-        await(connector.getServiceInfoPartial(fakeRequest, ec)) shouldBe validHtml
+        connector.getServiceInfoPartial(fakeRequest, ec).futureValue shouldBe validHtml
       }
     }
   }

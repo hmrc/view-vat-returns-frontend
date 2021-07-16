@@ -18,11 +18,12 @@ package models
 
 import java.time.LocalDate
 
+import controllers.ControllerBaseSpec
 import models.payments.{Payment, Payments}
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.libs.json.Json
-import uk.gov.hmrc.play.test.UnitSpec
 
-class PaymentsSpec extends UnitSpec {
+class PaymentsSpec extends ControllerBaseSpec with GuiceOneAppPerSuite {
 
   "A payment" should {
 

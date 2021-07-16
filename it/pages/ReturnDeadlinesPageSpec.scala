@@ -53,7 +53,7 @@ class ReturnDeadlinesPageSpec extends IntegrationBaseSpec {
         obligationsStub.stubOutstandingObligations
       }
 
-      val response: WSResponse = await(request().get())
+      val response: WSResponse = request().get().futureValue
       response.status shouldBe Status.OK
     }
 
@@ -63,7 +63,7 @@ class ReturnDeadlinesPageSpec extends IntegrationBaseSpec {
         obligationsStub.stubOutstandingObligations
       }
 
-      val response: WSResponse = await(request().get())
+      val response: WSResponse = request().get().futureValue
       lazy implicit val document: Document = Jsoup.parse(response.body)
       val deadlineSelector = "hr.govuk-section-break"
       document.select(deadlineSelector).size() shouldBe 1
@@ -79,7 +79,7 @@ class ReturnDeadlinesPageSpec extends IntegrationBaseSpec {
         CustomerInfoStub.stubOptedOutUser
       }
 
-      val response: WSResponse = await(request().get())
+      val response: WSResponse = request().get().futureValue
       response.status shouldBe Status.OK
     }
 
@@ -90,7 +90,7 @@ class ReturnDeadlinesPageSpec extends IntegrationBaseSpec {
         CustomerInfoStub.stubOptedOutUser
       }
 
-      val response: WSResponse = await(request().get())
+      val response: WSResponse = request().get().futureValue
       lazy implicit val document: Document = Jsoup.parse(response.body)
       val deadlineSelector = "hr.govuk-section-break"
 
@@ -110,7 +110,7 @@ class ReturnDeadlinesPageSpec extends IntegrationBaseSpec {
         CustomerInfoStub.stubCustomerInfo
       }
 
-      val response: WSResponse = await(request().get())
+      val response: WSResponse = request().get().futureValue
       response.status shouldBe Status.OK
     }
 
@@ -121,7 +121,7 @@ class ReturnDeadlinesPageSpec extends IntegrationBaseSpec {
         CustomerInfoStub.stubCustomerInfo
       }
 
-      val response: WSResponse = await(request().get())
+      val response: WSResponse = request().get().futureValue
       lazy implicit val document: Document = Jsoup.parse(response.body)
       val deadlineSelector = "hr.govuk-section-break"
       document.select(deadlineSelector).size() shouldBe 1
@@ -135,7 +135,7 @@ class ReturnDeadlinesPageSpec extends IntegrationBaseSpec {
         CustomerInfoStub.stubErrorFromApi
       }
 
-      val response: WSResponse = await(request().get())
+      val response: WSResponse = request().get().futureValue
       response.status shouldBe Status.INTERNAL_SERVER_ERROR
     }
 

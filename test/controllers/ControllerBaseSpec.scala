@@ -17,16 +17,21 @@
 package controllers
 
 import akka.actor.ActorSystem
-import akka.stream.{ActorMaterializer, Materializer}
 import common.EnrolmentKeys._
 import common.SessionKeys
 import common.SessionKeys.clientVrn
 import controllers.predicate.DDInterruptPredicate
 import mocks.MockAuth
 import models.User
-import play.api.http.Status
+import org.scalamock.scalatest.MockFactory
+import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.http.Status.FORBIDDEN
 import play.api.mvc._
-import play.api.test.FakeRequest
+import play.api.test.{FakeRequest, Injecting}
+import play.api.test.Helpers.{defaultAwaitTimeout, status}
 import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual}
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.auth.core.{AffinityGroup, Enrolment, EnrolmentIdentifier, Enrolments}
@@ -34,13 +39,18 @@ import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys => GovUkSessionKeys}
 
 import scala.concurrent.Future
 
-class ControllerBaseSpec extends MockAuth {
+class ControllerBaseSpec extends MockAuth
+  with AnyWordSpecLike
+  with Matchers
+  with ScalaFutures
+  with MockFactory
+  with GuiceOneAppPerSuite
+  with Injecting {
 
   val vrn = "999999999"
   val arn = "XARN1234567"
 
   implicit val system: ActorSystem = ActorSystem()
-  implicit val materializer: Materializer = ActorMaterializer()
   implicit val hc: HeaderCarrier = HeaderCarrier()
   val ddInterruptPredicate: DDInterruptPredicate = new DDInterruptPredicate(
     mcc
@@ -108,7 +118,7 @@ class ControllerBaseSpec extends MockAuth {
           callAuthService(individualAuthResult)
           controllerAction(insolventRequest)
         }
-        status(result) shouldBe Status.FORBIDDEN
+        status(result) shouldBe FORBIDDEN
       }
     }
   }

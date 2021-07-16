@@ -17,6 +17,7 @@
 package controllers
 
 import java.time.{LocalDate, Period}
+
 import audit.AuditingService
 import audit.models.ViewSubmittedVatObligationsAuditModel
 import config.AppConfig
@@ -31,9 +32,10 @@ import play.twirl.api.HtmlFormat
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-import utils.LoggerUtil.logWarn
+import utils.LoggerUtil
 import views.html.errors.SubmittedReturnsErrorView
 import views.html.returns.SubmittedReturnsView
+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -48,11 +50,11 @@ class SubmittedReturnsController @Inject()(mcc: MessagesControllerComponents,
                                            DDInterrupt: DDInterruptPredicate)
                                           (implicit appConfig: AppConfig,
                                            auditService: AuditingService,
-                                           ec: ExecutionContext) extends FrontendController(mcc) {
+                                           ec: ExecutionContext) extends FrontendController(mcc) with LoggerUtil {
 
   def redirect(year: Int): Action[AnyContent] = authorisedController.authorisedAction ({ _ =>
     _ =>
-      Future(MovedPermanently(controllers.routes.SubmittedReturnsController.submittedReturns().url))
+      Future(MovedPermanently(controllers.routes.SubmittedReturnsController.submittedReturns.url))
   }, ignoreMandatedStatus = true)
 
   def currentYear: Int = dateService.now().getYear
@@ -71,7 +73,7 @@ class SubmittedReturnsController @Inject()(mcc: MessagesControllerComponents,
             case Right(model) =>
               Ok(submittedReturnsView(model, showInsolvencyContent, serviceInfoContent))
             case Left(error) =>
-              logWarn("[ReturnObligationsController][submittedReturns] error: " + error.toString)
+              logger.warn("[ReturnObligationsController][submittedReturns] error: " + error.toString)
               InternalServerError(submittedReturnsErrorView(user))
           }
         }
@@ -108,7 +110,7 @@ class SubmittedReturnsController @Inject()(mcc: MessagesControllerComponents,
 
           auditService.extendedAudit(
             ViewSubmittedVatObligationsAuditModel(user, obligations),
-            routes.SubmittedReturnsController.submittedReturns().url
+            routes.SubmittedReturnsController.submittedReturns.url
           )
 
           Right(VatReturnsViewModel(

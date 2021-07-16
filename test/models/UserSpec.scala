@@ -16,10 +16,10 @@
 
 package models
 
+import controllers.ControllerBaseSpec
 import uk.gov.hmrc.auth.core.{Enrolment, EnrolmentIdentifier, Enrolments}
-import uk.gov.hmrc.play.test.UnitSpec
 
-class UserSpec extends UnitSpec {
+class UserSpec extends ControllerBaseSpec {
 
   "Creating a User with only a VRN" should {
 

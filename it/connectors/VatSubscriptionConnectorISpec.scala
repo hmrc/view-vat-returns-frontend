@@ -57,7 +57,7 @@ class VatSubscriptionConnectorISpec extends IntegrationBaseSpec {
           Some("2018-01-01"),
           mtdfb
         ))
-        private val result = await(connector.getCustomerInfo("999999999"))
+        private val result = connector.getCustomerInfo("999999999").futureValue
 
         result shouldBe expected
       }
@@ -71,7 +71,7 @@ class VatSubscriptionConnectorISpec extends IntegrationBaseSpec {
         override def setupStubs(): StubMapping = CustomerInfoStub.stubErrorFromApi
         setupStubs()
         val expected = Left(ServerSideError("500", message))
-        private val result = await(connector.getCustomerInfo("999999999"))
+        private val result = connector.getCustomerInfo("999999999").futureValue
 
         result shouldBe expected
       }

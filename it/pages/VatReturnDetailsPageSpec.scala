@@ -58,7 +58,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
           FinancialDataStub.stubVatReturnCreditCharge
         }
 
-        val response: WSResponse = await(request().get())
+        val response: WSResponse = request().get().futureValue
         response.status shouldBe Status.OK
       }
     }
@@ -75,7 +75,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
           FinancialDataStub.stubVatReturnDebitCharge(0)
         }
 
-        val response: WSResponse = await(request().get())
+        val response: WSResponse = request().get().futureValue
         response.status shouldBe Status.OK
       }
     }
@@ -92,7 +92,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
           FinancialDataStub.stubAAReturnCreditChargeOutstandingPayment
         }
 
-        val response: WSResponse = await(request().get())
+        val response: WSResponse = request().get().futureValue
         response.status shouldBe Status.OK
       }
     }
@@ -109,7 +109,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
           FinancialDataStub.stubAAReturnDebitChargeOutstandingPayment(0)
         }
 
-        val response: WSResponse = await(request().get())
+        val response: WSResponse = request().get().futureValue
         response.status shouldBe Status.OK
       }
     }
@@ -126,7 +126,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
           FinancialDataStub.stubPOAReturnCreditCharge
         }
 
-        val response: WSResponse = await(request().get())
+        val response: WSResponse = request().get().futureValue
         response.status shouldBe Status.OK
       }
     }
@@ -143,7 +143,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
           FinancialDataStub.stubPOAReturnDebitCharge(0)
         }
 
-        val response: WSResponse = await(request().get())
+        val response: WSResponse = request().get().futureValue
         response.status shouldBe Status.OK
       }
     }
@@ -160,7 +160,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
           FinancialDataStub.stubNoPayments
         }
 
-        val response: WSResponse = await(request().get())
+        val response: WSResponse = request().get().futureValue
         response.status shouldBe Status.OK
       }
     }
@@ -180,7 +180,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
           FinancialDataStub.stubVatReturnDebitCharge(4000)
         }
 
-        val response: WSResponse = await(request().get())
+        val response: WSResponse = request().get().futureValue
         response.status shouldBe Status.OK
       }
     }
@@ -197,7 +197,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
           FinancialDataStub.stubAAReturnDebitChargeOutstandingPayment(5000)
         }
 
-        val response: WSResponse = await(request().get())
+        val response: WSResponse = request().get().futureValue
         response.status shouldBe Status.OK
       }
     }
@@ -214,7 +214,7 @@ class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
           FinancialDataStub.stubPOAReturnDebitCharge(5000)
         }
 
-        val response: WSResponse = await(request().get())
+        val response: WSResponse = request().get().futureValue
         response.status shouldBe Status.OK
       }
     }

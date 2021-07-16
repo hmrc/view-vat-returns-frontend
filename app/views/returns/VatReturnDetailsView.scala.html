@@ -30,7 +30,6 @@
       govukDetails: GovukDetails,
       govukBackLink: GovukBackLink,
       paymentStatus: PaymentStatus)
-
 @(vatReturnViewModel: VatReturnViewModel,
   serviceInfoContent: Html = HtmlFormat.empty)(
   implicit request: Request[_], messages: Messages, appConfig: config.AppConfig, user: User)
@@ -64,7 +63,7 @@
 @navContent = @{
   if(user.isAgent) {
     govukBackLink(BackLink(
-      href = controllers.routes.SubmittedReturnsController.submittedReturns().url,
+      href = controllers.routes.SubmittedReturnsController.submittedReturns.url,
       content = Text(messages("base.back"))
     ))
   } else {
@@ -72,7 +71,7 @@
       links = Map(
         appConfig.btaHomeUrl -> messages("breadcrumbs.bta"),
         appConfig.vatDetailsUrl -> messages("breadcrumbs.vat"),
-        if(vatReturnViewModel.showReturnsBreadcrumb) controllers.routes.SubmittedReturnsController.submittedReturns().url -> messages("submittedReturns.title")
+        if(vatReturnViewModel.showReturnsBreadcrumb) controllers.routes.SubmittedReturnsController.submittedReturns.url -> messages("submittedReturns.title")
         else appConfig.vatPaymentsUrl -> messages("breadcrumbs.vatPayments")
       ),
       currentPage = returnHeading(useShortDayFormat = false).toString

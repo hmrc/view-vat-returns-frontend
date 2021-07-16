@@ -19,14 +19,14 @@ package connectors.httpParsers
 import java.time.LocalDate
 
 import connectors.httpParsers.PaymentsHttpParser.PaymentsReads
+import controllers.ControllerBaseSpec
 import models.errors._
 import models.payments.{Payment, Payments}
 import play.api.http.Status
 import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.http.HttpResponse
-import uk.gov.hmrc.play.test.UnitSpec
 
-class PaymentsHttpParserSpec extends UnitSpec {
+class PaymentsHttpParserSpec extends ControllerBaseSpec {
 
   "PaymentsReads" when {
 

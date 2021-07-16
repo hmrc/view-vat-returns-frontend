@@ -19,14 +19,14 @@ package connectors.httpParsers
 import java.time.LocalDate
 
 import connectors.httpParsers.VatReturnObligationsHttpParser.VatReturnObligationsReads
+import controllers.ControllerBaseSpec
 import models.errors._
 import models.{VatReturnObligation, VatReturnObligations}
 import play.api.http.Status
 import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.http.HttpResponse
-import uk.gov.hmrc.play.test.UnitSpec
 
-class VatReturnObligationsHttpParserSpec extends UnitSpec {
+class VatReturnObligationsHttpParserSpec extends ControllerBaseSpec {
 
   "VatReturnObligationsReads" when {
 

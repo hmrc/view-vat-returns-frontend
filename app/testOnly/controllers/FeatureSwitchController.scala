@@ -40,7 +40,7 @@ class FeatureSwitchController @Inject()(mcc: MessagesControllerComponents,
 
   def submitFeatureSwitch: Action[AnyContent] = Action { implicit request =>
     FeatureSwitchForm.form.bindFromRequest().fold(
-      _ => Redirect(routes.FeatureSwitchController.featureSwitch()),
+      _ => Redirect(routes.FeatureSwitchController.featureSwitch),
       success = handleSuccess
     )
   }
@@ -49,6 +49,6 @@ class FeatureSwitchController @Inject()(mcc: MessagesControllerComponents,
     appConfig.features.userResearchBanner(model.userResearchBannerEnabled)
     appConfig.features.staticDateEnabled(model.staticDateEnabled)
     appConfig.features.niProtocolEnabled(model.niProtocolEnabled)
-    Redirect(routes.FeatureSwitchController.featureSwitch())
+    Redirect(routes.FeatureSwitchController.featureSwitch)
   }
 }

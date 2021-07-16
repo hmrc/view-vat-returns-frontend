@@ -55,7 +55,7 @@ class VatReturnsConnectorISpec extends IntegrationBaseSpec {
         ))
 
         setupStubs()
-        private val result = await(connector.getVatReturnDetails("123456789", "%23001"))
+        private val result = connector.getVatReturnDetails("123456789", "%23001").futureValue
 
         result shouldBe expected
       }
@@ -72,7 +72,7 @@ class VatReturnsConnectorISpec extends IntegrationBaseSpec {
         ))
 
         setupStubs()
-        private val result = await(connector.getVatReturnDetails("123456789", "%23001"))
+        private val result = connector.getVatReturnDetails("123456789", "%23001").futureValue
 
         result shouldBe expected
       }
@@ -89,7 +89,7 @@ class VatReturnsConnectorISpec extends IntegrationBaseSpec {
         ))
 
         setupStubs()
-        private val result = await(connector.getVatReturnDetails("123456789", "%23001"))
+        private val result = connector.getVatReturnDetails("123456789", "%23001").futureValue
 
         result shouldBe expected
       }
@@ -103,7 +103,7 @@ class VatReturnsConnectorISpec extends IntegrationBaseSpec {
         val errors = Seq(ApiSingleError("ERROR_1", "MESSAGE_1"), ApiSingleError("ERROR_2", "MESSAGE_2"))
         val expected = Left(MultipleErrors("BAD_REQUEST", Json.toJson(errors).toString()))
         setupStubs()
-        private val result = await(connector.getVatReturnDetails("123456789", "%23001"))
+        private val result = connector.getVatReturnDetails("123456789", "%23001").futureValue
 
         result shouldBe expected
       }

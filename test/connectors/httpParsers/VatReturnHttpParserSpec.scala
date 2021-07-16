@@ -17,14 +17,14 @@
 package connectors.httpParsers
 
 import connectors.httpParsers.VatReturnHttpParser.VatReturnReads
+import controllers.ControllerBaseSpec
 import models.VatReturn
 import models.errors._
 import play.api.http.Status
 import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.http.HttpResponse
-import uk.gov.hmrc.play.test.UnitSpec
 
-class VatReturnHttpParserSpec extends UnitSpec {
+class VatReturnHttpParserSpec extends ControllerBaseSpec {
 
   "VatReturnReads" when {
 

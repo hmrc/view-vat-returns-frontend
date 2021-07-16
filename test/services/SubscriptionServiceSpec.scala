@@ -46,7 +46,7 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           .expects(*, *, *)
           .returns(Future.successful(Right(customerInformationMax)))
 
-        lazy val result: Option[CustomerInformation] = await(service.getUserDetails(vrn))
+        lazy val result: Option[CustomerInformation] = service.getUserDetails(vrn).futureValue
 
         result shouldBe Some(customerInformationMax)
       }
@@ -60,7 +60,7 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
           .expects(*, *, *)
           .returns(Future.successful(Left(BadRequestError("", ""))))
 
-        val result: Option[CustomerInformation] = await(service.getUserDetails(vrn))
+        val result: Option[CustomerInformation] = service.getUserDetails(vrn).futureValue
 
         result shouldBe None
       }
