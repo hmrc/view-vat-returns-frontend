@@ -58,7 +58,10 @@ class AuthorisedControllerSpec extends ControllerBaseSpec {
             callDateService()
             target(fakeRequest)
           }
-          status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+
+          "return an internal server error" in {
+            status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+          }
 
           "add both the insolvent and futureInsolvency flags to the session" in {
             session(result).get(SessionKeys.insolventWithoutAccessKey) shouldBe Some("false")
@@ -77,8 +80,14 @@ class AuthorisedControllerSpec extends ControllerBaseSpec {
             callDateService()
             target(fakeRequest)
           }
-          status(result) shouldBe Status.OK
-          contentAsString(result) shouldBe "welcome"
+
+          "return the correct status" in {
+            status(result) shouldBe Status.OK
+          }
+
+          "return the correct content" in {
+            contentAsString(result) shouldBe "welcome"
+          }
 
           "add both the insolvent and futureInsolvency flags to the session" in {
             session(result).get(SessionKeys.insolventWithoutAccessKey) shouldBe Some("false")

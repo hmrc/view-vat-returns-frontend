@@ -55,7 +55,7 @@ class AuthoriseAgentWithClient @Inject()(enrolmentsAuthService: EnrolmentsAuthSe
           .retrieve(allEnrolments) {
             enrolments =>
               enrolments.enrolments.collectFirst {
-                case Enrolment(EnrolmentKeys.agentEnrolmentKey, EnrolmentIdentifier(_, arn) :: _, EnrolmentKeys.activated, _) => arn
+                case Enrolment(EnrolmentKeys.agentEnrolmentKey, Seq(EnrolmentIdentifier(_, arn)), EnrolmentKeys.activated, _) => arn
               } match {
                 case Some(arn) => checkMandationStatus(block, vrn, arn, ignoreMandatedStatus)
                 case None =>
@@ -76,7 +76,6 @@ class AuthoriseAgentWithClient @Inject()(enrolmentsAuthService: EnrolmentsAuthSe
         Future.successful(Redirect(appConfig.agentClientLookupUrl(request.uri)))
     }
   }
-
 
   private def checkMandationStatus(block: MessagesRequest[AnyContent] => User => Future[Result],
                                    vrn: String,
