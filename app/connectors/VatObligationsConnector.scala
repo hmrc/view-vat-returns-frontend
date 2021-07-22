@@ -25,16 +25,15 @@ import models.Obligation.Status
 import models.VatReturnObligations
 import play.api.http.HeaderNames
 import services.MetricsService
-import uk.gov.hmrc.http.{HeaderCarrier, HttpReads}
-import uk.gov.hmrc.http.HttpClient
-import utils.LoggerUtil.logWarn
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads}
+import utils.LoggerUtil
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class VatObligationsConnector @Inject()(http: HttpClient,
                                         appConfig: AppConfig,
-                                        metrics: MetricsService) {
+                                        metrics: MetricsService) extends LoggerUtil {
 
 
   private[connectors] def obligationsUrl(vrn: String): String = {
@@ -73,7 +72,7 @@ class VatObligationsConnector @Inject()(http: HttpClient,
         obligations
       case httpError@Left(error) =>
         metrics.getObligationsCallFailureCounter.inc()
-        logWarn("VatObligationsConnector received error: " + error.message)
+        logger.warn("VatObligationsConnector received error: " + error.message)
         httpError
     }
   }

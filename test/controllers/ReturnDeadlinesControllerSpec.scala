@@ -180,7 +180,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
         }
 
         "return the opt-out return deadlines page" in {
-          val document: Document = Jsoup.parse(bodyOf(result))
+          val document: Document = Jsoup.parse(contentAsString(result))
           messages(document.getElementById("submit-return-link").text()) shouldBe "Submit VAT Return"
         }
       }
@@ -202,7 +202,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
         }
 
         "return the opt-out return deadlines page" in {
-          val document: Document = Jsoup.parse(bodyOf(result))
+          val document: Document = Jsoup.parse(contentAsString(result))
           messages(document.getElementById("submit-return-link").text()) shouldBe "Submit VAT Return"
         }
 
@@ -230,7 +230,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
         }
 
         "return the opt-out return deadlines page" in {
-          val document: Document = Jsoup.parse(bodyOf(result))
+          val document: Document = Jsoup.parse(contentAsString(result))
           messages(document.getElementById("submit-return-link").text()) shouldBe "Submit VAT Return"
         }
       }
@@ -252,7 +252,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
         }
 
         "return the opt-out return deadlines page" in {
-          val document: Document = Jsoup.parse(bodyOf(result))
+          val document: Document = Jsoup.parse(contentAsString(result))
           messages(document.getElementById("submit-return-link").text()) shouldBe "Submit VAT Return"
         }
 
@@ -280,7 +280,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
         }
 
         "return the opt-out return deadlines page" in {
-          val document: Document = Jsoup.parse(bodyOf(result))
+          val document: Document = Jsoup.parse(contentAsString(result))
           messages(document.getElementById("submit-return-link").text()) shouldBe "Submit VAT Return"
         }
       }
@@ -302,7 +302,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
         }
 
         "return the opt-out return deadlines page" in {
-          val document: Document = Jsoup.parse(bodyOf(result))
+          val document: Document = Jsoup.parse(contentAsString(result))
           messages(document.getElementById("submit-return-link").text()) shouldBe "Submit VAT Return"
         }
 
@@ -330,7 +330,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
         }
 
         "return the regular return deadlines page" in {
-          val document: Document = Jsoup.parse(bodyOf(result))
+          val document: Document = Jsoup.parse(contentAsString(result))
           document.getElementById("submit-return-link") shouldBe null
         }
       }
@@ -352,7 +352,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
         }
 
         "return the regular return deadlines page" in {
-          val document: Document = Jsoup.parse(bodyOf(result))
+          val document: Document = Jsoup.parse(contentAsString(result))
           document.getElementById("submit-return-link") shouldBe null
         }
 
@@ -380,7 +380,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
       }
 
       "return the no returns view" in {
-        val document: Document = Jsoup.parse(bodyOf(result))
+        val document: Document = Jsoup.parse(contentAsString(result))
           document.select("#content > p:nth-child(3)").text should include
           "You do not have any returns due right now."
       }
@@ -432,7 +432,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
         }
 
         "return the no returns view" in {
-          val document: Document = Jsoup.parse(bodyOf(result))
+          val document: Document = Jsoup.parse(contentAsString(result))
             document.select("#content > p:nth-child(3)").text should include
             "You do not have any returns due right now."
         }
@@ -455,7 +455,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
         }
 
         "return the technical problem view" in {
-          val document: Document = Jsoup.parse(bodyOf(result))
+          val document: Document = Jsoup.parse(contentAsString(result))
           messages(document.select("h1").text) shouldBe "Sorry, there is a problem with the service"
         }
       }
@@ -505,7 +505,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
       }
 
       "return the technical problem view" in {
-        val document: Document = Jsoup.parse(bodyOf(result))
+        val document: Document = Jsoup.parse(contentAsString(result))
         messages(document.select("h1").text) shouldBe "Sorry, there is a problem with the service"
       }
     }

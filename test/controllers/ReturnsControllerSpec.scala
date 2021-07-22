@@ -167,7 +167,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
           }
 
           "have the correct title" in {
-            messages(Jsoup.parse(bodyOf(result)).select("h1").text) shouldBe "This return is not available"
+            messages(Jsoup.parse(contentAsString(result)).select("h1").text) shouldBe "This return is not available"
           }
         }
       }
@@ -369,7 +369,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
           }
 
           "have the correct title" in {
-            messages(Jsoup.parse(bodyOf(result)).select("h1").text) shouldBe "This return is not available"
+            messages(Jsoup.parse(contentAsString(result)).select("h1").text) shouldBe "This return is not available"
           }
         }
       }
@@ -530,7 +530,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       }
 
       "return an OK status" in {
-        result.header.status shouldBe Status.OK
+        status(result) shouldBe Status.OK
       }
     }
 
@@ -541,7 +541,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
           val data = ReturnsControllerData(Left(NotFoundError), None, None, None, Html(""))
           lazy val result = controller.renderResult(data, isReturnsPageRequest = true,
             isNumericPeriodKey = false)(request(), user)
-          result.header.status shouldBe Status.NOT_FOUND
+          status(result) shouldBe Status.NOT_FOUND
         }
       }
 
@@ -551,7 +551,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
           val data = ReturnsControllerData(Left(NotFoundError), None, None, None, Html(""))
           lazy val result = controller.renderResult(data, isReturnsPageRequest = true,
             isNumericPeriodKey = true)(request(), user)
-          result.header.status shouldBe Status.NOT_FOUND
+          status(result) shouldBe Status.NOT_FOUND
         }
       }
     }
@@ -562,7 +562,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         val data = ReturnsControllerData(Right(exampleVatReturn), None, None, None, Html(""))
         lazy val result = controller.renderResult(data, isReturnsPageRequest = true,
           isNumericPeriodKey = false)(request(), user)
-        result.header.status shouldBe Status.INTERNAL_SERVER_ERROR
+        status(result) shouldBe Status.INTERNAL_SERVER_ERROR
       }
     }
 
@@ -572,7 +572,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         val data = ReturnsControllerData(Left(VatReturnError), None, None, None, Html(""))
         lazy val result = controller.renderResult(data, isReturnsPageRequest = true,
           isNumericPeriodKey = false)(request(), user)
-        result.header.status shouldBe Status.INTERNAL_SERVER_ERROR
+        status(result) shouldBe Status.INTERNAL_SERVER_ERROR
       }
     }
   }

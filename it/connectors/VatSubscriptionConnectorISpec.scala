@@ -21,6 +21,7 @@ import common.MandationStatuses.mtdfb
 import helpers.IntegrationBaseSpec
 import models.CustomerInformation
 import models.errors.ServerSideError
+import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import stubs.CustomerInfoStub
 import uk.gov.hmrc.http.HeaderCarrier
 

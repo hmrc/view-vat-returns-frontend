@@ -23,6 +23,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.http.Status
 import play.api.libs.ws.{WSRequest, WSResponse}
+import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import stubs.{AuthStub, CustomerInfoStub, VatObligationsStub}
 
 class ReturnDeadlinesPageSpec extends IntegrationBaseSpec {

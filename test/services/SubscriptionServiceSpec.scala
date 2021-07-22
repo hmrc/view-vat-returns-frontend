@@ -21,6 +21,7 @@ import connectors.VatSubscriptionConnector
 import controllers.ControllerBaseSpec
 import models.CustomerInformation
 import models.errors.BadRequestError
+import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}

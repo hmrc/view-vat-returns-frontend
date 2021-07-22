@@ -19,6 +19,7 @@ package connectors
 import controllers.ControllerBaseSpec
 import play.api.http.Status
 import play.api.i18n.MessagesApi
+import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import play.twirl.api.Html
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads}
 import uk.gov.hmrc.http.HttpClient

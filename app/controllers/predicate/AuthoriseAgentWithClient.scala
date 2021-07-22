@@ -24,9 +24,9 @@ import play.api.mvc._
 import services.{EnrolmentsAuthService, SubscriptionService}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.allEnrolments
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.LoggerUtil._
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
+import utils.LoggerUtil
 import views.html.errors.UnauthorisedView
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -38,7 +38,7 @@ class AuthoriseAgentWithClient @Inject()(enrolmentsAuthService: EnrolmentsAuthSe
                                          unauthorisedView: UnauthorisedView,
                                          errorHandler: ServiceErrorHandler)
                                         (implicit appConfig: AppConfig,
-                                         ec: ExecutionContext) extends FrontendController(mcc) {
+                                         ec: ExecutionContext) extends FrontendController(mcc) with LoggerUtil {
 
   def authoriseAsAgent(block: MessagesRequest[AnyContent] => User => Future[Result], ignoreMandatedStatus: Boolean)
                       (implicit request: MessagesRequest[AnyContent]): Future[Result] = {
@@ -55,28 +55,27 @@ class AuthoriseAgentWithClient @Inject()(enrolmentsAuthService: EnrolmentsAuthSe
           .retrieve(allEnrolments) {
             enrolments =>
               enrolments.enrolments.collectFirst {
-                case Enrolment(EnrolmentKeys.agentEnrolmentKey, EnrolmentIdentifier(_, arn) :: _, EnrolmentKeys.activated, _) => arn
+                case Enrolment(EnrolmentKeys.agentEnrolmentKey, Seq(EnrolmentIdentifier(_, arn)), EnrolmentKeys.activated, _) => arn
               } match {
                 case Some(arn) => checkMandationStatus(block, vrn, arn, ignoreMandatedStatus)
                 case None =>
-                  logDebug("[AuthPredicate][authoriseAsAgent] - Agent with no HMRC-AS-AGENT enrolment. Rendering unauthorised view.")
+                  logger.debug("[AuthPredicate][authoriseAsAgent] - Agent with no HMRC-AS-AGENT enrolment. Rendering unauthorised view.")
                   Future.successful(Forbidden(unauthorisedView()))
               }
           } recover {
           case _: NoActiveSession =>
-            logDebug(s"AgentPredicate][authoriseAsAgent] - No active session. Redirecting to ${appConfig.signInUrl}")
+            logger.debug(s"AgentPredicate][authoriseAsAgent] - No active session. Redirecting to ${appConfig.signInUrl}")
             Redirect(appConfig.signInUrl)
           case _: AuthorisationException =>
-            logDebug(s"[AgentPredicate][authoriseAsAgent] - Agent does not have delegated authority for Client. " +
+            logger.debug(s"[AgentPredicate][authoriseAsAgent] - Agent does not have delegated authority for Client. " +
               s"Redirecting to ${appConfig.agentClientUnauthorisedUrl(request.uri)}")
             Redirect(appConfig.agentClientUnauthorisedUrl(request.uri))
         }
       case None =>
-        logDebug(s"[AuthoriseAsAgentWithClient][invokeBlock] - No Client VRN in session, redirecting to Select Client page")
+        logger.debug(s"[AuthoriseAsAgentWithClient][invokeBlock] - No Client VRN in session, redirecting to Select Client page")
         Future.successful(Redirect(appConfig.agentClientLookupUrl(request.uri)))
     }
   }
-
 
   private def checkMandationStatus(block: MessagesRequest[AnyContent] => User => Future[Result],
                                    vrn: String,
@@ -92,7 +91,7 @@ class AuthoriseAgentWithClient @Inject()(enrolmentsAuthService: EnrolmentsAuthSe
         val user = User(vrn, arn = Some(arn))
         block(request)(user)
       case Some(_) =>
-        logDebug("[AuthorisedAgentWithClient][checkMandationStatus] - Agent acting for MTDfB client")
+        logger.debug("[AuthorisedAgentWithClient][checkMandationStatus] - Agent acting for MTDfB client")
         Future.successful(Redirect(appConfig.agentClientHubUrl))
       case None =>
         Future.successful(errorHandler.showInternalServerError)

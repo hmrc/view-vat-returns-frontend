@@ -25,11 +25,10 @@ import play.api.mvc.AnyContent
 import scala.concurrent.Future
 import play.api.test.Helpers._
 
-
 class AuthorisedControllerSpec extends ControllerBaseSpec {
 
     def target(request: Request[AnyContent], ignoreMandatedStatus: Boolean = false): Future[Result] =
-      mockAuthorisedController.authorisedAction({ _ => _ => Ok("welcome")
+      mockAuthorisedController.authorisedAction({ _ => _ => Future.successful(Ok("welcome"))
       }, ignoreMandatedStatus)(new MessagesRequest[AnyContent](request, mcc.messagesApi))
 
 
@@ -59,7 +58,10 @@ class AuthorisedControllerSpec extends ControllerBaseSpec {
             callDateService()
             target(fakeRequest)
           }
-          status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+
+          "return an internal server error" in {
+            status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+          }
 
           "add both the insolvent and futureInsolvency flags to the session" in {
             session(result).get(SessionKeys.insolventWithoutAccessKey) shouldBe Some("false")
@@ -78,8 +80,14 @@ class AuthorisedControllerSpec extends ControllerBaseSpec {
             callDateService()
             target(fakeRequest)
           }
-          status(result) shouldBe Status.OK
-          await(bodyOf(result)) shouldBe "welcome"
+
+          "return the correct status" in {
+            status(result) shouldBe Status.OK
+          }
+
+          "return the correct content" in {
+            contentAsString(result) shouldBe "welcome"
+          }
 
           "add both the insolvent and futureInsolvency flags to the session" in {
             session(result).get(SessionKeys.insolventWithoutAccessKey) shouldBe Some("false")

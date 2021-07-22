@@ -19,19 +19,27 @@ package helpers
 import common.SessionKeys
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, TestSuite}
+import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.http.HeaderNames
-import play.api.{Application, Environment, Mode}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 import play.api.test.Injecting
-import uk.gov.hmrc.play.test.UnitSpec
+import play.api.{Application, Environment, Mode}
 
 import scala.concurrent.ExecutionContext
 
-trait IntegrationBaseSpec extends UnitSpec with WireMockHelper with GuiceOneServerPerSuite with TestSuite
-  with BeforeAndAfterEach with BeforeAndAfterAll with Injecting {
+trait IntegrationBaseSpec extends AnyWordSpecLike
+  with Matchers
+  with ScalaFutures
+  with WireMockHelper
+  with GuiceOneServerPerSuite
+  with BeforeAndAfterEach
+  with BeforeAndAfterAll
+  with Injecting {
 
   val mockHost: String = WireMockHelper.host
   val mockPort: String = WireMockHelper.wireMockPort.toString

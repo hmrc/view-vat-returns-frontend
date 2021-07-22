@@ -24,6 +24,7 @@ import models.Obligation.Status
 import models.errors.{ObligationError, ServerSideError}
 import models.payments.{Payment, Payments}
 import models._
+import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -296,10 +297,10 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
 
       lazy val result: ServiceResponse[VatReturnObligations] = {
         callObligationsConnector(Right(exampleObligations))
-        service.getFulfilledObligations(vrn, LocalDate.parse("2018-01-01"))
+        await(service.getFulfilledObligations(vrn, LocalDate.parse("2018-01-01")))
       }
 
-      await(result) shouldBe Right(exampleObligations)
+      result shouldBe Right(exampleObligations)
     }
   }
 }

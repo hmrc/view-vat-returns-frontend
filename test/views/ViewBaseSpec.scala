@@ -16,22 +16,23 @@
 
 package views
 
+import common.SessionKeys
 import mocks.MockAppConfig
 import models.User
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
+import org.scalatest.Assertion
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.{Lang, Messages, MessagesApi, MessagesImpl}
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.{FakeRequest, Injecting}
-import uk.gov.hmrc.play.test.UnitSpec
-import common.SessionKeys
-import org.scalatest.Assertion
 
 import scala.collection.JavaConverters._
 
 
-class ViewBaseSpec extends UnitSpec with GuiceOneAppPerSuite with Injecting {
+class ViewBaseSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite with Injecting {
 
   implicit lazy val mockConfig: MockAppConfig = new MockAppConfig(app.configuration)
   implicit lazy val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()

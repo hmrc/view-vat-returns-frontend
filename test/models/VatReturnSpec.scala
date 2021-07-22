@@ -16,10 +16,11 @@
 
 package models
 
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpecLike
 import play.api.libs.json.Json
-import uk.gov.hmrc.play.test.UnitSpec
 
-class VatReturnSpec extends UnitSpec {
+class VatReturnSpec extends AnyWordSpecLike with Matchers {
 
   "A VAT Return" should {
 

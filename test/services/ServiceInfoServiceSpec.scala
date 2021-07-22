@@ -19,6 +19,7 @@ package services
 import connectors.ServiceInfoConnector
 import controllers.ControllerBaseSpec
 import play.api.mvc.Request
+import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import play.twirl.api.Html
 
 import scala.concurrent.{ExecutionContext, Future}

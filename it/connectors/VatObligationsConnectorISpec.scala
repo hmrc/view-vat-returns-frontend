@@ -24,6 +24,7 @@ import models.Obligation.Status
 import models.errors.{ApiSingleError, BadRequestError, MultipleErrors}
 import models.{VatReturnObligation, VatReturnObligations}
 import play.api.libs.json.Json
+import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import stubs.VatObligationsStub
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -67,7 +68,8 @@ class VatObligationsConnectorISpec extends IntegrationBaseSpec {
       private val result = await(connector.getVatReturnObligations("123456789",
         Some(LocalDate.parse("2017-01-01")),
         Some(LocalDate.parse("2017-12-31")),
-        Status.All))
+        Status.All
+      ))
 
       result shouldBe expected
     }
@@ -95,7 +97,8 @@ class VatObligationsConnectorISpec extends IntegrationBaseSpec {
       private val result = await(connector.getVatReturnObligations("123456789",
         Some(LocalDate.parse("2017-01-01")),
         Some(LocalDate.parse("2017-12-31")),
-        Status.Outstanding))
+        Status.Outstanding
+      ))
 
       result shouldBe expected
     }
@@ -123,7 +126,8 @@ class VatObligationsConnectorISpec extends IntegrationBaseSpec {
       private val result = await(connector.getVatReturnObligations("123456789",
         Some(LocalDate.parse("2017-01-01")),
         Some(LocalDate.parse("2017-12-31")),
-        Status.Fulfilled))
+        Status.Fulfilled
+      ))
 
       result shouldBe expected
     }
@@ -143,7 +147,8 @@ class VatObligationsConnectorISpec extends IntegrationBaseSpec {
       private val result = await(connector.getVatReturnObligations("123456789",
         Some(LocalDate.parse("2017-01-01")),
         Some(LocalDate.parse("2017-12-31")),
-        Status.Outstanding))
+        Status.Outstanding
+      ))
 
       result shouldBe expected
     }
@@ -163,7 +168,8 @@ class VatObligationsConnectorISpec extends IntegrationBaseSpec {
       private val result = await(connector.getVatReturnObligations("123456789",
         Some(LocalDate.parse("2017-01-01")),
         Some(LocalDate.parse("2017-12-31")),
-        Status.Fulfilled))
+        Status.Fulfilled
+      ))
 
       result shouldBe expected
     }
@@ -183,7 +189,8 @@ class VatObligationsConnectorISpec extends IntegrationBaseSpec {
       private val result = await(connector.getVatReturnObligations("123456789",
         Some(LocalDate.parse("2017-01-01")),
         Some(LocalDate.parse("2017-12-31")),
-        Status.Fulfilled))
+        Status.Fulfilled
+      ))
 
       result shouldEqual expected
     }
@@ -211,7 +218,8 @@ class VatObligationsConnectorISpec extends IntegrationBaseSpec {
       private val result = await(connector.getVatReturnObligations("123456789",
         None,
         None,
-        Status.Outstanding))
+        Status.Outstanding
+      ))
 
       result shouldBe expected
     }
@@ -232,7 +240,8 @@ class VatObligationsConnectorISpec extends IntegrationBaseSpec {
       private val result = await(connector.getVatReturnObligations("123456789",
         Some(LocalDate.parse("2017-01-01")),
         Some(LocalDate.parse("2017-12-31")),
-        Status.Fulfilled))
+        Status.Fulfilled
+      ))
 
       result shouldEqual expected
     }
@@ -252,7 +261,8 @@ class VatObligationsConnectorISpec extends IntegrationBaseSpec {
       private val result = await(connector.getVatReturnObligations("123456789",
         Some(LocalDate.parse("2017-01-01")),
         Some(LocalDate.parse("2017-12-31")),
-        Status.Fulfilled))
+        Status.Fulfilled
+      ))
 
       result shouldEqual expected
     }
@@ -269,7 +279,8 @@ class VatObligationsConnectorISpec extends IntegrationBaseSpec {
       private val result = await(connector.getVatReturnObligations("123456789",
         Some(LocalDate.parse("2017-01-01")),
         Some(LocalDate.parse("2017-12-31")),
-        Status.Fulfilled))
+        Status.Fulfilled
+      ))
 
       result shouldBe expected
     }

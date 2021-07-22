@@ -20,18 +20,16 @@ import config.AppConfig
 import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
 import javax.inject.{Inject, Singleton}
 import models.payments.Payments
-import services.{DateService, MetricsService}
-import utils.LoggerUtil.logWarn
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.HttpClient
+import services.MetricsService
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
+import utils.LoggerUtil
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class FinancialDataConnector @Inject()(http: HttpClient,
                                        appConfig: AppConfig,
-                                       metrics: MetricsService,
-                                       dateService: DateService) {
+                                       metrics: MetricsService) extends LoggerUtil {
 
   private[connectors] def paymentsUrl(vrn: String): String = s"${appConfig.financialDataBaseUrl}/financial-transactions/vat/$vrn"
 
@@ -64,7 +62,7 @@ class FinancialDataConnector @Inject()(http: HttpClient,
         payments
       case httpError@Left(error) =>
         metrics.getPaymentsCallFailureCounter.inc()
-        logWarn("FinancialDataConnector received error: " + error.message)
+        logger.warn("FinancialDataConnector received error: " + error.message)
         httpError
     }
   }
