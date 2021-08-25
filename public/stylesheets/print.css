@@ -1,106 +1,87 @@
 @media screen {
-    .onlyprint, .heading-secondary.onlyprint {
-        display: none;
-    }
+  .onlyprint, .heading-secondary.onlyprint {
+    display: none;
+  }
 }
 
 @media print {
 
-    @page {
-        margin: 15mm 15mm 15mm 15mm;
-    }
-
-    header, footer, a, nav, #notice-banner, .govuk-phase-banner, .centered-content, .button, .govuk-breadcrumbs, #content > .text--right, button, #get-help-action, .link-back, p, details.govuk-details, title, .noprint, .heading-secondary.noprint {
-        display: none;
-    }
-
-    .grid-row.column-two-thirds {
-        width: 100%;
-    }
-
-    html {
-        background: white;
-    }
-
-    .foot {
-        position: absolute;
-        bottom: 10px;
-        right: 0;
-        color: #6f777b;
-        font-size: 14px;
-    }
-
-    #content {
-        padding-bottom: 0px;
-        margin: 5%;
-    }
-
-    .form-group {
-        margin-bottom: 15px;
-    }
-
-    .heading-xlarge {
-        font-size: 30px;
-        margin-bottom: 12px;
-        margin-top: 0px;
-    }
-
-    h2.govuk-heading-l {
-        font-size: 27px;
-        float: left;
-    }
-
-    h3.govuk-heading-m {
-        font-size: 18px !important;
-        margin-top: 1.25em;
-        float: left;
-        clear: left;
-    }
-
-    .heading-secondary {
-        font-size: 18px !important;
-    }
-
-    .bold-small {
-        font-size: 16px
-    }
-
-    .govuk-heading-s, hr {
-        float: left;
-        text-align: left;
-    }
-
-    li {
-        font-size: 16px !important;
-    }
-
-    dt, dd {
-        font-size: 14px !important;
-    }
-
-    dt {
-        float: left;
-        clear: left;
-        width: 25%;
-        text-align: left;
-        border-bottom: none;
-    }
-
-    dd {
-        float: left;
-        text-align: left;
-        width: 25%;
-        overflow: hidden;
-        border-bottom: none;
-    }
-
-    dd.govuk-summary-list__value {
-        width: 50%;
-    }
-
-  .govuk-summary-list:last-child div,
-  .card-full dl:last-child {
-    border-bottom: none;
+  header, footer, a, nav, #notice-banner, .govuk-phase-banner, .centered-content, .govuk-button, .govuk-breadcrumbs, #content > .text--right, button, #get-help-action, .link-back, p, details.govuk-details, title, .noprint, .heading-secondary.noprint {
+    display: none !important;
   }
 
+  .govuk-grid-column-two-thirds {
+    width: 100% !important;
+  }
+
+  dt, dd, .govuk-summary-list__row, hr {
+    border-bottom: none !important;
+  }
+
+  dd, dt, li, span {
+    font-size: 80% !important;
+  }
+
+  .onlyprint {
+    font-size: 90% !important;
+    margin-bottom: 20px !important;
+  }
+
+  .onlyprint > h2, h3 {
+    margin-top: 10px !important;
+    margin-bottom: 10px !important;
+    padding-top: 0px !important;
+  }
+
+  h2, h3 {
+    font-size: 110% !important;
+  }
+
+  h1 {
+    font-size: 200% !important;
+    margin-bottom: 20px !important;
+  }
+
+  section {
+    display: block !important;
+  }
+
+  .govuk-form-group {
+    margin-bottom: 5px !important;
+  }
+
+  .govuk-summary-list {
+    display: table !important;
+    width: 100% !important;
+    table-layout: fixed !important;
+  }
+
+  .govuk-summary-list__row {
+    display: table-row !important;
+  }
+
+  .govuk-\!-padding-bottom-3 {
+    padding-bottom: 0px !important;
+  }
+
+  .govuk-summary-list__key, .govuk-summary-list__value, .govuk-summary-list__actions {
+    display: table-cell !important;
+    padding-top: 10px !important;
+    padding-right: 20px !important;
+    padding-bottom: 10px !important;
+  }
+
+  .govuk-summary-list__key {
+    width: 10% !important;
+    display: table-cell !important;
+  }
+
+  .govuk-summary-list__value {
+    width: 70% !important;
+    display: table-cell !important;
+  }
+
+  .govuk-summary-list__key {
+    display: table-cell !important;
+  }
 }
