@@ -51,6 +51,10 @@
     <script>window.HMRCFrontend.initAll();</script>
 }
 
+@titleServiceUrl = @{
+user.fold[Option[String]](None)(u => if(u.isAgent) Some(appConfig.agentClientHubUrl) else Some(appConfig.btaHomeUrl))
+}
+
 @beforeContentHtml = {
   @serviceInfoContent
   @hmrcLanguageSelect(LanguageSelect(
@@ -82,6 +86,7 @@
 
   @hmrcStandardHeader(
     serviceName = Some(titleServiceName),
+    serviceUrl = titleServiceUrl,
     signOutUrl = if(showSignOut) Some(routes.SignOutController.signOut(feedbackOnSignOut).url) else None,
     userResearchBanner = if(appConfig.features.userResearchBanner()) Some(UserResearchBanner(
         url = "https://signup.take-part-in-research.service.gov.uk/?utm_campaign=VATviewchange&utm_source=Other&utm_medium=other&t=HMRC&id=34"
