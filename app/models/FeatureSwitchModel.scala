@@ -17,5 +17,4 @@
 package models
 
 case class FeatureSwitchModel(userResearchBannerEnabled: Boolean,
-                              staticDateEnabled: Boolean,
-                              niProtocolEnabled: Boolean)
+                              staticDateEnabled: Boolean)
