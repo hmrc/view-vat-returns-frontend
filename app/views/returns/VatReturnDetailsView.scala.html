@@ -56,10 +56,6 @@
   }
 }
 
-@niProtocolSuffix = @{
-  if(appConfig.features.niProtocolEnabled()) ".niProtocol" else ""
-}
-
 @navContent = @{
   if(user.isAgent) {
     govukBackLink(BackLink(
@@ -124,22 +120,22 @@
       <dl class="govuk-summary-list">
         <div class="govuk-summary-list__row" id="box-one">
           <dt class="govuk-summary-list__key govuk-hint">@messages("yourVatReturn.boxOne")</dt>
-          <dd class="govuk-summary-list__value govuk-hint">@messages(s"yourVatReturn.boxOneDescription$niProtocolSuffix")</dd>
+          <dd class="govuk-summary-list__value govuk-hint">@messages("yourVatReturn.boxOneDescription")</dd>
           <dd class="govuk-summary-list__actions govuk-hint">@displayMoney(vatReturnViewModel.vatReturnDetails.vatReturn.vatDueSales)</dd>
         </div>
         <div class="govuk-summary-list__row" id="box-two">
           <dt class="govuk-summary-list__key govuk-hint">@messages("yourVatReturn.boxTwo")</dt>
-          <dd class="govuk-summary-list__value govuk-hint">@messages(s"yourVatReturn.boxTwoDescription$niProtocolSuffix")</dd>
+          <dd class="govuk-summary-list__value govuk-hint">@messages("yourVatReturn.boxTwoDescription")</dd>
           <dd class="govuk-summary-list__actions govuk-hint">@displayMoney(vatReturnViewModel.vatReturnDetails.vatReturn.vatDueAcquisitions)</dd>
         </div>
         <div class="govuk-summary-list__row" id="box-three">
           <dt class="govuk-summary-list__key govuk-hint">@messages("yourVatReturn.boxThree")</dt>
-          <dd class="govuk-summary-list__value govuk-hint">@messages(s"yourVatReturn.boxThreeDescription$niProtocolSuffix")</dd>
+          <dd class="govuk-summary-list__value govuk-hint">@messages("yourVatReturn.boxThreeDescription")</dd>
           <dd class="govuk-summary-list__actions govuk-hint">@displayMoney(vatReturnViewModel.vatReturnDetails.vatReturn.totalVatDue)</dd>
         </div>
         <div class="govuk-summary-list__row" id="box-four">
           <dt class="govuk-summary-list__key govuk-hint">@messages("yourVatReturn.boxFour")</dt>
-          <dd class="govuk-summary-list__value govuk-hint">@messages(s"yourVatReturn.boxFourDescription$niProtocolSuffix")</dd>
+          <dd class="govuk-summary-list__value govuk-hint">@messages("yourVatReturn.boxFourDescription")</dd>
           <dd class="govuk-summary-list__actions govuk-hint" style="white-space:nowrap">
             <span aria-hidden="true">&minus;</span>
             @displayMoney(vatReturnViewModel.vatReturnDetails.vatReturn.vatReclaimedCurrentPeriod.abs)
@@ -147,7 +143,7 @@
         </div>
         <div class="govuk-summary-list__row" id="box-five">
           <dt class="govuk-summary-list__key">@messages("yourVatReturn.boxFive")</dt>
-          <dd class="govuk-summary-list__value"><strong>@messages(s"yourVatReturn.boxFiveDescription$niProtocolSuffix")</strong></dd>
+          <dd class="govuk-summary-list__value"><strong>@messages("yourVatReturn.boxFiveDescription")</strong></dd>
           <dd class="govuk-summary-list__actions"><strong class="bold-small">
               <span class="govuk-visually-hidden">
                 @messages(
@@ -179,17 +175,17 @@
         </div>
         <div class="govuk-summary-list__row" id="box-seven">
           <dt class="govuk-summary-list__key govuk-hint">@messages("yourVatReturn.boxSeven")</dt>
-          <dd class="govuk-summary-list__value govuk-hint">@messages(s"yourVatReturn.boxSevenDescription$niProtocolSuffix")</dd>
+          <dd class="govuk-summary-list__value govuk-hint">@messages("yourVatReturn.boxSevenDescription")</dd>
           <dd class="govuk-summary-list__actions govuk-hint">@displayMoney(vatReturnViewModel.vatReturnDetails.vatReturn.totalValuePurchasesExVAT)</dd>
         </div>
         <div class="govuk-summary-list__row" id="box-eight">
           <dt class="govuk-summary-list__key govuk-hint">@messages("yourVatReturn.boxEight")</dt>
-          <dd class="govuk-summary-list__value govuk-hint">@messages(s"yourVatReturn.boxEightDescription$niProtocolSuffix")</dd>
+          <dd class="govuk-summary-list__value govuk-hint">@messages("yourVatReturn.boxEightDescription")</dd>
           <dd class="govuk-summary-list__actions govuk-hint">@displayMoney(vatReturnViewModel.vatReturnDetails.vatReturn.totalValueGoodsSuppliedExVAT)</dd>
         </div>
         <div class="govuk-summary-list__row" id="box-nine">
           <dt class="govuk-summary-list__key govuk-hint">@messages("yourVatReturn.boxNine")</dt>
-          <dd class="govuk-summary-list__value govuk-hint">@messages(s"yourVatReturn.boxNineDescription$niProtocolSuffix")</dd>
+          <dd class="govuk-summary-list__value govuk-hint">@messages("yourVatReturn.boxNineDescription")</dd>
           <dd class="govuk-summary-list__actions govuk-hint">@displayMoney(vatReturnViewModel.vatReturnDetails.vatReturn.totalAcquisitionsExVAT)</dd>
         </div>
       </dl>

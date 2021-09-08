@@ -32,8 +32,7 @@ class FeatureSwitchController @Inject()(mcc: MessagesControllerComponents,
     Ok(featureSwitchView(FeatureSwitchForm.form.fill(
       FeatureSwitchModel(
         userResearchBannerEnabled = appConfig.features.userResearchBanner(),
-        staticDateEnabled = appConfig.features.staticDateEnabled(),
-        niProtocolEnabled = appConfig.features.niProtocolEnabled()
+        staticDateEnabled = appConfig.features.staticDateEnabled()
       )
     )))
   }
@@ -48,7 +47,6 @@ class FeatureSwitchController @Inject()(mcc: MessagesControllerComponents,
   def handleSuccess(model: FeatureSwitchModel): Result = {
     appConfig.features.userResearchBanner(model.userResearchBannerEnabled)
     appConfig.features.staticDateEnabled(model.staticDateEnabled)
-    appConfig.features.niProtocolEnabled(model.niProtocolEnabled)
     Redirect(routes.FeatureSwitchController.featureSwitch)
   }
 }
