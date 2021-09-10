@@ -57,8 +57,7 @@ val compile = Seq(
   "uk.gov.hmrc"       %% "play-partials"              % "8.2.0-play-28",
   "uk.gov.hmrc"       %% "play-language"              % "5.1.0-play-28",
   "com.typesafe.play" %% "play-json-joda"             % "2.7.4",
-  "uk.gov.hmrc"       %% "play-frontend-govuk"        % "0.80.0-play-28",
-  "uk.gov.hmrc"       %% "play-frontend-hmrc"         % "0.85.0-play-28"
+  "uk.gov.hmrc"       %% "play-frontend-hmrc"         % "1.4.0-play-28"
 )
 
 def test(scope: String = "test, it"): Seq[ModuleID] = Seq(
@@ -82,7 +81,6 @@ def oneForkedJvmPerTest(tests: Seq[TestDefinition]): Seq[Group] = tests map {
 
 TwirlKeys.templateImports ++= Seq(
   "uk.gov.hmrc.govukfrontend.views.html.components._",
-  "uk.gov.hmrc.govukfrontend.views.html.helpers._",
   "uk.gov.hmrc.hmrcfrontend.views.html.components._",
   "uk.gov.hmrc.hmrcfrontend.views.html.helpers._"
 )
