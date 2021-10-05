@@ -16,11 +16,13 @@
 
 package views
 
-import java.time.LocalDate
+import models.User
 
+import java.time.LocalDate
 import models.viewModels.ReturnDeadlineViewModel
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import play.twirl.api.Html
 import views.html.returns.NoUpcomingReturnDeadlinesView
 
 class NoUpcomingReturnDeadlinesViewSpec extends ViewBaseSpec {
@@ -38,45 +40,80 @@ class NoUpcomingReturnDeadlinesViewSpec extends ViewBaseSpec {
 
     val noReturnsNextDeadline = "#no-returns-next-deadline"
     val noReturnsDue = "#no-returns"
+    val caption = "#content > span"
+    val backLink = "body > div.govuk-width-container > a"
   }
 
-  "Rendering the Return deadlines page with no fulfilled obligations" should {
+  "The Return deadlines page for a principal user" should {
 
-    val noFulfilledObligation = None
-    lazy val view = injectedView(noFulfilledObligation)
-    lazy implicit val document: Document = Jsoup.parse(view.body)
+    "Render the Return deadlines page with no fulfilled obligations" should {
 
-    "render the breadcrumbs which" should {
+      val noFulfilledObligation = None
+      lazy val view = injectedView(noFulfilledObligation, Html(""), None)
+      lazy implicit val document: Document = Jsoup.parse(view.body)
 
-      "have the 'Business tax account' title" in {
-        elementText(Selectors.btaBreadcrumb) shouldBe "Business tax account"
+      "render the breadcrumbs which" should {
+
+        "have the 'Business tax account' title" in {
+          elementText(Selectors.btaBreadcrumb) shouldBe "Business tax account"
+        }
+
+        "and links to the BTA service" in {
+          element(Selectors.btaBreadCrumbLink).attr("href") shouldBe "bta-url"
+        }
+
+        "have the 'VAT' title" in {
+          elementText(Selectors.vatDetailsBreadCrumb) shouldBe "Your VAT account"
+        }
+
+        "and links to the VAT Summary service" in {
+          element(Selectors.vatDetailsBreadcrumbLink).attr("href") shouldBe "vat-details-url"
+        }
+
+        "have the 'Return deadlines' title" in {
+          elementText(Selectors.returnDeadlinesBreadCrumb) shouldBe "Return deadlines"
+        }
       }
 
-      "and links to the BTA service" in {
-        element(Selectors.btaBreadCrumbLink).attr("href") shouldBe "bta-url"
+      "have the correct text for no deadlines with guidance" in {
+        elementText(Selectors.noReturnsDue) shouldBe
+          "You do not have any returns due right now. Your next deadline will show here on the first day of your next" +
+            " accounting period."
       }
 
-      "have the 'VAT' title" in {
-        elementText(Selectors.vatDetailsBreadCrumb) shouldBe "Your VAT account"
-      }
-
-      "and links to the VAT Summary service" in {
-        element(Selectors.vatDetailsBreadcrumbLink).attr("href") shouldBe "vat-details-url"
-      }
-
-      "have the 'Return deadlines' title" in {
-        elementText(Selectors.returnDeadlinesBreadCrumb) shouldBe "Return deadlines"
+      "do not have business entity name"in {
+        elementExtinct(Selectors.caption)
       }
     }
 
-    "have the correct text for no deadlines with guidance" in {
-      elementText(Selectors.noReturnsDue) shouldBe
-        "You do not have any returns due right now. Your next deadline will show here on the first day of your next" +
-          " accounting period."
+    "Rendering the Return deadlines page with a fulfilled obligation" should {
+
+      val fulfilledObligation = Some(ReturnDeadlineViewModel(
+        periodTo = LocalDate.parse("2018-04-01"),
+        periodFrom = LocalDate.parse("2018-01-01"),
+        due = LocalDate.parse("2018-05-01"),
+        periodKey = "18CC"
+      ))
+      lazy val view = injectedView(fulfilledObligation, Html(""), None)
+      lazy implicit val document: Document = Jsoup.parse(view.body)
+
+      "have the correct text for no deadlines" in {
+        elementText(Selectors.noReturnsNextDeadline) shouldBe
+          "We received your return for the period 1 January to 1 April 2018."
+      }
+
+      "have the correct received return guidance" in {
+        elementText(Selectors.noReturnsDue) shouldBe
+          "You do not have any returns due right now. Your next deadline will show here on the first day of your next accounting period."
+      }
+
+      "do not have business entity name"in {
+        elementExtinct(Selectors.caption)
+      }
     }
   }
 
-  "Rendering the Return deadlines page with a fulfilled obligation" should {
+  "The Return deadlines page for agent user" should {
 
     val fulfilledObligation = Some(ReturnDeadlineViewModel(
       periodTo = LocalDate.parse("2018-04-01"),
@@ -84,8 +121,22 @@ class NoUpcomingReturnDeadlinesViewSpec extends ViewBaseSpec {
       due = LocalDate.parse("2018-05-01"),
       periodKey = "18CC"
     ))
-    lazy val view = injectedView(fulfilledObligation)
+
+    implicit val user: User = agentUser
+    lazy val view = injectedView(fulfilledObligation, Html(""), Some("Ancient Antiques"))
     lazy implicit val document: Document = Jsoup.parse(view.body)
+
+    "have the correct title" in {
+      document.title shouldBe "Return deadlines - Your client’s VAT details - GOV.UK"
+    }
+
+    "have the correct page heading" in {
+      elementText(Selectors.pageHeading) shouldBe "Return deadlines"
+    }
+
+    "have the client name caption" in {
+      elementText(Selectors.caption) shouldBe "Ancient Antiques"
+    }
 
     "have the correct text for no deadlines" in {
       elementText(Selectors.noReturnsNextDeadline) shouldBe
@@ -96,5 +147,17 @@ class NoUpcomingReturnDeadlinesViewSpec extends ViewBaseSpec {
       elementText(Selectors.noReturnsDue) shouldBe
         "You do not have any returns due right now. Your next deadline will show here on the first day of your next accounting period."
     }
+
+    "renders a back link" which {
+
+      "has the correct text" in {
+        elementText(Selectors.backLink) shouldBe "Back"
+      }
+
+      "has the correct href" in {
+        element(Selectors.backLink).attr("href") shouldBe "agent-client-agent-action"
+      }
+    }
   }
-}
+
+  }

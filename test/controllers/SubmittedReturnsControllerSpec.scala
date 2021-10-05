@@ -206,7 +206,6 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
           callObligationsForYear(exampleObligations(2018))
           callObligationsForYear(exampleObligations(2017))
           callSubscriptionService(Some(customerInformationMax))
-          callSubscriptionService(Some(customerInformationMax))
           controller.submittedReturns(request(fakeRequestWithClientsVRN))
         }
 

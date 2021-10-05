@@ -71,10 +71,8 @@ trait MockAuth extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
 
   val mockAuthorisedAgentWithClient: AuthoriseAgentWithClient = new AuthoriseAgentWithClient(
     enrolmentsAuthService,
-    mockSubscriptionService,
     mcc,
-    unauthorisedView,
-    errorHandler
+    unauthorisedView
   )
 
   val mockAuthorisedController: AuthorisedController = new AuthorisedController(

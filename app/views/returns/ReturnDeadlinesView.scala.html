@@ -14,7 +14,6 @@
  * limitations under the License.
  *@
 
-@import play.twirl.api.HtmlFormat
 @import models.viewModels.ReturnDeadlineViewModel
 @import views.html.templates.formatters.breadcrumbs._
 @import views.html.templates.formatters.dates._
@@ -23,10 +22,10 @@
       navigationBreadcrumb: NavigationBreadcrumb,
       displayDate: DisplayDate,
       displayDateRange: DisplayDateRange,
-      govukDetails: GovukDetails)
+      govukDetails: GovukDetails,
+      govukBackLink: GovukBackLink)
 
-@(deadlines: Seq[ReturnDeadlineViewModel],
-  serviceInfoContent: Html = HtmlFormat.empty)(
+@(deadlines: Seq[ReturnDeadlineViewModel], serviceInfoContent: Html, clientName: Option[String])(
   implicit request: Request[_],messages: Messages, appConfig: config.AppConfig, user: User)
 
 @govukDetailsHtml = {
@@ -38,11 +37,18 @@
 }
 
 @navContent = @{
-  navigationBreadcrumb(Map(
-    appConfig.btaHomeUrl -> messages("breadcrumbs.bta"),
-    appConfig.vatDetailsUrl -> messages("breadcrumbs.vat")),
-    currentPage = messages("returnDeadlines.title")
-  )
+  if(user.isAgent) {
+    govukBackLink(BackLink(
+      href = appConfig.agentClientHubUrl,
+      content = Text(messages("base.back"))
+    ))
+  } else {
+    navigationBreadcrumb(Map(
+      appConfig.btaHomeUrl -> messages("breadcrumbs.bta"),
+      appConfig.vatDetailsUrl -> messages("breadcrumbs.vat")),
+      currentPage = messages("returnDeadlines.title")
+    )
+  }
 }
 
 @mainTemplate(
@@ -51,6 +57,9 @@
   serviceInfoContent = serviceInfoContent,
   user = Some(user)
 ) {
+    @clientName.map { name =>
+      <span class = "govuk-caption-xl">@name</span>
+    }
     <h1 class="govuk-heading-xl">@messages("returnDeadlines.title")</h1>
     <p class="govuk-body govuk-!-margin-bottom-7" aria-hidden="true">@messages("returnDeadlines.submitBy")</p>
 

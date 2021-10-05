@@ -44,13 +44,12 @@ class AuthorisedController @Inject()(enrolmentsAuthService: EnrolmentsAuthServic
                                      ec: ExecutionContext) extends FrontendController(mcc)  with LoggerUtil {
 
   def authorisedAction(block: MessagesRequest[AnyContent] => User => Future[Result],
-                       allowAgentAccess: Boolean = true,
-                       ignoreMandatedStatus: Boolean = false): Action[AnyContent] = Action.async { implicit request =>
+                       allowAgentAccess: Boolean = true): Action[AnyContent] = Action.async { implicit request =>
 
     enrolmentsAuthService.authorised.retrieve(Retrievals.allEnrolments and Retrievals.affinityGroup) {
       case _ ~ Some(AffinityGroup.Agent) =>
         if (allowAgentAccess) {
-          agentWithClientPredicate.authoriseAsAgent(block, ignoreMandatedStatus)
+          agentWithClientPredicate.authoriseAsAgent(block)
         } else {
           logger.debug("[AuthorisedController][authorisedAction] User is agent and agent access is forbidden. Redirecting to Agent Action page.")
           Future.successful(Redirect(appConfig.agentClientHubUrl))

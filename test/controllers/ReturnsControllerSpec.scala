@@ -183,7 +183,6 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
             callVatReturn(Right(exampleVatReturn))
             setupCommonSuccessMocks()
             callConstructReturnDetailsModel(exampleVatReturnDetails)
-            callSubscriptionService(Some(customerInformationNonMTDfB))
             controller.vatReturn(2018, "#001")(request(fakeRequestWithClientsVRN))
           }
 
@@ -401,7 +400,6 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
             callVatReturn(Right(exampleVatReturn))
             setupCommonSuccessMocks()
             callConstructReturnDetailsModel(exampleVatReturnDetails)
-            callSubscriptionService(Some(customerInformationNonMTDfB))
             controller.vatReturnViaPayments("#001")(request(fakeRequestWithClientsVRN))
           }
 

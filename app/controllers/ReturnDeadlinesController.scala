@@ -17,7 +17,6 @@
 package controllers
 
 import java.time.LocalDate
-
 import audit.AuditingService
 import audit.models.ViewOpenVatObligationsAuditModel
 import common.MandationStatuses._
@@ -96,11 +95,14 @@ class ReturnDeadlinesController @Inject()(mcc: MessagesControllerComponents,
   private[controllers] def noUpcomingObligationsAction(serviceInfoContent: Html, currentDate: LocalDate)
                                                       (implicit request: MessagesRequest[AnyContent],
                                                        user: User): Future[Result] = {
+
+    val clientName = request.session.get(SessionKeys.clientName)
+
     returnsService.getFulfilledObligations(user.vrn, currentDate).map {
-      case Right(VatReturnObligations(Seq())) => Ok(noUpcomingReturnDeadlinesView(None, serviceInfoContent))
+      case Right(VatReturnObligations(Seq())) => Ok(noUpcomingReturnDeadlinesView(None, serviceInfoContent, clientName))
       case Right(VatReturnObligations(obligations)) =>
         val lastFulfilledObligation: VatReturnObligation = returnsService.getLastObligation(obligations)
-        Ok(noUpcomingReturnDeadlinesView(Some(toReturnDeadlineViewModel(lastFulfilledObligation, currentDate)), serviceInfoContent))
+        Ok(noUpcomingReturnDeadlinesView(Some(toReturnDeadlineViewModel(lastFulfilledObligation, currentDate)), serviceInfoContent, clientName))
       case Left(error) =>
         logger.warn("[ReturnObligationsController][fulfilledObligationsAction] error: " + error.toString)
         errorHandler.showInternalServerError
@@ -113,12 +115,13 @@ class ReturnDeadlinesController @Inject()(mcc: MessagesControllerComponents,
                                                      request: MessagesRequest[AnyContent]): Future[Result] = {
 
     val submitStatuses : List[String] = List(nonMTDfB, nonDigital, mtdfbExempt)
+    val clientName = request.session.get(SessionKeys.clientName)
 
     def view(mandationStatus: String) = mandationStatus match {
       case status if submitStatuses.contains(status) =>
         optOutReturnDeadlinesView(obligations, dateService.now(), serviceInfoContent)
       case _ =>
-        returnDeadlinesView(obligations, serviceInfoContent)
+        returnDeadlinesView(obligations, serviceInfoContent, clientName)
     }
 
     request.session.get(SessionKeys.mtdVatMandationStatus) match {

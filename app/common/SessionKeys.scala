@@ -22,4 +22,5 @@ object SessionKeys {
   val insolventWithoutAccessKey: String = "insolventWithoutAccess"
   val futureInsolvencyDate: String = "futureInsolvencyDate"
   val viewedDDInterrupt: String = "vatViewChangeHasViewedDDInterrupt"
+  val clientName: String = "mtdVatAgentClientName"
 }

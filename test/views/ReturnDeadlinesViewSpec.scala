@@ -16,11 +16,13 @@
 
 package views
 
-import java.time.LocalDate
+import models.User
 
+import java.time.LocalDate
 import models.viewModels.ReturnDeadlineViewModel
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import play.twirl.api.Html
 import views.html.returns.ReturnDeadlinesView
 
 class ReturnDeadlinesViewSpec extends ViewBaseSpec {
@@ -47,9 +49,169 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
     val returnDeadlinesBreadCrumb = "div.govuk-breadcrumbs li:nth-of-type(3)"
 
     val overdueLabel = ".task-overdue"
+    val caption = "#content > span"
+    val backLink = "body > div.govuk-width-container > a"
   }
 
-  "Rendering the Return deadlines page with a single deadline" should {
+  "The Return deadlines page for principal user" should {
+
+    "Render the Return deadlines page with a single deadline" should {
+
+      val singleDeadline = Seq(
+        ReturnDeadlineViewModel(
+          LocalDate.parse("2018-02-02"),
+          LocalDate.parse("2018-01-01"),
+          LocalDate.parse("2018-01-01"),
+          periodKey = "18CC"
+        )
+      )
+
+      lazy val view = injectedView(singleDeadline, Html(""), None)
+      lazy implicit val document: Document = Jsoup.parse(view.body)
+
+      "render the breadcrumbs which" should {
+
+        "have the 'Business tax account' title" in {
+          elementText(Selectors.btaBreadcrumb) shouldBe "Business tax account"
+        }
+
+        "and links to the BTA service" in {
+          element(Selectors.btaBreadCrumbLink).attr("href") shouldBe "bta-url"
+        }
+
+        "have the 'VAT' title" in {
+          elementText(Selectors.vatDetailsBreadCrumb) shouldBe "Your VAT account"
+        }
+
+        "and links to the VAT Summary service" in {
+          element(Selectors.vatDetailsBreadcrumbLink).attr("href") shouldBe "vat-details-url"
+        }
+
+        "have the 'Return deadlines' title" in {
+          elementText(Selectors.returnDeadlinesBreadCrumb) shouldBe "Return deadlines"
+        }
+      }
+
+      "have the correct document title" in {
+        document.title shouldBe "Return deadlines - Business tax account - GOV.UK"
+      }
+
+      "have the correct page heading" in {
+        elementText(Selectors.pageHeading) shouldBe "Return deadlines"
+      }
+
+      "have the correct message regarding submitting returns through software" in {
+        elementText(Selectors.submitThroughSoftware) shouldBe "Use your accounting software to submit a return by:"
+      }
+
+      "have the correct obligation due date" in {
+        elementText(Selectors.firstDeadlineDueDate) should include("2 February 2018")
+      }
+
+      "have the correct obligation start and end date text" in {
+        elementText(Selectors.firstDeadlinePeriod) shouldBe "for the period 1 January to 1 January 2018"
+      }
+
+      "have the correct hint box title" in {
+        elementText(Selectors.howToDoThis) shouldBe "How to submit a return"
+      }
+
+      "have the correct message regarding downloading software in the hint box" in {
+        elementText(Selectors.downloadSoftware) shouldBe "Choose accounting software that supports this service (opens in a new tab) if you have not already."
+      }
+
+      "have a link to govuk commercial software page" in {
+        document.select(s"${Selectors.downloadSoftware} > a").first().attr("href") shouldBe "https://www.gov.uk/guidance/software-for-sending-income-tax-updates"
+      }
+
+      "have the correct message regarding VAT records in the hint box" in {
+        elementText(Selectors.vatRecords) shouldBe "Keep your VAT records in your accounting software."
+      }
+
+      "have the correct message regarding sending HMRC VAT returns in the hint box" in {
+        elementText(Selectors.sendReturns) shouldBe "Submit any VAT Returns before your deadlines."
+      }
+
+      "do not have business entity name"in {
+        elementExtinct(Selectors.caption)
+      }
+    }
+
+    "Render the Return deadlines page with multiple deadlines" should {
+
+      val multipleDeadlines = Seq(
+        ReturnDeadlineViewModel(
+          LocalDate.parse("2018-02-02"),
+          LocalDate.parse("2018-01-01"),
+          LocalDate.parse("2018-01-01"),
+          periodKey = "18CC"
+        ),
+        ReturnDeadlineViewModel(
+          LocalDate.parse("2018-10-12"),
+          LocalDate.parse("2018-09-07"),
+          LocalDate.parse("2018-09-07"),
+          overdue = true,
+          periodKey = "18CC"
+        )
+      )
+
+      lazy val view = injectedView(multipleDeadlines, Html(""), None)
+      lazy implicit val document: Document = Jsoup.parse(view.body)
+
+      "have the correct obligation due date for the first deadline" in {
+        elementText(Selectors.firstDeadlineDueDate) should include("2 February 2018")
+      }
+
+      "have the correct obligation start and end date text for the first deadline" in {
+        elementText(Selectors.firstDeadlinePeriod) shouldBe "for the period 1 January to 1 January 2018"
+      }
+
+      "have the correct obligation due date for the second deadline" in {
+        elementText(Selectors.secondDeadlineDueDate) should include("12 October 2018")
+      }
+
+      "have the correct obligation start and end date text for the second deadline" in {
+        elementText(Selectors.secondDeadlinePeriod) shouldBe "for the period 7 September to 7 September 2018"
+      }
+
+      "have the overdue label" in {
+        elementText(Selectors.overdueLabel) shouldBe "overdue"
+      }
+
+      "do not have business entity name"in {
+        elementExtinct(Selectors.caption)
+      }
+    }
+
+    "Render the Return deadlines page with a final return" should {
+
+      val finalReturnDeadline = Seq(
+        ReturnDeadlineViewModel(
+          LocalDate.parse("2018-02-02"),
+          LocalDate.parse("2018-01-01"),
+          LocalDate.parse("2018-01-01"),
+          periodKey = mockConfig.finalReturnPeriodKey
+        )
+      )
+
+      lazy val view = injectedView(finalReturnDeadline, Html(""), None)
+      lazy implicit val document: Document = Jsoup.parse(view.body)
+
+      "have the correct obligation due date for the deadline" in {
+        elementText(Selectors.firstDeadlineDueDate) should include("2 February 2018")
+      }
+
+      "have the wording for the final return period" in {
+        elementText(Selectors.firstDeadlinePeriod) shouldBe "for your final return"
+      }
+
+      "do not have business entity name"in {
+        elementExtinct(Selectors.caption)
+      }
+    }
+  }
+
+  "The Return deadlines page for agent user" should {
 
     val singleDeadline = Seq(
       ReturnDeadlineViewModel(
@@ -59,39 +221,20 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
         periodKey = "18CC"
       )
     )
-
-    lazy val view = injectedView(singleDeadline)
+    implicit val user: User = agentUser
+    lazy val view = injectedView(singleDeadline, Html(""), Some("Ancient Antiques"))
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
-    "render the breadcrumbs which" should {
-
-      "have the 'Business tax account' title" in {
-        elementText(Selectors.btaBreadcrumb) shouldBe "Business tax account"
-      }
-
-      "and links to the BTA service" in {
-        element(Selectors.btaBreadCrumbLink).attr("href") shouldBe "bta-url"
-      }
-
-      "have the 'VAT' title" in {
-        elementText(Selectors.vatDetailsBreadCrumb) shouldBe "Your VAT account"
-      }
-
-      "and links to the VAT Summary service" in {
-        element(Selectors.vatDetailsBreadcrumbLink).attr("href") shouldBe "vat-details-url"
-      }
-
-      "have the 'Return deadlines' title" in {
-        elementText(Selectors.returnDeadlinesBreadCrumb) shouldBe "Return deadlines"
-      }
-    }
-
-    "have the correct document title" in {
-      document.title shouldBe "Return deadlines - Business tax account - GOV.UK"
+    "have the correct title" in {
+      document.title shouldBe "Return deadlines - Your client’s VAT details - GOV.UK"
     }
 
     "have the correct page heading" in {
       elementText(Selectors.pageHeading) shouldBe "Return deadlines"
+    }
+
+    "have the client name caption" in {
+      elementText(Selectors.caption) shouldBe "Ancient Antiques"
     }
 
     "have the correct message regarding submitting returns through software" in {
@@ -99,7 +242,7 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
     }
 
     "have the correct obligation due date" in {
-      elementText(Selectors.firstDeadlineDueDate) should include ("2 February 2018")
+      elementText(Selectors.firstDeadlineDueDate) should include("2 February 2018")
     }
 
     "have the correct obligation start and end date text" in {
@@ -125,70 +268,16 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
     "have the correct message regarding sending HMRC VAT returns in the hint box" in {
       elementText(Selectors.sendReturns) shouldBe "Submit any VAT Returns before your deadlines."
     }
-  }
 
-  "Rendering the Return deadlines page with multiple deadlines" should {
+    "renders a back link" which {
 
-    val multipleDeadlines = Seq(
-      ReturnDeadlineViewModel(
-        LocalDate.parse("2018-02-02"),
-        LocalDate.parse("2018-01-01"),
-        LocalDate.parse("2018-01-01"),
-        periodKey = "18CC"
-      ),
-      ReturnDeadlineViewModel(
-        LocalDate.parse("2018-10-12"),
-        LocalDate.parse("2018-09-07"),
-        LocalDate.parse("2018-09-07"),
-        overdue = true,
-        periodKey = "18CC"
-      )
-    )
+      "has the correct text" in {
+        elementText(Selectors.backLink) shouldBe "Back"
+      }
 
-    lazy val view = injectedView(multipleDeadlines)
-    lazy implicit val document: Document = Jsoup.parse(view.body)
-
-    "have the correct obligation due date for the first deadline" in {
-      elementText(Selectors.firstDeadlineDueDate) should include("2 February 2018")
-    }
-
-    "have the correct obligation start and end date text for the first deadline" in {
-      elementText(Selectors.firstDeadlinePeriod) shouldBe "for the period 1 January to 1 January 2018"
-    }
-
-    "have the correct obligation due date for the second deadline" in {
-      elementText(Selectors.secondDeadlineDueDate) should include("12 October 2018")
-    }
-
-    "have the correct obligation start and end date text for the second deadline" in {
-      elementText(Selectors.secondDeadlinePeriod) shouldBe "for the period 7 September to 7 September 2018"
-    }
-
-    "have the overdue label" in {
-      elementText(Selectors.overdueLabel) shouldBe "overdue"
-    }
-  }
-
-  "Rendering the Return deadlines page with a final return" should {
-
-    val finalReturnDeadline = Seq(
-      ReturnDeadlineViewModel(
-        LocalDate.parse("2018-02-02"),
-        LocalDate.parse("2018-01-01"),
-        LocalDate.parse("2018-01-01"),
-        periodKey = mockConfig.finalReturnPeriodKey
-      )
-    )
-
-    lazy val view = injectedView(finalReturnDeadline)
-    lazy implicit val document: Document = Jsoup.parse(view.body)
-
-    "have the correct obligation due date for the deadline" in {
-      elementText(Selectors.firstDeadlineDueDate) should include("2 February 2018")
-    }
-
-    "have the wording for the final return period" in {
-      elementText(Selectors.firstDeadlinePeriod) shouldBe "for your final return"
+      "has the correct href" in {
+        element(Selectors.backLink).attr("href") shouldBe "agent-client-agent-action"
+      }
     }
   }
 }
