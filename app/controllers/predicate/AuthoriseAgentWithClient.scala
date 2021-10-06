@@ -17,14 +17,13 @@
 package controllers.predicate
 
 import common._
-import config.{AppConfig, ServiceErrorHandler}
+import config.AppConfig
 import javax.inject.{Inject, Singleton}
 import models.User
 import play.api.mvc._
-import services.{EnrolmentsAuthService, SubscriptionService}
+import services.EnrolmentsAuthService
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.allEnrolments
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import utils.LoggerUtil
 import views.html.errors.UnauthorisedView
@@ -33,14 +32,12 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class AuthoriseAgentWithClient @Inject()(enrolmentsAuthService: EnrolmentsAuthService,
-                                         subscriptionService: SubscriptionService,
                                          mcc: MessagesControllerComponents,
-                                         unauthorisedView: UnauthorisedView,
-                                         errorHandler: ServiceErrorHandler)
+                                         unauthorisedView: UnauthorisedView)
                                         (implicit appConfig: AppConfig,
                                          ec: ExecutionContext) extends FrontendController(mcc) with LoggerUtil {
 
-  def authoriseAsAgent(block: MessagesRequest[AnyContent] => User => Future[Result], ignoreMandatedStatus: Boolean)
+  def authoriseAsAgent(block: MessagesRequest[AnyContent] => User => Future[Result])
                       (implicit request: MessagesRequest[AnyContent]): Future[Result] = {
 
     val delegatedAuthRule: String => Enrolment = vrn =>
@@ -57,7 +54,9 @@ class AuthoriseAgentWithClient @Inject()(enrolmentsAuthService: EnrolmentsAuthSe
               enrolments.enrolments.collectFirst {
                 case Enrolment(EnrolmentKeys.agentEnrolmentKey, Seq(EnrolmentIdentifier(_, arn)), EnrolmentKeys.activated, _) => arn
               } match {
-                case Some(arn) => checkMandationStatus(block, vrn, arn, ignoreMandatedStatus)
+                case Some(arn) =>
+                  val user = User(vrn, arn = Some(arn))
+                  block(request)(user)
                 case None =>
                   logger.debug("[AuthPredicate][authoriseAsAgent] - Agent with no HMRC-AS-AGENT enrolment. Rendering unauthorised view.")
                   Future.successful(Forbidden(unauthorisedView()))
@@ -77,24 +76,4 @@ class AuthoriseAgentWithClient @Inject()(enrolmentsAuthService: EnrolmentsAuthSe
     }
   }
 
-  private def checkMandationStatus(block: MessagesRequest[AnyContent] => User => Future[Result],
-                                   vrn: String,
-                                   arn: String,
-                                   ignoreMandatedStatus: Boolean)
-                                  (implicit request: MessagesRequest[AnyContent], hc: HeaderCarrier): Future[Result] = {
-
-    val permittedStatuses: List[String] =
-      List(MandationStatuses.nonMTDfB, MandationStatuses.nonDigital, MandationStatuses.mtdfbExempt)
-
-    subscriptionService.getUserDetails(vrn) flatMap {
-      case Some(details) if ignoreMandatedStatus || permittedStatuses.contains(details.mandationStatus) =>
-        val user = User(vrn, arn = Some(arn))
-        block(request)(user)
-      case Some(_) =>
-        logger.debug("[AuthorisedAgentWithClient][checkMandationStatus] - Agent acting for MTDfB client")
-        Future.successful(Redirect(appConfig.agentClientHubUrl))
-      case None =>
-        Future.successful(errorHandler.showInternalServerError)
-    }
-  }
 }

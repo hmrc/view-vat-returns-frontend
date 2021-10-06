@@ -16,7 +16,6 @@
 
 package controllers.predicates
 
-import common.TestModels._
 import controllers.ControllerBaseSpec
 import play.api.http.Status
 import play.api.mvc.{AnyContent, MessagesRequest, Request, Result}
@@ -33,10 +32,10 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
 
     lazy val authResponse: Enrolments = Enrolments(agentEnrolment)
 
-    def target(request: Request[AnyContent], ignoreMandatedStatus: Boolean = false): Future[Result] =
+    def target(request: Request[AnyContent]): Future[Result] =
       mockAuthorisedAgentWithClient.authoriseAsAgent({ _ =>
         _ => Future.successful(Ok("welcome"))
-      }, ignoreMandatedStatus)(new MessagesRequest[AnyContent](request, mcc.messagesApi))
+      })(new MessagesRequest[AnyContent](request, mcc.messagesApi))
 
   "AgentPredicate .authoriseAsAgent" when {
 
@@ -46,70 +45,39 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
 
         "agent has HMRC-AS-AGENT enrolment" when {
 
-          "client is Non MTDfB" should {
+          "return the result of the original code block" in {
 
-            "return the result of the original code block" in {
+            callAuthServiceEnrolmentsOnly(authResponse)
 
-              callAuthServiceEnrolmentsOnly(authResponse)
-              callSubscriptionService(Some(customerInformationNonMTDfB))
+            lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
 
-              lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
-
-              status(result) shouldBe Status.OK
-              contentAsString(result) shouldBe "welcome"
-            }
-          }
-
-          "client is Non Digital" should {
-
-            "return the result of the original code block" in {
-
-              callAuthServiceEnrolmentsOnly(authResponse)
-              callSubscriptionService(Some(customerInformationNonDigital))
-
-              lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
-
-              status(result) shouldBe Status.OK
-              contentAsString(result) shouldBe "welcome"
-            }
-          }
-
-          "client is MTDfB Exempt" should {
-
-            "return the result of the original code block" in {
-
-              callAuthServiceEnrolmentsOnly(authResponse)
-              callSubscriptionService(Some(customerInformationMTDfBExempt))
-
-              lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
-
-              status(result) shouldBe Status.OK
-              contentAsString(result) shouldBe "welcome"
-            }
-          }
-
-          "agent does not have HMRC-AS-AGENT enrolment" should {
-
-            "return 403" in {
-
-              val otherEnrolment: Enrolments = Enrolments(
-                Set(
-                  Enrolment(
-                    "OTHER-ENROLMENT",
-                    Seq(EnrolmentIdentifier("AA", "AA")),
-                    "Activated"
-                  )
-                )
-              )
-
-              callAuthServiceEnrolmentsOnly(otherEnrolment)
-
-              lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
-
-              status(result) shouldBe Status.FORBIDDEN
-            }
+            status(result) shouldBe Status.OK
+            contentAsString(result) shouldBe "welcome"
           }
         }
+
+        "agent does not have HMRC-AS-AGENT enrolment" should {
+
+          "return 403" in {
+
+            val otherEnrolment: Enrolments = Enrolments(
+              Set(
+                Enrolment(
+                  "OTHER-ENROLMENT",
+                  Seq(EnrolmentIdentifier("AA", "AA")),
+                  "Activated"
+                )
+              )
+            )
+
+            callAuthServiceEnrolmentsOnly(otherEnrolment)
+
+            lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
+
+            status(result) shouldBe Status.FORBIDDEN
+          }
+        }
+
 
         "agent does not have delegated enrolment for VRN" should {
 
@@ -126,45 +94,6 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
           }
         }
 
-        "client does not have the correct mandation status" should {
-
-          "redirect to agent-client-lookup agent access page" in {
-
-            callAuthServiceEnrolmentsOnly(authResponse)
-            callSubscriptionService(Some(customerInformationMax))
-
-            lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
-
-            status(result) shouldBe Status.SEE_OTHER
-            redirectLocation(result) shouldBe Some(mockConfig.agentClientHubUrl)
-          }
-
-          "correctly redirect if 'ignoreMandatedStatus' is set to true" in {
-
-            callAuthServiceEnrolmentsOnly(authResponse)
-            callSubscriptionService(Some(customerInformationMax))
-
-            lazy val result: Future[Result] =
-              target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"), ignoreMandatedStatus = true)
-
-            status(result) shouldBe Status.OK
-            contentAsString(result) shouldBe "welcome"
-          }
-        }
-
-        "an error is returned from the customer info call" should {
-
-          "throw an internal server error" in {
-
-            callAuthServiceEnrolmentsOnly(authResponse)
-            callSubscriptionService(None)
-
-            lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
-
-            status(result) shouldBe Status.INTERNAL_SERVER_ERROR
-          }
-
-        }
 
         "user has no session" should {
 

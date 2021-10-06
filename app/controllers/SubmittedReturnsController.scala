@@ -52,14 +52,14 @@ class SubmittedReturnsController @Inject()(mcc: MessagesControllerComponents,
                                            auditService: AuditingService,
                                            ec: ExecutionContext) extends FrontendController(mcc) with LoggerUtil {
 
-  def redirect(year: Int): Action[AnyContent] = authorisedController.authorisedAction ({ _ =>
+  def redirect(year: Int): Action[AnyContent] = authorisedController.authorisedAction { _ =>
     _ =>
       Future(MovedPermanently(controllers.routes.SubmittedReturnsController.submittedReturns.url))
-  }, ignoreMandatedStatus = true)
+  }
 
   def currentYear: Int = dateService.now().getYear
 
-  def submittedReturns: Action[AnyContent] = authorisedController.authorisedAction({ implicit request =>
+  def submittedReturns: Action[AnyContent] = authorisedController.authorisedAction{ implicit request =>
     implicit user =>
       DDInterrupt.interruptCheck { _ =>
         for {
@@ -78,7 +78,7 @@ class SubmittedReturnsController @Inject()(mcc: MessagesControllerComponents,
           }
         }
       }
-  }, ignoreMandatedStatus = true)
+  }
 
   private[controllers] def getValidYears(registrationDate: Option[LocalDate]): Seq[Int] =
     registrationDate match {

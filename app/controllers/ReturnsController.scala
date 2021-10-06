@@ -32,7 +32,6 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import utils.LoggerUtil
 import views.html.errors.PreMtdReturnView
 import views.html.returns.VatReturnDetailsView
-
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -49,7 +48,7 @@ class ReturnsController @Inject()(mcc: MessagesControllerComponents,
                                   auditService: AuditingService,
                                   ec: ExecutionContext) extends FrontendController(mcc) with LoggerUtil {
 
-  def vatReturn(year: Int, periodKey: String): Action[AnyContent] = authorisedController.authorisedAction ({
+  def vatReturn(year: Int, periodKey: String): Action[AnyContent] = authorisedController.authorisedAction {
     implicit request =>
       implicit user =>
         if(validPeriodKey(periodKey)) {
@@ -76,9 +75,9 @@ class ReturnsController @Inject()(mcc: MessagesControllerComponents,
           logger.warn(s"[ReturnsController][vatReturn] - The given period key was invalid - `$periodKey`")
           Future.successful(errorHandler.showNotFoundError)
         }
-  }, ignoreMandatedStatus = true)
+  }
 
-  def vatReturnViaPayments(periodKey: String): Action[AnyContent] = authorisedController.authorisedAction ({
+  def vatReturnViaPayments(periodKey: String): Action[AnyContent] = authorisedController.authorisedAction {
     implicit request =>
       implicit user =>
         if(validPeriodKey(periodKey)) {
@@ -106,7 +105,7 @@ class ReturnsController @Inject()(mcc: MessagesControllerComponents,
           logger.warn(s"[ReturnsController][vatReturnViaPayments] - The given period key was invalid - `$periodKey`")
           Future.successful(errorHandler.showNotFoundError)
         }
-  }, ignoreMandatedStatus = true)
+  }
 
   private[controllers] def renderResult(pageData: ReturnsControllerData,
                                         isReturnsPageRequest: Boolean, isNumericPeriodKey: Boolean)
