@@ -42,7 +42,7 @@ class SubmittedReturnsErrorViewSpec extends ViewBaseSpec {
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct document title" in {
-      document.title shouldBe "There is a problem with the service - Business tax account - GOV.UK"
+      document.title shouldBe "There is a problem with the service - Manage your VAT account - GOV.UK"
     }
 
     "have the correct document heading" in {
@@ -60,7 +60,7 @@ class SubmittedReturnsErrorViewSpec extends ViewBaseSpec {
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct document title" in {
-      document.title shouldBe "There is a problem with the service - Business tax account - GOV.UK"
+      document.title shouldBe "There is a problem with the service - Manage your VAT account - GOV.UK"
     }
 
     "have the correct document heading" in {

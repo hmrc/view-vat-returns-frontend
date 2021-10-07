@@ -42,7 +42,7 @@ class PreMtdReturnViewSpec extends ViewBaseSpec {
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct document title" in {
-      document.title shouldBe "This return is not available - Business tax account - GOV.UK"
+      document.title shouldBe "This return is not available - Manage your VAT account - GOV.UK"
     }
 
     "have a back link" that {
@@ -75,7 +75,7 @@ class PreMtdReturnViewSpec extends ViewBaseSpec {
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct document title" in {
-      document.title shouldBe "This return is not available - Business tax account - GOV.UK"
+      document.title shouldBe "This return is not available - Manage your VAT account - GOV.UK"
     }
 
     "have the correct document heading" in {

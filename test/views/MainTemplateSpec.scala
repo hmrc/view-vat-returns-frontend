@@ -32,11 +32,11 @@ class MainTemplateSpec extends ViewBaseSpec {
       lazy implicit val document: Document = Jsoup.parse(view.body)
 
       "have the correct service name" in {
-        elementText(".govuk-header__link--service-name") shouldBe "Your client’s VAT details"
+        elementText(".hmrc-header__service-name") shouldBe "Your client’s VAT details"
       }
 
       "have the correct service URL" in {
-        element(".govuk-header__link--service-name").attr("href") shouldBe mockConfig.agentClientHubUrl
+        element(".hmrc-header__service-name").attr("href") shouldBe mockConfig.agentClientHubUrl
       }
     }
 
@@ -46,11 +46,11 @@ class MainTemplateSpec extends ViewBaseSpec {
       lazy implicit val document: Document = Jsoup.parse(view.body)
 
       "have the correct service name" in {
-        elementText(".govuk-header__link--service-name") shouldBe "Business tax account"
+        elementText(".hmrc-header__service-name") shouldBe "Manage your VAT account"
       }
 
       "have the correct service URL" in {
-        element(".govuk-header__link--service-name").attr("href") shouldBe mockConfig.btaHomeUrl
+        element(".hmrc-header__service-name").attr("href") shouldBe mockConfig.vatDetailsUrl
       }
     }
 
@@ -60,11 +60,11 @@ class MainTemplateSpec extends ViewBaseSpec {
       lazy implicit val document: Document = Jsoup.parse(view.body)
 
       "have the correct service name" in {
-        elementText(".govuk-header__link--service-name") shouldBe "VAT"
+        elementText(".hmrc-header__service-name") shouldBe "VAT"
       }
 
       "have the correct service URL" in {
-        element(".govuk-header__link--service-name").attr("href") shouldBe ""
+        element(".hmrc-header__service-name").attr("href") shouldBe ""
       }
     }
   }

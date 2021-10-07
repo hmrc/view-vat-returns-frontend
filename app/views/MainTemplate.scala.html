@@ -52,7 +52,7 @@
 }
 
 @titleServiceUrl = @{
-user.fold[Option[String]](None)(u => if(u.isAgent) Some(appConfig.agentClientHubUrl) else Some(appConfig.btaHomeUrl))
+user.fold[Option[String]](None)(u => if(u.isAgent) Some(appConfig.agentClientHubUrl) else Some(appConfig.vatDetailsUrl))
 }
 
 @beforeContentHtml = {
