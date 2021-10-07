@@ -5,7 +5,7 @@ base.back = Yn ôl
 base.signOut = Allgofnodi
 base.pageTitle = {0} - {1} - GOV.UK
 
-navTitle.nonAgent = Cyfrif Treth Busnes
+navTitle.nonAgent = Rheoli eich cyfrif TAW
 navTitle.agent = Manylion TAW eich cleient
 navTitle.makingTaxDigitalForVat = TAW
 

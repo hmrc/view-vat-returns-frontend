@@ -5,7 +5,7 @@ base.back = Back
 base.signOut = Sign out
 base.pageTitle = {0} - {1} - GOV.UK
 
-navTitle.nonAgent = Business tax account
+navTitle.nonAgent = Manage your VAT account
 navTitle.agent = Your client’s VAT details
 navTitle.makingTaxDigitalForVat = VAT
 
