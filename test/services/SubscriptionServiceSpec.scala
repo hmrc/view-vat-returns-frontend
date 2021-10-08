@@ -31,17 +31,14 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
   val hasFlatRateSchemeNo: Boolean = false
   val hasFlatRateSchemeYes: Boolean = true
 
-  private trait Test {
     val mockConnector: VatSubscriptionConnector = mock[VatSubscriptionConnector]
     val service: SubscriptionService = new SubscriptionService(mockConnector)
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-  }
 
   "Calling .getUserDetails" when {
 
     "the connector retrieves customer details" should {
 
-      "return the details" in new Test {
+      "return the details" in {
 
         (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
           .expects(*, *, *)
@@ -55,7 +52,7 @@ class SubscriptionServiceSpec extends ControllerBaseSpec {
 
     "the connector returns an error" should {
 
-      "return None" in new Test {
+      "return None" in {
 
         (mockConnector.getCustomerInfo(_: String)(_: HeaderCarrier, _: ExecutionContext))
           .expects(*, *, *)
