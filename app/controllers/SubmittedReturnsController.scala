@@ -28,7 +28,6 @@ import models.{CustomerInformation, MigrationDateModel, ServiceResponse, User}
 import models.errors.ObligationError
 import models.Obligation.Status.Fulfilled
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import play.twirl.api.HtmlFormat
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -65,7 +64,7 @@ class SubmittedReturnsController @Inject()(mcc: MessagesControllerComponents,
         for {
           customerDetails <- subscriptionService.getUserDetails(user.vrn)
           showInsolvencyContent = showInsolventContent(customerDetails)
-          serviceInfoContent <- if (user.isAgent) Future.successful(HtmlFormat.empty) else serviceInfoService.getServiceInfoPartial
+          serviceInfoContent <- serviceInfoService.getServiceInfoPartial
           migrationDates = getMigrationDates(customerDetails)
           obligationsResult <- getReturnObligations(migrationDates)
         } yield {

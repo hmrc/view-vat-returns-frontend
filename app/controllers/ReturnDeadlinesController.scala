@@ -27,7 +27,7 @@ import javax.inject.{Inject, Singleton}
 import models._
 import models.viewModels.ReturnDeadlineViewModel
 import play.api.mvc._
-import play.twirl.api.{Html, HtmlFormat}
+import play.twirl.api.Html
 import services.{DateService, ReturnsService, ServiceInfoService, SubscriptionService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import utils.LoggerUtil
@@ -51,11 +51,6 @@ class ReturnDeadlinesController @Inject()(mcc: MessagesControllerComponents,
                                           auditService: AuditingService,
                                           ec: ExecutionContext) extends FrontendController(mcc) with LoggerUtil {
 
-
-  private[controllers] def serviceInfoCall()(implicit user: User, req: Request[_]): Future[Html] = {
-    if (user.isAgent) Future.successful(HtmlFormat.empty) else serviceInfoService.getServiceInfoPartial
-  }
-
   private[controllers] def toReturnDeadlineViewModel(obligation: VatReturnObligation, date: LocalDate): ReturnDeadlineViewModel = {
     ReturnDeadlineViewModel(
       obligation.due,
@@ -74,7 +69,7 @@ class ReturnDeadlinesController @Inject()(mcc: MessagesControllerComponents,
 
         openObligations.flatMap {
           case Right(VatReturnObligations(obligations)) =>
-            serviceInfoCall().flatMap { serviceInfoContent =>
+            serviceInfoService.getServiceInfoPartial.flatMap { serviceInfoContent =>
               auditService.extendedAudit(
                 ViewOpenVatObligationsAuditModel(user, obligations),
                 routes.ReturnDeadlinesController.returnDeadlines.url

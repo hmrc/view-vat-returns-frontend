@@ -394,6 +394,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
         callDateService()
         callOpenObligations(exampleObligations)
         callExtendedAudit
+        callServiceInfoPartialService
         callSubscriptionService(Some(customerInformationNonMTDfB))
         controller.returnDeadlines()(request(fakeRequestWithClientsVRN))
       }
@@ -422,6 +423,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
           callOpenObligations(emptyObligations)
           callFulfilledObligations(emptyObligations)
           callExtendedAudit
+          callServiceInfoPartialService
           controller.returnDeadlines()(request(fakeRequestWithClientsVRN))
         }
 

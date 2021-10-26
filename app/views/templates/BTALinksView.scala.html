@@ -14,13 +14,13 @@
  * limitations under the License.
  *@
 
-@import models.ListLinksModel
+@import models.ListLinks
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcNotificationBadge
 @import uk.gov.hmrc.hmrcfrontend.views.Aliases.NotificationBadge
 
 @this(hmrcNotificationBadge : HmrcNotificationBadge)
 
-@(navLinks: Seq[ListLinksModel])(implicit messages: Messages)
+@(navLinks: Seq[ListLinks])
 <nav id="secondary-nav" class="hmrc-account-menu">
     <ul class="hmrc-account-menu__main govuk-grid-column-full" style="padding: 0;">
         @for( nav <- navLinks) {

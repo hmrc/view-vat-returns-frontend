@@ -67,7 +67,7 @@ class ReturnsController @Inject()(mcc: MessagesControllerComponents,
             customerInfo <- entityNameCall
             payment <- financialDataCall(customerInfo)
             obligation <- obligationCall
-            serviceInfoContent <- if(user.isAgent) Future.successful(HtmlFormat.empty) else serviceInfoService.getServiceInfoPartial
+            serviceInfoContent <- serviceInfoService.getServiceInfoPartial
           } yield ReturnsControllerData(vatReturn, customerInfo, payment, obligation, serviceInfoContent))
             .flatMap(pageData => renderResult(pageData, isReturnsPageRequest, numericPeriodKey(periodKey)))
 

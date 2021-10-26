@@ -17,38 +17,24 @@
 package connectors
 
 import config.AppConfig
-import javax.inject.{Inject, Singleton}
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.Request
-import play.twirl.api.Html
+import models.NavContent
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
-import uk.gov.hmrc.play.partials.HtmlPartial.{HtmlPartialHttpReads, connectionExceptionsAsHtmlPartialFailure}
-import uk.gov.hmrc.play.partials.{HeaderCarrierForPartialsConverter, HtmlPartial}
 import utils.LoggerUtil
-import views.html.templates.BtaNavigationLinks
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ServiceInfoConnector @Inject()(http: HttpClient,
-                                     hcForPartials: HeaderCarrierForPartialsConverter,
-                                     btaNavigationLinks: BtaNavigationLinks)
-                                    (implicit val messagesApi: MessagesApi,
-                                     appConfig: AppConfig)
-  extends HtmlPartialHttpReads
-    with I18nSupport
-    with LoggerUtil {
+class ServiceInfoConnector @Inject()(http: HttpClient)
+                                           (implicit config: AppConfig) extends LoggerUtil {
 
-  lazy val btaUrl: String = appConfig.btaBaseUrl + "/business-account/partial/service-info"
+  lazy val btaUrl: String = config.btaBaseUrl + "/business-account/partial/nav-links"
 
-  def getServiceInfoPartial(implicit request: Request[_], ec: ExecutionContext): Future[Html] = {
-    implicit val hc: HeaderCarrier = hcForPartials.fromRequestWithEncryptedCookie(request)
-    http.GET[HtmlPartial](btaUrl) recover connectionExceptionsAsHtmlPartialFailure map { p =>
-      p.successfulContentOrElse(btaNavigationLinks())
-    } recover {
-      case _ =>
-        logger.warn("[ServiceInfoConnector][getServiceInfoPartial] - Unexpected error retrieving service info partial")
-        btaNavigationLinks()
-    }
-  }
+  def getNavLinks()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[NavContent]] =
+    http.GET[Option[NavContent]](btaUrl)
+      .recover {
+        case e =>
+          logger.warn(s"[ServiceInfoPartialConnector][getNavLinks] - Unexpected error ${e.getMessage}")
+          None
+      }
 }
