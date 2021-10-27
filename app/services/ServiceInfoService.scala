@@ -17,15 +17,56 @@
 package services
 
 import connectors.ServiceInfoConnector
+
 import javax.inject.{Inject, Singleton}
-import play.api.mvc.Request
-import play.twirl.api.Html
+import models.{ListLinks, NavContent, User}
+import play.api.http.HeaderNames
+import play.api.i18n.{Lang, Messages}
+import play.twirl.api.{Html, HtmlFormat}
+import uk.gov.hmrc.http.HeaderCarrier
+import views.html.templates.BTALinksView
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ServiceInfoService @Inject()(serviceInfoConnector: ServiceInfoConnector) {
+class ServiceInfoService @Inject()(serviceInfoConnector: ServiceInfoConnector, btaLinks: BTALinksView) {
 
-  def getServiceInfoPartial(implicit request: Request[_], ec: ExecutionContext): Future[Html] =
-    serviceInfoConnector.getServiceInfoPartial
+  def getServiceInfoPartial(implicit user: User, hc: HeaderCarrier, ec: ExecutionContext, messages: Messages): Future[Html] =
+    if(user.isAgent){
+      Future.successful(HtmlFormat.empty)
+    } else {
+      val hcWithCookie = hc.copy(extraHeaders = hc.headers(Seq(HeaderNames.COOKIE)))
+      serviceInfoConnector.getNavLinks()(hcWithCookie, ec).map { links =>
+        val listLinks = partialList(links)
+        btaLinks(listLinks)
+      }
+    }
+
+  def notificationBadgeCount(messageCount: Int): String =
+    messageCount match {
+      case 0 => "0"
+      case count if count > 99  => "+99"
+      case _ => s"$messageCount"
+    }
+
+  def partialList(navLinks: Option[NavContent])(implicit messages: Messages): Seq[ListLinks] =
+    navLinks match {
+      case Some(NavContent(home, account, message, help)) =>
+        if(messages.lang == Lang("cy")){
+          Seq(
+            ListLinks(home.cy, home.url),
+            ListLinks(account.cy, account.url),
+            ListLinks(message.cy, message.url, Some(notificationBadgeCount(message.alerts.getOrElse(0)))),
+            ListLinks(help.cy, help.url)
+          )
+        } else {
+          Seq(
+            ListLinks(home.en, home.url),
+            ListLinks(account.en, account.url),
+            ListLinks(message.en, message.url, Some(notificationBadgeCount(message.alerts.getOrElse(0)))),
+            ListLinks(help.en, help.url)
+          )
+        }
+      case None => Seq()
+    }
 }

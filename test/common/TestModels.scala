@@ -17,7 +17,7 @@
 package common
 
 import common.MandationStatuses._
-import models.CustomerInformation
+import models.{CustomerInformation, NavContent, NavLinks}
 
 object TestModels {
 
@@ -64,4 +64,11 @@ object TestModels {
   val customerInformationMTDfBExempt: CustomerInformation = customerInformationMax.copy(mandationStatus = mtdfbExempt)
   val customerInformationNoMigDates: CustomerInformation =
     customerInformationMax.copy(customerMigratedToETMPDate = None, hybridToFullMigrationDate = None)
+
+  val navContent: NavContent = NavContent(
+    NavLinks("Home", "Hafan", "http://localhost:9999/home"),
+    NavLinks("Account", "Crfrif", "http://localhost:9999/account"),
+    NavLinks("Messages", "Negeseuon", "http://localhost:9999/messages", Some(1)),
+    NavLinks("Help", "Cymorth", "http://localhost:9999/help")
+  )
 }

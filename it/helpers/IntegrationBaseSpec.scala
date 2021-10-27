@@ -48,7 +48,8 @@ trait IntegrationBaseSpec extends AnyWordSpecLike
   lazy val client: WSClient = inject[WSClient]
   implicit val ec: ExecutionContext = inject[ExecutionContext]
 
-  def viewedDDInterrupt: Option[String] => Map[String, String] = _.fold(Map.empty[String, String])(x => Map(SessionKeys.viewedDDInterrupt -> x))
+  def viewedDDInterrupt: Option[String] => Map[String, String] =
+    _.fold(Map.empty[String, String])(x => Map(SessionKeys.viewedDDInterrupt -> x))
 
   def servicesConfig: Map[String, String] = Map(
     "microservice.services.auth.host" -> mockHost,
@@ -64,7 +65,9 @@ trait IntegrationBaseSpec extends AnyWordSpecLike
     "microservice.services.vat-returns.host" -> mockHost,
     "microservice.services.vat-returns.port" -> mockPort,
     "microservice.services.vat-obligations.host" -> mockHost,
-    "microservice.services.vat-obligations.port" -> mockPort
+    "microservice.services.vat-obligations.port" -> mockPort,
+    "microservice.services.business-tax-account.host" -> mockHost,
+    "microservice.services.business-tax-account.port" -> mockPort
   )
 
   override implicit lazy val app: Application = new GuiceApplicationBuilder()

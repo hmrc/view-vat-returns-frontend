@@ -41,9 +41,6 @@ trait AppConfig {
   val financialDataBaseUrl: String
   val btaBaseUrl: String
   val btaHomeUrl: String
-  val btaMessagesUrl: String
-  val btaManageAccountUrl: String
-  val btaHelpAndContactUrl: String
   val vatDetailsUrl: String
   val reportVatErrorUrl: String
   val feedbackFormPartialUrl: String
@@ -101,13 +98,8 @@ class FrontendAppConfig @Inject()(implicit configuration: Configuration, sc: Ser
   override val vatSubscriptionBaseUrl: String = sc.baseUrl("vat-subscription")
   override val financialDataBaseUrl: String = sc.baseUrl("financial-transactions")
 
-  private lazy val helpAndContactFrontendUrl: String = sc.getString(Keys.helpAndContactFrontendBase)
-
-  override lazy val btaBaseUrl: String = sc.baseUrl(Keys.businessTaxAccountBase)
+  override lazy val btaBaseUrl: String = sc.baseUrl(Keys.businessTaxAccount)
   override lazy val btaHomeUrl: String = sc.getString(Keys.businessTaxAccountHost) + sc.getString(Keys.businessTaxAccountUrl)
-  override lazy val btaMessagesUrl: String = btaHomeUrl + sc.getString(Keys.businessTaxAccountMessagesUrl)
-  override lazy val btaManageAccountUrl: String = btaHomeUrl + sc.getString(Keys.businessTaxAccountManageAccountUrl)
-  override lazy val btaHelpAndContactUrl: String = helpAndContactFrontendUrl + sc.getString(Keys.helpAndContactHelpUrl)
 
   private lazy val vatSummaryBase: String = sc.getString(Keys.vatSummaryBase)
   override lazy val vatDetailsUrl: String = vatSummaryBase + sc.getString(Keys.vatDetailsUrl)

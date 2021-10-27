@@ -182,6 +182,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
             callAuthServiceEnrolmentsOnly(Enrolments(agentEnrolment))
             callVatReturn(Right(exampleVatReturn))
             setupCommonSuccessMocks()
+            callServiceInfoPartialService
             callConstructReturnDetailsModel(exampleVatReturnDetails)
             controller.vatReturn(2018, "#001")(request(fakeRequestWithClientsVRN))
           }

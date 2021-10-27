@@ -16,7 +16,7 @@
 
 package views.templates
 
-import models.ListLinksModel
+import models.ListLinks
 import views.html.templates.BTALinksView
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -27,8 +27,8 @@ class BTALinksViewSpec extends ViewBaseSpec {
 
   val injectedView: BTALinksView = inject[BTALinksView]
 
-  val messagesLink : ListLinksModel = ListLinksModel("Messages","/business-account/messages",Some("1"),Some(true))
-  val manageAccountLink: ListLinksModel = ListLinksModel("Manage account", "/business-account/manage-account", Some("0"),Some(true))
+  val messagesLink : ListLinks = ListLinks("Messages","/business-account/messages",Some("1"),Some(true))
+  val manageAccountLink: ListLinks = ListLinks("Manage account", "/business-account/manage-account", Some("0"),Some(true))
 
   "BTALinks" should {
 
@@ -59,7 +59,7 @@ class BTALinksViewSpec extends ViewBaseSpec {
 
     "render a Messages link without a notification alert" which {
 
-      val noAltertlink: ListLinksModel = ListLinksModel("Messages", "/business-account/messages", Some("0"), Some(true))
+      val noAltertlink: ListLinks = ListLinks("Messages", "/business-account/messages", Some("0"), Some(true))
 
       val view: Html = injectedView(Seq(noAltertlink))
       lazy implicit val document: Document = Jsoup.parse(view.body)
@@ -93,7 +93,7 @@ class BTALinksViewSpec extends ViewBaseSpec {
 
     "not render when required" which {
 
-      val hideMenu: ListLinksModel = ListLinksModel("Messages", "/business-account/messages", Some("0"), Some(false))
+      val hideMenu: ListLinks = ListLinks("Messages", "/business-account/messages", Some("0"), Some(false))
 
       val view: Html = injectedView(Seq(hideMenu))
       lazy implicit val document: Document = Jsoup.parse(view.body)

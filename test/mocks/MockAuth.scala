@@ -34,7 +34,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.{Lang, Messages, MessagesApi, MessagesImpl}
-import play.api.mvc.{MessagesControllerComponents, Request}
+import play.api.mvc.MessagesControllerComponents
 import play.api.test.Injecting
 import play.twirl.api.Html
 import services._
@@ -46,7 +46,8 @@ import views.html.errors.UnauthorisedView
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait MockAuth extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite with BeforeAndAfterEach with MockFactory with Injecting {
+trait MockAuth extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite with BeforeAndAfterEach with
+  MockFactory with Injecting {
 
   implicit val mockConfig: AppConfig = new MockAppConfig(app.configuration)
   implicit val ec: ExecutionContext = inject[ExecutionContext]
@@ -112,7 +113,8 @@ trait MockAuth extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
       .returns(Future.successful(response))
 
   def callObligationWithMatchingPeriodKey(response: Option[VatReturnObligation]): Any =
-    (mockVatReturnService.getObligationWithMatchingPeriodKey(_: String, _: Int, _: String)(_: HeaderCarrier, _: ExecutionContext))
+    (mockVatReturnService.getObligationWithMatchingPeriodKey(_: String, _: Int, _: String)
+                                                            (_: HeaderCarrier, _: ExecutionContext))
       .expects(*, *, *, *, *)
       .returns(Future.successful(response))
 
@@ -132,12 +134,13 @@ trait MockAuth extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
       .returns({})
 
   def callServiceInfoPartialService: Any =
-    (mockServiceInfoService.getServiceInfoPartial(_: Request[_], _: ExecutionContext))
-      .expects(*, *)
+    (mockServiceInfoService.getServiceInfoPartial(_: User, _: HeaderCarrier, _: ExecutionContext, _: Messages))
+      .expects(*, *, *, *)
       .returns(Future.successful(Html("")))
 
   def callAuthService(response: Future[~[Enrolments, Option[AffinityGroup]]]): Any =
-    (mockAuthConnector.authorise(_: Predicate, _: Retrieval[~[Enrolments, Option[AffinityGroup]]])(_: HeaderCarrier, _: ExecutionContext))
+    (mockAuthConnector.authorise(_: Predicate, _: Retrieval[~[Enrolments, Option[AffinityGroup]]])
+                                (_: HeaderCarrier, _: ExecutionContext))
       .expects(*, *, *, *)
       .returns(response)
 

@@ -203,6 +203,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
           callExtendedAudit
           callAuthService(agentAuthResult)
           callAuthServiceEnrolmentsOnly(Enrolments(agentEnrolment))
+          callServiceInfoPartialService
           callObligationsForYear(exampleObligations(2018))
           callObligationsForYear(exampleObligations(2017))
           callSubscriptionService(Some(customerInformationMax))
