@@ -18,6 +18,10 @@ unauthorised.title = You are not authorised to use this service
 unauthorised.signUpWithSoftware = You need to sign up to use software to submit your VAT Returns.
 unauthorised.alreadySignedUp = If you have already signed up, you need to sign in with the correct Government Gateway details.
 
+insolventUnauthorised.title = Sorry, you cannot access this service
+insolventUnauthorised.message = Your business has been declared insolvent.
+insolventUnauthorised.buttonText = Go to your business tax account
+
 notFound.title = Page not found
 notFound.heading = This page cannot be found
 notFound.message = Please check that you have entered the correct web address.

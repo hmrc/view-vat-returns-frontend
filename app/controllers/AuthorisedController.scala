@@ -19,6 +19,7 @@ package controllers
 import common.{SessionKeys, EnrolmentKeys => Keys}
 import config.{AppConfig, ServiceErrorHandler}
 import controllers.predicate.AuthoriseAgentWithClient
+
 import javax.inject.{Inject, Singleton}
 import models.User
 import play.api.mvc._
@@ -28,7 +29,7 @@ import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import utils.LoggerUtil
-import views.html.errors.UnauthorisedView
+import views.html.errors.{InsolventUnauthView, UnauthorisedView}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -38,6 +39,7 @@ class AuthorisedController @Inject()(enrolmentsAuthService: EnrolmentsAuthServic
                                      agentWithClientPredicate: AuthoriseAgentWithClient,
                                      mcc: MessagesControllerComponents,
                                      unauthorisedView: UnauthorisedView,
+                                     insolventUnauthView: InsolventUnauthView,
                                      errorHandler: ServiceErrorHandler,
                                      dateService: DateService)
                                     (implicit appConfig: AppConfig,
@@ -83,7 +85,7 @@ class AuthorisedController @Inject()(enrolmentsAuthService: EnrolmentsAuthServic
           val user = User(vrn, status == Keys.activated, containsNonMtdVat)
 
           (request.session.get(SessionKeys.insolventWithoutAccessKey), request.session.get(SessionKeys.futureInsolvencyDate)) match {
-            case (Some("true"), _) => Future.successful(Forbidden)
+            case (Some("true"), _) => Future.successful(Forbidden(insolventUnauthView(user)))
             case (Some("false"), Some("true")) => Future.successful(errorHandler.showInternalServerError)
             case (Some("false"), Some("false")) => block(request)(user)
             case _ => insolvencySubscriptionCall(user, block(request))
@@ -108,7 +110,7 @@ class AuthorisedController @Inject()(enrolmentsAuthService: EnrolmentsAuthServic
           case (true, futureDateBlock) =>
             logger.debug("[AuthorisedController][insolvencySubscriptionCall] - User is insolvent and not continuing to trade")
             Future.successful(
-              Forbidden(unauthorisedView()).addingToSession(
+              Forbidden(insolventUnauthView(user)).addingToSession(
                 SessionKeys.insolventWithoutAccessKey -> "true",
                 SessionKeys.futureInsolvencyDate -> s"$futureDateBlock")
             )

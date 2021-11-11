@@ -44,6 +44,10 @@ unauthorised.title = Nid ydych wedi’ch awdurdodi i ddefnyddio’r gwasanaeth h
 unauthorised.signUpWithSoftware = Mae angen i chi gofrestru i ddefnyddio meddalwedd er mwyn cyflwyno’ch Ffurflenni TAW.
 unauthorised.alreadySignedUp = Os ydych eisoes wedi cofrestru, bydd angen i chi fewngofnodi gan ddefnyddio’r manylion cywir ar gyfer Porth y Llywodraeth.
 
+insolventUnauthorised.title = Mae’n ddrwg gennym - ni allwch gael mynediad at y gwasanaeth hwn
+insolventUnauthorised.message = Mae’ch busnes wedi’i ddatgan yn ansolfent.
+insolventUnauthorised.buttonText = Ewch i’ch cyfrif treth busnes
+
 notFound.title = Heb ddod o hyd i’r dudalen
 notFound.heading = Ni ellir dod o hyd i’r dudalen hon
 notFound.message = Gwiriwch eich bod wedi nodi’r cyfeiriad gwe cywir.
