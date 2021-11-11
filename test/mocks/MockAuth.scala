@@ -17,7 +17,6 @@
 package mocks
 
 import java.time.LocalDate
-
 import audit.AuditingService
 import audit.models.{AuditModel, ExtendedAuditModel}
 import config.{AppConfig, ServiceErrorHandler}
@@ -42,7 +41,7 @@ import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.{Retrieval, ~}
 import uk.gov.hmrc.auth.core.{AffinityGroup, AuthConnector, Enrolments}
 import uk.gov.hmrc.http.HeaderCarrier
-import views.html.errors.UnauthorisedView
+import views.html.errors.{InsolventUnauthView, UnauthorisedView}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -65,6 +64,7 @@ trait MockAuth extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
   val mockVatSubscriptionConnector: VatSubscriptionConnector = mock[VatSubscriptionConnector]
 
   val unauthorisedView: UnauthorisedView = inject[UnauthorisedView]
+  val insolventUnauthView: InsolventUnauthView = inject[InsolventUnauthView]
 
   val enrolmentsAuthService: EnrolmentsAuthService = new EnrolmentsAuthService(mockAuthConnector)
 
@@ -82,6 +82,7 @@ trait MockAuth extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
     mockAuthorisedAgentWithClient,
     mcc,
     unauthorisedView,
+    insolventUnauthView,
     errorHandler,
     mockDateService
   )
