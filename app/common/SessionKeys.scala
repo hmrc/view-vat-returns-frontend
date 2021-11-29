@@ -18,9 +18,11 @@ package common
 
 object SessionKeys {
   val mtdVatMandationStatus: String = "mtdVatMandationStatus"
-  val clientVrn: String = "CLIENT_VRN"
+  val mtdVatvcClientVrn: String = "mtdVatvcClientVrn"
   val insolventWithoutAccessKey: String = "insolventWithoutAccess"
   val futureInsolvencyDate: String = "futureInsolvencyDate"
   val viewedDDInterrupt: String = "vatViewChangeHasViewedDDInterrupt"
-  val clientName: String = "mtdVatAgentClientName"
+  val clientName: String = "mtdVatvcAgentClientName"
+  val submissionYear: String = "mtdVatvcSubmissionYear"
+  val inSessionPeriodKey: String = "mtdVatvcInSessionPeriodKey"
 }

@@ -39,7 +39,7 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
 
   "AgentPredicate .authoriseAsAgent" when {
 
-    "CLIENT_VRN is in session" when {
+    "mtdVatvcClientVrn is in session" when {
 
       "agent has delegated enrolment for VRN" when {
 
@@ -49,7 +49,7 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
 
             callAuthServiceEnrolmentsOnly(authResponse)
 
-            lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
+            lazy val result: Future[Result] = target(fakeRequest.withSession("mtdVatvcClientVrn" -> "123456789"))
 
             status(result) shouldBe Status.OK
             contentAsString(result) shouldBe "welcome"
@@ -72,7 +72,7 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
 
             callAuthServiceEnrolmentsOnly(otherEnrolment)
 
-            lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
+            lazy val result: Future[Result] = target(fakeRequest.withSession("mtdVatvcClientVrn" -> "123456789"))
 
             status(result) shouldBe Status.FORBIDDEN
           }
@@ -87,7 +87,7 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
             .expects(*, *, *, *)
             .returns(Future.failed(InsufficientEnrolments()))
 
-          lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
+          lazy val result: Future[Result] = target(fakeRequest.withSession("mtdVatvcClientVrn" -> "123456789"))
 
             status(result) shouldBe Status.SEE_OTHER
             redirectLocation(result) shouldBe Some(mockConfig.agentClientUnauthorisedUrl("/"))
@@ -103,7 +103,7 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
             .expects(*, *, *, *)
             .returns(Future.failed(MissingBearerToken()))
 
-            lazy val result: Future[Result] = target(fakeRequest.withSession("CLIENT_VRN" -> "123456789"))
+            lazy val result: Future[Result] = target(fakeRequest.withSession("mtdVatvcClientVrn" -> "123456789"))
 
             status(result) shouldBe Status.SEE_OTHER
             redirectLocation(result) shouldBe Some(mockConfig.signInUrl)
@@ -111,7 +111,7 @@ class AuthoriseAgentWithClientSpec extends ControllerBaseSpec {
         }
       }
 
-      "CLIENT_VRN is not in session" should {
+      "mtdVatvcClientVrn is not in session" should {
 
         "redirect to agent-client lookup VRN lookup page" in {
 

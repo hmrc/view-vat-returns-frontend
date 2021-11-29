@@ -18,7 +18,9 @@ package controllers
 
 import audit.AuditingService
 import audit.models.ViewVatReturnAuditModel
+import common.SessionKeys
 import config.{AppConfig, ServiceErrorHandler}
+
 import javax.inject.{Inject, Singleton}
 import models._
 import models.errors.NotFoundError
@@ -32,6 +34,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import utils.LoggerUtil
 import views.html.errors.PreMtdReturnView
 import views.html.returns.VatReturnDetailsView
+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -136,16 +139,16 @@ class ReturnsController @Inject()(mcc: MessagesControllerComponents,
   private def checkIfComingFromSubmissionConfirmation(preMtdReturn: Boolean)
                                                      (implicit req: MessagesRequest[AnyContent],
                                                       user: User): Future[Result] = {
-    val inSessionYear = req.session.get("submissionYear")
-    val inSessionPeriodKey = req.session.get("inSessionPeriodKey")
+    val inSessionSubmissionYear = req.session.get(SessionKeys.submissionYear)
+    val inSessionPeriodKey = req.session.get(SessionKeys.inSessionPeriodKey)
 
-    if(inSessionYear.nonEmpty && inSessionPeriodKey.nonEmpty) {
+    if(inSessionSubmissionYear.nonEmpty && inSessionPeriodKey.nonEmpty) {
       logger.warn(
         "[ReturnsController][checkIfComingFromSubmissionConfirmation] error: User has come from the submission confirmation page, " +
         "but their submission has not yet been processed."
       )
       Future.successful(
-        Redirect(routes.SubmittedReturnsController.submittedReturns).removingFromSession("submissionYear", "inSessionPeriodKey")
+        Redirect(routes.SubmittedReturnsController.submittedReturns).removingFromSession(SessionKeys.submissionYear, SessionKeys.inSessionPeriodKey)
       )
     } else {
       if(preMtdReturn) {

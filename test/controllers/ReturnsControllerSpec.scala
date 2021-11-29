@@ -16,8 +16,8 @@
 
 package controllers
 
+import common.SessionKeys
 import java.time.LocalDate
-
 import common.TestModels.customerInformationNonMTDfB
 import models._
 import models.errors.{NotFoundError, VatReturnError}
@@ -30,7 +30,6 @@ import play.twirl.api.Html
 import uk.gov.hmrc.auth.core.{Enrolments, InsufficientEnrolments, MissingBearerToken}
 import views.html.errors.PreMtdReturnView
 import views.html.returns.VatReturnDetailsView
-
 import scala.concurrent.Future
 
 class ReturnsControllerSpec extends ControllerBaseSpec {
@@ -258,12 +257,8 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
           callVatReturn(Left(NotFoundError))
           setupCommonSuccessMocks()
           callServiceInfoPartialService
-          controller.vatReturn(2018, "18AA")(
-            request(fakeRequest.withSession(
-              "submissionYear" -> "2018",
-              "inSessionPeriodKey" -> "18AA"
-            ))
-          )
+          controller.vatReturn(2018, "18AA")(request(fakeRequest.withSession(
+              SessionKeys.inSessionPeriodKey -> "18AA", SessionKeys.submissionYear -> "2018")))
         }
 
         "return 303 (See Other)" in {
