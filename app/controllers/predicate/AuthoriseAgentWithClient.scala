@@ -45,7 +45,7 @@ class AuthoriseAgentWithClient @Inject()(enrolmentsAuthService: EnrolmentsAuthSe
         .withIdentifier(EnrolmentKeys.vatIdentifierId, vrn)
         .withDelegatedAuthRule(EnrolmentKeys.mtdVatDelegatedAuthRule)
 
-    request.session.get(SessionKeys.clientVrn) match {
+    request.session.get(SessionKeys.mtdVatvcClientVrn) match {
       case Some(vrn) =>
         enrolmentsAuthService
           .authorised(delegatedAuthRule(vrn))

@@ -41,7 +41,7 @@ class ViewBaseSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuit
   lazy val vrn = "999999999"
   lazy val arn = "XAIT00000000000"
   lazy val fakeRequestWithClientsVRN: FakeRequest[AnyContentAsEmpty.type] =
-    FakeRequest().withSession(SessionKeys.clientVrn -> vrn)
+    FakeRequest().withSession(SessionKeys.mtdVatvcClientVrn -> vrn)
   implicit val user: User = User(vrn)
   lazy val agentUser: User = User(vrn, active = true, hasNonMtdVat = true, Some(arn))
 

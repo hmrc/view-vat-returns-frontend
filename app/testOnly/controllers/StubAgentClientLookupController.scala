@@ -36,7 +36,7 @@ class StubAgentClientLookupController @Inject()(mcc: MessagesControllerComponent
 
   def unauth(redirectUrl: String): Action[AnyContent] = Action { implicit request =>
     Ok(agentClientUnauthView(redirectUrl))
-      .removingFromSession(SessionKeys.clientVrn)
+      .removingFromSession(SessionKeys.mtdVatvcClientVrn)
   }
 
   def agentHub: Action[AnyContent] = Action { implicit request =>
@@ -47,7 +47,7 @@ class StubAgentClientLookupController @Inject()(mcc: MessagesControllerComponent
     StubAgentClientLookupForm.form.bindFromRequest().fold(
       err => InternalServerError(s"Failed to bind model:\n\nError: $err"),
       success => Redirect(success.redirectUrl)
-        .addingToSession(SessionKeys.clientVrn -> success.vrn)
+        .addingToSession(SessionKeys.mtdVatvcClientVrn -> success.vrn)
         .addingToSession(SessionKeys.viewedDDInterrupt -> "true")
     )
   }
