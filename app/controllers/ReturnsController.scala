@@ -20,7 +20,6 @@ import audit.AuditingService
 import audit.models.ViewVatReturnAuditModel
 import common.SessionKeys
 import config.{AppConfig, ServiceErrorHandler}
-
 import javax.inject.{Inject, Singleton}
 import models._
 import models.errors.NotFoundError
@@ -34,7 +33,6 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import utils.LoggerUtil
 import views.html.errors.PreMtdReturnView
 import views.html.returns.VatReturnDetailsView
-
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton

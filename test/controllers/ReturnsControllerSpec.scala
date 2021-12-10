@@ -341,7 +341,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
           }
         }
 
-        "an all numeric period key is provided but but a return cannot be found matching period key" should {
+        "an all numeric period key is provided but a return cannot be found matching period key" should {
 
           lazy val result = {
             callAuthService(individualAuthResult)
@@ -382,6 +382,22 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
         "not make a call to retrieve mandation status" in {
           status(result) shouldBe Status.OK
+        }
+      }
+
+      ".obligationCall returns an error when payment model returns nothing" should {
+
+        lazy val result = {
+          callAuthService(individualAuthResult)
+          callVatReturn(Right(exampleVatReturn))
+          callSubscriptionService(Some(customerInformationNonMTDfB))
+          callVatReturnPayment(None)
+          callServiceInfoPartialService
+          controller.vatReturnViaPayments("18AA")(request())
+        }
+
+        "return Internal Server Error (500)" in {
+          status(result) shouldBe Status.INTERNAL_SERVER_ERROR
         }
       }
     }

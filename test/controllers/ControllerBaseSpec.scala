@@ -61,8 +61,21 @@ class ControllerBaseSpec extends MockAuth {
     GovUkSessionKeys.lastRequestTimestamp -> "1498236506662",
     GovUkSessionKeys.authToken -> "Bearer Token"
   )
+
   lazy val insolventRequest: FakeRequest[AnyContentAsEmpty.type] =
     FakeRequest().withSession(SessionKeys.insolventWithoutAccessKey -> "true")
+
+  lazy val insolventRequestError: FakeRequest[AnyContentAsEmpty.type] =
+    FakeRequest().withSession(SessionKeys.insolventWithoutAccessKey -> "false", SessionKeys.futureInsolvencyDate -> "true")
+
+  lazy val insolventRequestTrade: FakeRequest[AnyContentAsEmpty.type] =
+    FakeRequest().withSession(SessionKeys.insolventWithoutAccessKey -> "false", SessionKeys.futureInsolvencyDate -> "false")
+
+  lazy val insolventRequestNoTrade: FakeRequest[AnyContentAsEmpty.type] =
+    FakeRequest().withSession(SessionKeys.insolventWithoutAccessKey -> "true", SessionKeys.futureInsolvencyDate -> "false")
+
+  lazy val mandationRequest: FakeRequest[AnyContentAsEmpty.type] =
+    FakeRequest().withSession(SessionKeys.mtdVatMandationStatus -> "Non MTDfB")
 
   lazy val fakeRequestWithClientsVRN: FakeRequest[AnyContentAsEmpty.type] = fakeRequest.withSession(mtdVatvcClientVrn -> vrn)
 
@@ -87,6 +100,14 @@ class ControllerBaseSpec extends MockAuth {
 
   val individualAuthResult: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(new ~(
     Enrolments(mtdVatEnrolment), Some(Individual)
+  ))
+
+  val noEnrolmentsAuthResponse: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(new ~(
+    Enrolments(Set()), Some(Individual)
+  ))
+
+  val noAffinityAuthResponse: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(new ~(
+    Enrolments(mtdVatEnrolment), None
   ))
 
   val migratedUserAuthResult: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(new ~(

@@ -32,7 +32,6 @@ import services.{DateService, ReturnsService, ServiceInfoService, SubscriptionSe
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import utils.LoggerUtil
 import views.html.returns.{NoUpcomingReturnDeadlinesView, OptOutReturnDeadlinesView, ReturnDeadlinesView}
-
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
