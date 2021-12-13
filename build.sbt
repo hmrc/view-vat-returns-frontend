@@ -39,7 +39,6 @@ lazy val coverageSettings: Seq[Setting[_]] = {
     "testOnlyDoNotUseInAppConf.*",
     "com.kenshoo.play.metrics.*",
     "controllers.javascript.*",
-    "views.*",
   )
 
   Seq(
