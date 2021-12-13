@@ -67,15 +67,15 @@ case class CustomerInformation(organisationName: Option[String],
 object CustomerInformation {
 
   implicit val customerInformationReads: Reads[CustomerInformation] = (
-    (JsPath \ "customerDetails" \ "organisationName").readNullable[String].orElse(Reads.pure(None)) and
-    (JsPath \ "customerDetails" \ "firstName").readNullable[String].orElse(Reads.pure(None)) and
-    (JsPath \ "customerDetails" \ "lastName").readNullable[String].orElse(Reads.pure(None)) and
-    (JsPath \ "customerDetails" \ "tradingName").readNullable[String].orElse(Reads.pure(None)) and
+    (JsPath \ "customerDetails" \ "organisationName").readNullable[String] and
+    (JsPath \ "customerDetails" \ "firstName").readNullable[String] and
+    (JsPath \ "customerDetails" \ "lastName").readNullable[String] and
+    (JsPath \ "customerDetails" \ "tradingName").readNullable[String] and
     (JsPath \ "customerDetails" \ "isInsolvent").read[Boolean] and
     (JsPath \ "customerDetails" \ "continueToTrade").readNullable[Boolean] and
     (JsPath \ "customerDetails" \ "insolvencyType").readNullable[String] and
     (JsPath \ "customerDetails" \ "insolvencyDate").readNullable[String] and
-    (JsPath \ "flatRateScheme").readNullable[JsValue].orElse(Reads.pure(None)).map(_.isDefined) and
+    (JsPath \ "flatRateScheme").readNullable[JsValue].map(_.isDefined) and
     (JsPath \\ "isPartialMigration").readNullable[Boolean].map(_.contains(true)) and
     (JsPath \\ "customerMigratedToETMPDate").readNullable[String] and
     (JsPath \\ "hybridToFullMigrationDate").readNullable[String] and

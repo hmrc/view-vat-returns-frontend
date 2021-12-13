@@ -174,36 +174,36 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
     "user is an agent" when {
 
-        "authorised" should {
+      "authorised" should {
+
+        lazy val result = {
+          callAuthService(agentAuthResult)
+          callAuthServiceEnrolmentsOnly(Enrolments(agentEnrolment))
+          callVatReturn(Right(exampleVatReturn))
+          setupCommonSuccessMocks()
+          callServiceInfoPartialService
+          callConstructReturnDetailsModel(exampleVatReturnDetails)
+          controller.vatReturn(2018, "#001")(request(fakeRequestWithClientsVRN))
+        }
+
+        "return 200" in {
+          status(result) shouldBe Status.OK
+        }
+      }
+
+      "not authorised" should {
+
+        "return 403" in {
 
           lazy val result = {
             callAuthService(agentAuthResult)
-            callAuthServiceEnrolmentsOnly(Enrolments(agentEnrolment))
-            callVatReturn(Right(exampleVatReturn))
-            setupCommonSuccessMocks()
-            callServiceInfoPartialService
-            callConstructReturnDetailsModel(exampleVatReturnDetails)
+            callAuthServiceEnrolmentsOnly(Enrolments(mtdVatEnrolment))
             controller.vatReturn(2018, "#001")(request(fakeRequestWithClientsVRN))
           }
 
-          "return 200" in {
-            status(result) shouldBe Status.OK
-          }
+          status(result) shouldBe Status.FORBIDDEN
         }
-
-        "not authorised" should {
-
-          "return 403" in {
-
-            lazy val result = {
-              callAuthService(agentAuthResult)
-              callAuthServiceEnrolmentsOnly(Enrolments(mtdVatEnrolment))
-              controller.vatReturn(2018, "#001")(request(fakeRequestWithClientsVRN))
-            }
-
-            status(result) shouldBe Status.FORBIDDEN
-          }
-        }
+      }
 
     }
 
@@ -258,7 +258,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
           setupCommonSuccessMocks()
           callServiceInfoPartialService
           controller.vatReturn(2018, "18AA")(request(fakeRequest.withSession(
-              SessionKeys.inSessionPeriodKey -> "18AA", SessionKeys.submissionYear -> "2018")))
+            SessionKeys.inSessionPeriodKey -> "18AA", SessionKeys.submissionYear -> "2018")))
         }
 
         "return 303 (See Other)" in {
@@ -404,34 +404,34 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
     "user is an agent" when {
 
-        "authorised" should {
+      "authorised" should {
 
-          lazy val result = {
-            callAuthService(agentAuthResult)
-            callAuthServiceEnrolmentsOnly(Enrolments(agentEnrolment))
-            callVatReturn(Right(exampleVatReturn))
-            setupCommonSuccessMocks()
-            callConstructReturnDetailsModel(exampleVatReturnDetails)
-            controller.vatReturnViaPayments("#001")(request(fakeRequestWithClientsVRN))
-          }
-
-          "return 200" in {
-            status(result) shouldBe Status.OK
-          }
+        lazy val result = {
+          callAuthService(agentAuthResult)
+          callAuthServiceEnrolmentsOnly(Enrolments(agentEnrolment))
+          callVatReturn(Right(exampleVatReturn))
+          setupCommonSuccessMocks()
+          callConstructReturnDetailsModel(exampleVatReturnDetails)
+          controller.vatReturnViaPayments("#001")(request(fakeRequestWithClientsVRN))
         }
 
-        "not authorised" should {
-
-          lazy val result = {
-            callAuthService(agentAuthResult)
-            callAuthServiceEnrolmentsOnly(Enrolments(mtdVatEnrolment))
-            controller.vatReturnViaPayments("#001")(request(fakeRequestWithClientsVRN))
-          }
-
-          "return 403" in {
-            status(result) shouldBe Status.FORBIDDEN
-          }
+        "return 200" in {
+          status(result) shouldBe Status.OK
         }
+      }
+
+      "not authorised" should {
+
+        lazy val result = {
+          callAuthService(agentAuthResult)
+          callAuthServiceEnrolmentsOnly(Enrolments(mtdVatEnrolment))
+          controller.vatReturnViaPayments("#001")(request(fakeRequestWithClientsVRN))
+        }
+
+        "return 403" in {
+          status(result) shouldBe Status.FORBIDDEN
+        }
+      }
 
     }
 
