@@ -380,8 +380,8 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
 
       "return the no returns view" in {
         val document: Document = Jsoup.parse(contentAsString(result))
-          document.select("#content > p:nth-child(3)").text should include
-          "You do not have any returns due right now."
+        document.select("#content > p:nth-child(3)").text should include
+        "You do not have any returns due right now."
       }
     }
 
@@ -432,8 +432,8 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
 
         "return the no returns view" in {
           val document: Document = Jsoup.parse(contentAsString(result))
-            document.select("#content > p:nth-child(3)").text should include
-            "You do not have any returns due right now."
+          document.select("#content > p:nth-child(3)").text should include
+          "You do not have any returns due right now."
         }
       }
 

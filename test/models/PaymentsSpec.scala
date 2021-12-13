@@ -52,6 +52,32 @@ class PaymentsSpec extends AnyWordSpecLike with Matchers {
       result shouldEqual examplePayment
     }
   }
+  "A payment where outstanding amount is not supplied" should {
+
+    val examplePayment = Payment(
+      "VAT",
+      LocalDate.parse("2017-06-01"),
+      LocalDate.parse("2017-07-01"),
+      LocalDate.parse("2017-07-21"),
+      0,
+      "#004"
+    )
+
+    val exampleInputString =
+      """{
+        |"chargeType":"VAT",
+        |"taxPeriodFrom":"2017-06-01",
+        |"taxPeriodTo":"2017-07-01",
+        |"items":[{"dueDate":"2017-07-21"}, {"dueDate":"2017-07-22"}],
+        |"periodKey":"#004"
+        |}"""
+        .stripMargin.replace("\n", "")
+
+    "be parsed from appropriate JSON" in {
+      val result = Json.parse(exampleInputString).as[Payment]
+      result shouldEqual examplePayment
+    }
+  }
 
   "Payments" should {
 
