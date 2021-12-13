@@ -19,7 +19,6 @@ package controllers
 import common.{SessionKeys, EnrolmentKeys => Keys}
 import config.{AppConfig, ServiceErrorHandler}
 import controllers.predicate.AuthoriseAgentWithClient
-
 import javax.inject.{Inject, Singleton}
 import models.User
 import play.api.mvc._
@@ -30,7 +29,6 @@ import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import utils.LoggerUtil
 import views.html.errors.{InsolventUnauthView, UnauthorisedView}
-
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -66,7 +64,7 @@ class AuthorisedController @Inject()(enrolmentsAuthService: EnrolmentsAuthServic
         logger.warn(s"[AuthorisedController][authorisedAction] insufficient enrolment exception encountered")
         Future.successful(Forbidden(unauthorisedView()))
       case _: AuthorisationException =>
-        logger.warn(s"[AuthorisedController][authorisedAction] encountered unauthorisation exception")
+        logger.warn(s"[AuthorisedController][authorisedAction] encountered authorisation exception")
         Future.successful(Forbidden(unauthorisedView()))
     }
   }

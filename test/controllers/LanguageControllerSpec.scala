@@ -17,14 +17,13 @@
 package controllers
 
 import play.api.http.Status.SEE_OTHER
-import play.api.i18n.Langs
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 
 class LanguageControllerSpec extends ControllerBaseSpec {
 
-  lazy val controller = new LanguageController(inject[Langs], mockConfig, mcc)
+  lazy val controller = new LanguageController(mockConfig, mcc)
 
   lazy val fRequest: FakeRequest[AnyContentAsEmpty.type] =
     FakeRequest("get", "aurl").withHeaders(REFERER -> "thisIsMyNextLocation")

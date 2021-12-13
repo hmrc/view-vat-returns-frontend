@@ -17,9 +17,8 @@
 package controllers
 
 import java.time.LocalDate
-
 import common.SessionKeys
-import common.TestModels.{customerInformationMax, customerInformationMin, customerInformationNoMigDates, customerInformationNonMTDfB}
+import common.TestModels._
 import models._
 import models.errors.ObligationError
 import models.viewModels.{ReturnObligationsViewModel, VatReturnsViewModel}
@@ -31,7 +30,6 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core._
 import views.html.errors.SubmittedReturnsErrorView
 import views.html.returns.SubmittedReturnsView
-
 import scala.concurrent.Future
 
 class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
@@ -441,4 +439,36 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
       }
     }
   }
+
+  "Calling .showInsolventContent" when {
+
+      "the user is insolvent and not exempt from restrictions" should {
+
+        "return true" in {
+          controller.showInsolventContent(Some(customerDetailsInsolvent)) shouldBe true
+        }
+      }
+
+      "the user is insolvent and exempt from restrictions" should {
+
+        "return false" in {
+          controller.showInsolventContent(Some(customerDetailsInsolventTradingExempt)) shouldBe false
+        }
+      }
+
+      "the user is not insolvent" should {
+
+        "return false" in {
+          controller.showInsolventContent(Some(customerInformationMin)) shouldBe false
+        }
+      }
+    }
+
+    "the account details service response contains an error" should {
+
+      "return false" in {
+        controller.showInsolventContent(None) shouldBe false
+      }
+    }
+
 }

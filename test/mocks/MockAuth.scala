@@ -42,7 +42,6 @@ import uk.gov.hmrc.auth.core.retrieve.{Retrieval, ~}
 import uk.gov.hmrc.auth.core.{AffinityGroup, AuthConnector, Enrolments}
 import uk.gov.hmrc.http.HeaderCarrier
 import views.html.errors.{InsolventUnauthView, UnauthorisedView}
-
 import scala.concurrent.{ExecutionContext, Future}
 
 trait MockAuth extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite with BeforeAndAfterEach with

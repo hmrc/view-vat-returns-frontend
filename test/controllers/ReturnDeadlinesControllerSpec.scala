@@ -17,8 +17,8 @@
 package controllers
 
 import java.time.LocalDate
-
 import common.SessionKeys
+import common.SessionKeys.mtdVatMandationStatus
 import common.TestModels._
 import models._
 import models.errors.ObligationError
@@ -29,7 +29,6 @@ import play.api.test.Helpers.{charset, contentType, _}
 import play.twirl.api.Html
 import uk.gov.hmrc.auth.core.{User => _, _}
 import views.html.returns.{NoUpcomingReturnDeadlinesView, OptOutReturnDeadlinesView, ReturnDeadlinesView}
-
 import scala.concurrent.Future
 
 class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
@@ -550,6 +549,54 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
 
       "return 500" in {
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+      }
+    }
+  }
+
+  "The .upcomingObligationsAction" when {
+
+    "mandation status is in session" should {
+
+      lazy val result = {
+        callDateService()
+        controller.upcomingObligationsAction(Seq(returnDeadlinesModel), Html(""))(user, request(mandationRequest))
+      }
+
+      "return 200" in {
+        status(result) shouldBe Status.OK
+      }
+    }
+
+    "mandation status is not in session" when {
+
+      lazy val result = {
+        callSubscriptionService(Some(customerInformationMax))
+        controller.upcomingObligationsAction(Seq(returnDeadlinesModel), Html(""))(user, request())
+      }
+
+      "VAT subscription call is a success" should {
+
+        "mandation session key is added" in {
+
+          session(result).get(mtdVatMandationStatus) shouldBe Some("MTDfB")
+        }
+
+        "return 200" in {
+          status(result) shouldBe Status.OK
+        }
+      }
+
+      "Returns an error from VAT subscription" should {
+
+        lazy val result = {
+          callSubscriptionService(None)
+          controller.upcomingObligationsAction(Seq(returnDeadlinesModel), Html(""))(user, request())
+        }
+
+        "return an Internal Server Error (500)" in {
+
+          status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+        }
       }
     }
   }

@@ -32,7 +32,7 @@ lazy val coverageSettings: Seq[Setting[_]] = {
     "<empty>",
     ".*Reverse.*",
     "app.*",
-    "views.html.templates.formatters.*",
+    "views.*",
     "prod.*",
     "config.*",
     "testOnly.*",

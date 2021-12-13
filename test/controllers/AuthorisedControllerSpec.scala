@@ -17,40 +17,95 @@
 package controllers
 
 import common.SessionKeys
-import common.TestModels.{customerInformationFutureInsolvent, customerInformationMax}
+import common.TestModels.customerInformationFutureInsolvent
+import org.jsoup.Jsoup
 import play.api.mvc.{MessagesRequest, Request, Result}
 import play.api.http.Status
 import play.api.mvc.Results.Ok
 import play.api.mvc.AnyContent
+import play.api.test.FakeRequest
 import scala.concurrent.Future
 import play.api.test.Helpers._
+import uk.gov.hmrc.auth.core.{InsufficientEnrolments, InternalError}
 
 class AuthorisedControllerSpec extends ControllerBaseSpec {
 
-    def target(request: Request[AnyContent], ignoreMandatedStatus: Boolean = false): Future[Result] =
-      mockAuthorisedController.authorisedAction({ _ => _ => Future.successful(Ok("welcome"))
-      }, ignoreMandatedStatus)(new MessagesRequest[AnyContent](request, mcc.messagesApi))
+  def target(request: Request[AnyContent], ignoreMandatedStatus: Boolean = false): Future[Result] =
+    mockAuthorisedController.authorisedAction({ _ => _ => Future.successful(Ok("welcome"))
+    }, ignoreMandatedStatus)(new MessagesRequest[AnyContent](request, mcc.messagesApi))
 
 
-    "AuthorisedController .insolvencySubscriptionCall" when {
+  "AuthorisedController" when {
 
-      "User is insolvent and not continuing to trade" should {
+    "the user is an Individual (Principal Entity)" when {
 
-        "return Forbidden (403)" in {
+      "they have an active HMRC-MTD-VAT enrolment" when {
+
+        "they have a value in session for their insolvency status" when {
+
+          "insolvent user not continuing to trade" should {
+
+            lazy val result = {
+              callAuthService(individualAuthResult)
+              callDateService()
+              target(insolventRequestNoTrade)
+            }
+
+            "return Forbidden (403)" in {
+              status(result) shouldBe Status.FORBIDDEN
+            }
+          }
+
+          "user is permitted to trade" should {
+
+            lazy val result = {
+              callAuthService(individualAuthResult)
+              callDateService()
+              target(insolventRequestTrade)
+            }
+
+            "return OK (200)" in {
+              status(result) shouldBe Status.OK
+            }
+
+            "return the correct content" in {
+              contentAsString(result) shouldBe "welcome"
+            }
+          }
+
+          "user not permitted to trade" should {
+
+            lazy val result = {
+              callAuthService(individualAuthResult)
+              callDateService()
+              target(insolventRequestError)
+            }
+
+            "return an Internal Server Error (500)" in {
+              status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+            }
+          }
+        }
+
+        "there is an error returned from customer information API" should {
 
           lazy val result = {
             callAuthService(individualAuthResult)
-            callSubscriptionService(Some(customerInformationMax.copy(isInsolvent = true, continueToTrade = Some(false))))
+            callSubscriptionService(None)
             callDateService()
             target(fakeRequest)
           }
-          status(result) shouldBe Status.FORBIDDEN
+
+          "return 500" in {
+            status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+
+          }
         }
       }
 
-      "User have a value in session for future insolvency and the value is true" should {
+      ".insolvencySubscriptionCall" should {
 
-        "return ISE (500)" should {
+        "user not permitted to trade" should {
 
           lazy val result = {
             callAuthService(individualAuthResult)
@@ -59,57 +114,94 @@ class AuthorisedControllerSpec extends ControllerBaseSpec {
             target(fakeRequest)
           }
 
-          "return an internal server error" in {
+          "return an Internal Server Error (500)" in {
             status(result) shouldBe Status.INTERNAL_SERVER_ERROR
           }
 
-          "add both the insolvent and futureInsolvency flags to the session" in {
+          "adding sessionKeys" in {
             session(result).get(SessionKeys.insolventWithoutAccessKey) shouldBe Some("false")
             session(result).get(SessionKeys.futureInsolvencyDate) shouldBe Some("true")
           }
         }
       }
 
-      "User have a value in session for future insolvency and the value is false" should {
+      "they do not have an active HMRC-MTD-VAT enrolment" should {
 
-        "return OK (200)" should {
+        lazy val result: Future[Result] = {
+          callAuthService(Future.failed(InsufficientEnrolments()))
+          target(fakeRequest)
+        }
 
-          lazy val result = {
-            callAuthService(individualAuthResult)
-            callSubscriptionService(Some(customerInformationFutureInsolvent.copy(insolvencyDate = Some("2018-05-01"))))
-            callDateService()
-            target(fakeRequest)
-          }
+        "return Forbidden (403)" in {
+          status(result) shouldBe Status.FORBIDDEN
+        }
 
-          "return the correct status" in {
-            status(result) shouldBe Status.OK
-          }
-
-          "return the correct content" in {
-            contentAsString(result) shouldBe "welcome"
-          }
-
-          "add both the insolvent and futureInsolvency flags to the session" in {
-            session(result).get(SessionKeys.insolventWithoutAccessKey) shouldBe Some("false")
-            session(result).get(SessionKeys.futureInsolvencyDate) shouldBe Some("false")
-          }
+        "render the Not Signed Up page" in {
+          Jsoup.parse(contentAsString(result)).title shouldBe "You are not authorised to use this service - VAT - GOV.UK"
         }
       }
 
-      "The customer info call fails" should {
+      "they have no HMRC-MTD-VAT enrolment" should {
 
-        "return 500" in {
-          lazy val result = {
-            callAuthService(individualAuthResult)
-            callSubscriptionService(None)
-            callDateService()
-            target(fakeRequest)
-          }
-          status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+        lazy val result = {
+          callAuthService(noEnrolmentsAuthResponse)
+          target(FakeRequest())
+        }
+
+        "return Forbidden (403)" in {
+          status(result) shouldBe Status.FORBIDDEN
+        }
+
+        "render the Not Signed Up page" in {
+          Jsoup.parse(contentAsString(result)).title shouldBe "You are not authorised to use this service - VAT - GOV.UK"
+        }
+      }
+
+      "there is a different authorisation exception" should {
+
+        lazy val result: Future[Result] = {
+          callAuthService(Future.failed(InternalError()))
+          target(fakeRequest)
+        }
+
+        "return Forbidden (403)" in {
+          status(result) shouldBe Status.FORBIDDEN
+        }
+
+        "render the Not Signed Up page" in {
+          Jsoup.parse(contentAsString(result)).title shouldBe "You are not authorised to use this service - VAT - GOV.UK"
         }
       }
     }
+
+    "the user has no affinity" should {
+
+      lazy val result = {
+        callAuthService(noAffinityAuthResponse)
+        target(FakeRequest())
+      }
+
+      "return ISE (500)" in {
+        status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+      }
+    }
+
+    "the user is agent and access is forbidden" should {
+
+      lazy val result = {
+        callAuthService(agentAuthResult)
+        target(FakeRequest())
+      }
+
+      "redirect to agent hub page" in {
+
+        status(result) shouldBe Status.SEE_OTHER
+        redirectLocation(result) shouldBe Some(mockConfig.agentClientHubUrl)
+      }
+
+    }
   }
+}
 
 
 

@@ -17,7 +17,9 @@
 package common
 
 import common.MandationStatuses._
+import models.viewModels.ReturnDeadlineViewModel
 import models.{CustomerInformation, NavContent, NavLinks}
+import java.time.LocalDate
 
 object TestModels {
 
@@ -59,11 +61,16 @@ object TestModels {
     customerInformationMax.copy(isInsolvent = true, continueToTrade = Some(false))
   val customerInformationFutureInsolvent: CustomerInformation =
     customerInformationMax.copy(isInsolvent = true, insolvencyDate = Some("2018-05-02"))
+  val customerDetailsInsolventTradingExempt: CustomerInformation =
+    customerInformationMax.copy(isInsolvent = true, continueToTrade = Some(false), insolvencyType = Some("07"))
   val customerInformationNonMTDfB: CustomerInformation = customerInformationMax.copy(mandationStatus = nonMTDfB)
   val customerInformationNonDigital: CustomerInformation = customerInformationMax.copy(mandationStatus = nonDigital)
   val customerInformationMTDfBExempt: CustomerInformation = customerInformationMax.copy(mandationStatus = mtdfbExempt)
   val customerInformationNoMigDates: CustomerInformation =
     customerInformationMax.copy(customerMigratedToETMPDate = None, hybridToFullMigrationDate = None)
+
+  val returnDeadlinesModel: ReturnDeadlineViewModel = ReturnDeadlineViewModel(
+    LocalDate.parse("2018-05-02"), LocalDate.parse("2018-05-02"), LocalDate.parse("2018-05-02"), periodKey = "18AA")
 
   val navContent: NavContent = NavContent(
     NavLinks("Home", "Hafan", "http://localhost:9999/home"),
