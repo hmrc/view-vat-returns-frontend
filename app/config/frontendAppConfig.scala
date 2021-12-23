@@ -66,7 +66,6 @@ trait AppConfig {
   val agentClientLookupUrl: String => String
   val agentClientUnauthorisedUrl: String => String
   val agentClientHubUrl: String
-  val accessibilityLinkUrl: String
   val gtmContainer: String
   val directDebitInterruptUrl : String
 }
@@ -170,6 +169,4 @@ class FrontendAppConfig @Inject()(implicit configuration: Configuration, sc: Ser
 
   override lazy val agentClientHubUrl: String =
     sc.getString(Keys.vatAgentClientLookupFrontendHost) + sc.getString(Keys.vatAgentClientLookupHubUrl)
-
-  override val accessibilityLinkUrl: String = sc.getString(ConfigKeys.vatSummaryBase) + sc.getString(ConfigKeys.vatSummaryAccessibilityUrl)
 }

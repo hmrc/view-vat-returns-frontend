@@ -115,6 +115,6 @@ user.fold[Option[String]](None)(u => if(u.isAgent) Some(appConfig.agentClientHub
     headBlock = Some(head),
     headerBlock = Some(header),
     beforeContentBlock = Some(beforeContentHtml),
-    footerBlock = Some(hmrcStandardFooter(accessibilityStatementUrl = Some(appConfig.accessibilityLinkUrl))),
+    footerBlock = Some(hmrcStandardFooter()),
     scriptsBlock = Some(scripts)
 )(fullContent)
