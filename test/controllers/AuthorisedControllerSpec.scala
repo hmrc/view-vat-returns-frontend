@@ -157,6 +157,30 @@ class AuthorisedControllerSpec extends ControllerBaseSpec {
         }
       }
 
+      "they have an unrecognised identifier name" should {
+
+        lazy val result = {
+          callAuthService(invalidIdentifierNameAuthResult)
+          target(FakeRequest())
+        }
+
+        "return Forbidden (403)" in {
+          status(result) shouldBe Status.FORBIDDEN
+        }
+      }
+
+      "they have no identifiers" should {
+
+        lazy val result = {
+          callAuthService(emptyIdentifiersAuthResult)
+          target(FakeRequest())
+        }
+
+        "return Forbidden (403)" in {
+          status(result) shouldBe Status.FORBIDDEN
+        }
+      }
+
       "there is a different authorisation exception" should {
 
         lazy val result: Future[Result] = {

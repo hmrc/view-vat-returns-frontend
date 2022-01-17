@@ -74,27 +74,21 @@ class AuthorisedController @Inject()(enrolmentsAuthService: EnrolmentsAuthServic
 
     val vatEnrolments: Set[Enrolment] = User.extractVatEnrolments(enrolments)
 
-    if (vatEnrolments.exists(_.key == Keys.mtdVatEnrolmentKey)) {
-      val containsNonMtdVat: Boolean = User.containsNonMtdVat(vatEnrolments)
+    vatEnrolments.collectFirst {
+      case Enrolment(Keys.mtdVatEnrolmentKey, Seq(EnrolmentIdentifier(Keys.vatIdentifierId, vrn)), status, _) =>
 
-      vatEnrolments.collectFirst {
-        case Enrolment(Keys.mtdVatEnrolmentKey, Seq(EnrolmentIdentifier(Keys.vatIdentifierId, vrn)), status, _) =>
+        val containsNonMtdVat: Boolean = User.containsNonMtdVat(vatEnrolments)
+        val user = User(vrn, status == Keys.activated, containsNonMtdVat)
 
-          val user = User(vrn, status == Keys.activated, containsNonMtdVat)
-
-          (request.session.get(SessionKeys.insolventWithoutAccessKey), request.session.get(SessionKeys.futureInsolvencyDate)) match {
-            case (Some("true"), _) => Future.successful(Forbidden(insolventUnauthView(user)))
-            case (Some("false"), Some("true")) => Future.successful(errorHandler.showInternalServerError)
-            case (Some("false"), Some("false")) => block(request)(user)
-            case _ => insolvencySubscriptionCall(user, block(request))
-          }
-
-      } getOrElse {
-        logger.warn("[AuthorisedController][authoriseAsNonAgent] Non-agent with invalid VRN")
-        Future.successful(errorHandler.showInternalServerError)
-      }
-    } else {
-      logger.debug("[AuthorisedController][authoriseAsNonAgent] Non-agent with no HMRC-MTD-VAT enrolment. Rendering unauthorised view.")
+        (request.session.get(SessionKeys.insolventWithoutAccessKey), request.session.get(SessionKeys.futureInsolvencyDate)) match {
+          case (Some("true"), _) => Future.successful(Forbidden(insolventUnauthView(user)))
+          case (Some("false"), Some("true")) => Future.successful(errorHandler.showInternalServerError)
+          case (Some("false"), Some("false")) => block(request)(user)
+          case _ => insolvencySubscriptionCall(user, block(request))
+        }
+    } getOrElse {
+      logger.debug("[AuthorisedController][authoriseAsNonAgent] " +
+        "Non-agent with no HMRC-MTD-VAT enrolment. Rendering unauthorised view.")
       Future.successful(Forbidden(unauthorisedView()))
     }
   }
