@@ -98,6 +98,12 @@ class ControllerBaseSpec extends MockAuth {
     Some(mtdVatDelegatedAuthRule)
   ))
 
+  val invalidIdentifierNameEnrolment: Set[Enrolment] =
+    Set(Enrolment(mtdVatEnrolmentKey, Seq(EnrolmentIdentifier("F", vrn)), activated))
+
+  val emptyIdentifiersEnrolment: Set[Enrolment] =
+    Set(Enrolment(mtdVatEnrolmentKey, Seq(), activated))
+
   val individualAuthResult: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(new ~(
     Enrolments(mtdVatEnrolment), Some(Individual)
   ))
@@ -116,6 +122,14 @@ class ControllerBaseSpec extends MockAuth {
 
   val agentAuthResult: Future[~[Enrolments, Option[AffinityGroup]]] = Future.successful(new ~(
     Enrolments(agentEnrolment), Some(Agent)
+  ))
+
+  val invalidIdentifierNameAuthResult: Future[Enrolments ~ Some[AffinityGroup.Individual.type]] = Future.successful(new ~(
+    Enrolments(invalidIdentifierNameEnrolment), Some(Individual)
+  ))
+
+  val emptyIdentifiersAuthResult: Future[Enrolments ~ Some[AffinityGroup.Individual.type]] = Future.successful(new ~(
+    Enrolments(emptyIdentifiersEnrolment), Some(Individual)
   ))
 
   def insolvencyCheck(controllerAction: Action[AnyContent]): Unit = {
