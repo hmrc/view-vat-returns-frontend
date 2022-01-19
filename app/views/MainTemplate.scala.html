@@ -24,7 +24,7 @@
 @this(govukLayout: GovukLayout,
       govukHeader: GovukHeader,
       standardBetaBanner: StandardBetaBanner,
-      hmrcReportTechnicalIssue: HmrcReportTechnicalIssue,
+      hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper,
       hmrcLanguageSelect: HmrcLanguageSelect,
       hmrcTimeoutDialog: HmrcTimeoutDialog,
       hmrcStandardHeader: HmrcStandardHeader,
@@ -39,20 +39,22 @@
   user: Option[User] = None)(mainContent: Html)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
 @titleServiceName = @{
-    user.fold(messages("navTitle.makingTaxDigitalForVat"))(u => if(u.isAgent) messages("navTitle.agent") else messages("navTitle.nonAgent"))
+  user.fold(messages("navTitle.makingTaxDigitalForVat"))(u =>
+    if(u.isAgent) messages("navTitle.agent") else messages("navTitle.nonAgent"))
 }
 
 @scripts = {
-    <script src='@routes.Assets.at("lib/govuk-frontend/govuk/all.js")'></script>
-    <script src='@routes.Assets.at("lib/hmrc-frontend/hmrc/all.js")'></script>
-    <script type="text/javascript" src='@routes.Assets.at("javascript/btalinks.js")'></script>
+  <script src='@routes.Assets.at("lib/govuk-frontend/govuk/all.js")'></script>
+  <script src='@routes.Assets.at("lib/hmrc-frontend/hmrc/all.js")'></script>
+  <script type="text/javascript" src='@routes.Assets.at("javascript/btalinks.js")'></script>
 
-    <script>window.GOVUKFrontend.initAll();</script>
-    <script>window.HMRCFrontend.initAll();</script>
+  <script>window.GOVUKFrontend.initAll();</script>
+  <script>window.HMRCFrontend.initAll();</script>
 }
 
 @titleServiceUrl = @{
-user.fold[Option[String]](None)(u => if(u.isAgent) Some(appConfig.agentClientHubUrl) else Some(appConfig.vatDetailsUrl))
+  user.fold[Option[String]](None)(u =>
+    if(u.isAgent) Some(appConfig.agentClientHubUrl) else Some(appConfig.vatDetailsUrl))
 }
 
 @beforeContentHtml = {
@@ -67,54 +69,47 @@ user.fold[Option[String]](None)(u => if(u.isAgent) Some(appConfig.agentClientHub
 }
 
 @head = {
-    @hmrcTrackingConsentSnippet()
-    <link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/application.css")' media="all">
-    <link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/print.css")'>
+  @hmrcTrackingConsentSnippet()
+  <link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/application.css")' media="all">
+  <link rel="stylesheet" type="text/css" href='@routes.Assets.at("stylesheets/print.css")'>
 
-    @if(showSignOut) {
-        @hmrcTimeoutDialog(TimeoutDialog(
-          timeout = Some(appConfig.timeoutPeriod),
-          countdown = Some(appConfig.timeoutCountdown),
-          signOutUrl = Some(routes.SignOutController.signOut(feedbackOnSignOut).url),
-          keepAliveUrl = Some("#"),
-          signOutButtonText = Some(messages("base.signOut"))
-        ))
-    }
+  @if(showSignOut) {
+    @hmrcTimeoutDialog(TimeoutDialog(
+      timeout = Some(appConfig.timeoutPeriod),
+      countdown = Some(appConfig.timeoutCountdown),
+      signOutUrl = Some(routes.SignOutController.signOut(feedbackOnSignOut).url),
+      keepAliveUrl = Some("#"),
+      signOutButtonText = Some(messages("base.signOut"))
+    ))
+  }
 }
 
 @header = {
-
   @hmrcStandardHeader(
     serviceName = Some(titleServiceName),
     serviceUrl = titleServiceUrl,
     signOutUrl = if(showSignOut) Some(routes.SignOutController.signOut(feedbackOnSignOut).url) else None,
-    userResearchBanner = if(appConfig.features.userResearchBanner()) Some(UserResearchBanner(
+    userResearchBanner =
+      if(appConfig.features.userResearchBanner()) Some(UserResearchBanner(
         url = "https://signup.take-part-in-research.service.gov.uk/?utm_campaign=VATviewchange&utm_source=Other&utm_medium=other&t=HMRC&id=34"
-        )) else None,
+      )) else None,
     phaseBanner = Some(standardBetaBanner(url = appConfig.feedbackUrl(request.uri))),
     displayHmrcBanner = false
   )
 }
 
-@getHelpHtml = @{
-  hmrcReportTechnicalIssue(ReportTechnicalIssue(
-    serviceCode = appConfig.contactFormServiceIdentifier,
-    language = if(messages.lang.code == "cy") Cy else En
-  ))
-}
-
 @fullContent = {
-    <div id="content" class="govuk-!-margin-bottom-6">
-        @mainContent
-    </div>
-    @getHelpHtml
+  <div id="content" class="govuk-!-margin-bottom-6">
+    @mainContent
+  </div>
+  @hmrcReportTechnicalIssueHelper()
 }
 
 @govukLayout(
-    pageTitle = Some(messages("base.pageTitle", pageTitle, titleServiceName)),
-    headBlock = Some(head),
-    headerBlock = Some(header),
-    beforeContentBlock = Some(beforeContentHtml),
-    footerBlock = Some(hmrcStandardFooter()),
-    scriptsBlock = Some(scripts)
+  pageTitle = Some(messages("base.pageTitle", pageTitle, titleServiceName)),
+  headBlock = Some(head),
+  headerBlock = Some(header),
+  beforeContentBlock = Some(beforeContentHtml),
+  footerBlock = Some(hmrcStandardFooter()),
+  scriptsBlock = Some(scripts)
 )(fullContent)
