@@ -75,7 +75,7 @@ class FrontendAppConfig @Inject()(implicit configuration: Configuration, sc: Ser
 
   override val appName: String = sc.getString("appName")
   private lazy val contactHost: String = sc.getString(Keys.contactFrontendHost)
-  override lazy val contactFormServiceIdentifier: String = "VATVC"
+  override lazy val contactFormServiceIdentifier: String = sc.getString(Keys.contactFrontendService)
   private lazy val contactFrontendService = sc.baseUrl(Keys.contactFrontendService)
   override lazy val reportAProblemPartialUrl: String =
     s"$contactHost/contact/problem_reports_ajax?service=$contactFormServiceIdentifier"

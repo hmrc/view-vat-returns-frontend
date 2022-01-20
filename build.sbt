@@ -51,20 +51,20 @@ lazy val coverageSettings: Seq[Setting[_]] = {
 
 val compile = Seq(
   ws,
-  "uk.gov.hmrc"       %% "bootstrap-frontend-play-28" % "5.16.0",
+  "uk.gov.hmrc"       %% "bootstrap-frontend-play-28" % "5.19.0",
   "uk.gov.hmrc"       %% "play-language"              % "5.1.0-play-28",
-  "com.typesafe.play" %% "play-json-joda"             % "2.7.4",
-  "uk.gov.hmrc"       %% "play-frontend-hmrc"         % "1.25.0-play-28"
+  "com.typesafe.play" %% "play-json-joda"             % "2.9.2",
+  "uk.gov.hmrc"       %% "play-frontend-hmrc"         % "2.0.0-play-28"
 )
 
 def test(scope: String = "test, it"): Seq[ModuleID] = Seq(
   "org.scalatest"           %% "scalatest"                    % "3.1.4"           % scope,
   "com.vladsch.flexmark"    %  "flexmark-all"                 % "0.36.8"          % scope,
   "org.pegdown"             %  "pegdown"                      % "1.6.0"           % scope,
-  "org.jsoup"               %  "jsoup"                        % "1.14.1"          % scope,
+  "org.jsoup"               %  "jsoup"                        % "1.14.3"          % scope,
   "org.scalatestplus.play"  %% "scalatestplus-play"           % "5.1.0"           % scope,
   "org.scalamock"           %% "scalamock-scalatest-support"  % "3.6.0"           % scope,
-  "com.github.tomakehurst"  %  "wiremock-jre8"                % "2.26.3"          % scope
+  "com.github.tomakehurst"  %  "wiremock-jre8"                % "2.27.2"          % scope
 )
 
 def oneForkedJvmPerTest(tests: Seq[TestDefinition]): Seq[Group] = tests map {
@@ -93,7 +93,7 @@ lazy val microservice = Project(appName, file("."))
   .settings(defaultSettings(): _*)
   .settings(majorVersion := 0)
   .settings(
-    scalaVersion := "2.12.14",
+    scalaVersion := "2.12.15",
     libraryDependencies ++= appDependencies,
     retrieveManaged := true,
     evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false)
