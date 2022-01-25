@@ -29,120 +29,241 @@ class PaymentStatusTemplateSpec extends TemplateBaseSpec {
 
   val whatYouOweCalc = "We have worked out what you owe based on any payments you might have made on your account. "
 
-  "Rendering the payment status information" when {
+  "A principal user" should {
+    "render the payment status information" when {
 
-    "then User is NOT Hybrid and" when {
+      "then User is NOT Hybrid and" when {
 
-      "the user owes money on their VAT return" should {
+        "the user owes money on their VAT return" should {
 
-        val expectedText = whatYouOweCalc +
-          "You need to pay this bill by 11 November 2011. " +
-          "It can take up to 7 days to show that you have made a payment. " +
-          "Return total: £1,000 " +
-          "You owe HMRC: £1,000"
+          val expectedText = whatYouOweCalc +
+            "You need to pay this bill by 11 November 2011. " +
+            "It can take up to 7 days to show that you have made a payment. " +
+            "Return total: £1,000 " +
+            "You owe HMRC: £1,000"
+
+          val template = injectedTemplate(
+            1000,
+            dueDate = LocalDate.parse("2011-11-11"),
+            moneyOwed = true,
+            oweHmrc = Some(true),
+            isHybridUser = false,
+            outstandingAmount = Some(1000)
+          )(user = user, messages = messages)
+          val document: Document = Jsoup.parse(template.body)
+
+          "render the expected text" in {
+            document.body().text() shouldBe expectedText
+          }
+        }
+
+        "the outstanding amount on the return is zero" should {
+
+          val expectedText = whatYouOweCalc + "Return total: £0 You owe HMRC: £0"
+
+          val template = injectedTemplate(
+            0,
+            dueDate = LocalDate.parse("2011-11-11"),
+            moneyOwed = false,
+            oweHmrc = Some(false),
+            isHybridUser = false,
+            outstandingAmount = Some(0)
+          )(user = user, messages = messages)
+          val document: Document = Jsoup.parse(template.body)
+
+          "render the expected text" in {
+            document.body().text() shouldBe expectedText
+          }
+        }
+
+        "the outstanding amount on the return is less than the return amount" should {
+
+          val expectedText = whatYouOweCalc +
+            "You need to pay this bill by 11 November 2011. " +
+            "It can take up to 7 days to show that you have made a payment. " +
+            "Return total: £1,000 " +
+            "You owe HMRC: £500"
+
+          val template = injectedTemplate(
+            1000,
+            dueDate = LocalDate.parse("2011-11-11"),
+            moneyOwed = true,
+            oweHmrc = Some(true),
+            isHybridUser = false,
+            outstandingAmount = Some(500)
+          )(user = user, messages = messages)
+          val document: Document = Jsoup.parse(template.body)
+
+          "render the expected text" in {
+            document.body().text() shouldBe expectedText
+          }
+        }
+
+        "the user is waiting for HMRC to pay them back for their VAT return" should {
+
+          val expectedText = whatYouOweCalc + "It can take up to 30 days for you to receive a repayment. " +
+            "Return total: £1,000 HMRC owes you: £1,000"
+
+          val template = injectedTemplate(
+            1000,
+            dueDate = LocalDate.parse("2011-11-11"),
+            moneyOwed = true,
+            oweHmrc = Some(false),
+            isHybridUser = false,
+            outstandingAmount = Some(-1000)
+          )(user = user, messages = messages)
+          val document: Document = Jsoup.parse(template.body)
+
+          "render the expected text" in {
+            document.body().text() shouldBe expectedText
+          }
+        }
+      }
+
+      "then User is Hybrid" should {
+
+        val expectedText = "Return total: £1,000"
 
         val template = injectedTemplate(
           1000,
           dueDate = LocalDate.parse("2011-11-11"),
-          moneyOwed = true,
-          oweHmrc = Some(true),
-          isHybridUser = false,
-          outstandingAmount = Some(1000)
-        )
-        val document: Document = Jsoup.parse(template.body)
-
-        "render the expected text" in {
-          document.body().text() shouldBe expectedText
-        }
-      }
-
-      "the outstanding amount on the return is zero" should {
-
-        val expectedText = whatYouOweCalc + "Return total: £0 You owe HMRC: £0"
-
-        val template = injectedTemplate(
-          0,
-          dueDate = LocalDate.parse("2011-11-11"),
+          oweHmrc = Some(false),
           moneyOwed = false,
-          oweHmrc = Some(false),
-          isHybridUser = false,
-          outstandingAmount = Some(0)
-        )
+          isHybridUser = true,
+          outstandingAmount = Some(1000)
+        )(user = user, messages = messages)
         val document: Document = Jsoup.parse(template.body)
 
         "render the expected text" in {
           document.body().text() shouldBe expectedText
         }
-      }
 
-      "the outstanding amount on the return is less than the return amount" should {
-
-        val expectedText = whatYouOweCalc +
-          "You need to pay this bill by 11 November 2011. " +
-          "It can take up to 7 days to show that you have made a payment. " +
-          "Return total: £1,000 " +
-          "You owe HMRC: £500"
-
-        val template = injectedTemplate(
-          1000,
-          dueDate = LocalDate.parse("2011-11-11"),
-          moneyOwed = true,
-          oweHmrc = Some(true),
-          isHybridUser = false,
-          outstandingAmount = Some(500)
-        )
-        val document: Document = Jsoup.parse(template.body)
-
-        "render the expected text" in {
-          document.body().text() shouldBe expectedText
+        "not render the paragraph about how what you owe has been calculated" in {
+          document.body().text() shouldNot contain(whatYouOweCalc)
         }
-      }
 
-      "the user is waiting for HMRC to pay them back for their VAT return" should {
-
-        val expectedText = whatYouOweCalc + "It can take up to 30 days for you to receive a repayment. " +
-          "Return total: £1,000 HMRC owes you: £1,000"
-
-        val template = injectedTemplate(
-          1000,
-          dueDate = LocalDate.parse("2011-11-11"),
-          moneyOwed = true,
-          oweHmrc = Some(false),
-          isHybridUser = false,
-          outstandingAmount = Some(-1000)
-        )
-        val document: Document = Jsoup.parse(template.body)
-
-        "render the expected text" in {
-          document.body().text() shouldBe expectedText
+        "not render what HMRC owes the user" in {
+          document.body().text() shouldNot contain("HMRC owes you: £1,000")
         }
       }
     }
+  }
+  "An agent" should {
+    "render the payment status information" when {
 
-    "then User is Hybrid" should {
+      "then User is NOT Hybrid and" when {
 
-      val expectedText = "Return total: £1,000"
+        "the user owes money on their VAT return" should {
 
-      val template = injectedTemplate(
-        1000,
-        dueDate = LocalDate.parse("2011-11-11"),
-        oweHmrc = Some(false),
-        moneyOwed = false,
-        isHybridUser = true,
-        outstandingAmount = Some(1000)
-      )
-      val document: Document = Jsoup.parse(template.body)
+          val expectedText = whatYouOweCalc +
+            "You need to pay this bill by 11 November 2011. " +
+            "It can take up to 7 days to show that you have made a payment. " +
+            "Return total: £1,000 " +
+            "You owe HMRC: £1,000"
 
-      "render the expected text" in {
-        document.body().text() shouldBe expectedText
+          val template = injectedTemplate(
+            1000,
+            dueDate = LocalDate.parse("2011-11-11"),
+            moneyOwed = true,
+            oweHmrc = Some(true),
+            isHybridUser = false,
+            outstandingAmount = Some(1000)
+          )(user = agentUser, messages = messages)
+          val document: Document = Jsoup.parse(template.body)
+
+          "render the expected text" in {
+            document.body().text() shouldBe expectedText
+          }
+        }
+
+        "the outstanding amount on the return is zero" should {
+
+          val expectedText = whatYouOweCalc + "Return total: £0 You owe HMRC: £0"
+
+          val template = injectedTemplate(
+            0,
+            dueDate = LocalDate.parse("2011-11-11"),
+            moneyOwed = false,
+            oweHmrc = Some(false),
+            isHybridUser = false,
+            outstandingAmount = Some(0)
+          )(user = agentUser, messages = messages)
+          val document: Document = Jsoup.parse(template.body)
+
+          "render the expected text" in {
+            document.body().text() shouldBe expectedText
+          }
+        }
+
+        "the outstanding amount on the return is less than the return amount" should {
+
+          val expectedText = whatYouOweCalc +
+            "You need to pay this bill by 11 November 2011. " +
+            "It can take up to 7 days to show that you have made a payment. " +
+            "Return total: £1,000 " +
+            "You owe HMRC: £500"
+
+          val template = injectedTemplate(
+            1000,
+            dueDate = LocalDate.parse("2011-11-11"),
+            moneyOwed = true,
+            oweHmrc = Some(true),
+            isHybridUser = false,
+            outstandingAmount = Some(500)
+          )(user = agentUser, messages = messages)
+          val document: Document = Jsoup.parse(template.body)
+
+          "render the expected text" in {
+            document.body().text() shouldBe expectedText
+          }
+        }
+
+        "the user is waiting for HMRC to pay them back for their VAT return" should {
+
+          val expectedText = whatYouOweCalc + "It can take up to 30 days for you to receive a repayment. " +
+            "Return total: £1,000 HMRC owes you: £1,000"
+
+          val template = injectedTemplate(
+            1000,
+            dueDate = LocalDate.parse("2011-11-11"),
+            moneyOwed = true,
+            oweHmrc = Some(false),
+            isHybridUser = false,
+            outstandingAmount = Some(-1000)
+          )(user = agentUser, messages = messages)
+          val document: Document = Jsoup.parse(template.body)
+
+          "render the expected text" in {
+            document.body().text() shouldBe expectedText
+          }
+        }
       }
 
-      "not render the paragraph about how what you owe has been calculated" in {
-        document.body().text() shouldNot contain(whatYouOweCalc)
-      }
+      "then User is Hybrid" should {
 
-      "not render what HMRC owes the user" in {
-        document.body().text() shouldNot contain("HMRC owes you: £1,000")
+        val expectedText = "Return total: £1,000"
+
+        val template = injectedTemplate(
+          1000,
+          dueDate = LocalDate.parse("2011-11-11"),
+          oweHmrc = Some(false),
+          moneyOwed = false,
+          isHybridUser = true,
+          outstandingAmount = Some(1000)
+        )(user = agentUser, messages = messages)
+        val document: Document = Jsoup.parse(template.body)
+
+        "render the expected text" in {
+          document.body().text() shouldBe expectedText
+        }
+
+        "not render the paragraph about how what you owe has been calculated" in {
+          document.body().text() shouldNot contain(whatYouOweCalc)
+        }
+
+        "not render what HMRC owes the user" in {
+          document.body().text() shouldNot contain("HMRC owes you: £1,000")
+        }
       }
     }
   }

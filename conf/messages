@@ -90,10 +90,14 @@ paymentStatus.returnTotal = Return total:
 paymentStatus.hmrcPaid = HMRC paid you:
 paymentStatus.hmrcOwesYou = HMRC owes you:
 paymentStatus.youOweHmrc = You owe HMRC:
+paymentStatus.youOweHmrcAgent = Your client owes HMRC:
 paymentStatus.billToPay = You need to pay this bill by {0}.
+paymentStatus.billToPayAgent = Your client needs to pay this bill by {0}.
 paymentStatus.paymentProcessing = It can take up to 7 days to show that you have made a payment.
+paymentStatus.paymentProcessingAgent = It can take up to 7 days to show that they have made a payment.
 paymentStatus.repaymentProcessing = It can take up to 30 days for you to receive a repayment.
 paymentStatus.whatYouOweCalc = We have worked out what you owe based on any payments you might have made on your account.
+paymentStatus.whatYouOweCalcAgent = We have worked out what your client owes based on any payments made on their account.
 
 submittedReturns.title = Submitted returns
 submittedReturns.yearReturns = {0} returns
