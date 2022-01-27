@@ -116,10 +116,14 @@ paymentStatus.returnTotal = Cyfanswm y Ffurflen TAW:
 paymentStatus.hmrcPaid = Talodd CThEM y canlynol i chi:
 paymentStatus.hmrcOwesYou = Mae ar CThEM y swm hwn i chi:
 paymentStatus.youOweHmrc = Mae arnoch y swm hwn i CThEM:
+paymentStatus.youOweHmrcAgent = Dyma’r swm sydd ar eich cleient i CThEM:
 paymentStatus.billToPay = Mae’n rhaid i chi dalu’r bil hwn erbyn {0}.
+paymentStatus.billToPayAgent = Mae angen i’ch cleient dalu’r bil hwn erbyn {0}.
 paymentStatus.paymentProcessing = Gall gymryd hyd at 7 diwrnod i ddangos eich bod wedi gwneud taliad.
+paymentStatus.paymentProcessingAgent = Gall gymryd hyd at 7 diwrnod i ddangos ei fod wedi gwneud taliad.
 paymentStatus.repaymentProcessing = Gall gymryd hyd at 30 diwrnod i chi gael ad-daliad.
 paymentStatus.whatYouOweCalc = Rydym wedi cyfrifo’r hyn sydd arnoch ar sail unrhyw daliadau mae’n bosibl eich bod wedi eu gwneud ar eich cyfrif.
+paymentStatus.whatYouOweCalcAgent = Rydym wedi cyfrifo’r hyn sydd ar eich cleient ar sail unrhyw daliadau a wnaed ar ei gyfrif.
 
 submittedReturns.title = Ffurflenni TAW wedi’u cyflwyno
 submittedReturns.yearReturns = Ffurflenni TAW {0}
