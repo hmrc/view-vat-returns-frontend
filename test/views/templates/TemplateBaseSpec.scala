@@ -17,6 +17,7 @@
 package views.templates
 
 import mocks.MockAppConfig
+import models.User
 import org.jsoup.Jsoup
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.matchers.should.Matchers
@@ -34,6 +35,8 @@ class TemplateBaseSpec extends AnyWordSpecLike
 
   implicit val mockAppConfig: MockAppConfig = new MockAppConfig(app.configuration)
   implicit lazy val messages: Messages = MessagesImpl(Lang("en-GB"), inject[MessagesApi])
+  implicit val user: User = User("999999999")
+  val agentUser: User = User("999999999", arn = Some("XARN1234567"))
 
   def formatHtml(body: Html): String = Jsoup.parseBodyFragment(s"\n$body\n").toString.trim
 }

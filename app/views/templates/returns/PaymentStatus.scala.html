@@ -26,14 +26,17 @@
   dueDate: LocalDate,
   moneyOwed: Boolean,
   oweHmrc: Option[Boolean],
-  isHybridUser: Boolean)(implicit messages: Messages)
+  isHybridUser: Boolean)(implicit messages: Messages, user: User)
 
 @if(isHybridUser) {
     <h2 class="govuk-heading-l">@messages("paymentStatus.returnTotal") @displayMoney(amount)</h2>
 } else {
 
+    @if(user.isAgent) {
+    <p class="govuk-body">@messages("paymentStatus.whatYouOweCalcAgent")</p>
+    }else {
     <p class="govuk-body">@messages("paymentStatus.whatYouOweCalc")</p>
-
+    }
     @(moneyOwed, oweHmrc, outstandingAmount) match {
         case (true, Some(false), Some(outstandingAmount)) => {
             <p class="govuk-body">@messages("paymentStatus.repaymentProcessing")</p>
@@ -42,15 +45,25 @@
 
         }
         case (true, Some(true), Some(outstandingAmount)) => {
+        @if(user.isAgent) {
+            <p class="govuk-body">@messages("paymentStatus.billToPayAgent", displayDate(dueDate)) @messages("paymentStatus.paymentProcessingAgent")</p>
+        } else {
             <p class="govuk-body">@messages("paymentStatus.billToPay", displayDate(dueDate)) @messages("paymentStatus.paymentProcessing")</p>
+        }
             <h2 class="govuk-heading-l">@messages("paymentStatus.returnTotal") @displayMoney(amount)</h2>
+        @if(user.isAgent) {
+            <h3 class="govuk-heading-m">@messages("paymentStatus.youOweHmrcAgent") @displayMoney(outstandingAmount)</h3>
+        } else {
             <h3 class="govuk-heading-m">@messages("paymentStatus.youOweHmrc") @displayMoney(outstandingAmount)</h3>
-
+        }
         }
         case (false, _, Some(outstandingAmount)) => {
             <h2 class="govuk-heading-l ">@messages("paymentStatus.returnTotal") @displayMoney(amount)</h2>
+        @if(user.isAgent) {
+            <h3 class="govuk-heading-m">@messages("paymentStatus.youOweHmrcAgent") @displayMoney(outstandingAmount)</h3>
+        } else {
             <h3 class="govuk-heading-m">@messages("paymentStatus.youOweHmrc") @displayMoney(outstandingAmount)</h3>
-
+        }
         }
         case _ => {
             <h2 class="govuk-heading-l">@messages("paymentStatus.returnTotal") @displayMoney(amount)</h2>
