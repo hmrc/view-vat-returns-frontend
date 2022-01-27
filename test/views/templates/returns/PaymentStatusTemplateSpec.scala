@@ -34,7 +34,7 @@ class PaymentStatusTemplateSpec extends TemplateBaseSpec {
   "A principal user" should {
     "render the payment status information" when {
 
-      "then User is NOT Hybrid and" when {
+      "the User is NOT Hybrid and" when {
 
         "the user owes money on their VAT return" should {
 
@@ -122,7 +122,7 @@ class PaymentStatusTemplateSpec extends TemplateBaseSpec {
         }
       }
 
-      "then User is Hybrid" should {
+      "the User is Hybrid" should {
 
         val expectedText = "Return total: £1,000"
 
@@ -153,7 +153,7 @@ class PaymentStatusTemplateSpec extends TemplateBaseSpec {
   "An agent" should {
     "render the payment status information" when {
 
-      "then User is NOT Hybrid and" when {
+      "the User is NOT Hybrid and" when {
 
         "the user owes money on their VAT return" should {
 
@@ -221,7 +221,7 @@ class PaymentStatusTemplateSpec extends TemplateBaseSpec {
         }
       }
 
-      "then User is Hybrid" should {
+      "the User is Hybrid" should {
 
         val expectedText = "Return total: £1,000"
 
