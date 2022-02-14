@@ -123,7 +123,11 @@ class ReturnsController @Inject()(mcc: MessagesControllerComponents,
         val model = viewModel
         auditEvent(isReturnsPageRequest, model)
         Future.successful(Ok(vatReturnDetailsView(model, pageData.serviceInfoContent)))
+      case (Left(NotFoundError),Some(_),_) =>
+        logger.warn("[ReturnsController][renderResult] error: a valid obligation was returned from the service but submission not processed")
+        checkIfComingFromSubmissionConfirmation(isNumericPeriodKey)
       case (Left(NotFoundError), _, _) =>
+        logger.warn("[ReturnsController][renderResult] error: submission not processed and no valid obligation")
         checkIfComingFromSubmissionConfirmation(isNumericPeriodKey)
       case (Right(_), None, _) =>
         logger.warn("[ReturnsController][renderResult] error: render required a valid obligation but none was returned")
