@@ -88,7 +88,8 @@ class ReturnsController @Inject()(mcc: MessagesControllerComponents,
           val financialDataCall = returnsService.getPayment(user.vrn, periodKey)
 
           def obligationCall(payment: Option[Payment]) = {
-            payment.fold(Future.successful(Option.empty[VatReturnObligation])) { p =>
+            payment.fold{logger.warn("[ReturnsController][obligationCall] No Payment was found")
+              Future.successful(Option.empty[VatReturnObligation])} { p =>
               returnsService.getObligationWithMatchingPeriodKey(user.vrn, p.periodTo.getYear, periodKey)
             }
           }
@@ -124,10 +125,11 @@ class ReturnsController @Inject()(mcc: MessagesControllerComponents,
         auditEvent(isReturnsPageRequest, model)
         Future.successful(Ok(vatReturnDetailsView(model, pageData.serviceInfoContent)))
       case (Left(NotFoundError), _, _) =>
+        logger.warn("[ReturnsController][renderResult] error: submission not processed and no valid obligation")
         checkIfComingFromSubmissionConfirmation(isNumericPeriodKey)
       case (Right(_), None, _) =>
         logger.warn("[ReturnsController][renderResult] error: render required a valid obligation but none was returned")
-        Future.successful(errorHandler.showInternalServerError)
+        checkIfComingFromSubmissionConfirmation(isNumericPeriodKey)
       case _ =>
         logger.warn("[ReturnsController][renderResult] error: Unknown error")
         Future.successful(errorHandler.showInternalServerError)

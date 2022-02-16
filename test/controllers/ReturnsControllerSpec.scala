@@ -396,8 +396,8 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
           controller.vatReturnViaPayments("18AA")(request())
         }
 
-        "return Internal Server Error (500)" in {
-          status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+        "return NOT_FOUND Error (404)" in {
+          status(result) shouldBe Status.NOT_FOUND
         }
       }
     }
@@ -568,11 +568,40 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
     "there is a VAT return but no obligation" should {
 
-      "return an Internal Server Error status" in {
+      "return an 303(SEE OTHER) status if user has come from the submission journey" in {
+        val data = ReturnsControllerData(Right(exampleVatReturn), None, None, None, Html(""))
+        lazy val result = controller.renderResult(data, isReturnsPageRequest = true,
+          isNumericPeriodKey = false)(request(fakeRequest.withSession(SessionKeys.submissionYear -> "true",
+          SessionKeys.inSessionPeriodKey -> "true")), user)
+        status(result) shouldBe Status.SEE_OTHER
+      }
+
+      "is a pre-mtd return" should {
+        val data = ReturnsControllerData(Right(exampleVatReturn), None, None, None, Html(""))
+        lazy val result = controller.renderResult(data, isReturnsPageRequest = true,
+          isNumericPeriodKey = true)(request(), user)
+
+        "return a 404 NOT FOUND" in {
+          status(result) shouldBe Status.NOT_FOUND
+        }
+
+        "return the title" in {
+          Jsoup.parse(contentAsString(result)).select("h1").text shouldBe "This return is not available"
+        }
+      }
+
+      "is not a pre-mtd return" should {
         val data = ReturnsControllerData(Right(exampleVatReturn), None, None, None, Html(""))
         lazy val result = controller.renderResult(data, isReturnsPageRequest = true,
           isNumericPeriodKey = false)(request(), user)
-        status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+
+        "return a NOT_FOUND if a return exists but no obligation" in {
+          status(result) shouldBe Status.NOT_FOUND
+        }
+
+        "return the title" in {
+          Jsoup.parse(contentAsString(result)).select("h1").text shouldBe "This page cannot be found"
+        }
       }
     }
 
