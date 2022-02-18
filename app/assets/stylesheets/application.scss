@@ -13,8 +13,8 @@ $hmrc-assets-path: "/vat-through-software/vat-returns/assets/lib/hmrc-frontend/h
   padding-top: 0;
 }
 
-.govuk-back-link {
-  margin-bottom: 40px;
+.govuk-back-link, .govuk-breadcrumbs {
+  margin-bottom: 30px;
 }
 
 #service-info-list {

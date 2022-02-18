@@ -37,7 +37,6 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
     val btaBreadcrumbLink = s"$btaBreadcrumb a"
     val vatBreadcrumb = "div.govuk-breadcrumbs li:nth-of-type(2)"
     val vatBreadcrumbLink = s"$vatBreadcrumb a"
-    val submittedReturnsBreadcrumb = "div.govuk-breadcrumbs li:nth-of-type(3)"
     val submitThroughSoftwareLink = "div > div > a"
     val noReturnsFound = ".govuk-tabs__panel > p"
     val tabOne = "#content > div.govuk-tabs > ul > li:nth-child(1) > a"
@@ -115,10 +114,6 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
 
             "link to the VAT Details page" in {
               element(Selectors.vatBreadcrumbLink).attr("href") shouldBe "vat-details-url"
-            }
-
-            "have the text 'Submitted returns'" in {
-              elementText(Selectors.submittedReturnsBreadcrumb) shouldBe "Submitted returns"
             }
           }
 
@@ -400,7 +395,6 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
           an[TestFailedException] should be thrownBy element(Selectors.btaBreadcrumbLink)
           an[TestFailedException] should be thrownBy elementText(Selectors.vatBreadcrumb)
           an[TestFailedException] should be thrownBy element(Selectors.vatBreadcrumbLink)
-          an[TestFailedException] should be thrownBy elementText(Selectors.submittedReturnsBreadcrumb)
         }
 
         "render back link" in {

@@ -36,7 +36,6 @@ class NoUpcomingReturnDeadlinesViewSpec extends ViewBaseSpec {
     val btaBreadCrumbLink = "div.govuk-breadcrumbs li:nth-of-type(1) a"
     val vatDetailsBreadCrumb = "div.govuk-breadcrumbs li:nth-of-type(2)"
     val vatDetailsBreadcrumbLink = "div.govuk-breadcrumbs li:nth-of-type(2) a"
-    val returnDeadlinesBreadCrumb = "div.govuk-breadcrumbs li:nth-of-type(3)"
 
     val noReturnsNextDeadline = "#no-returns-next-deadline"
     val noReturnsDue = "#no-returns"
@@ -68,10 +67,6 @@ class NoUpcomingReturnDeadlinesViewSpec extends ViewBaseSpec {
 
         "and links to the VAT Summary service" in {
           element(Selectors.vatDetailsBreadcrumbLink).attr("href") shouldBe "vat-details-url"
-        }
-
-        "have the 'Return deadlines' title" in {
-          elementText(Selectors.returnDeadlinesBreadCrumb) shouldBe "Return deadlines"
         }
       }
 
