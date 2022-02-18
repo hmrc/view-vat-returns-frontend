@@ -16,12 +16,11 @@
 
 @import play.twirl.api.HtmlFormat
 @import models.viewModels.ReturnDeadlineViewModel
-@import views.html.templates.formatters.breadcrumbs._
 @import views.html.templates.formatters.dates._
 @import java.time.LocalDate
 
 @this(mainTemplate: MainTemplate,
-      navigationBreadcrumb: NavigationBreadcrumb,
+      govukBreadcrumbs: GovukBreadcrumbs,
       displayDate: DisplayDate,
       displayDateRange: DisplayDateRange,
       govukBackLink: GovukBackLink)
@@ -38,11 +37,12 @@
       href = appConfig.agentClientHubUrl
     ))
   } else {
-    navigationBreadcrumb(Map(
-      appConfig.btaHomeUrl -> messages("breadcrumbs.bta"),
-      appConfig.vatDetailsUrl -> messages("breadcrumbs.vat")),
-      currentPage = messages("returnDeadlines.submitReturn.title")
-    )
+    govukBreadcrumbs(Breadcrumbs(
+      items = Seq(
+        BreadcrumbsItem(content = Text(messages("breadcrumbs.bta")), href = Some(appConfig.btaHomeUrl)),
+        BreadcrumbsItem(content = Text(messages("breadcrumbs.vat")), href = Some(appConfig.vatDetailsUrl))
+      )
+    ))
   }
 }
 

@@ -15,11 +15,10 @@
  *@
 
 @import models.viewModels.ReturnDeadlineViewModel
-@import views.html.templates.formatters.breadcrumbs._
 @import views.html.templates.formatters.dates._
 
 @this(mainTemplate: MainTemplate,
-      navigationBreadcrumb: NavigationBreadcrumb,
+      govukBreadcrumbs: GovukBreadcrumbs,
       displayDate: DisplayDate,
       displayDateRange: DisplayDateRange,
       govukDetails: GovukDetails,
@@ -43,11 +42,12 @@
       content = Text(messages("base.back"))
     ))
   } else {
-    navigationBreadcrumb(Map(
-      appConfig.btaHomeUrl -> messages("breadcrumbs.bta"),
-      appConfig.vatDetailsUrl -> messages("breadcrumbs.vat")),
-      currentPage = messages("returnDeadlines.title")
-    )
+    govukBreadcrumbs(Breadcrumbs(
+      items = Seq(
+        BreadcrumbsItem(content = Text(messages("breadcrumbs.bta")), href = Some(appConfig.btaHomeUrl)),
+        BreadcrumbsItem(content = Text(messages("breadcrumbs.vat")), href = Some(appConfig.vatDetailsUrl))
+      )
+    ))
   }
 }
 

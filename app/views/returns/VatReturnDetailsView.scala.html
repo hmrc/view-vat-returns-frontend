@@ -19,11 +19,10 @@
 @import utils.ImplicitDateFormatter._
 @import views.html.templates.formatters.dates._
 @import views.html.templates.formatters.money._
-@import views.html.templates.formatters.breadcrumbs._
 @import views.html.templates.returns.PaymentStatus
 
 @this(mainTemplate: MainTemplate,
-      navigationBreadcrumb: NavigationBreadcrumb,
+      govukBreadcrumbs: GovukBreadcrumbs,
       displayDate: DisplayDate,
       displayDateRange: DisplayDateRange,
       displayMoney: DisplayMoney,
@@ -63,15 +62,20 @@
       content = Text(messages("base.back"))
     ))
   } else {
-    navigationBreadcrumb(
-      links = Map(
-        appConfig.btaHomeUrl -> messages("breadcrumbs.bta"),
-        appConfig.vatDetailsUrl -> messages("breadcrumbs.vat"),
-        if(vatReturnViewModel.showReturnsBreadcrumb) controllers.routes.SubmittedReturnsController.submittedReturns.url -> messages("submittedReturns.title")
-        else appConfig.vatPaymentsUrl -> messages("breadcrumbs.vatPayments")
-      ),
-      currentPage = returnHeading(useShortDayFormat = false).toString
-    )
+    govukBreadcrumbs(Breadcrumbs(
+      items = Seq(
+        BreadcrumbsItem(content = Text(messages("breadcrumbs.bta")), href = Some(appConfig.btaHomeUrl)),
+        BreadcrumbsItem(content = Text(messages("breadcrumbs.vat")), href = Some(appConfig.vatDetailsUrl)),
+        if(vatReturnViewModel.showReturnsBreadcrumb) {
+          BreadcrumbsItem(
+            content = Text(messages("submittedReturns.title")),
+            href = Some(controllers.routes.SubmittedReturnsController.submittedReturns.url)
+          )
+        } else {
+          BreadcrumbsItem(content = Text(messages("breadcrumbs.vatPayments")), href = Some(appConfig.vatPaymentsUrl))
+        }
+      )
+    ))
   }
 }
 

@@ -15,12 +15,11 @@
  *@
 
 @import play.twirl.api.HtmlFormat
-@import views.html.templates.formatters.breadcrumbs.NavigationBreadcrumb
 @import views.html.templates.returns.{SubmittedReturnsTabs, SubmittedReturnsTabsContent}
 @import models.viewModels.VatReturnsViewModel
 
 @this(mainTemplate: MainTemplate,
-      navigationBreadcrumb: NavigationBreadcrumb,
+      govukBreadcrumbs: GovukBreadcrumbs,
       submittedReturnsTabs: SubmittedReturnsTabs,
       submittedReturnsTabsContent: SubmittedReturnsTabsContent,
       govukInsetText: GovukInsetText,
@@ -41,12 +40,12 @@
       content = Text(messages("base.back"))
     ))
   } else {
-    navigationBreadcrumb(
-      links = Map(
-        appConfig.btaHomeUrl -> messages("breadcrumbs.bta"),
-        appConfig.vatDetailsUrl -> messages("breadcrumbs.vat")),
-      currentPage = messages("submittedReturns.title")
-    )
+    govukBreadcrumbs(Breadcrumbs(
+      items = Seq(
+        BreadcrumbsItem(content = Text(messages("breadcrumbs.bta")), href = Some(appConfig.btaHomeUrl)),
+        BreadcrumbsItem(content = Text(messages("breadcrumbs.vat")), href = Some(appConfig.vatDetailsUrl))
+      )
+    ))
   }
 }
 

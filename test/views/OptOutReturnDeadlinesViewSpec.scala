@@ -45,7 +45,6 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
     val btaBreadCrumbLink = "div.govuk-breadcrumbs li:nth-of-type(1) a"
     val vatDetailsBreadCrumb = "div.govuk-breadcrumbs li:nth-of-type(2)"
     val vatDetailsBreadcrumbLink = "div.govuk-breadcrumbs li:nth-of-type(2) a"
-    val returnDeadlinesBreadCrumb = "div.govuk-breadcrumbs li:nth-of-type(3)"
 
     val backLink = ".govuk-back-link"
 
@@ -87,10 +86,6 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
 
         "and links to the VAT Summary service" in {
           element(Selectors.vatDetailsBreadcrumbLink).attr("href") shouldBe "vat-details-url"
-        }
-
-        "have the 'Submit VAT Return' title" in {
-          elementText(Selectors.returnDeadlinesBreadCrumb) shouldBe "Submit VAT Return"
         }
       }
 

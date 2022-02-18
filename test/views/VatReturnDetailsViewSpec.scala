@@ -60,7 +60,6 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
     val vatBreadcrumbLink = "ol.govuk-breadcrumbs__list li:nth-of-type(2) a"
     val previousPageBreadcrumb = "ol.govuk-breadcrumbs__list li:nth-of-type(3)"
     val previousPageBreadcrumbLink = "ol.govuk-breadcrumbs__list li:nth-of-type(3) a"
-    val currentPage = "ol.govuk-breadcrumbs__list li:nth-of-type(4)"
 
     val backLink = ".govuk-back-link"
 
@@ -145,11 +144,6 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
         element(Selectors.previousPageBreadcrumbLink).attr("href") shouldBe
           controllers.routes.SubmittedReturnsController.submittedReturns.url
       }
-
-      "have the correct current page text containing the obligation dates" in {
-        elementText(Selectors.currentPage) shouldBe "1 January to 31 March 2017"
-      }
-
     }
 
     "have the correct subheading" in {
@@ -247,7 +241,6 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
       an[TestFailedException] should be thrownBy element(Selectors.vatBreadcrumbLink)
       an[TestFailedException] should be thrownBy element(Selectors.previousPageBreadcrumb)
       an[TestFailedException] should be thrownBy element(Selectors.previousPageBreadcrumbLink)
-      an[TestFailedException] should be thrownBy element(Selectors.currentPage)
     }
 
     "render a back link" in {
@@ -601,10 +594,6 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
 
     "have the pageHeading of 'Final return'" in {
       elementText(Selectors.pageHeading + " > .noprint") shouldBe "Submitted return for Final return"
-    }
-
-    "have the breadcrumb heading of 'Final return" in {
-      elementText(Selectors.currentPage) shouldBe "Final return"
     }
   }
 }
