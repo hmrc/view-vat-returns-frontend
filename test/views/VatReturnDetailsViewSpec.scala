@@ -189,7 +189,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
     }
 
     "have inset text guidance for printing the return" in {
-      element(".govuk-inset-text").text() shouldBe "To save your Return, choose ’Save as PDF’ from the print drop-down menu"
+      element(".govuk-inset-text").text() shouldBe "To save your Return, choose ‘Save as PDF’ from the print drop-down menu"
     }
 
 
@@ -253,7 +253,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
     }
 
     "have inset text guidance for printing the return" in {
-      element(".govuk-inset-text").text() shouldBe "To save your Return, choose ’Save as PDF’ from the print drop-down menu"
+      element(".govuk-inset-text").text() shouldBe "To save your Return, choose ‘Save as PDF’ from the print drop-down menu"
     }
 
     "have a print or save button" in {
