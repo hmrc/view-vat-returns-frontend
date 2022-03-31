@@ -47,7 +47,7 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
     val vatDetailsBreadCrumb = "div.govuk-breadcrumbs li:nth-of-type(2)"
     val vatDetailsBreadcrumbLink = "div.govuk-breadcrumbs li:nth-of-type(2) a"
 
-    val overdueLabel = ".task-overdue"
+    val overdueLabel = ".govuk-tag--red"
     val caption = "#content > span"
     val backLink = "body > div.govuk-width-container > a"
   }

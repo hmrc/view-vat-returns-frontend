@@ -48,7 +48,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
 
     val backLink = ".govuk-back-link"
 
-    val overdueLabel = ".task-overdue"
+    val overdueLabel = ".govuk-tag--red"
     val cannotSubmitText = "li > span:nth-child(3)"
   }
 
