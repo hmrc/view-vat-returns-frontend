@@ -203,6 +203,9 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
       "do not have business entity name"in {
         elementExtinct(Selectors.caption)
       }
+      "not have an overdue label" in {
+        elementExtinct(".govuk-tag--red")
+      }
     }
   }
 

@@ -211,6 +211,9 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
       "have a submit-your-return link" in {
         document.getElementById("submit-return-link").text() shouldBe "Submit VAT Return"
       }
+      "not have an overdue label" in {
+        elementExtinct(".govuk-tag--red")
+      }
     }
 
     "end date has not yet passed" should {
