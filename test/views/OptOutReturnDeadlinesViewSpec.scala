@@ -48,7 +48,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
 
     val backLink = ".govuk-back-link"
 
-    val overdueLabel = ".task-overdue"
+    val overdueLabel = ".govuk-tag--red"
     val cannotSubmitText = "li > span:nth-child(3)"
   }
 
@@ -210,6 +210,9 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
 
       "have a submit-your-return link" in {
         document.getElementById("submit-return-link").text() shouldBe "Submit VAT Return"
+      }
+      "not have an overdue label" in {
+        elementExtinct(".govuk-tag--red")
       }
     }
 

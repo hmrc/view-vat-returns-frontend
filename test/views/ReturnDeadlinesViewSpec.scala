@@ -47,7 +47,7 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
     val vatDetailsBreadCrumb = "div.govuk-breadcrumbs li:nth-of-type(2)"
     val vatDetailsBreadcrumbLink = "div.govuk-breadcrumbs li:nth-of-type(2) a"
 
-    val overdueLabel = ".task-overdue"
+    val overdueLabel = ".govuk-tag--red"
     val caption = "#content > span"
     val backLink = "body > div.govuk-width-container > a"
   }
@@ -202,6 +202,9 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
 
       "do not have business entity name"in {
         elementExtinct(Selectors.caption)
+      }
+      "not have an overdue label" in {
+        elementExtinct(".govuk-tag--red")
       }
     }
   }

@@ -23,7 +23,8 @@
       govukBreadcrumbs: GovukBreadcrumbs,
       displayDate: DisplayDate,
       displayDateRange: DisplayDateRange,
-      govukBackLink: GovukBackLink)
+      govukBackLink: GovukBackLink,
+      govukTag: GovukTag)
 
 @(deadlines: Seq[ReturnDeadlineViewModel],
     currentDate: LocalDate,
@@ -63,7 +64,10 @@
           </p>
           @if(deadline.overdue) {
             <span>
-              <strong class="task-overdue">@messages("common.overdue")</strong>
+              @govukTag(Tag(
+                content = Text(messages("common.overdue")),
+                classes = "govuk-tag--red"
+                ))
             </span>
           }
           <p class="govuk-body govuk-!-margin-bottom-0 govuk-hint">

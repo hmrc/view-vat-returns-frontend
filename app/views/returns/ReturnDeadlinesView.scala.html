@@ -22,7 +22,8 @@
       displayDate: DisplayDate,
       displayDateRange: DisplayDateRange,
       govukDetails: GovukDetails,
-      govukBackLink: GovukBackLink)
+      govukBackLink: GovukBackLink,
+      govukTag: GovukTag)
 
 @(deadlines: Seq[ReturnDeadlineViewModel], serviceInfoContent: Html, clientName: Option[String])(
   implicit request: Request[_],messages: Messages, appConfig: config.AppConfig, user: User)
@@ -72,9 +73,10 @@
                 @displayDate(deadline.due)
               </p>
               @if(deadline.overdue) {
-                <span>
-                  <strong class="task-overdue">@messages("common.overdue")</strong>
-                </span>
+                @govukTag(Tag(
+                content = Text(messages("common.overdue")),
+                classes = "govuk-tag--red"
+                ))
               }
               <p class="govuk-body govuk-!-margin-bottom-0 govuk-hint">
                 @if(deadline.isFinalReturn) {
