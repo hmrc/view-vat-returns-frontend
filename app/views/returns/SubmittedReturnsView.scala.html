@@ -27,6 +27,7 @@
 
 @(model: VatReturnsViewModel,
   showInsolvencyContent: Boolean,
+  recentlySubmittedReturn: Boolean,
   serviceInfoContent: Html = HtmlFormat.empty)(
   implicit request: Request[_],
            messages: Messages,
@@ -60,8 +61,16 @@
 
     @if(showInsolvencyContent) {
       @govukInsetText(InsetText(
-        content = Text(messages("submittedReturns.insolvencyNotice"))
+        content = Text(messages("submittedReturns.insolvencyNotice")),
+        id = Some("insolvency-notice")
       ))
+    }
+
+    @if(recentlySubmittedReturn) {
+        @govukInsetText(InsetText(
+            content = Text(messages("submittedReturns.recentlySubmittedNotice")),
+            id = Some("return-recently-submitted-content")
+        ))
     }
 
     <div class="govuk-tabs" data-module="govuk-tabs">

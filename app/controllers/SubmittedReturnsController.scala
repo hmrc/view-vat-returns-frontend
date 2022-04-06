@@ -19,20 +19,23 @@ package controllers
 import java.time.{LocalDate, Period}
 import audit.AuditingService
 import audit.models.ViewSubmittedVatObligationsAuditModel
+import common.SessionKeys
 import config.AppConfig
 import controllers.predicate.DDInterruptPredicate
+
 import javax.inject.{Inject, Singleton}
 import models.viewModels.{ReturnObligationsViewModel, VatReturnsViewModel}
 import models.{CustomerInformation, MigrationDateModel, ServiceResponse, User}
 import models.errors.ObligationError
 import models.Obligation.Status.Fulfilled
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import utils.LoggerUtil
 import views.html.errors.SubmittedReturnsErrorView
 import views.html.returns.SubmittedReturnsView
+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -57,6 +60,7 @@ class SubmittedReturnsController @Inject()(mcc: MessagesControllerComponents,
   def currentYear: Int = dateService.now().getYear
 
   def submittedReturns: Action[AnyContent] = authorisedController.authorisedAction{ implicit request =>
+    val recentlySubmittedReturnValue = request.session.get(SessionKeys.mtdVatvcSubmittedReturn)
     implicit user =>
       DDInterrupt.interruptCheck { _ =>
         for {
@@ -68,7 +72,7 @@ class SubmittedReturnsController @Inject()(mcc: MessagesControllerComponents,
         } yield {
           obligationsResult match {
             case Right(model) =>
-              Ok(submittedReturnsView(model, showInsolvencyContent, serviceInfoContent))
+              Ok(submittedReturnsView(model, showInsolvencyContent, hasRecentlySubmittedReturn(recentlySubmittedReturnValue), serviceInfoContent))
             case Left(error) =>
               logger.warn("[ReturnObligationsController][submittedReturns] error: " + error.toString)
               InternalServerError(submittedReturnsErrorView(user))
@@ -149,4 +153,11 @@ class SubmittedReturnsController @Inject()(mcc: MessagesControllerComponents,
         !information.exemptInsolvencyTypes.contains(information.insolvencyType.getOrElse(""))
       case _ => false
     }
+
+  private[controllers] def hasRecentlySubmittedReturn(sessionKeyValue: Option[String]): Boolean = {
+    sessionKeyValue match {
+      case Some("true") => true
+      case _ => false
+    }
+  }
 }

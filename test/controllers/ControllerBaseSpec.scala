@@ -19,7 +19,7 @@ package controllers
 import akka.actor.ActorSystem
 import common.EnrolmentKeys._
 import common.SessionKeys
-import common.SessionKeys.mtdVatvcClientVrn
+import common.SessionKeys.{mtdVatvcClientVrn, mtdVatvcSubmittedReturn}
 import controllers.predicate.DDInterruptPredicate
 import mocks.MockAuth
 import models.User
@@ -31,6 +31,7 @@ import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual}
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.auth.core.{AffinityGroup, Enrolment, EnrolmentIdentifier, Enrolments}
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys => GovUkSessionKeys}
+
 import scala.concurrent.Future
 
 class ControllerBaseSpec extends MockAuth {
@@ -60,6 +61,10 @@ class ControllerBaseSpec extends MockAuth {
   lazy val fakeRequestWithSession: FakeRequest[AnyContentAsEmpty.type] = fakeRequest.withSession(
     GovUkSessionKeys.lastRequestTimestamp -> "1498236506662",
     GovUkSessionKeys.authToken -> "Bearer Token"
+  )
+
+  lazy val recentlySubmittedReturnRequest: FakeRequest[AnyContentAsEmpty.type] = fakeRequest.withSession(
+    mtdVatvcSubmittedReturn -> "true"
   )
 
   lazy val insolventRequest: FakeRequest[AnyContentAsEmpty.type] =
