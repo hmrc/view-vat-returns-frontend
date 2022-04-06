@@ -116,6 +116,7 @@ submittedReturns.finalReturn = Final return
 submittedReturns.back = Back to client’s details
 submittedReturns.backToTop = Back to top
 submittedReturns.insolvencyNotice = You cannot view returns made before the insolvency date.
+submittedReturns.recentlySubmittedNotice = Check back later if you cannot see a recently submitted return.
 
 returnDeadlines.title = Return deadlines
 returnDeadlines.submitBy = Use your accounting software to submit a return by:

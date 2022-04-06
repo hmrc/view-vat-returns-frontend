@@ -25,4 +25,5 @@ object SessionKeys {
   val clientName: String = "mtdVatvcAgentClientName"
   val submissionYear: String = "mtdVatvcSubmissionYear"
   val inSessionPeriodKey: String = "mtdVatvcInSessionPeriodKey"
+  val mtdVatvcSubmittedReturn: String = "mtdVatvcSubmittedReturn"
 }

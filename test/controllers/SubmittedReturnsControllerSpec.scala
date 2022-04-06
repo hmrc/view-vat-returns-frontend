@@ -471,4 +471,20 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
       }
     }
 
+  "Calling .hasRecentlySubmittedReturn" when {
+
+    "the user has a recently submitted return in session" should {
+
+      "return true" in {
+        controller.hasRecentlySubmittedReturn(Some("true")) shouldBe true
+      }
+    }
+
+    "the user has no recently submitted return in session" should {
+
+      "return false" in {
+        controller.hasRecentlySubmittedReturn(None) shouldBe false
+      }
+    }
+  }
 }
