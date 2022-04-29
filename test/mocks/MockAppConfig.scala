@@ -54,6 +54,8 @@ class MockAppConfig(val runModeConfiguration: Configuration, val mode: Mode = Mo
   override val timeoutCountdown: Int = 20
   override val govUkCommercialSoftwareUrl: String =
     "https://www.gov.uk/guidance/software-for-sending-income-tax-updates"
+  override val govUkSignUpGuideUrl: String =
+    "https://www.gov.uk/guidance/when-to-start-using-making-tax-digital-for-vat-if-youve-not-before"
   override val languageMap: Map[String, Lang] = Map(
     "english" -> Lang("en"),
     "cymraeg" -> Lang("cy")

@@ -20,6 +20,7 @@
 @import java.time.LocalDate
 
 @this(mainTemplate: MainTemplate,
+      signUpBanner: SignUpBanner,
       govukBreadcrumbs: GovukBreadcrumbs,
       displayDate: DisplayDate,
       displayDateRange: DisplayDateRange,
@@ -28,7 +29,8 @@
 
 @(deadlines: Seq[ReturnDeadlineViewModel],
     currentDate: LocalDate,
-    serviceInfoContent: Html = HtmlFormat.empty)(
+    serviceInfoContent: Html = HtmlFormat.empty,
+    mandationStatus: String)(
     implicit request: Request[_], messages: Messages, appConfig: config.AppConfig, user: User)
 
 @navContent = @{
@@ -53,7 +55,9 @@
   serviceInfoContent = serviceInfoContent,
   user = Some(user)
 ) {
+
   <h1 class="govuk-heading-xl">@messages("returnDeadlines.submitReturn.title")</h1>
+    @signUpBanner(mandationStatus)
   <div class="govuk-form-group">
     <ul class="govuk-list">
       @for(deadline <- deadlines){

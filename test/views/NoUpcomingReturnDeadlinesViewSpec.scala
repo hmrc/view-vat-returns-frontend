@@ -41,6 +41,8 @@ class NoUpcomingReturnDeadlinesViewSpec extends ViewBaseSpec {
     val noReturnsDue = "#no-returns"
     val caption = "#content > span"
     val backLink = "body > div.govuk-width-container > a"
+
+    val banner = ".govuk-notification-banner"
   }
 
   "The Return deadlines page for a principal user" should {
@@ -48,7 +50,7 @@ class NoUpcomingReturnDeadlinesViewSpec extends ViewBaseSpec {
     "Render the Return deadlines page with no fulfilled obligations" should {
 
       val noFulfilledObligation = None
-      lazy val view = injectedView(noFulfilledObligation, Html(""), None)
+      lazy val view = injectedView(noFulfilledObligation, Html(""), None, "")
       lazy implicit val document: Document = Jsoup.parse(view.body)
 
       "render the breadcrumbs which" should {
@@ -68,6 +70,11 @@ class NoUpcomingReturnDeadlinesViewSpec extends ViewBaseSpec {
         "and links to the VAT Summary service" in {
           element(Selectors.vatDetailsBreadcrumbLink).attr("href") shouldBe "vat-details-url"
         }
+
+      }
+
+      "not display a signup banner as mandation status is not in session" in {
+        elementExtinct(Selectors.banner)
       }
 
       "have the correct text for no deadlines with guidance" in {
@@ -89,8 +96,12 @@ class NoUpcomingReturnDeadlinesViewSpec extends ViewBaseSpec {
         due = LocalDate.parse("2018-05-01"),
         periodKey = "18CC"
       ))
-      lazy val view = injectedView(fulfilledObligation, Html(""), None)
+      lazy val view = injectedView(fulfilledObligation, Html(""), None, "Non MTDfB")
       lazy implicit val document: Document = Jsoup.parse(view.body)
+
+      "display a signup banner as mandation status is 'Non MTDfB'" in {
+        element(Selectors.banner)
+      }
 
       "have the correct text for no deadlines" in {
         elementText(Selectors.noReturnsNextDeadline) shouldBe
@@ -118,7 +129,7 @@ class NoUpcomingReturnDeadlinesViewSpec extends ViewBaseSpec {
     ))
 
     implicit val user: User = agentUser
-    lazy val view = injectedView(fulfilledObligation, Html(""), Some("Ancient Antiques"))
+    lazy val view = injectedView(fulfilledObligation, Html(""), Some("Ancient Antiques"), "")
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct title" in {
@@ -131,6 +142,10 @@ class NoUpcomingReturnDeadlinesViewSpec extends ViewBaseSpec {
 
     "have the client name caption" in {
       elementText(Selectors.caption) shouldBe "Ancient Antiques"
+    }
+
+    "not display a signup banner as mandation status is 'MTDfB'" in {
+      elementExtinct(Selectors.banner)
     }
 
     "have the correct text for no deadlines" in {

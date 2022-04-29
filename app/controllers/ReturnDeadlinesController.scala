@@ -91,12 +91,14 @@ class ReturnDeadlinesController @Inject()(mcc: MessagesControllerComponents,
                                                        user: User): Future[Result] = {
 
     val clientName = request.session.get(SessionKeys.clientName)
+    val mandationStatus = request.session.get(SessionKeys.mtdVatMandationStatus).getOrElse("")
 
     returnsService.getFulfilledObligations(user.vrn, currentDate).map {
-      case Right(VatReturnObligations(Seq())) => Ok(noUpcomingReturnDeadlinesView(None, serviceInfoContent, clientName))
+      case Right(VatReturnObligations(Seq())) => Ok(noUpcomingReturnDeadlinesView(None, serviceInfoContent, clientName, mandationStatus))
       case Right(VatReturnObligations(obligations)) =>
         val lastFulfilledObligation: VatReturnObligation = returnsService.getLastObligation(obligations)
-        Ok(noUpcomingReturnDeadlinesView(Some(toReturnDeadlineViewModel(lastFulfilledObligation, currentDate)), serviceInfoContent, clientName))
+        Ok(noUpcomingReturnDeadlinesView(Some(toReturnDeadlineViewModel(lastFulfilledObligation, currentDate)),
+          serviceInfoContent, clientName, mandationStatus))
       case Left(error) =>
         logger.warn("[ReturnObligationsController][fulfilledObligationsAction] error: " + error.toString)
         errorHandler.showInternalServerError
@@ -113,7 +115,7 @@ class ReturnDeadlinesController @Inject()(mcc: MessagesControllerComponents,
 
     def view(mandationStatus: String) = mandationStatus match {
       case status if submitStatuses.contains(status) =>
-        optOutReturnDeadlinesView(obligations, dateService.now(), serviceInfoContent)
+        optOutReturnDeadlinesView(obligations, dateService.now(), serviceInfoContent, mandationStatus)
       case _ =>
         returnDeadlinesView(obligations, serviceInfoContent, clientName)
     }
