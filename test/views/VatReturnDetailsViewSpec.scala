@@ -602,7 +602,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the pageHeading of 'Final return'" in {
-      elementText(Selectors.pageHeading + " > .noprint") shouldBe "Submitted return for Final return"
+      elementText(Selectors.pageHeading) shouldBe "Submitted return for Final return"
     }
   }
 }
