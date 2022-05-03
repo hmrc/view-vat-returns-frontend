@@ -56,6 +56,7 @@ trait AppConfig {
   val timeoutPeriod: Int
   val timeoutCountdown: Int
   val govUkCommercialSoftwareUrl: String
+  val govUkSignUpGuideUrl: String
   val languageMap: Map[String, Lang]
   val routeToSwitchLanguage :String => Call
   val submitVatReturnBase: String
@@ -141,6 +142,7 @@ class FrontendAppConfig @Inject()(implicit configuration: Configuration, sc: Ser
   override lazy val timeoutCountdown: Int = sc.getString(Keys.timeoutCountDown).toInt
 
   override lazy val govUkCommercialSoftwareUrl: String = sc.getString(Keys.govUkCommercialSoftwareUrl)
+  override lazy val govUkSignUpGuideUrl: String = sc.getString(Keys.govUkSignUpGuideUrl)
 
   override val languageMap: Map[String, Lang] = Map(
     "english" -> Lang("en"),

@@ -28,7 +28,7 @@ import models.viewModels.{ReturnObligationsViewModel, VatReturnsViewModel}
 import models.{CustomerInformation, MigrationDateModel, ServiceResponse, User}
 import models.errors.ObligationError
 import models.Obligation.Status.Fulfilled
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
