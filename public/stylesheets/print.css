@@ -6,7 +6,7 @@
 
 @media print {
 
-  header, footer, a, nav, #notice-banner, .govuk-phase-banner, .centered-content, .govuk-button, .govuk-breadcrumbs, #content > .text--right, button, #get-help-action, .link-back, p, details.govuk-details, title, .noprint, .heading-secondary.noprint {
+  header, footer, a, nav, #notice-banner, .govuk-phase-banner, .cbanner-govuk-cookie-banner, .centered-content, .govuk-button, .govuk-breadcrumbs, #content > .text--right, button, #get-help-action, .link-back, p, details.govuk-details, title, .noprint, .heading-secondary.noprint {
     display: none !important;
   }
 
