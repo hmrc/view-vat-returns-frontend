@@ -125,32 +125,26 @@ class ReturnsController @Inject()(mcc: MessagesControllerComponents,
         auditEvent(isReturnsPageRequest, model)
         Future.successful(Ok(vatReturnDetailsView(model, pageData.serviceInfoContent)))
       case (Left(NotFoundError), _, _) =>
-        logger.warn("[ReturnsController][renderResult] error: submission not processed and no valid obligation")
-        checkIfComingFromSubmissionConfirmation(isNumericPeriodKey)
+        checkIfComingFromSubmissionConfirmation(isNumericPeriodKey, "return")
       case (Right(_), None, _) =>
-        logger.warn("[ReturnsController][renderResult] error: render required a valid obligation but none was returned")
-        checkIfComingFromSubmissionConfirmation(isNumericPeriodKey)
+        checkIfComingFromSubmissionConfirmation(isNumericPeriodKey, "obligation")
       case _ =>
-        logger.warn("[ReturnsController][renderResult] error: Unknown error")
+        logger.warn("[ReturnsController][renderResult] - Unknown error")
         Future.successful(errorHandler.showInternalServerError)
     }
   }
 
-  private def checkIfComingFromSubmissionConfirmation(preMtdReturn: Boolean)
+  private def checkIfComingFromSubmissionConfirmation(preMtdReturn: Boolean, logContext: String)
                                                      (implicit req: MessagesRequest[AnyContent],
                                                       user: User): Future[Result] = {
     val inSessionSubmissionYear = req.session.get(SessionKeys.submissionYear)
     val inSessionPeriodKey = req.session.get(SessionKeys.inSessionPeriodKey)
 
     if(inSessionSubmissionYear.nonEmpty && inSessionPeriodKey.nonEmpty) {
-      logger.warn(
-        "[ReturnsController][checkIfComingFromSubmissionConfirmation] error: User has come from the submission confirmation page, " +
-        "but their submission has not yet been processed."
-      )
-      Future.successful(
-        Redirect(routes.SubmittedReturnsController.submittedReturns).removingFromSession(SessionKeys.submissionYear, SessionKeys.inSessionPeriodKey)
-      )
+      Future.successful(Redirect(routes.SubmittedReturnsController.submittedReturns)
+        .removingFromSession(SessionKeys.submissionYear, SessionKeys.inSessionPeriodKey))
     } else {
+      logger.warn(s"[ReturnsController][checkIfComingFromSubmissionConfirmation] - Unable to retrieve VAT $logContext data")
       if(preMtdReturn) {
         Future.successful(NotFound(preMtdReturnView(user)))
       } else {
