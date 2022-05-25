@@ -163,6 +163,6 @@ returnDeadlines.submitReturn.returnDeadline = Dyddiad cau ar gyfer cyflwyno
 returnDeadlines.submitReturn.futureReturn = Byddwch yn gallu cyflwyno’ch Ffurflen TAW o {0} ymlaen.
 
 returnDeadlines.signUpBanner.heading = Pwysig
-returnDeadlines.signUpBanner.title = Newidiodd y ffordd i gyflwyno ffurflenni TAW ar 1 Ebrill oherwydd Troi Treth yn Ddigidol
-returnDeadlines.signUpBanner.text = Ni allwch ddefnyddio’r gwasanaeth hwn i gyflwyno datganiadau ar gyfer cyfnodau cyfrifyddu sy’n dechrau ar ôl 1 Ebrill 2022. Yn lle hynny, rhaid cadw cofnodion digidol a rhaid cyflwyno ffurflenni gan ddefnyddio meddalwedd sy’n gydnaws â CThEM.
+returnDeadlines.signUpBanner.title = Newidiodd y ffordd o gyflwyno Ffurflenni TAW ar 1 Ebrill oherwydd Troi Treth yn Ddigidol
+returnDeadlines.signUpBanner.text = Ni allwch ddefnyddio’r gwasanaeth hwn i gyflwyno datganiadau ar gyfer cyfnodau cyfrifyddu sy’n dechrau ar ôl 1 Ebrill 2022. Yn lle hynny, rhaid cadw cofnodion digidol a rhaid cyflwyno Ffurflenni gan ddefnyddio meddalwedd sy’n gydnaws â CThEM.
 returnDeadlines.signUpBanner.link = Darganfod pryd i gofrestru a dechrau defnyddio Troi Treth yn Ddigidol ar gyfer TAW (yn agor tab newydd)
