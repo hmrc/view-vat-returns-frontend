@@ -80,7 +80,7 @@ yourVatReturn.bullet2 = 1% or less of your box 6 figure and below £50,000
 yourVatReturn.printOrSave = Print VAT Return
 yourVatReturn.printHeading = Your VAT Return
 yourVatReturn.footer = Correct as of {0}
-yourVatReturn.insetText = To save your Return, choose ‘Save as PDF’ from the print drop-down menu
+yourVatReturn.insetText = To save this Return, choose ‘Save as PDF’ from the print drop-down menu
 
 preMtdReturn.heading = This return is not available
 preMtdReturn.message = This is because you might have submitted it before you first joined Making Tax Digital for VAT.
