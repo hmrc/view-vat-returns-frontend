@@ -106,7 +106,7 @@ yourVatReturn.bullet2 = 1% neu’n llai o’ch ffigur ym mlwch 6 ac yn is na £5
 yourVatReturn.printOrSave = Argraffu’r Ffurflen TAW
 yourVatReturn.printHeading = Eich Ffurflen TAW
 yourVatReturn.footer = Cywir ar {0}
-yourVatReturn.insetText = I gadw’ch Ffurflen TAW, dewiswch ‘Cadw ar ffurf PDF’ o’r gwymplen argraffu
+yourVatReturn.insetText = I gadw’r Ffurflen TAW hon, dewiswch ‘Cadw ar ffurf PDF’ o’r gwymplen argraffu
 
 preMtdReturn.heading = Nid yw’r Ffurflen TAW hon ar gael
 preMtdReturn.message = Mae hyn oherwydd efallai eich bod wedi ei chyflwyno cyn i chi ymuno â’r cynllun Troi Treth yn Ddigidol ar gyfer TAW.
