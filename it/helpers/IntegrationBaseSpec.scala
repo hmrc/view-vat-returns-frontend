@@ -44,6 +44,8 @@ trait IntegrationBaseSpec extends AnyWordSpecLike
   val mockHost: String = WireMockHelper.host
   val mockPort: String = WireMockHelper.wireMockPort.toString
   val appRouteContext: String = "/vat-through-software/vat-returns"
+  val authToken : String = "authToken"
+  def authSession: Map[String, String] = Map(authToken -> "mock-bearer-token")
 
   lazy val client: WSClient = inject[WSClient]
   implicit val ec: ExecutionContext = inject[ExecutionContext]
@@ -87,7 +89,7 @@ trait IntegrationBaseSpec extends AnyWordSpecLike
 
   def buildRequest(path: String, additionalCookies: Map[String, String] = Map.empty): WSRequest =
     client.url(s"http://localhost:$port$appRouteContext$path")
-      .withHttpHeaders(HeaderNames.COOKIE -> SessionCookieBaker.bakeSessionCookie(additionalCookies), "Csrf-Token" -> "nocheck")
+      .withHttpHeaders(HeaderNames.COOKIE -> SessionCookieBaker.bakeSessionCookie(additionalCookies ++ authSession), "Csrf-Token" -> "nocheck")
       .withFollowRedirects(false)
 
   def document(response: WSResponse): Document = Jsoup.parse(response.body)
