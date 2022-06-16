@@ -86,7 +86,6 @@ yourVatReturn.boxFour = Blwch 4
 yourVatReturn.boxFourDescription = TAW a adenillwyd yn y cyfnod ar bryniadau a mewnbynnau eraill (gan gynnwys caffaeliadau yng Ngogledd Iwerddon o Aelod-wladwriaethau’r UE)
 yourVatReturn.boxFive = Blwch 5
 yourVatReturn.boxFiveDescription = TAW net i dalu i CThEM neu ei hadennill (dyma’r gwahaniaeth rhwng blychau 3 a 4)
-yourVatReturn.boxFiveContext = Dyma flwch 3 {0} didynnwch flwch 4 {1}
 yourVatReturn.boxSix = Blwch 6
 yourVatReturn.boxSixNoFlatRate = Cyfanswm gwerth gwerthiannau a chyflenwadau eraill, ac eithrio TAW
 yourVatReturn.boxSixFlatRate = Cyfanswm gwerth gwerthiannau a chyflenwadau eraill, yn cynnwys TAW

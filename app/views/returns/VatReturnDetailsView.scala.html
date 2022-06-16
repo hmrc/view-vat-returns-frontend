@@ -143,16 +143,8 @@
         <div class="govuk-summary-list__row" id="box-five">
           <dt class="govuk-summary-list__key">@messages("yourVatReturn.boxFive")</dt>
           <dd class="govuk-summary-list__value"><strong>@messages("yourVatReturn.boxFiveDescription")</strong></dd>
-          <dd class="govuk-summary-list__actions"><strong class="bold-small">
-              <span class="govuk-visually-hidden">
-                @messages(
-                  "yourVatReturn.boxFiveContext",
-                  displayMoney(vatReturnViewModel.vatReturnDetails.vatReturn.totalVatDue),
-                  displayMoney(vatReturnViewModel.vatReturnDetails.vatReturn.vatReclaimedCurrentPeriod)
-                )
-              </span>
-              @displayMoney(vatReturnViewModel.vatReturnDetails.vatReturn.netVatDue)
-            </strong>
+          <dd class="govuk-summary-list__actions">
+            <strong class="bold-small">@displayMoney(vatReturnViewModel.vatReturnDetails.vatReturn.netVatDue)</strong>
           </dd>
         </div>
       </dl>
