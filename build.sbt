@@ -36,7 +36,6 @@ lazy val coverageSettings: Seq[Setting[_]] = {
     "prod.*",
     "config.*",
     "testOnly.*",
-    "testOnlyDoNotUseInAppConf.*",
     "com.kenshoo.play.metrics.*",
     "controllers.javascript.*"
   )
@@ -52,19 +51,14 @@ lazy val coverageSettings: Seq[Setting[_]] = {
 val compile = Seq(
   ws,
   "uk.gov.hmrc"       %% "bootstrap-frontend-play-28" % "5.24.0",
-  "uk.gov.hmrc"       %% "play-language"              % "5.3.0-play-28",
   "com.typesafe.play" %% "play-json-joda"             % "2.10.0-RC5",
-  "uk.gov.hmrc"       %% "play-frontend-hmrc"         % "3.20.0-play-28"
+  "uk.gov.hmrc"       %% "play-frontend-hmrc"         % "3.21.0-play-28"
 )
 
 def test(scope: String = "test, it"): Seq[ModuleID] = Seq(
-  "org.scalatest"           %% "scalatest"                    % "3.1.4"           % scope,
-  "com.vladsch.flexmark"    %  "flexmark-all"                 % "0.36.8"          % scope,
-  "org.pegdown"             %  "pegdown"                      % "1.6.0"           % scope,
+  "uk.gov.hmrc"             %% "bootstrap-test-play-28"       % "5.24.0"          % scope,
   "org.jsoup"               %  "jsoup"                        % "1.14.3"          % scope,
-  "org.scalatestplus.play"  %% "scalatestplus-play"           % "5.1.0"           % scope,
-  "org.scalamock"           %% "scalamock-scalatest-support"  % "3.6.0"           % scope,
-  "com.github.tomakehurst"  %  "wiremock-jre8"                % "2.27.2"          % scope
+  "org.scalamock"           %% "scalamock-scalatest-support"  % "3.6.0"           % scope
 )
 
 def oneForkedJvmPerTest(tests: Seq[TestDefinition]): Seq[Group] = tests map {

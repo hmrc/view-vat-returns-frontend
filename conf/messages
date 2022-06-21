@@ -86,7 +86,6 @@ yourVatReturn.boxFour = Box 4
 yourVatReturn.boxFourDescription = VAT reclaimed in the period on purchases and other inputs (including acquisitions in Northern Ireland from EU member states)
 yourVatReturn.boxFive = Box 5
 yourVatReturn.boxFiveDescription = Net VAT to pay to HMRC or reclaim (this is the difference between box 3 and 4)
-yourVatReturn.boxFiveContext = This is box 3 {0} take away box 4 {1}
 yourVatReturn.boxSix = Box 6
 yourVatReturn.boxSixNoFlatRate = Total value of sales and other supplies, excluding VAT
 yourVatReturn.boxSixFlatRate = Total value of sales and other supplies, including VAT
