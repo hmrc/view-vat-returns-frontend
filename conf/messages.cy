@@ -35,11 +35,6 @@ month.short.10 = Hyd
 month.short.11 = Tach
 month.short.12 = Rhag
 
-sessionTimeout.title = Mae’ch sesiwn wedi’i therfynu
-sessionTimeout.helpOne = I fwrw golwg dros eich Ffurflenni TAW, bydd angen i chi
-sessionTimeout.helpTwo = fewngofnodi
-sessionTimeout.helpThree = gan ddefnyddio’ch Dynodydd Defnyddiwr (ID) ar gyfer Porth y Llywodraeth.
-
 unauthorised.title = Nid ydych wedi’ch awdurdodi i ddefnyddio’r gwasanaeth hwn
 unauthorised.signUpWithSoftware = Mae angen i chi gofrestru i ddefnyddio meddalwedd er mwyn cyflwyno’ch Ffurflenni TAW.
 unauthorised.alreadySignedUp = Os ydych eisoes wedi cofrestru, bydd angen i chi fewngofnodi gan ddefnyddio’r manylion cywir ar gyfer Porth y Llywodraeth.
@@ -56,19 +51,9 @@ technicalProblem.title = Mae problem gyda’r gwasanaeth
 technicalProblem.heading = Mae’n ddrwg gennym – mae problem gyda’r gwasanaeth
 technicalProblem.message = Rhowch gynnig arall arni yn nes ymlaen.
 
-userResearch.heading = Helpwch ni i wella ein gwasanaeth
-userResearch.enterSurvey = Cymerwch ran yn ein harolwg
-userResearch.close = Dim diolch
-userResearch.close.context = Nid wyf eisiau cymryd rhan yn yr arolwg
-
 breadcrumbs.bta = Cyfrif Treth Busnes
 breadcrumbs.vat = Eich cyfrif TAW
 breadcrumbs.vatPayments = Yr hyn sydd arnoch
-
-btaNavLinks.home = Hafan
-btaNavLinks.manageAccount = Rheoli''r cyfrif
-btaNavLinks.messages = Negeseuon
-btaNavLinks.helpAndContact = Cymorth a chysylltu
 
 yourVatReturn.title = Ffurflen TAW a gyflwynwyd ar gyfer
 yourVatReturn.dateSubmitted = Dyddiad cyflwyno:
@@ -111,9 +96,7 @@ preMtdReturn.heading = Nid yw’r Ffurflen TAW hon ar gael
 preMtdReturn.message = Mae hyn oherwydd efallai eich bod wedi ei chyflwyno cyn i chi ymuno â’r cynllun Troi Treth yn Ddigidol ar gyfer TAW.
 preMtdReturn.link = Bwrw golwg dros y Ffurflenni TAW a gyflwynwyd gennych yn flaenorol (yn agor mewn tab newydd)
 
-paymentStatus.youPaid = Rydych wedi talu:
 paymentStatus.returnTotal = Cyfanswm y Ffurflen TAW:
-paymentStatus.hmrcPaid = Talodd CThEM y canlynol i chi:
 paymentStatus.hmrcOwesYou = Mae ar CThEM y swm hwn i chi:
 paymentStatus.youOweHmrc = Mae arnoch y swm hwn i CThEM:
 paymentStatus.youOweHmrcAgent = Dyma’r swm sydd ar eich cleient i CThEM:
@@ -131,15 +114,10 @@ submittedReturns.period = Ar gyfer y cyfnod:
 submittedReturns.periodPrefix = Bwrw golwg dros Ffurflen TAW ar gyfer y cyfnod
 submittedReturns.previousReturnsOne = Os ydych wedi cyflwyno Ffurflenni TAW heb ddefnyddio’r feddalwedd ar gyfer y gwasanaeth newydd hwn, gallwch
 submittedReturns.previousReturnsTwo = fwrw golwg dros eich Ffurflenni TAW blaenorol (yn agor mewn tab newydd)
-submittedReturns.activeTab = Yn edrych ar hyn o bryd ar Ffurflenni TAW o {0}
-submittedReturns.inactiveTab = Bwrw golwg dros Ffurflenni TAW o {0}
 submittedReturns.noSubmitted = Nid ydych wedi cyflwyno unrhyw Ffurflenni TAW gan ddefnyddio’r gwasanaeth TAW newydd y flwyddyn hon.
-submittedReturns.activePrevious = Yn edrych ar hyn o bryd ar Ffurflenni TAW blaenorol
-submittedReturns.inactivePrevious = Bwrw golwg dros Ffurflenni TAW blaenorol
 submittedReturns.previousReturns = Ffurflenni TAW blaenorol
 submittedReturns.finalReturn = Ffurflen TAW derfynol
 submittedReturns.back = Yn ôl i fanylion y cleient
-submittedReturns.backToTop = Nôl i’r brig
 submittedReturns.insolvencyNotice = Ni allwch fwrw golwg dros Ffurflenni TAW a chyflwynwyd cyn dyddiad yr ansolfedd.
 submittedReturns.recentlySubmittedNotice = Gwiriwch yn hwyrach ymlaen os na allwch weld Ffurflen TAW sydd wedi’i chyflwyno’n ddiweddar.
 
