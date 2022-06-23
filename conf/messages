@@ -35,11 +35,6 @@ month.short.10 = Oct
 month.short.11 = Nov
 month.short.12 = Dec
 
-sessionTimeout.title = Your session has timed out
-sessionTimeout.helpOne = To view your VAT returns, you will have to
-sessionTimeout.helpTwo = sign in
-sessionTimeout.helpThree = using your Government Gateway ID.
-
 unauthorised.title = You are not authorised to use this service
 unauthorised.signUpWithSoftware = You need to sign up to use software to submit your VAT Returns.
 unauthorised.alreadySignedUp = If you have already signed up, you need to sign in with the correct Government Gateway details.
@@ -56,19 +51,9 @@ technicalProblem.title = There is a problem with the service
 technicalProblem.heading = Sorry, there is a problem with the service
 technicalProblem.message = Try again later.
 
-userResearch.heading = Please help us improve our service
-userResearch.enterSurvey = Enter our survey
-userResearch.close = No thanks
-userResearch.close.context = I do not want to enter the survey
-
 breadcrumbs.bta = Business tax account
 breadcrumbs.vat = Your VAT account
 breadcrumbs.vatPayments = What you owe
-
-btaNavLinks.home = Home
-btaNavLinks.manageAccount = Manage account
-btaNavLinks.messages = Messages
-btaNavLinks.helpAndContact = Help and contact
 
 yourVatReturn.title = Submitted return for
 yourVatReturn.dateSubmitted = Date submitted:
@@ -111,9 +96,7 @@ preMtdReturn.heading = This return is not available
 preMtdReturn.message = This is because you might have submitted it before you first joined Making Tax Digital for VAT.
 preMtdReturn.link = View your previously submitted returns (opens in a new tab)
 
-paymentStatus.youPaid = You paid:
 paymentStatus.returnTotal = Return total:
-paymentStatus.hmrcPaid = HMRC paid you:
 paymentStatus.hmrcOwesYou = HMRC owes you:
 paymentStatus.youOweHmrc = You owe HMRC:
 paymentStatus.youOweHmrcAgent = Your client owes HMRC:
@@ -131,15 +114,10 @@ submittedReturns.period = For the period:
 submittedReturns.periodPrefix = View return for the period
 submittedReturns.previousReturnsOne = If you have submitted returns without using the software for this new service, you can
 submittedReturns.previousReturnsTwo = view your previous returns (opens in a new tab)
-submittedReturns.activeTab = Currently viewing returns from {0}
-submittedReturns.inactiveTab = View returns from {0}
 submittedReturns.noSubmitted = You have not submitted any returns using the new VAT service this year.
-submittedReturns.activePrevious = Currently viewing previous returns
-submittedReturns.inactivePrevious = View previous returns
 submittedReturns.previousReturns = Previous returns
 submittedReturns.finalReturn = Final return
 submittedReturns.back = Back to client’s details
-submittedReturns.backToTop = Back to top
 submittedReturns.insolvencyNotice = You cannot view returns made before the insolvency date.
 submittedReturns.recentlySubmittedNotice = Check back later if you cannot see a recently submitted return.
 
