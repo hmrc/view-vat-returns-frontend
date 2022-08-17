@@ -17,23 +17,19 @@
 package connectors
 
 import java.time.LocalDate
-
 import config.AppConfig
 import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
 import javax.inject.{Inject, Singleton}
 import models.Obligation.Status
 import models.VatReturnObligations
 import play.api.http.HeaderNames
-import services.MetricsService
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads}
 import utils.LoggerUtil
-
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class VatObligationsConnector @Inject()(http: HttpClient,
-                                        appConfig: AppConfig,
-                                        metrics: MetricsService) extends LoggerUtil {
+                                        appConfig: AppConfig) extends LoggerUtil {
 
 
   private[connectors] def obligationsUrl(vrn: String): String = {
@@ -51,7 +47,6 @@ class VatObligationsConnector @Inject()(http: HttpClient,
 
     import connectors.httpParsers.VatReturnObligationsHttpParser.VatReturnObligationsReads
 
-    val timer = metrics.getObligationsTimer.time()
     val queryString: Seq[(String, String)] = (to, from) match {
       case (Some(dateTo), Some(dateFrom)) => Seq("from" -> dateFrom.toString, "to" -> dateTo.toString, "status" -> status.toString)
       case (_, _) => Seq("status" -> status.toString)
@@ -68,10 +63,8 @@ class VatObligationsConnector @Inject()(http: HttpClient,
 
     httpRequest.map {
       case obligations@Right(_) =>
-        timer.stop()
         obligations
       case httpError@Left(error) =>
-        metrics.getObligationsCallFailureCounter.inc()
         logger.warn("VatObligationsConnector received error: " + error.message)
         httpError
     }

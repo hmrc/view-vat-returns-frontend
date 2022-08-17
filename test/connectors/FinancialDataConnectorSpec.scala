@@ -17,7 +17,6 @@
 package connectors
 
 import controllers.ControllerBaseSpec
-import mocks.MockMetricsService
 import uk.gov.hmrc.http.HttpClient
 
 class FinancialDataConnectorSpec extends ControllerBaseSpec {
@@ -25,7 +24,7 @@ class FinancialDataConnectorSpec extends ControllerBaseSpec {
   "FinancialDataConnector" should {
 
     "generate the correct payments url" in {
-      val connector = new FinancialDataConnector(mock[HttpClient], mockConfig, MockMetricsService)
+      val connector = new FinancialDataConnector(mock[HttpClient], mockConfig)
       connector.paymentsUrl("111111111") shouldEqual "/financial-transactions/vat/111111111"
     }
   }

@@ -20,24 +20,19 @@ import config.AppConfig
 import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
 import javax.inject.{Inject, Singleton}
 import models.payments.Payments
-import services.MetricsService
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
 import utils.LoggerUtil
-
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class FinancialDataConnector @Inject()(http: HttpClient,
-                                       appConfig: AppConfig,
-                                       metrics: MetricsService) extends LoggerUtil {
+                                       appConfig: AppConfig) extends LoggerUtil {
 
   private[connectors] def paymentsUrl(vrn: String): String = s"${appConfig.financialDataBaseUrl}/financial-transactions/vat/$vrn"
 
   def getPayments(vrn: String, year: Option[Int])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[Payments]] = {
 
     import connectors.httpParsers.PaymentsHttpParser.PaymentsReads
-
-    val timer = metrics.getPaymentsTimer.time()
 
     val querySeq = year match {
       case Some(y) =>
@@ -58,10 +53,8 @@ class FinancialDataConnector @Inject()(http: HttpClient,
 
     httpRequest.map {
       case payments@Right(_) =>
-        timer.stop()
         payments
       case httpError@Left(error) =>
-        metrics.getPaymentsCallFailureCounter.inc()
         logger.warn("FinancialDataConnector received error: " + error.message)
         httpError
     }
