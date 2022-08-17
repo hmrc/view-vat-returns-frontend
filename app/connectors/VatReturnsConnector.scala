@@ -18,22 +18,18 @@ package connectors
 
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets.UTF_8
-
 import config.AppConfig
 import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
 import javax.inject.{Inject, Singleton}
 import models.VatReturn
 import play.api.http.HeaderNames
-import services.MetricsService
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads}
 import utils.LoggerUtil
-
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class VatReturnsConnector @Inject()(http: HttpClient,
-                                appConfig: AppConfig,
-                                metrics: MetricsService) extends LoggerUtil {
+                                appConfig: AppConfig) extends LoggerUtil {
 
   private[connectors] def returnUrl(vrn: String, periodKey: String) = {
     appConfig.vatReturnsBaseUrl + s"/vat-returns/returns/vrn/$vrn?period-key=${URLEncoder.encode(periodKey, UTF_8.name())}"
@@ -49,8 +45,6 @@ class VatReturnsConnector @Inject()(http: HttpClient,
 
     import connectors.httpParsers.VatReturnHttpParser.VatReturnReads
 
-    val timer = metrics.getVatReturnTimer.time()
-
     val httpRequest = http.GET(
       returnUrl(vrn, periodKey)
     )(
@@ -61,10 +55,8 @@ class VatReturnsConnector @Inject()(http: HttpClient,
 
     httpRequest.map {
       case nineBox@Right(_) =>
-        timer.stop()
         nineBox
       case httpError@Left(error) =>
-        metrics.getVatReturnCallFailureCounter.inc()
         logger.warn("VatReturnsConnector received error: " + error.message)
         httpError
     }

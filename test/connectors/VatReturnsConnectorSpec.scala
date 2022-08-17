@@ -17,12 +17,11 @@
 package connectors
 
 import controllers.ControllerBaseSpec
-import mocks.MockMetricsService
 import uk.gov.hmrc.http.HttpClient
 
 class VatReturnsConnectorSpec extends ControllerBaseSpec {
 
-  lazy val connector = new VatReturnsConnector(mock[HttpClient], mockConfig, MockMetricsService)
+  lazy val connector = new VatReturnsConnector(mock[HttpClient], mockConfig)
 
   "VatReturnsConnector" should {
 
