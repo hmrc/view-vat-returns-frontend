@@ -36,12 +36,9 @@ class AuditingService @Inject()(appConfig: AppConfig, auditConnector: AuditConne
   implicit val dateTimeJsReader: Reads[DateTime] = JodaReads.jodaDateReads("yyyyMMddHHmmss")
   implicit val dateTimeWriter: Writes[DateTime] = JodaWrites.jodaDateWrites("dd/MM/yyyy HH:mm:ss")
 
-  implicit val dataEventWrites: Writes[DataEvent] = Json.writes[DataEvent]
-  implicit val extendedDataEventWrites: Writes[ExtendedDataEvent] = Json.writes[ExtendedDataEvent]
-
   def audit(auditModel: AuditModel, path: String = "-")(implicit hc: HeaderCarrier, ec: ExecutionContext): Unit = {
     val dataEvent = toDataEvent(appConfig.appName, auditModel, path)
-    logger.debug(s"Splunk Audit Event:\n\n${Json.toJson(dataEvent)}")
+    logger.debug(s"Splunk Audit Event:\n\n$dataEvent")
     handleAuditResult(auditConnector.sendEvent(dataEvent))
   }
 
@@ -56,7 +53,7 @@ class AuditingService @Inject()(appConfig: AppConfig, auditConnector: AuditConne
 
   def extendedAudit(auditModel: ExtendedAuditModel, path: String = "-")(implicit hc: HeaderCarrier, ec: ExecutionContext): Unit = {
     val extendedDataEvent = toExtendedDataEvent(appConfig.appName, auditModel, path)
-    logger.debug(s"Splunk Audit Event:\n\n${Json.toJson(extendedDataEvent)}")
+    logger.debug(s"Splunk Audit Event:\n\n$extendedDataEvent")
     handleAuditResult(auditConnector.sendExtendedEvent(extendedDataEvent))
   }
 
