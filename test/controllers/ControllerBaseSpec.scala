@@ -20,7 +20,6 @@ import akka.actor.ActorSystem
 import common.EnrolmentKeys._
 import common.SessionKeys
 import common.SessionKeys.{mtdVatvcClientVrn, mtdVatvcSubmittedReturn}
-import controllers.predicate.DDInterruptPredicate
 import mocks.MockAuth
 import models.User
 import play.api.http.Status.FORBIDDEN
@@ -31,7 +30,6 @@ import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual}
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.auth.core.{AffinityGroup, Enrolment, EnrolmentIdentifier, Enrolments}
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys => GovUkSessionKeys}
-
 import scala.concurrent.Future
 
 class ControllerBaseSpec extends MockAuth {
@@ -41,21 +39,15 @@ class ControllerBaseSpec extends MockAuth {
 
   implicit val system: ActorSystem = ActorSystem()
   implicit val hc: HeaderCarrier = HeaderCarrier()
-  val ddInterruptPredicate: DDInterruptPredicate = new DDInterruptPredicate(
-    mcc
-  )
 
   def fakeRequestToPOSTWithSession(input: (String, String)*): FakeRequest[AnyContentAsFormUrlEncoded] =
     fakeRequestWithSession.withFormUrlEncodedBody(input: _*)
 
-  lazy val DDInterruptRequest: FakeRequest[AnyContentAsEmpty.type] =
-    FakeRequest("GET","/homepage")
-
-  lazy val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withSession(SessionKeys.viewedDDInterrupt -> "true")
+  lazy val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   def request(request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()): MessagesRequest[AnyContentAsEmpty.type] =
     new MessagesRequest[AnyContentAsEmpty.type](request.withSession(SessionKeys.insolventWithoutAccessKey -> "false",
-      SessionKeys.futureInsolvencyDate -> "false", SessionKeys.viewedDDInterrupt -> "true"), mcc.messagesApi)
+      SessionKeys.futureInsolvencyDate -> "false"), mcc.messagesApi)
   implicit val user: User = User(vrn)
 
   lazy val fakeRequestWithSession: FakeRequest[AnyContentAsEmpty.type] = fakeRequest.withSession(
