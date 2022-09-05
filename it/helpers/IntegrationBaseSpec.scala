@@ -16,7 +16,6 @@
 
 package helpers
 
-import common.SessionKeys
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.scalatest.concurrent.ScalaFutures
@@ -29,7 +28,6 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 import play.api.test.Injecting
 import play.api.{Application, Environment, Mode}
-
 import scala.concurrent.ExecutionContext
 
 trait IntegrationBaseSpec extends AnyWordSpecLike
@@ -49,9 +47,6 @@ trait IntegrationBaseSpec extends AnyWordSpecLike
 
   lazy val client: WSClient = inject[WSClient]
   implicit val ec: ExecutionContext = inject[ExecutionContext]
-
-  def viewedDDInterrupt: Option[String] => Map[String, String] =
-    _.fold(Map.empty[String, String])(x => Map(SessionKeys.viewedDDInterrupt -> x))
 
   def servicesConfig: Map[String, String] = Map(
     "microservice.services.auth.host" -> mockHost,

@@ -48,7 +48,6 @@ class StubAgentClientLookupController @Inject()(mcc: MessagesControllerComponent
       err => InternalServerError(s"Failed to bind model:\n\nError: $err"),
       success => Redirect(success.redirectUrl)
         .addingToSession(SessionKeys.mtdVatvcClientVrn -> success.vrn)
-        .addingToSession(SessionKeys.viewedDDInterrupt -> "true")
     )
   }
 }

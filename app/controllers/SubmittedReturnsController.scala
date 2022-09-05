@@ -21,8 +21,6 @@ import audit.AuditingService
 import audit.models.ViewSubmittedVatObligationsAuditModel
 import common.SessionKeys
 import config.AppConfig
-import controllers.predicate.DDInterruptPredicate
-
 import javax.inject.{Inject, Singleton}
 import models.viewModels.{ReturnObligationsViewModel, VatReturnsViewModel}
 import models.{CustomerInformation, MigrationDateModel, ServiceResponse, User}
@@ -35,7 +33,6 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import utils.LoggerUtil
 import views.html.errors.SubmittedReturnsErrorView
 import views.html.returns.SubmittedReturnsView
-
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -46,8 +43,7 @@ class SubmittedReturnsController @Inject()(mcc: MessagesControllerComponents,
                                            serviceInfoService: ServiceInfoService,
                                            subscriptionService: SubscriptionService,
                                            submittedReturnsView: SubmittedReturnsView,
-                                           submittedReturnsErrorView: SubmittedReturnsErrorView,
-                                           DDInterrupt: DDInterruptPredicate)
+                                           submittedReturnsErrorView: SubmittedReturnsErrorView)
                                           (implicit appConfig: AppConfig,
                                            auditService: AuditingService,
                                            ec: ExecutionContext) extends FrontendController(mcc) with LoggerUtil {
@@ -59,24 +55,23 @@ class SubmittedReturnsController @Inject()(mcc: MessagesControllerComponents,
 
   def currentYear: Int = dateService.now().getYear
 
-  def submittedReturns: Action[AnyContent] = authorisedController.authorisedAction{ implicit request =>
+  def submittedReturns: Action[AnyContent] = authorisedController.authorisedAction { implicit request =>
     val recentlySubmittedReturnValue = request.session.get(SessionKeys.mtdVatvcSubmittedReturn)
     implicit user =>
-      DDInterrupt.interruptCheck { _ =>
-        for {
-          customerDetails <- subscriptionService.getUserDetails(user.vrn)
-          showInsolvencyContent = showInsolventContent(customerDetails)
-          serviceInfoContent <- serviceInfoService.getServiceInfoPartial
-          migrationDates = getMigrationDates(customerDetails)
-          obligationsResult <- getReturnObligations(migrationDates)
-        } yield {
-          obligationsResult match {
-            case Right(model) =>
-              Ok(submittedReturnsView(model, showInsolvencyContent, hasRecentlySubmittedReturn(recentlySubmittedReturnValue), serviceInfoContent))
-            case Left(error) =>
-              logger.warn("[ReturnObligationsController][submittedReturns] error: " + error.toString)
-              InternalServerError(submittedReturnsErrorView(user))
-          }
+
+      for {
+        customerDetails <- subscriptionService.getUserDetails(user.vrn)
+        showInsolvencyContent = showInsolventContent(customerDetails)
+        serviceInfoContent <- serviceInfoService.getServiceInfoPartial
+        migrationDates = getMigrationDates(customerDetails)
+        obligationsResult <- getReturnObligations(migrationDates)
+      } yield {
+        obligationsResult match {
+          case Right(model) =>
+            Ok(submittedReturnsView(model, showInsolvencyContent, hasRecentlySubmittedReturn(recentlySubmittedReturnValue), serviceInfoContent))
+          case Left(error) =>
+            logger.warn("[ReturnObligationsController][submittedReturns] error: " + error.toString)
+            InternalServerError(submittedReturnsErrorView(user))
         }
       }
   }

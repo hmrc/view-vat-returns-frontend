@@ -70,5 +70,4 @@ class MockAppConfig(val runModeConfiguration: Configuration, val mode: Mode = Mo
   override val agentClientLookupUrl: String => String = uri =>  s"/agent-client-lookup/$uri"
   override val agentClientUnauthorisedUrl: String => String = uri => s"agent-client-unauthorised/$uri"
   override val agentClientHubUrl: String = "agent-client-agent-action"
-  override val directDebitInterruptUrl: String = "/directDebitUrl"
 }
