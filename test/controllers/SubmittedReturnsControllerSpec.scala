@@ -121,8 +121,8 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
 
         "return tabs for current year (2018) and previous year (2017) but not Previous Returns" in {
           val body = contentAsString(result)
-          body should include ("""<a class="govuk-tabs__tab" href="#year-2018"""")
-          body should include ("""<a class="govuk-tabs__tab" href="#year-2017"""")
+          body should include ("""<a class="govuk-tabs__tab" href="#submitted-return-tab-2018"""")
+          body should include ("""<a class="govuk-tabs__tab" href="#submitted-return-tab-2017"""")
           body shouldNot include ("""<a class="govuk-tabs__tab" href="#previous-returns"""")
         }
       }
@@ -153,8 +153,8 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
 
         "return a tab for current year (2018) but not previous year (2017) or Previous Returns" in {
           val body = contentAsString(result)
-          body should include ("""<a class="govuk-tabs__tab" href="#year-2018"""")
-          body shouldNot include ("""<a class="govuk-tabs__tab" href="#year-2017"""")
+          body should include ("""<a class="govuk-tabs__tab" href="#submitted-return-tab-2018"""")
+          body shouldNot include ("""<a class="govuk-tabs__tab" href="#submitted-return-tab-2017"""")
           body shouldNot include ("""<a class="govuk-tabs__tab" href="#previous-returns"""")
         }
       }
