@@ -15,15 +15,22 @@
  *@
 
 @import play.twirl.api.HtmlFormat
-@import views.html.templates.returns.{SubmittedReturnsTabs, SubmittedReturnsTabsContent}
 @import models.viewModels.VatReturnsViewModel
+@import models.viewModels.ReturnObligationsViewModel
+@import config.AppConfig
+@import views.html.templates.formatters.dates.DisplayDateRange
+@import views.html.templates.returns.TabContentPreviousReturns
+@import views.html.templates.returns.TabContentReturnYears
 
 @this(mainTemplate: MainTemplate,
       govukBreadcrumbs: GovukBreadcrumbs,
-      submittedReturnsTabs: SubmittedReturnsTabs,
-      submittedReturnsTabsContent: SubmittedReturnsTabsContent,
       govukInsetText: GovukInsetText,
-      govukBackLink: GovukBackLink)
+      govukBackLink: GovukBackLink,
+      govukTabs: GovukTabs,
+      govukButton: GovukButton,
+      displayDateRange: DisplayDateRange,
+      tabContentPreviousReturns: TabContentPreviousReturns,
+      tabContentReturnYears: TabContentReturnYears)
 
 @(model: VatReturnsViewModel,
   showInsolvencyContent: Boolean,
@@ -50,6 +57,31 @@
   }
 }
 
+@tabItems = @{
+
+  val panels = model.returnYears.map { year =>
+    TabItem(
+      id = Some(s"submitted-return-tab-$year"),
+      label = year.toString,
+      panel = TabPanel(
+        content = HtmlContent(tabContentReturnYears(model, year))
+      )
+    )
+  }
+
+  if(model.showPreviousReturnsTab) {
+    panels ++ Seq(TabItem(
+      id = Some("previous-returns"),
+      label = messages("submittedReturns.previousReturns"),
+      panel = TabPanel(
+        content = HtmlContent(tabContentPreviousReturns(model))
+      )
+    ))
+  } else {
+    panels
+  }
+}
+
 @mainTemplate(
   pageTitle = messages("submittedReturns.title"),
   backLinkContent = Some(navContent),
@@ -73,8 +105,17 @@
         ))
     }
 
-    <div class="govuk-tabs" data-module="govuk-tabs">
-        @submittedReturnsTabs(years = model.returnYears, showPreviousReturnsTab = model.showPreviousReturnsTab)
-        @submittedReturnsTabsContent(model)
-    </div>
+    @govukTabs(Tabs(
+        items = tabItems
+    ))
+
+    @if(user.isAgent) {
+      <p id="finish">
+          @govukButton(Button(
+              href = Some(appConfig.agentClientHubUrl),
+              content = Text(messages("submittedReturns.back"))
+          ))
+      </p>
+    }
+
 }
