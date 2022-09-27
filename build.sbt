@@ -50,13 +50,13 @@ lazy val coverageSettings: Seq[Setting[_]] = {
 
 val compile = Seq(
   ws,
-  "uk.gov.hmrc"       %% "bootstrap-frontend-play-28" % "7.3.0",
+  "uk.gov.hmrc"       %% "bootstrap-frontend-play-28" % "7.4.0",
   "com.typesafe.play" %% "play-json-joda"             % "2.10.0-RC6",
   "uk.gov.hmrc"       %% "play-frontend-hmrc"         % "3.22.0-play-28"
 )
 
 def test(scope: String = "test, it"): Seq[ModuleID] = Seq(
-  "uk.gov.hmrc"             %% "bootstrap-test-play-28"       % "7.3.0"           % scope,
+  "uk.gov.hmrc"             %% "bootstrap-test-play-28"       % "7.4.0"           % scope,
   "org.jsoup"               %  "jsoup"                        % "1.15.2"          % scope,
   "org.scalamock"           %% "scalamock-scalatest-support"  % "3.6.0"           % scope
 )
@@ -87,15 +87,15 @@ lazy val microservice = Project(appName, file("."))
   .settings(defaultSettings(): _*)
   .settings(majorVersion := 0)
   .settings(
-    scalaVersion := "2.12.15",
+    scalaVersion := "2.12.16",
     libraryDependencies ++= appDependencies,
     retrieveManaged := true
   )
   .configs(IntegrationTest)
   .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
   .settings(
-    Keys.fork in IntegrationTest := false,
-    unmanagedSourceDirectories in IntegrationTest := (baseDirectory in IntegrationTest)(base => Seq(base / "it")).value,
+    IntegrationTest / Keys.fork := false,
+    IntegrationTest / unmanagedSourceDirectories := (IntegrationTest / baseDirectory)(base => Seq(base / "it")).value,
     addTestReportOption(IntegrationTest, "int-test-reports"),
-    testGrouping in IntegrationTest := oneForkedJvmPerTest((definedTests in IntegrationTest).value),
-    parallelExecution in IntegrationTest := false)
+    IntegrationTest / testGrouping := oneForkedJvmPerTest((IntegrationTest / definedTests).value),
+    IntegrationTest / parallelExecution := false)
