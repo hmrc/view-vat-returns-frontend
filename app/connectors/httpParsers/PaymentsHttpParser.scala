@@ -58,7 +58,7 @@ object PaymentsHttpParser extends ResponseHttpParsers with LoggerUtil {
       "VAT POA Return Credit Charge"
     )
 
-    val charges: Seq[JsValue] = (json \ "financialTransactions").as[JsArray].value
+    val charges = (json \ "financialTransactions").as[JsArray].value
 
     val vatReturnCharges = charges.filter { charge =>
       val chargeType: String = (charge \ "chargeType").as[String]

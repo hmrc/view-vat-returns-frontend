@@ -101,7 +101,7 @@ class SubmittedReturnsController @Inject()(mcc: MessagesControllerComponents,
 
         case result =>
 
-          val obligations = result.flatMap(_.right.toSeq).flatMap(_.obligations)
+          val obligations = result.flatMap(_.toSeq).flatMap(_.obligations)
           val migratedWithin15Months = customerMigratedWithin15M(migrationDatesModel.migrationDate)
 
           auditService.extendedAudit(
@@ -137,8 +137,8 @@ class SubmittedReturnsController @Inject()(mcc: MessagesControllerComponents,
     migrationDate match {
       case Some(date) =>
         val prevReturnsMonthLimit = 14
-        val monthsSinceMigration = Math.abs(Period.between(dateService.now(), date).toTotalMonths)
-        0 to prevReturnsMonthLimit contains monthsSinceMigration
+        val monthsSinceMigration = Math.abs(Period.between(dateService.now(), date).toTotalMonths).toInt
+        (0 to prevReturnsMonthLimit).contains(monthsSinceMigration)
       case None => false
     }
 

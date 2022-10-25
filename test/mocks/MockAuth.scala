@@ -87,7 +87,7 @@ trait MockAuth extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
   )
 
   def callDateService(response: LocalDate = LocalDate.parse("2018-05-01")): Any =
-    (mockDateService.now: () => LocalDate)
+    (() => mockDateService.now())
       .stubs()
       .returns(response)
 

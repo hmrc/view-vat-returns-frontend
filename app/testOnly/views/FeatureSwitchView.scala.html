@@ -14,33 +14,33 @@
  * limitations under the License.
  *@
 
-@import config.ConfigKeys
-@import helper.CSRF
-@import views.html.templates.inputs.SingleCheckbox
+@import testOnly.views.FeatureSwitchItems
 
 @this(mainTemplate: MainTemplate,
-      singleCheckbox: SingleCheckbox)
+      govukCheckboxes: GovukCheckboxes,
+      govukButton: GovukButton,
+      formWithCSRF: FormWithCSRF,
+      featureSwitchItems: FeatureSwitchItems)
 
 @(form: Form[FeatureSwitchModel])(implicit request: Request[_], messages: Messages, appConfig: config.AppConfig)
 
 @mainTemplate(pageTitle = "Feature switches") {
 
-    @helper.form(action = testOnly.controllers.routes.FeatureSwitchController.submitFeatureSwitch) {
-        @CSRF.formField
+  @formWithCSRF(action = testOnly.controllers.routes.FeatureSwitchController.submitFeatureSwitch) {
+    @govukCheckboxes(Checkboxes(
+      name = "feature-switch",
+      fieldset = Some(Fieldset(
+        legend = Some(Legend(
+          content = Text("Features"),
+          classes = "govuk-fieldset__legend govuk-fieldset__legend--l",
+          isPageHeading = true
+        )),
+      )),
+      items = featureSwitchItems.items(form)
+    ))
 
-        <div class="govuk-form-group">
-            <fieldset class="govuk-fieldset">
-                <legend>
-                    <h1 class="govuk-heading-m">Features</h1>
-                </legend>
-                <div class="govuk-checkboxes">
-                    @singleCheckbox(form(ConfigKeys.userResearchBannerFeature), "User research banner")
-                    @singleCheckbox(form(ConfigKeys.staticDateEnabledFeature), "Use static date (2018-05-01)")
-                </div>
-
-            </fieldset>
-        </div>
-
-        <button class="govuk-button" data-module="govuk-button" type="submit" id="continue-button">Submit</button>
-    }
+    @govukButton(Button(
+      content = Text("Submit")
+    ))
+  }
 }

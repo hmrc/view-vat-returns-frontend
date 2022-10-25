@@ -58,7 +58,7 @@ class ReturnDeadlinesController @Inject()(mcc: MessagesControllerComponents,
     )
   }
 
-  def returnDeadlines(): Action[AnyContent] = authorisedController.authorisedAction { implicit request =>
+  def returnDeadlines: Action[AnyContent] = authorisedController.authorisedAction { implicit request =>
     implicit user =>
 
       val openObligations = returnsService.getOpenReturnObligations(user.vrn)
