@@ -46,7 +46,7 @@ class AuthorisedController @Inject()(enrolmentsAuthService: EnrolmentsAuthServic
   def authorisedAction(block: MessagesRequest[AnyContent] => User => Future[Result],
                        allowAgentAccess: Boolean = true): Action[AnyContent] = Action.async { implicit request =>
 
-    enrolmentsAuthService.authorised.retrieve(Retrievals.allEnrolments and Retrievals.affinityGroup) {
+    enrolmentsAuthService.authorised().retrieve(Retrievals.allEnrolments and Retrievals.affinityGroup) {
       case _ ~ Some(AffinityGroup.Agent) =>
         if (allowAgentAccess) {
           agentWithClientPredicate.authoriseAsAgent(block)

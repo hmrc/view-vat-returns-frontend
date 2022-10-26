@@ -28,9 +28,7 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.{Lang, Messages, MessagesApi, MessagesImpl}
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.{FakeRequest, Injecting}
-
-import scala.collection.JavaConverters._
-
+import play.twirl.api.TwirlHelperImports.twirlJavaCollectionToScala
 
 class ViewBaseSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite with Injecting {
 
@@ -70,7 +68,7 @@ class ViewBaseSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuit
   }
 
   def elementAttributes(cssSelector: String)(implicit document: Document): Map[String, String] = {
-    val attributes = element(cssSelector).attributes.asList().asScala.toList
+    val attributes = element(cssSelector).attributes().asList()
     attributes.map(attribute => (attribute.getKey, attribute.getValue)).toMap
   }
 

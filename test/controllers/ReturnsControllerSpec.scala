@@ -514,14 +514,16 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
         isHybridUser = false
       )
 
-      (mockDateService.now: () => LocalDate).stubs().returns(LocalDate.parse("2018-05-01"))
+      val result: VatReturnViewModel = {
+        callDateService()
+        controller.constructViewModel(
+          Some(customerInformationNonMTDfB),
+          exampleObligation,
+          exampleVatReturnDetails,
+          isReturnsPageRequest = true
+        )
+      }
 
-      lazy val result: VatReturnViewModel = controller.constructViewModel(
-        Some(customerInformationNonMTDfB),
-        exampleObligation,
-        exampleVatReturnDetails,
-        isReturnsPageRequest = true
-      )
       result shouldBe expectedViewModel
     }
   }

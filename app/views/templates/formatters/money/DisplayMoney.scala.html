@@ -18,7 +18,7 @@
 
 @this()
 
-@(value: BigDecimal)()
+@(value: BigDecimal)
 
 @(value.isWhole, value >= 0) match {
   case (true, true) => { @Money.pounds(value) }

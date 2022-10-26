@@ -35,9 +35,7 @@ lazy val coverageSettings: Seq[Setting[_]] = {
     "views.*",
     "prod.*",
     "config.*",
-    "testOnly.*",
-    "com.kenshoo.play.metrics.*",
-    "controllers.javascript.*"
+    "testOnly.*"
   )
 
   Seq(
@@ -58,7 +56,7 @@ val compile = Seq(
 def test(scope: String = "test, it"): Seq[ModuleID] = Seq(
   "uk.gov.hmrc"             %% "bootstrap-test-play-28"       % "7.8.0"           % scope,
   "org.jsoup"               %  "jsoup"                        % "1.15.2"          % scope,
-  "org.scalamock"           %% "scalamock-scalatest-support"  % "3.6.0"           % scope
+  "org.scalamock"           %% "scalamock"                    % "5.2.0"           % scope
 )
 
 def oneForkedJvmPerTest(tests: Seq[TestDefinition]): Seq[Group] = tests map {
@@ -87,7 +85,7 @@ lazy val microservice = Project(appName, file("."))
   .settings(defaultSettings(): _*)
   .settings(majorVersion := 0)
   .settings(
-    scalaVersion := "2.12.16",
+    scalaVersion := "2.13.8",
     libraryDependencies ++= appDependencies,
     retrieveManaged := true
   )
