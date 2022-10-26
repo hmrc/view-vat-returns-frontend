@@ -63,8 +63,8 @@ class AuthorisedController @Inject()(enrolmentsAuthService: EnrolmentsAuthServic
       case _: InsufficientEnrolments =>
         logger.warn(s"[AuthorisedController][authorisedAction] insufficient enrolment exception encountered")
         Future.successful(Forbidden(unauthorisedView()))
-      case _: AuthorisationException =>
-        logger.warn(s"[AuthorisedController][authorisedAction] encountered authorisation exception")
+      case ex: AuthorisationException =>
+        logger.warn(s"[AuthorisedController][authorisedAction] encountered authorisation exception: $ex")
         Future.successful(Forbidden(unauthorisedView()))
     }
   }
