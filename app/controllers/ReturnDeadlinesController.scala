@@ -74,7 +74,7 @@ class ReturnDeadlinesController @Inject()(mcc: MessagesControllerComponents,
             if (obligations.isEmpty) {
               noUpcomingObligationsAction(serviceInfoContent, currentDate)
             } else {
-              upcomingObligationsAction(obligations.map(toReturnDeadlineViewModel(_, currentDate)), serviceInfoContent)
+              upcomingObligationsAction(obligations.distinct.map(toReturnDeadlineViewModel(_, currentDate)), serviceInfoContent)
             }
           }
         case Left(error) =>

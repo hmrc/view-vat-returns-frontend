@@ -101,7 +101,7 @@ class SubmittedReturnsController @Inject()(mcc: MessagesControllerComponents,
 
         case result =>
 
-          val obligations = result.flatMap(_.toSeq).flatMap(_.obligations)
+          val obligations = result.flatMap(_.toSeq).flatMap(_.obligations).distinct
           val migratedWithin15Months = customerMigratedWithin15M(migrationDatesModel.migrationDate)
 
           auditService.extendedAudit(
