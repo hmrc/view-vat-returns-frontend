@@ -45,6 +45,27 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
     )))
   )
 
+  def duplicateObligations(year: Int): ServiceResponse[VatReturnObligations] = Right(
+    VatReturnObligations(Seq(
+      VatReturnObligation(
+        LocalDate.parse(s"$year-01-01"),
+        LocalDate.parse(s"$year-12-31"),
+        LocalDate.parse(s"$year-01-31"),
+        "F",
+        None,
+        "#001"
+      ),
+      VatReturnObligation(
+        LocalDate.parse(s"$year-01-01"),
+        LocalDate.parse(s"$year-12-31"),
+        LocalDate.parse(s"$year-01-31"),
+        "F",
+        None,
+        "#001"
+      )
+    ))
+  )
+
   val emptyObligations: ServiceResponse[VatReturnObligations] = Right(VatReturnObligations(Seq.empty))
 
   def controller: SubmittedReturnsController = new SubmittedReturnsController(
@@ -316,28 +337,56 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
 
   "Calling .getReturnObligations" when {
 
-    "the obligation calls are successful" should {
+    "the obligation calls are successful" when {
 
-      lazy val result = {
-        callDateService()
-        callObligationsForYear(exampleObligations(2018))
-        callExtendedAudit
-        await(controller.getReturnObligations(exampleMigrationDateModel))
+      "there are no duplicate returns" should {
+
+        lazy val result = {
+          callDateService()
+          callObligationsForYear(exampleObligations(2018))
+          callExtendedAudit
+          await(controller.getReturnObligations(exampleMigrationDateModel))
+        }
+
+        val expectedModel = VatReturnsViewModel(
+          Seq(2018),
+          Seq(ReturnObligationsViewModel(
+            LocalDate.parse("2018-01-01"),
+            LocalDate.parse("2018-12-31"),
+            "#001"
+          )),
+          showPreviousReturnsTab = false,
+          vrn
+        )
+
+        "return a VatReturnsViewModel with the correct information" in {
+          result shouldBe Right(expectedModel)
+        }
       }
 
-      val expectedModel = VatReturnsViewModel(
-        Seq(2018),
-        Seq(ReturnObligationsViewModel(
-          LocalDate.parse("2018-01-01"),
-          LocalDate.parse("2018-12-31"),
-          "#001"
-        )),
-        showPreviousReturnsTab = false,
-        vrn
-      )
+      "there are duplicate returns" should {
 
-      "return a VatReturnsViewModel with the correct information" in {
-        result shouldBe Right(expectedModel)
+        lazy val result = {
+          callDateService()
+          callObligationsForYear(duplicateObligations(2018))
+          callExtendedAudit
+          await(controller.getReturnObligations(exampleMigrationDateModel))
+        }
+
+        val expectedModel = VatReturnsViewModel(
+          Seq(2018),
+          Seq(ReturnObligationsViewModel(
+            LocalDate.parse("2018-01-01"),
+            LocalDate.parse("2018-12-31"),
+            "#001"
+          )),
+          showPreviousReturnsTab = false,
+          vrn
+        )
+
+        "filter out the duplicates" in {
+          result shouldBe Right(expectedModel)
+        }
       }
     }
 
