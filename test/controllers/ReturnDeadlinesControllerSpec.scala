@@ -29,6 +29,8 @@ import play.api.test.Helpers.{charset, contentType, _}
 import play.twirl.api.Html
 import uk.gov.hmrc.auth.core.{User => _, _}
 import views.html.returns.{NoUpcomingReturnDeadlinesView, OptOutReturnDeadlinesView, ReturnDeadlinesView}
+
+import scala.collection.convert.ImplicitConversions.`list asScalaBuffer`
 import scala.concurrent.Future
 
 class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
@@ -42,7 +44,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
     "#001"
   )
 
-  val duplicateObligations = Right(Seq(obligation, obligation))
+  val duplicateObligations: ServiceResponse[VatReturnObligations] = Right(VatReturnObligations(Seq(obligation, obligation)))
 
   val exampleObligations: ServiceResponse[VatReturnObligations] = Right(VatReturnObligations(Seq(obligation)))
 
@@ -210,6 +212,32 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
           session(result).get(SessionKeys.mtdVatMandationStatus) shouldBe Some("Non MTDfB")
         }
       }
+
+      "there are duplicate returns" should {
+
+        lazy val result = {
+          callAuthService(individualAuthResult)
+          callDateService()
+          callOpenObligations(duplicateObligations)
+          callExtendedAudit
+          callServiceInfoPartialService
+          controller.returnDeadlines()(request(fakeRequest.withSession("mtdVatMandationStatus" -> "Non MTDfB")))
+        }
+
+        "return 200" in {
+          status(result) shouldBe Status.OK
+        }
+
+        "return the opt-out return deadlines page" in {
+          val document: Document = Jsoup.parse(contentAsString(result))
+          messages(document.getElementById("submit-return-link").text()) shouldBe "Submit VAT Return"
+        }
+
+        "filter out the duplicates" in {
+          val document: Document = Jsoup.parse(contentAsString(result))
+          document.select("#submit-return-link").length > 1 shouldBe false
+        }
+      }
     }
 
     "for a non-Digital user" when {
@@ -258,6 +286,32 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
 
         "put the mandation status in the session" in {
           session(result).get(SessionKeys.mtdVatMandationStatus) shouldBe Some("Non Digital")
+        }
+      }
+
+      "there are duplicate returns" should {
+
+        lazy val result = {
+          callAuthService(individualAuthResult)
+          callDateService()
+          callOpenObligations(duplicateObligations)
+          callExtendedAudit
+          callServiceInfoPartialService
+          controller.returnDeadlines()(request(fakeRequest.withSession("mtdVatMandationStatus" -> "Non Digital")))
+        }
+
+        "return 200" in {
+          status(result) shouldBe Status.OK
+        }
+
+        "return the opt-out return deadlines page" in {
+          val document: Document = Jsoup.parse(contentAsString(result))
+          messages(document.getElementById("submit-return-link").text()) shouldBe "Submit VAT Return"
+        }
+
+        "filter out the duplicates" in {
+          val document: Document = Jsoup.parse(contentAsString(result))
+          document.select("#submit-return-link").length > 1 shouldBe false
         }
       }
     }
@@ -313,8 +367,27 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
 
       "there are duplicate returns" should {
 
-        "filter out the duplicates" in {
+        lazy val result = {
+          callAuthService(individualAuthResult)
+          callDateService()
+          callOpenObligations(duplicateObligations)
+          callExtendedAudit
+          callServiceInfoPartialService
+          controller.returnDeadlines()(request(fakeRequest.withSession("mtdVatMandationStatus" -> "MTDfB Exempt")))
+        }
 
+        "return 200" in {
+          status(result) shouldBe Status.OK
+        }
+
+        "return the opt-out return deadlines page" in {
+          val document: Document = Jsoup.parse(contentAsString(result))
+          messages(document.getElementById("submit-return-link").text()) shouldBe "Submit VAT Return"
+        }
+
+        "filter out the duplicates" in {
+          val document: Document = Jsoup.parse(contentAsString(result))
+          document.select("#submit-return-link").length > 1 shouldBe false
         }
       }
     }
