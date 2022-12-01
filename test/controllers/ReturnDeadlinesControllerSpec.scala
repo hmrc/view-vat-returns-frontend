@@ -42,6 +42,8 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
     "#001"
   )
 
+  val duplicateObligations = Right(Seq(obligation, obligation))
+
   val exampleObligations: ServiceResponse[VatReturnObligations] = Right(VatReturnObligations(Seq(obligation)))
 
   val emptyObligations: ServiceResponse[VatReturnObligations] = Right(VatReturnObligations(Seq.empty))
@@ -306,6 +308,13 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
 
         "put the mandation status in the session" in {
           session(result).get(SessionKeys.mtdVatMandationStatus) shouldBe Some("MTDfB Exempt")
+        }
+      }
+
+      "there are duplicate returns" should {
+
+        "filter out the duplicates" in {
+
         }
       }
     }
