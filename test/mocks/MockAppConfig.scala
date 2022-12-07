@@ -46,7 +46,6 @@ class MockAppConfig(val runModeConfiguration: Configuration, val mode: Mode = Mo
   override val finalReturnPeriodKey: String = "9999"
   override def surveyUrl(identifier: String): String = s"/some-survey-url/$identifier"
   override def signOutUrl(identifier: String): String = s"/some-gg-signout-url/$identifier"
-  override val mtdVatSignUpUrl: String = "mtd-sign-up"
   override val unauthorisedSignOutUrl: String = "/unauth-signout"
   override val vatSubscriptionBaseUrl: String = ""
   override val selfHost: String = "www.app.com"
@@ -54,8 +53,6 @@ class MockAppConfig(val runModeConfiguration: Configuration, val mode: Mode = Mo
   override val timeoutCountdown: Int = 20
   override val govUkCommercialSoftwareUrl: String =
     "https://www.gov.uk/guidance/software-for-sending-income-tax-updates"
-  override val govUkSignUpGuideUrl: String =
-    "https://www.gov.uk/guidance/when-to-start-using-making-tax-digital-for-vat-if-youve-not-before"
   override val languageMap: Map[String, Lang] = Map(
     "english" -> Lang("en"),
     "cymraeg" -> Lang("cy")

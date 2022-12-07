@@ -42,7 +42,6 @@ class NoUpcomingReturnDeadlinesViewSpec extends ViewBaseSpec {
     val caption = "#content > span"
     val backLink = "body > div.govuk-width-container > a"
 
-    val banner = ".govuk-notification-banner"
   }
 
   "The Return deadlines page for a principal user" should {
@@ -73,10 +72,6 @@ class NoUpcomingReturnDeadlinesViewSpec extends ViewBaseSpec {
 
       }
 
-      "not display a signup banner as mandation status is not in session" in {
-        elementExtinct(Selectors.banner)
-      }
-
       "have the correct text for no deadlines with guidance" in {
         elementText(Selectors.noReturnsDue) shouldBe
           "You do not have any returns due right now. Your next deadline will show here on the first day of your next" +
@@ -98,10 +93,6 @@ class NoUpcomingReturnDeadlinesViewSpec extends ViewBaseSpec {
       ))
       lazy val view = injectedView(fulfilledObligation, Html(""), None, "Non MTDfB")
       lazy implicit val document: Document = Jsoup.parse(view.body)
-
-      "display a signup banner as mandation status is 'Non MTDfB'" in {
-        element(Selectors.banner)
-      }
 
       "have the correct text for no deadlines" in {
         elementText(Selectors.noReturnsNextDeadline) shouldBe
@@ -142,10 +133,6 @@ class NoUpcomingReturnDeadlinesViewSpec extends ViewBaseSpec {
 
     "have the client name caption" in {
       elementText(Selectors.caption) shouldBe "Ancient Antiques"
-    }
-
-    "not display a signup banner as mandation status is 'MTDfB'" in {
-      elementExtinct(Selectors.banner)
     }
 
     "have the correct text for no deadlines" in {

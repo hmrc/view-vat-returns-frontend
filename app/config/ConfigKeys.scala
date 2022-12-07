@@ -58,16 +58,12 @@ object ConfigKeys {
   val surveyHost: String = "feedback-frontend.host"
   val surveyUrl: String = "feedback-frontend.url"
 
-  val mtdVatSignUpBaseUrl: String = "vat-subscription-frontend.host"
-  val mtdVatSignUpUrl: String = "vat-subscription-frontend.signUpUrl"
-
   val selfHost: String = "self.host"
 
   val timeoutPeriod: String = "timeout.period"
   val timeoutCountDown: String = "timeout.countDown"
 
   val govUkCommercialSoftwareUrl: String = "govuk-commercial-software.url"
-  val govUkSignUpGuideUrl: String = "govuk-signup-guide.url"
 
   val host: String = "host"
 }

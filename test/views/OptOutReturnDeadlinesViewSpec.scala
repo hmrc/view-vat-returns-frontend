@@ -51,7 +51,6 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
     val overdueLabel = ".govuk-tag--red"
     val cannotSubmitText = "li > span:nth-child(3)"
 
-    val banner = ".govuk-notification-banner"
   }
 
   "Rendering the Opted-Out Return deadlines page with a single deadline" when {
@@ -101,10 +100,6 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
 
       "have the correct page heading" in {
         elementText(Selectors.pageHeading) shouldBe "Submit VAT Return"
-      }
-
-      "display a signup banner as mandation status is 'Non MTDfB'" in {
-        element(Selectors.banner)
       }
 
       "have the correct obligation due date" in {
@@ -200,10 +195,6 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
 
       "render back link" in {
         elementText(Selectors.backLink) shouldBe "Back"
-      }
-
-      "not display a signup banner as mandation status is 'MTDfB'" in {
-        elementExtinct(Selectors.banner)
       }
 
       "have the correct obligation due date" in {

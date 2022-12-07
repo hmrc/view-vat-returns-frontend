@@ -138,8 +138,3 @@ returnDeadlines.submitReturn = Submit VAT Return
 returnDeadlines.submitReturn.title = Submit VAT Return
 returnDeadlines.submitReturn.returnDeadline = Return deadline
 returnDeadlines.submitReturn.futureReturn = You will be able to submit your return from the {0}.
-
-returnDeadlines.signUpBanner.heading = Important
-returnDeadlines.signUpBanner.title = The way to submit VAT returns changed on 1 April due to Making Tax Digital
-returnDeadlines.signUpBanner.text = You cannot use this service to submit returns for accounting periods starting after 1 April 2022. Instead, digital records must be kept and returns must be submitted using HMRC compatible software.
-returnDeadlines.signUpBanner.link = Find out when to sign up and start using Making Tax Digital for VAT (opens in a new tab)
