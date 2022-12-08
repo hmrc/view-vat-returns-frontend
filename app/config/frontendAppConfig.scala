@@ -48,14 +48,12 @@ trait AppConfig {
   val finalReturnPeriodKey: String
   def surveyUrl(identifier: String): String
   def signOutUrl(identifier: String): String
-  val mtdVatSignUpUrl: String
   val unauthorisedSignOutUrl: String
   val vatPaymentsUrl: String
   val selfHost: String
   val timeoutPeriod: Int
   val timeoutCountdown: Int
   val govUkCommercialSoftwareUrl: String
-  val govUkSignUpGuideUrl: String
   val languageMap: Map[String, Lang]
   val routeToSwitchLanguage :String => Call
   val submitVatReturnBase: String
@@ -130,16 +128,12 @@ class FrontendAppConfig @Inject()(implicit configuration: Configuration, sc: Ser
   override lazy val unauthorisedSignOutUrl: String
   = s"$governmentGatewayHost/bas-gateway/sign-out-without-state?continue=$signInContinueUrl"
 
-  private val mtdVatSignUpBaseUrl: String = sc.getString(Keys.mtdVatSignUpBaseUrl)
-  override lazy val mtdVatSignUpUrl: String = mtdVatSignUpBaseUrl + sc.getString(Keys.mtdVatSignUpUrl)
-
   override lazy val selfHost: String = sc.getString(Keys.selfHost)
 
   override lazy val timeoutPeriod: Int = sc.getString(Keys.timeoutPeriod).toInt
   override lazy val timeoutCountdown: Int = sc.getString(Keys.timeoutCountDown).toInt
 
   override lazy val govUkCommercialSoftwareUrl: String = sc.getString(Keys.govUkCommercialSoftwareUrl)
-  override lazy val govUkSignUpGuideUrl: String = sc.getString(Keys.govUkSignUpGuideUrl)
 
   override val languageMap: Map[String, Lang] = Map(
     "english" -> Lang("en"),

@@ -30,7 +30,6 @@ import play.twirl.api.Html
 import uk.gov.hmrc.auth.core.{User => _, _}
 import views.html.returns.{NoUpcomingReturnDeadlinesView, OptOutReturnDeadlinesView, ReturnDeadlinesView}
 
-import scala.collection.convert.ImplicitConversions.`list asScalaBuffer`
 import scala.concurrent.Future
 
 class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
@@ -235,7 +234,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
 
         "filter out the duplicates" in {
           val document: Document = Jsoup.parse(contentAsString(result))
-          document.select("#submit-return-link").length > 1 shouldBe false
+          List(document.select("#submit-return-link")).size > 1 shouldBe false
         }
       }
     }
@@ -311,7 +310,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
 
         "filter out the duplicates" in {
           val document: Document = Jsoup.parse(contentAsString(result))
-          document.select("#submit-return-link").length > 1 shouldBe false
+          List(document.select("#submit-return-link")).size > 1 shouldBe false
         }
       }
     }
@@ -387,7 +386,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
 
         "filter out the duplicates" in {
           val document: Document = Jsoup.parse(contentAsString(result))
-          document.select("#submit-return-link").length > 1 shouldBe false
+          List(document.select("#submit-return-link")).size > 1 shouldBe false
         }
       }
     }
