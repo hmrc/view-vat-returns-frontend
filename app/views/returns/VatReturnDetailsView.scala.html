@@ -136,8 +136,8 @@
           <dt class="govuk-summary-list__key govuk-hint">@messages("yourVatReturn.boxFour")</dt>
           <dd class="govuk-summary-list__value govuk-hint">@messages("yourVatReturn.boxFourDescription")</dd>
           <dd class="govuk-summary-list__actions govuk-hint" style="white-space:nowrap">
-            <span aria-hidden="true">&minus;</span>
-            @displayMoney(vatReturnViewModel.vatReturnDetails.vatReturn.vatReclaimedCurrentPeriod.abs)
+            &minus;
+            @displayMoney(vatReturnViewModel.vatReturnDetails.vatReturn.vatReclaimedCurrentPeriod)
           </dd>
         </div>
         <div class="govuk-summary-list__row" id="box-five">

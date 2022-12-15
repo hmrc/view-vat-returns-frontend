@@ -64,7 +64,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
     val backLink = ".govuk-back-link"
 
     val gaTagElement = "#content ul"
-    val minusSymbol = "#box-four > dd.govuk-summary-list__actions.govuk-hint > span"
+    val minusSymbol = "#box-four > dd.govuk-summary-list__actions.govuk-hint"
 
     def boxTitle(box: String): String = s"$box > dt"
     def boxDescription(box: String): String = s"$box > dd:nth-of-type(1)"
@@ -185,7 +185,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
     }
 
     "have the minus symbol before the box four amount" in {
-      elementText(Selectors.minusSymbol) shouldBe "−"
+      elementText(Selectors.minusSymbol) shouldBe "− £5,732"
     }
 
     "have inset text guidance for printing the return" in {
