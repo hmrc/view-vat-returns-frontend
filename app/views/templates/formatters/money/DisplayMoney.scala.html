@@ -22,7 +22,7 @@
 
 @(value.isWhole, value >= 0) match {
   case (true, true) => { @Money.pounds(value) }
-  case (true, false) => { &minus;@Money.pounds(value.abs) }
+  case (true, false) => { &#8722;@Money.pounds(value.abs) }
   case (false, true) => { @Money.pounds(value, 2) }
-  case (false, false) => { &minus;@Money.pounds(value.abs, 2) }
+  case (false, false) => { &#8722;@Money.pounds(value.abs, 2) }
 }
