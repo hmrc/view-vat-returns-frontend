@@ -33,13 +33,12 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
 
   object Selectors {
     val pageHeading = "#content h1"
-    val subHeadingP1 = "#content h2.govuk-heading-l"
-    val subHeadingP2 = "#content h3.govuk-heading-m"
-    val entityNameHeading = "#content h2.govuk-heading-m"
+    val subHeadingP1 = "#content p.govuk-heading-l"
+    val subHeadingP2 = "#content p.govuk-heading-m"
     val mainInformationText = "#content > section > div > p:nth-of-type(1)"
     val extraInformationText = "#content > section > div > p:nth-of-type(2)"
-    val tableHeadingOne = "#content section:nth-of-type(1) h3.govuk-heading-s"
-    val tableHeadingTwo = "#content section:nth-of-type(2) h3"
+    val tableHeadingOne = "#vat-details"
+    val tableHeadingTwo = "#additional-information"
 
     val boxes = List(
       "#box-one", "#box-two", "#box-three",
@@ -71,6 +70,31 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
   }
 
   val currentYear: Int = 2018
+  val payment = Payment(
+    "VAT Return Debit Charge",
+    LocalDate.parse("2017-01-01"),
+    LocalDate.parse("2017-03-31"),
+    LocalDate.parse("2017-04-05"),
+    1000.00,
+    "#001"
+  )
+  val returnDetails: VatReturnDetails = VatReturnDetails(
+    VatReturn(
+      "#001",
+      1297,
+      5755,
+      7052,
+      5732,
+      1000,
+      77656,
+      765765,
+      55454,
+      545645
+    ),
+    moneyOwed = true,
+    oweHmrc = Some(true),
+    Some(payment)
+  )
 
   val vatReturnViewModel: VatReturnViewModel = VatReturnViewModel(
     Some("Cheapo Clothing"),
@@ -79,24 +103,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
     LocalDate.parse("2017-04-06"),
     1000.00,
     LocalDate.parse("2017-04-08"),
-    VatReturnDetails(
-      VatReturn(
-        "#001",
-        1297,
-        5755,
-        7052,
-        5732,
-        1000,
-        77656,
-        765765,
-        55454,
-        545645
-      ),
-      moneyOwed = true,
-      oweHmrc = Some(true),
-      Some(Payment("VAT Return Debit Charge", LocalDate.parse("2017-01-01"), LocalDate.parse("2017-03-31"),
-        LocalDate.parse("2017-04-05"), 1000.00, "#001"))
-    ),
+    returnDetails,
     showReturnsBreadcrumb = true,
     currentYear,
     hasFlatRateScheme = true,
@@ -105,9 +112,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
 
   "Rendering the vat return details page from the returns route with flat rate scheme enabled" should {
 
-    lazy val view = {
-      injectedView(vatReturnViewModel)
-    }
+    lazy val view = injectedView(vatReturnViewModel)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct document title" in {
@@ -115,7 +120,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
     }
 
     "have the correct page heading" in {
-      elementText(Selectors.pageHeading) should include("Submitted return for")
+      elementText(Selectors.pageHeading) should include("Submitted return for Cheapo Clothing")
     }
 
     "render breadcrumbs which" should {
@@ -149,10 +154,6 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
     "have the correct subheading" in {
       elementText(Selectors.subHeadingP1) shouldBe "Return total: £1,000"
       elementText(Selectors.subHeadingP2) shouldBe "You owe HMRC: £1,000"
-    }
-
-    "have the correct trading name" in {
-      elementText(Selectors.entityNameHeading) shouldBe vatReturnViewModel.entityName.get
     }
 
     "have the correct heading for the first section of the return" in {
@@ -240,12 +241,12 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
     }
 
     "not render breadcrumbs which" in {
-      an[TestFailedException] should be thrownBy element(Selectors.btaBreadcrumb)
-      an[TestFailedException] should be thrownBy element(Selectors.btaBreadcrumbLink)
-      an[TestFailedException] should be thrownBy element(Selectors.vatBreadcrumb)
-      an[TestFailedException] should be thrownBy element(Selectors.vatBreadcrumbLink)
-      an[TestFailedException] should be thrownBy element(Selectors.previousPageBreadcrumb)
-      an[TestFailedException] should be thrownBy element(Selectors.previousPageBreadcrumbLink)
+      a[TestFailedException] should be thrownBy element(Selectors.btaBreadcrumb)
+      a[TestFailedException] should be thrownBy element(Selectors.btaBreadcrumbLink)
+      a[TestFailedException] should be thrownBy element(Selectors.vatBreadcrumb)
+      a[TestFailedException] should be thrownBy element(Selectors.vatBreadcrumbLink)
+      a[TestFailedException] should be thrownBy element(Selectors.previousPageBreadcrumb)
+      a[TestFailedException] should be thrownBy element(Selectors.previousPageBreadcrumbLink)
     }
 
     "render a back link" in {
@@ -278,37 +279,12 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
 
   "Rendering the vat return details page from the payments route" should {
 
-    val vatReturnViewModel = VatReturnViewModel(
-      Some("Cheapo Clothing"),
-      LocalDate.parse("2017-01-01"),
-      LocalDate.parse("2017-03-31"),
-      LocalDate.parse("2017-04-06"),
-      1000.00,
-      LocalDate.parse("2017-04-08"),
-      VatReturnDetails(
-        VatReturn(
-          "#001",
-          1297,
-          5755,
-          7052,
-          5732,
-          1000,
-          77656,
-          765765,
-          55454,
-          545645
-        ),
-        moneyOwed = false,
-        oweHmrc = Some(true),
-        None
-      ),
-      showReturnsBreadcrumb = false,
-      currentYear,
-      hasFlatRateScheme = true,
-      isHybridUser = false
+    val vatReturnViewModelNoOwed = vatReturnViewModel.copy(
+      vatReturnDetails = returnDetails.copy(moneyOwed = false, payment = None),
+      showReturnsBreadcrumb = false
     )
 
-    lazy val view = injectedView(vatReturnViewModel)
+    lazy val view = injectedView(vatReturnViewModelNoOwed)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "render a breadcrumb for the payments page" should {
@@ -329,14 +305,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
 
   "Rendering the vat return details page when money is owed on the return" should {
 
-    val vatReturnViewModel = VatReturnViewModel(
-      Some("Cheapo Clothing"),
-      LocalDate.parse("2017-01-01"),
-      LocalDate.parse("2017-03-31"),
-      LocalDate.parse("2017-04-06"),
-      1000.00,
-      LocalDate.parse("2017-04-08"),
-      VatReturnDetails(
+    val vatReturnViewModelMoneyOwed = vatReturnViewModel.copy(
+      vatReturnDetails = returnDetails.copy(vatReturn =
         VatReturn(
           "#001",
           1297,
@@ -348,25 +318,12 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
           765765,
           55454,
           545645
-        ),
-        moneyOwed = true,
-        oweHmrc = Some(true),
-        Some(Payment(
-          chargeType = "VAT",
-          periodFrom = LocalDate.parse("2017-01-01"),
-          periodTo = LocalDate.parse("2017-03-31"),
-          due = LocalDate.parse("2017-04-06"),
-          outstandingAmount = 1000.00,
-          periodKey = "#001"
-        ))
+        )
       ),
-      showReturnsBreadcrumb = false,
-      currentYear,
-      hasFlatRateScheme = true,
-      isHybridUser = false
+      showReturnsBreadcrumb = false
     )
 
-    lazy val view = injectedView(vatReturnViewModel)
+    lazy val view = injectedView(vatReturnViewModelMoneyOwed)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct subheading" in {
@@ -387,28 +344,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
 
   "Rendering the vat return details page when HMRC owe money on the return" should {
 
-    val vatReturnViewModel = VatReturnViewModel(
-      Some("Cheapo Clothing"),
-      LocalDate.parse("2017-01-01"),
-      LocalDate.parse("2017-03-31"),
-      LocalDate.parse("2017-04-06"),
-      1000.00,
-      LocalDate.parse("2017-04-08"),
-      VatReturnDetails(
-        VatReturn(
-          "#001",
-          1297,
-          5755,
-          7052,
-          5732,
-          1000,
-          77656,
-          765765,
-          55454,
-          545645
-        ),
-        moneyOwed = true,
-        oweHmrc = Some(false),
+    val vatReturnViewModelHmrcOwes = vatReturnViewModel.copy(
+      vatReturnDetails = returnDetails.copy(oweHmrc = Some(false), payment =
         Some(Payment(
           chargeType = "VAT",
           periodFrom = LocalDate.parse("2017-01-01"),
@@ -418,13 +355,10 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
           periodKey = "#001"
         ))
       ),
-      showReturnsBreadcrumb = false,
-      currentYear,
-      hasFlatRateScheme = true,
-      isHybridUser = false
+      showReturnsBreadcrumb = false
     )
 
-    lazy val view = injectedView(vatReturnViewModel)
+    lazy val view = injectedView(vatReturnViewModelHmrcOwes)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct subheading" in {
@@ -439,44 +373,18 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
 
   "Rendering the vat return details page when HMRC have paid what they owe on the return" should {
 
-    val vatReturnViewModel = VatReturnViewModel(
-      Some("Cheapo Clothing"),
-      LocalDate.parse("2017-01-01"),
-      LocalDate.parse("2017-03-31"),
-      LocalDate.parse("2017-04-06"),
-      1000.00,
-      LocalDate.parse("2017-04-08"),
-      VatReturnDetails(
-        VatReturn(
-          "#001",
-          1297,
-          5755,
-          7052,
-          5732,
-          1000,
-          77656,
-          765765,
-          55454,
-          545645
-        ),
+    val vatReturnViewModelHmrcPaid = vatReturnViewModel.copy(
+      vatReturnDetails = returnDetails.copy(
         moneyOwed = false,
         oweHmrc = Some(false),
-        Some(Payment(
-          chargeType = "VAT Return Credit Charge",
-          periodFrom = LocalDate.parse("2017-01-01"),
-          periodTo = LocalDate.parse("2017-03-31"),
-          due = LocalDate.parse("2017-04-06"),
-          outstandingAmount = 0,
-          periodKey = "#001"
+        payment = Some(payment.copy(
+          outstandingAmount = 0
         ))
       ),
-      showReturnsBreadcrumb = false,
-      currentYear,
-      hasFlatRateScheme = true,
-      isHybridUser = false
+      showReturnsBreadcrumb = false
     )
 
-    lazy val view = injectedView(vatReturnViewModel)
+    lazy val view = injectedView(vatReturnViewModelHmrcPaid)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct subheading" in {
@@ -487,37 +395,11 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
 
   "Rendering the vat return details page when a charge hasn't been generated yet" should {
 
-    val vatReturnViewModel = VatReturnViewModel(
-      Some("Cheapo Clothing"),
-      LocalDate.parse("2017-01-01"),
-      LocalDate.parse("2017-03-31"),
-      LocalDate.parse("2017-04-06"),
-      1000.00,
-      LocalDate.parse("2017-04-08"),
-      VatReturnDetails(
-        VatReturn(
-          "#001",
-          1297,
-          5755,
-          7052,
-          5732,
-          1000,
-          77656,
-          765765,
-          55454,
-          545645
-        ),
-        moneyOwed = true,
-        oweHmrc = None,
-        None
-      ),
-      showReturnsBreadcrumb = true,
-      currentYear,
-      hasFlatRateScheme = true,
-      isHybridUser = false
+    val vatReturnViewModelNoCharge = vatReturnViewModel.copy(
+      vatReturnDetails = returnDetails.copy(oweHmrc = None, payment = None)
     )
 
-    lazy val view = injectedView(vatReturnViewModel)
+    lazy val view = injectedView(vatReturnViewModelNoCharge)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct subheading" in {
@@ -528,55 +410,21 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
 
   "Rendering the VAT return details page when an entity name is not retrieved" should {
 
-    val vatReturnViewModel = VatReturnViewModel(
-      None,
-      LocalDate.parse("2017-01-01"),
-      LocalDate.parse("2017-03-31"),
-      LocalDate.parse("2017-04-06"),
-      1000.00,
-      LocalDate.parse("2017-04-08"),
-      VatReturnDetails(
-        VatReturn(
-          "#001",
-          1297,
-          5755,
-          7052,
-          5732,
-          1000,
-          77656,
-          765765,
-          55454,
-          545645
-        ),
-        moneyOwed = true,
-        oweHmrc = Some(true),
-        None
-      ),
-      showReturnsBreadcrumb = true,
-      currentYear,
-      hasFlatRateScheme = true,
-      isHybridUser = false
-    )
+    val vatReturnViewModelNoEntityName = vatReturnViewModel.copy(entityName = None)
 
-    lazy val view = injectedView(vatReturnViewModel)
+    lazy val view = injectedView(vatReturnViewModelNoEntityName)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
-    "not show the entity name heading" in {
-      document.select(Selectors.entityNameHeading) shouldBe empty
+    "not show the entity name in the page heading" in {
+      elementText(Selectors.pageHeading) shouldBe "Submitted return for 1 Jan to 31 Mar 2017"
     }
   }
 
   "Rendering the VAT return details page when the period key is 9999 (Final Return)" should {
 
-    val vatReturnViewModel = VatReturnViewModel(
-      None,
-      LocalDate.parse("2017-01-01"),
-      LocalDate.parse("2017-03-31"),
-      LocalDate.parse("2017-04-06"),
-      1000.00,
-      LocalDate.parse("2017-04-08"),
-      VatReturnDetails(
-        VatReturn(
+    val vatReturnViewModelFinalReturn = vatReturnViewModel.copy(
+      vatReturnDetails = returnDetails.copy(
+        vatReturn = VatReturn(
           "9999",
           1297,
           5755,
@@ -588,21 +436,15 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
           55454,
           545645
         ),
-        moneyOwed = true,
-        oweHmrc = Some(true),
-        None
-      ),
-      showReturnsBreadcrumb = true,
-      currentYear,
-      hasFlatRateScheme = true,
-      isHybridUser = false
+        payment = None
+      )
     )
 
-    lazy val view = injectedView(vatReturnViewModel)
+    lazy val view = injectedView(vatReturnViewModelFinalReturn)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the pageHeading of 'Final return'" in {
-      elementText(Selectors.pageHeading) shouldBe "Submitted return for Final return"
+      elementText(Selectors.pageHeading) shouldBe "Submitted return for Cheapo Clothing Final return"
     }
   }
 }
