@@ -64,7 +64,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
     val backLink = ".govuk-back-link"
 
     val gaTagElement = "#content ul"
-    val minusSymbol = "#box-four > dd.govuk-summary-list__actions.govuk-hint"
+    val minusSymbol = "#box-four > dd.govuk-summary-list__actions.vatvc-grey-paragraph-text"
 
     def boxTitle(box: String): String = s"$box > dt"
     def boxDescription(box: String): String = s"$box > dd:nth-of-type(1)"
