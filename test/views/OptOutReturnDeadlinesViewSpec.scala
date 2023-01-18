@@ -37,9 +37,9 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
     val sendReturns = ".list-number li:nth-child(3)"
 
     val firstDeadlineDueDate = ".govuk-list li:nth-of-type(1)"
-    val firstDeadlinePeriod = ".govuk-list li:nth-of-type(1) .govuk-hint"
+    val firstDeadlinePeriod = ".govuk-list li:nth-of-type(1) .vatvc-grey-paragraph-text"
     val secondDeadlineDueDate = ".govuk-list li:nth-of-type(2)"
-    val secondDeadlinePeriod = ".govuk-list li:nth-of-type(2) .govuk-hint"
+    val secondDeadlinePeriod = ".govuk-list li:nth-of-type(2) .vatvc-grey-paragraph-text"
 
     val btaBreadcrumb = "div.govuk-breadcrumbs li:nth-of-type(1)"
     val btaBreadCrumbLink = "div.govuk-breadcrumbs li:nth-of-type(1) a"
