@@ -33,8 +33,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
 
   object Selectors {
     val pageHeading = "#content h1"
-    val subHeadingP1 = "#content p.govuk-heading-l"
-    val subHeadingP2 = "#content p.govuk-heading-m"
+    val subHeadingP1 = ".return-total"
+    val subHeadingP2 = ".owe-hmrc"
     val mainInformationText = "#content > section > div > p:nth-of-type(1)"
     val extraInformationText = "#content > section > div > p:nth-of-type(2)"
     val tableHeadingOne = "#vat-details"
