@@ -29,44 +29,68 @@
   isHybridUser: Boolean)(implicit messages: Messages, user: User)
 
 @if(isHybridUser) {
-    <h2 class="govuk-heading-l">@messages("paymentStatus.returnTotal") @displayMoney(amount)</h2>
+  <p class="return-total govuk-body govuk-!-padding-top-3 govuk-!-font-weight-bold govuk-!-font-size-36">
+    @messages("paymentStatus.returnTotal") @displayMoney(amount)
+  </p>
 } else {
 
-    @if(user.isAgent) {
+  @if(user.isAgent) {
     <p class="govuk-body">@messages("paymentStatus.whatYouOweCalcAgent")</p>
-    }else {
+  } else {
     <p class="govuk-body">@messages("paymentStatus.whatYouOweCalc")</p>
+  }
+  @(moneyOwed, oweHmrc, outstandingAmount) match {
+    case (true, Some(false), Some(outstandingAmount)) => {
+      <p class="govuk-body">@messages("paymentStatus.repaymentProcessing")</p>
+      <p class="return-total govuk-body govuk-!-padding-top-4 govuk-!-font-weight-bold govuk-!-font-size-36">@messages("paymentStatus.returnTotal")
+        @displayMoney(amount)
+      </p>
+      <p class="owe-hmrc govuk-body govuk-!-padding-top-2 govuk-!-font-weight-bold govuk-!-font-size-24">
+        @messages("paymentStatus.hmrcOwesYou") @displayMoney(outstandingAmount.abs)
+      </p>
     }
-    @(moneyOwed, oweHmrc, outstandingAmount) match {
-        case (true, Some(false), Some(outstandingAmount)) => {
-            <p class="govuk-body">@messages("paymentStatus.repaymentProcessing")</p>
-            <h2 class="govuk-heading-l">@messages("paymentStatus.returnTotal") @displayMoney(amount)</h2>
-            <h3 class="govuk-heading-m">@messages("paymentStatus.hmrcOwesYou") @displayMoney(outstandingAmount.abs)</h3>
-
-        }
-        case (true, Some(true), Some(outstandingAmount)) => {
-        @if(user.isAgent) {
-            <p class="govuk-body">@messages("paymentStatus.billToPayAgent", displayDate(dueDate)) @messages("paymentStatus.paymentProcessingAgent")</p>
-        } else {
-            <p class="govuk-body">@messages("paymentStatus.billToPay", displayDate(dueDate)) @messages("paymentStatus.paymentProcessing")</p>
-        }
-            <h2 class="govuk-heading-l">@messages("paymentStatus.returnTotal") @displayMoney(amount)</h2>
-        @if(user.isAgent) {
-            <h3 class="govuk-heading-m">@messages("paymentStatus.youOweHmrcAgent") @displayMoney(outstandingAmount)</h3>
-        } else {
-            <h3 class="govuk-heading-m">@messages("paymentStatus.youOweHmrc") @displayMoney(outstandingAmount)</h3>
-        }
-        }
-        case (false, _, Some(outstandingAmount)) => {
-            <h2 class="govuk-heading-l ">@messages("paymentStatus.returnTotal") @displayMoney(amount)</h2>
-        @if(user.isAgent) {
-            <h3 class="govuk-heading-m">@messages("paymentStatus.youOweHmrcAgent") @displayMoney(outstandingAmount)</h3>
-        } else {
-            <h3 class="govuk-heading-m">@messages("paymentStatus.youOweHmrc") @displayMoney(outstandingAmount)</h3>
-        }
-        }
-        case _ => {
-            <h2 class="govuk-heading-l">@messages("paymentStatus.returnTotal") @displayMoney(amount)</h2>
-        }
+    case (true, Some(true), Some(outstandingAmount)) => {
+      @if(user.isAgent) {
+        <p class="govuk-body">
+          @messages("paymentStatus.billToPayAgent", displayDate(dueDate))
+          @messages("paymentStatus.paymentProcessingAgent")
+        </p>
+      } else {
+        <p class="govuk-body">
+          @messages("paymentStatus.billToPay", displayDate(dueDate)) @messages("paymentStatus.paymentProcessing")
+        </p>
+      }
+        <p class="return-total govuk-body govuk-!-padding-top-4 govuk-!-font-weight-bold govuk-!-font-size-36">@messages("paymentStatus.returnTotal")
+          @displayMoney(amount)
+        </p>
+      @if(user.isAgent) {
+        <p class="owe-hmrc govuk-body govuk-!-padding-top-2 govuk-!-font-weight-bold govuk-!-font-size-24">
+          @messages("paymentStatus.youOweHmrcAgent") @displayMoney(outstandingAmount)
+        </p>
+      } else {
+        <p class="owe-hmrc govuk-body govuk-!-padding-top-2 govuk-!-font-weight-bold govuk-!-font-size-24">
+          @messages("paymentStatus.youOweHmrc") @displayMoney(outstandingAmount)
+        </p>
+      }
     }
+    case (false, _, Some(outstandingAmount)) => {
+      <p class="return-total govuk-body govuk-!-padding-top-4 govuk-!-font-weight-bold govuk-!-font-size-36">
+        @messages("paymentStatus.returnTotal") @displayMoney(amount)
+      </p>
+      @if(user.isAgent) {
+        <p class="owe-hmrc govuk-body govuk-!-padding-top-2 govuk-!-font-weight-bold govuk-!-font-size-24">
+          @messages("paymentStatus.youOweHmrcAgent") @displayMoney(outstandingAmount)
+        </p>
+      } else {
+        <p class="owe-hmrc govuk-body govuk-!-padding-top-2 govuk-!-font-weight-bold govuk-!-font-size-24">
+          @messages("paymentStatus.youOweHmrc") @displayMoney(outstandingAmount)
+        </p>
+      }
+    }
+    case _ => {
+      <p class="return-total govuk-body govuk-!-padding-top-4 govuk-!-font-weight-bold govuk-!-font-size-36">
+        @messages("paymentStatus.returnTotal") @displayMoney(amount)
+      </p>
+    }
+  }
 }

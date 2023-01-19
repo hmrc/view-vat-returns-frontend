@@ -89,8 +89,8 @@
 
   <section>
     <h1 class="govuk-heading-xl">
-            <span class="govuk-caption-xl">@messages("yourVatReturn.title")</span>
-            @returnHeading(useShortDayFormat = true)
+      <span class="govuk-caption-xl">@messages("yourVatReturn.title") @vatReturnViewModel.entityName</span>
+      @returnHeading(useShortDayFormat = true)
     </h1>
 
     <div class="noprint">
@@ -109,13 +109,9 @@
       <li>@messages("yourVatReturn.dateSubmitted") @displayDate(vatReturnViewModel.dateSubmitted)</li>
     </ul>
 
-    @vatReturnViewModel.entityName.map { entityName =>
-      <h2 class="govuk-heading-m">@entityName</h2>
-    }
-
     <section>
-      <h3 class="govuk-heading-s govuk-form-group">@messages("yourVatReturn.vatDetails")</h3>
-        <hr class="govuk-section-break govuk-section-break--visible">
+      <h2 id="vat-details" class="govuk-heading-m govuk-form-group">@messages("yourVatReturn.vatDetails")</h2>
+      <hr class="govuk-section-break govuk-section-break--visible">
       <dl class="govuk-summary-list">
         <div class="govuk-summary-list__row" id="box-one">
           <dt class="govuk-summary-list__key vatvc-grey-paragraph-text">@messages("yourVatReturn.boxOne")</dt>
@@ -151,8 +147,8 @@
     </section>
 
     <section>
-      <h3 class="govuk-heading-s govuk-form-group">@messages("yourVatReturn.additionalInfo")</h3>
-        <hr class="govuk-section-break govuk-section-break--visible">
+      <h2 id="additional-information" class="govuk-heading-m govuk-form-group">@messages("yourVatReturn.additionalInfo")</h2>
+      <hr class="govuk-section-break govuk-section-break--visible">
       <dl class="govuk-summary-list">
         <div class="govuk-summary-list__row" id="box-six">
           <dt class="govuk-summary-list__key vatvc-grey-paragraph-text">@messages("yourVatReturn.boxSix")</dt>
