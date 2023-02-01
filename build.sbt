@@ -17,7 +17,6 @@
 import play.sbt.routes.RoutesKeys
 import sbt.Tests.{Group, SubProcess}
 import uk.gov.hmrc.DefaultBuildSettings._
-import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin._
 
 val appName: String = "view-vat-returns-frontend"
 lazy val appDependencies: Seq[ModuleID] = compile ++ test()
@@ -48,13 +47,13 @@ lazy val coverageSettings: Seq[Setting[_]] = {
 
 val compile = Seq(
   ws,
-  "uk.gov.hmrc"       %% "bootstrap-frontend-play-28" % "7.12.0",
+  "uk.gov.hmrc"       %% "bootstrap-frontend-play-28" % "7.13.0",
   "com.typesafe.play" %% "play-json-joda"             % "2.10.0-RC7",
   "uk.gov.hmrc"       %% "play-frontend-hmrc"         % "6.3.0-play-28"
 )
 
 def test(scope: String = "test, it"): Seq[ModuleID] = Seq(
-  "uk.gov.hmrc"             %% "bootstrap-test-play-28"       % "7.12.0"           % scope,
+  "uk.gov.hmrc"             %% "bootstrap-test-play-28"       % "7.13.0"           % scope,
   "org.jsoup"               %  "jsoup"                        % "1.15.3"          % scope,
   "org.scalamock"           %% "scalamock"                    % "5.2.0"           % scope
 )
