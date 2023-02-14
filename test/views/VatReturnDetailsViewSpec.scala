@@ -189,13 +189,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
       elementText(Selectors.minusSymbol) shouldBe "− £5,732"
     }
 
-    "have inset text guidance for printing the return" in {
-      element(".govuk-inset-text").text() shouldBe "To save this Return, choose ‘Save as PDF’ from the print drop-down menu"
-    }
-
-
-    "have a print or save button" in {
-      element(".govuk-button").text() shouldBe "Print VAT Return"
+    "have a print or download button" in {
+      element(".govuk-button").text() shouldBe "Print or download VAT Return"
     }
 
     "render the correct help revealing link text" in {
@@ -253,12 +248,8 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
       elementText(Selectors.backLink) shouldBe "Back"
     }
 
-    "have inset text guidance for printing the return" in {
-      element(".govuk-inset-text").text() shouldBe "To save this Return, choose ‘Save as PDF’ from the print drop-down menu"
-    }
-
-    "have a print or save button" in {
-      element(".govuk-button").text() shouldBe "Print VAT Return"
+    "have a print or download button" in {
+      element(".govuk-button").text() shouldBe "Print or download VAT Return"
     }
   }
 
