@@ -189,7 +189,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
       elementText(Selectors.minusSymbol) shouldBe "− £5,732"
     }
 
-    "have a print or save button" in {
+    "have a print or download button" in {
       element(".govuk-button").text() shouldBe "Print or download VAT Return"
     }
 
@@ -248,7 +248,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
       elementText(Selectors.backLink) shouldBe "Back"
     }
 
-    "have a print or save button" in {
+    "have a print or download button" in {
       element(".govuk-button").text() shouldBe "Print or download VAT Return"
     }
   }
