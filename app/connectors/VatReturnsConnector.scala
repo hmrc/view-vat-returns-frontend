@@ -19,7 +19,7 @@ package connectors
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets.UTF_8
 import config.AppConfig
-import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
+import connectors.httpParsers.ResponseHttpParsers.HttpResult
 import javax.inject.{Inject, Singleton}
 import models.VatReturn
 import play.api.http.HeaderNames
@@ -41,14 +41,14 @@ class VatReturnsConnector @Inject()(http: HttpClient,
   )
 
   def getVatReturnDetails(vrn: String, periodKey: String)
-                         (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[VatReturn]] = {
+                         (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResult[VatReturn]] = {
 
     import connectors.httpParsers.VatReturnHttpParser.VatReturnReads
 
     val httpRequest = http.GET(
       returnUrl(vrn, periodKey)
     )(
-      implicitly[HttpReads[HttpGetResult[VatReturn]]],
+      implicitly[HttpReads[HttpResult[VatReturn]]],
       headerCarrier(hc),
       implicitly[ExecutionContext]
     )

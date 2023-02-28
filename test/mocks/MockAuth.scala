@@ -20,7 +20,7 @@ import java.time.LocalDate
 import audit.AuditingService
 import audit.models.{AuditModel, ExtendedAuditModel}
 import config.{AppConfig, ServiceErrorHandler}
-import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
+import connectors.httpParsers.ResponseHttpParsers.HttpResult
 import connectors.{VatObligationsConnector, VatSubscriptionConnector}
 import controllers.AuthorisedController
 import controllers.predicate.AuthoriseAgentWithClient
@@ -159,7 +159,7 @@ trait MockAuth extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
       .expects(*, *)
       .returns(response)
 
-  def callObligationsConnector(response: HttpGetResult[VatReturnObligations]): Any =
+  def callObligationsConnector(response: HttpResult[VatReturnObligations]): Any =
     (mockVatObligationsConnector.getVatReturnObligations(_: String, _: Option[LocalDate], _: Option[LocalDate], _: Status.Value)
     (_: HeaderCarrier, _: ExecutionContext))
       .expects(*, *, *, *, *, *)

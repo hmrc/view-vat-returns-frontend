@@ -16,7 +16,7 @@
 
 package services
 
-import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
+import connectors.httpParsers.ResponseHttpParsers.HttpResult
 
 import java.time.LocalDate
 import connectors.{FinancialDataConnector, VatReturnsConnector}
@@ -77,7 +77,7 @@ class ReturnsServiceSpec extends ControllerBaseSpec {
 
   val examplePayments: Payments = Payments(Seq(examplePayment))
 
-  def callFinancialDataConnector(response: HttpGetResult[Payments]): Any =
+  def callFinancialDataConnector(response: HttpResult[Payments]): Any =
     (mockFinancialDataApiConnector.getPayments(_: String, _: Option[Int])(_: HeaderCarrier, _: ExecutionContext))
       .expects(*, *, *, *)
       .returns(Future.successful(response))
