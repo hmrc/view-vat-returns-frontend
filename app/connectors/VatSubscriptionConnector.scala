@@ -17,7 +17,7 @@
 package connectors
 
 import config.AppConfig
-import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
+import connectors.httpParsers.ResponseHttpParsers.HttpResult
 import javax.inject.{Inject, Singleton}
 import models.CustomerInformation
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient}
@@ -32,7 +32,7 @@ class VatSubscriptionConnector @Inject()(http: HttpClient,
     s"${appConfig.vatSubscriptionBaseUrl}/vat-subscription/$vrn/full-information"
 
   def getCustomerInfo(vrn: String)
-                     (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpGetResult[CustomerInformation]] = {
+                     (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResult[CustomerInformation]] = {
 
     import connectors.httpParsers.CustomerInfoHttpParser.CustomerInfoReads
 

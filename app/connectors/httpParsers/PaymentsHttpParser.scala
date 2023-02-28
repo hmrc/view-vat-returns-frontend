@@ -16,7 +16,7 @@
 
 package connectors.httpParsers
 
-import connectors.httpParsers.ResponseHttpParsers.HttpGetResult
+import connectors.httpParsers.ResponseHttpParsers.HttpResult
 import models.errors.{ApiSingleError, ServerSideError, UnexpectedJsonFormat, UnexpectedStatusError}
 import models.payments.Payments
 import play.api.http.Status.{BAD_REQUEST, NOT_FOUND, OK}
@@ -28,8 +28,8 @@ import scala.util.{Failure, Success, Try}
 
 object PaymentsHttpParser extends ResponseHttpParsers with LoggerUtil {
 
-  implicit object PaymentsReads extends HttpReads[HttpGetResult[Payments]] {
-    override def read(method: String, url: String, response: HttpResponse): HttpGetResult[Payments] = {
+  implicit object PaymentsReads extends HttpReads[HttpResult[Payments]] {
+    override def read(method: String, url: String, response: HttpResponse): HttpResult[Payments] = {
       response.status match {
         case OK => Try(removeNonVatReturnCharges(response.json).as[Payments]) match {
           case Success(model) => Right(model)
