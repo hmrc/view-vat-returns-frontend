@@ -39,7 +39,7 @@ class PaymentStatusTemplateSpec extends TemplateBaseSpec {
         "the user owes money on their VAT return" should {
 
           val expectedText = whatYouOweCalc +
-            "You need to pay this bill by 11 November 2011. " +
+            "You need to pay this bill by 11\u00a0November\u00a02011. " +
             "It can take up to 7 days to show that you have made a payment. " +
             "Return total: £1,000 " +
             "You owe HMRC: £1,000"
@@ -81,7 +81,7 @@ class PaymentStatusTemplateSpec extends TemplateBaseSpec {
         "the outstanding amount on the return is less than the return amount" should {
 
           val expectedText = whatYouOweCalc +
-            "You need to pay this bill by 11 November 2011. " +
+            "You need to pay this bill by 11\u00a0November\u00a02011. " +
             "It can take up to 7 days to show that you have made a payment. " +
             "Return total: £1,000 " +
             "You owe HMRC: £500"
@@ -158,7 +158,7 @@ class PaymentStatusTemplateSpec extends TemplateBaseSpec {
         "the user owes money on their VAT return" should {
 
           val expectedText = whatYouOweCalcAgent +
-            "Your client needs to pay this bill by 11 November 2011. " +
+            "Your client needs to pay this bill by 11\u00a0November\u00a02011. " +
             "It can take up to 7 days to show that they have made a payment. " +
             "Return total: £1,000 " +
             "Your client owes HMRC: £1,000"
@@ -200,7 +200,7 @@ class PaymentStatusTemplateSpec extends TemplateBaseSpec {
         "the outstanding amount on the return is less than the return amount" should {
 
           val expectedText = whatYouOweCalcAgent +
-            "Your client needs to pay this bill by 11 November 2011. " +
+            "Your client needs to pay this bill by 11\u00a0November\u00a02011. " +
             "It can take up to 7 days to show that they have made a payment. " +
             "Return total: £1,000 " +
             "Your client owes HMRC: £500"
