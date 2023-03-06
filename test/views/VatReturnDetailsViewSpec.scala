@@ -116,7 +116,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct document title" in {
-      document.title shouldBe "Submitted return for 1 January to 31 March 2017 - Manage your VAT account - GOV.UK"
+      document.title shouldBe "Submitted return for 1\u00a0January to 31\u00a0March\u00a02017 - Manage your VAT account - GOV.UK"
     }
 
     "have the correct page heading" in {
@@ -232,7 +232,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct document title" in {
-      document.title shouldBe "Submitted return for 1 January to 31 March 2017 - Your client’s VAT details - GOV.UK"
+      document.title shouldBe "Submitted return for 1\u00a0January to 31\u00a0March\u00a02017 - Your client’s VAT details - GOV.UK"
     }
 
     "not render breadcrumbs which" in {
@@ -329,7 +329,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
 
     "have the correct extra information text under the main information text" in {
       elementText(Selectors.extraInformationText) shouldBe
-        "You need to pay this bill by 6 April 2017. It can take up to 7 days to show that you have made a payment."
+        "You need to pay this bill by 6\u00a0April\u00a02017. It can take up to 7 days to show that you have made a payment."
     }
   }
 
@@ -407,7 +407,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "not show the entity name in the page heading" in {
-      elementText(Selectors.pageHeading) shouldBe "Submitted return for 1 Jan to 31 Mar 2017"
+      elementText(Selectors.pageHeading) shouldBe "Submitted return for 1\u00a0Jan to 31\u00a0Mar\u00a02017"
     }
   }
 
