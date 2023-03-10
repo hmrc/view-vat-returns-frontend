@@ -48,7 +48,7 @@ lazy val coverageSettings: Seq[Setting[_]] = {
 val compile = Seq(
   ws,
   "uk.gov.hmrc"       %% "bootstrap-frontend-play-28" % "7.14.0",
-  "uk.gov.hmrc"       %% "play-frontend-hmrc"         % "6.7.0-play-28"
+  "uk.gov.hmrc"       %% "play-frontend-hmrc"         % "6.8.0-play-28"
 )
 
 def test(scope: String = "test, it"): Seq[ModuleID] = Seq(
@@ -83,7 +83,8 @@ lazy val microservice = Project(appName, file("."))
   .settings(
     scalaVersion := "2.13.8",
     libraryDependencies ++= appDependencies,
-    retrieveManaged := true
+    retrieveManaged := true,
+      scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Wconf:cat=unused-imports&site=.*views.html.*:s")
   )
   .configs(IntegrationTest)
   .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
