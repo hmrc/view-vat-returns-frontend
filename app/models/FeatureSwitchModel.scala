@@ -16,5 +16,4 @@
 
 package models
 
-case class FeatureSwitchModel(userResearchBannerEnabled: Boolean,
-                              staticDateEnabled: Boolean)
+case class FeatureSwitchModel(staticDateEnabled: Boolean)

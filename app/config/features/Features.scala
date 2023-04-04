@@ -23,6 +23,5 @@ import play.api.Configuration
 
 @Singleton
 class Features @Inject()(config: Configuration) {
-  val userResearchBanner = new Feature(ConfigKeys.userResearchBannerFeature, config)
   val staticDateEnabled = new Feature(ConfigKeys.staticDateEnabledFeature, config)
 }
