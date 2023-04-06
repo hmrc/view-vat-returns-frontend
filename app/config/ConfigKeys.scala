@@ -23,7 +23,6 @@ object ConfigKeys {
 
   val signInBaseUrl: String = "signIn.url"
 
-  val userResearchBannerFeature: String = "features.userResearchBanner.enabled"
   val staticDateEnabledFeature: String = "features.staticDate.enabled"
   val staticDateValue: String = "date-service.staticDate.value"
 
