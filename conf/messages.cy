@@ -87,7 +87,7 @@ yourVatReturn.reportLink2 = roi gwybod am unrhyw wallau eraill (yn agor tab newy
 yourVatReturn.reportLink3 = i CThEF.
 yourVatReturn.bullet1 = £10,000 neu lai
 yourVatReturn.bullet2 = 1% neu’n llai o’ch ffigur ym mlwch 6 ac yn is na £50,000
-yourVatReturn.printOrDownload = Argraffu neu lawrlwytho Ffurflen TAW
+yourVatReturn.print = Argraffu’r Ffurflen TAW
 yourVatReturn.printHeading = Eich Ffurflen TAW
 yourVatReturn.footer = Cywir ar {0}
 

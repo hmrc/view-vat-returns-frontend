@@ -87,7 +87,7 @@ yourVatReturn.reportLink2 = report any other errors (opens in a new tab)
 yourVatReturn.reportLink3 = to HMRC.
 yourVatReturn.bullet1 = £10,000 or less
 yourVatReturn.bullet2 = 1% or less of your box 6 figure and below £50,000
-yourVatReturn.printOrDownload = Print or download VAT Return
+yourVatReturn.print = Print VAT Return
 yourVatReturn.printHeading = Your VAT Return
 yourVatReturn.footer = Correct as of {0}
 
