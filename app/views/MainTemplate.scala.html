@@ -18,12 +18,10 @@
 @import config.AppConfig
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers._
 @import models.User
-@import uk.gov.hmrc.hmrcfrontend.views.config.StandardBetaBanner
 
 
 @this(govukLayout: GovukLayout,
       govukHeader: GovukHeader,
-      standardBetaBanner: StandardBetaBanner,
       hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper,
       hmrcLanguageSelect: HmrcLanguageSelect,
       hmrcTimeoutDialog: HmrcTimeoutDialog,
@@ -90,7 +88,6 @@
     serviceUrl = titleServiceUrl,
     signOutUrl = if(showSignOut) Some(routes.SignOutController.signOut(feedbackOnSignOut).url) else None,
     userResearchBanner = Some(UserResearchBanner(url = "https://signup.take-part-in-research.service.gov.uk/?utm_campaign=VATviewchange&utm_source=Other&utm_medium=other&t=HMRC&id=34")),
-    phaseBanner = Some(standardBetaBanner(url = appConfig.feedbackUrl(request.uri))),
     displayHmrcBanner = false
   )
 }
