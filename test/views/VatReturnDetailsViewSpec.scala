@@ -190,7 +190,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
     }
 
     "have a print button" in {
-      element(".govuk-button").text() shouldBe "Print VAT Return"
+      elementText("#print-return-button") shouldBe "Print VAT Return"
     }
 
     "render the correct help revealing link text" in {
@@ -249,7 +249,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
     }
 
     "have a print button" in {
-      element(".govuk-button").text() shouldBe "Print VAT Return"
+      elementText("#print-return-button") shouldBe "Print VAT Return"
     }
   }
 

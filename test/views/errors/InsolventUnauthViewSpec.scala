@@ -30,7 +30,6 @@ class InsolventUnauthViewSpec extends ViewBaseSpec {
     object Selectors {
       val pageHeading = "#content h1"
       val message = "#insolvent-without-access-body"
-      val button = ".govuk-button"
       val signOut = "#sign-out-link"
       val signOutLink = "#sign-out-link"
     }
@@ -59,11 +58,11 @@ class InsolventUnauthViewSpec extends ViewBaseSpec {
     }
 
     "have the correct button text" in {
-      elementText(Selectors.button) shouldBe "Go to your business tax account"
+      elementText("#bta-button") shouldBe "Go to your business tax account"
     }
 
     "have the correct button link" in {
-      element(Selectors.button).attr("href") shouldBe "bta-url"
+      element("#bta-button").attr("href") shouldBe "bta-url"
     }
 
   }

@@ -47,12 +47,12 @@ lazy val coverageSettings: Seq[Setting[_]] = {
 
 val compile = Seq(
   ws,
-  "uk.gov.hmrc"       %% "bootstrap-frontend-play-28" % "7.14.0",
-  "uk.gov.hmrc"       %% "play-frontend-hmrc"         % "6.8.0-play-28"
+  "uk.gov.hmrc"       %% "bootstrap-frontend-play-28" % "7.15.0",
+  "uk.gov.hmrc"       %% "play-frontend-hmrc"         % "7.4.0-play-28"
 )
 
 def test(scope: String = "test, it"): Seq[ModuleID] = Seq(
-  "uk.gov.hmrc"             %% "bootstrap-test-play-28"       % "7.14.0"           % scope,
+  "uk.gov.hmrc"             %% "bootstrap-test-play-28"       % "7.15.0"           % scope,
   "org.scalamock"           %% "scalamock"                    % "5.2.0"           % scope
 )
 
