@@ -29,5 +29,6 @@
     @govukButton(Button(
         content = Text(messages("insolventUnauthorised.buttonText")),
         href = Some(appConfig.btaHomeUrl),
+        attributes = Map("id" -> "bta-button")
     ))
 }
