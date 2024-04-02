@@ -137,3 +137,5 @@ returnDeadlines.submitReturn = Cyflwyno Ffurflen TAW
 returnDeadlines.submitReturn.title = Cyflwyno Ffurflen TAW
 returnDeadlines.submitReturn.returnDeadline = Dyddiad cau ar gyfer cyflwyno
 returnDeadlines.submitReturn.futureReturn = Byddwch yn gallu cyflwyno’ch Ffurflen TAW o {0} ymlaen.
+
+webchat.askHMRC = Gofyn i CThEF (yn agor tab newydd)

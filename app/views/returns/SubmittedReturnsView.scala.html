@@ -82,6 +82,16 @@
   }
 }
 
+@webchatLink = {
+    <br>
+    <br>
+    <p class="govuk-body">
+        <a class="govuk-link" href="https://www.tax.service.gov.uk/ask-hmrc/chat/vat-online?ds" target="_blank" id="webchatLink-id">@messages("webchat.askHMRC")</a>
+    </p>
+    <br>
+    <br>
+}
+
 @mainTemplate(
   pageTitle = messages("submittedReturns.title"),
   backLinkContent = Some(navContent),
@@ -117,5 +127,7 @@
           ))
       </p>
     }
+
+    @if(appConfig.features.webchatEnabled()){ @webchatLink }
 
 }

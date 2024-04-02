@@ -137,3 +137,5 @@ returnDeadlines.submitReturn = Submit VAT Return
 returnDeadlines.submitReturn.title = Submit VAT Return
 returnDeadlines.submitReturn.returnDeadline = Return deadline
 returnDeadlines.submitReturn.futureReturn = You will be able to submit your return from the {0}.
+
+webchat.askHMRC = Ask HMRC (opens in a new tab)
