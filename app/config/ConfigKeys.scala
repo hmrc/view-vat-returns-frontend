@@ -24,6 +24,7 @@ object ConfigKeys {
   val signInBaseUrl: String = "signIn.url"
 
   val staticDateEnabledFeature: String = "features.staticDate.enabled"
+  val webchatEnabled: String = "features.webchat.enabled"
   val staticDateValue: String = "date-service.staticDate.value"
 
   val finalReturnPeriodKey: String = "final-return.periodKey"

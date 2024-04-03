@@ -19,7 +19,7 @@ package views
 import models.User
 
 import java.time.LocalDate
-import models.viewModels.ReturnDeadlineViewModel
+import models.viewModels.{ReturnDeadlineViewModel, VatReturnsViewModel}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.twirl.api.Html
@@ -276,6 +276,98 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
       "has the correct href" in {
         element(Selectors.backLink).attr("href") shouldBe "agent-client-agent-action"
       }
+    }
+  }
+
+  "The webchat link is displayed" when {
+    "the webchatEnabled feature switch is switched on for principal user" in {
+
+      val singleDeadline = Seq(
+        ReturnDeadlineViewModel(
+          LocalDate.parse("2018-02-02"),
+          LocalDate.parse("2018-01-01"),
+          LocalDate.parse("2018-01-01"),
+          periodKey = "18CC"
+        )
+      )
+
+      lazy val view = {
+        mockConfig.features.webchatEnabled(true)
+        injectedView(singleDeadline, Html(""), None)
+      }
+
+      lazy implicit val document: Document = Jsoup.parse(view.body)
+
+      document.select("#webchatLink-id").text() shouldBe "Ask HMRC (opens in a new tab)"
+      document.select("#webchatLink-id").attr("href") shouldBe "/ask-hmrc/chat/vat-online?ds"
+    }
+
+    "the webchatEnabled feature switch is switched on for an agent" in {
+
+      val singleDeadline = Seq(
+        ReturnDeadlineViewModel(
+          LocalDate.parse("2018-02-02"),
+          LocalDate.parse("2018-01-01"),
+          LocalDate.parse("2018-01-01"),
+          periodKey = "18CC"
+        )
+      )
+
+      lazy val view = {
+        mockConfig.features.webchatEnabled(true)
+        injectedView(singleDeadline, Html(""), None)(request, messages, mockConfig, agentUser)
+      }
+
+
+      lazy implicit val document: Document = Jsoup.parse(view.body)
+
+      document.select("#webchatLink-id").text() shouldBe "Ask HMRC (opens in a new tab)"
+      document.select("#webchatLink-id").attr("href") shouldBe "/ask-hmrc/chat/vat-online?ds"
+    }
+  }
+
+  "The webchat link is not displayed" when {
+    "the webchatEnabled feature switch is switched off for principal user" in {
+
+      val singleDeadline = Seq(
+        ReturnDeadlineViewModel(
+          LocalDate.parse("2018-02-02"),
+          LocalDate.parse("2018-01-01"),
+          LocalDate.parse("2018-01-01"),
+          periodKey = "18CC"
+        )
+      )
+
+      lazy val view = {
+        mockConfig.features.webchatEnabled(false)
+        injectedView(singleDeadline, Html(""), None)
+      }
+
+      lazy implicit val document: Document = Jsoup.parse(view.body)
+
+      document.select("#webchatLink-id").size shouldBe 0
+    }
+
+    "the webchatEnabled feature switch is switched off for an agent" in {
+
+      val singleDeadline = Seq(
+        ReturnDeadlineViewModel(
+          LocalDate.parse("2018-02-02"),
+          LocalDate.parse("2018-01-01"),
+          LocalDate.parse("2018-01-01"),
+          periodKey = "18CC"
+        )
+      )
+
+      lazy val view = {
+        mockConfig.features.webchatEnabled(false)
+        injectedView(singleDeadline, Html(""), None)(request, messages, mockConfig, agentUser)
+      }
+
+
+      lazy implicit val document: Document = Jsoup.parse(view.body)
+
+      document.select("#webchatLink-id").size shouldBe 0
     }
   }
 }

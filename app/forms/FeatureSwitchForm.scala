@@ -25,7 +25,8 @@ object FeatureSwitchForm {
 
   val form: Form[FeatureSwitchModel] = Form(
     mapping(
-      ConfigKeys.staticDateEnabledFeature -> boolean
+      ConfigKeys.staticDateEnabledFeature -> boolean,
+      ConfigKeys.webchatEnabled -> boolean
   )(FeatureSwitchModel.apply)(FeatureSwitchModel.unapply)
   )
 }

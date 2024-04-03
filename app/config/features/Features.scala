@@ -24,4 +24,5 @@ import play.api.Configuration
 @Singleton
 class Features @Inject()(config: Configuration) {
   val staticDateEnabled = new Feature(ConfigKeys.staticDateEnabledFeature, config)
+  val webchatEnabled = new Feature(ConfigKeys.webchatEnabled, config)
 }

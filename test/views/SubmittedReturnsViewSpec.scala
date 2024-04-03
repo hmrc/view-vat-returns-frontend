@@ -57,6 +57,20 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
     val previousReturnsLink = "#previous-one a:nth-of-type(1)"
   }
 
+  lazy val exampleReturns: Seq[ReturnObligationsViewModel] =
+    Seq(
+      ReturnObligationsViewModel(
+        LocalDate.parse("2018-01-01"),
+        LocalDate.parse("2018-03-31"),
+        "#001"
+      ),
+      ReturnObligationsViewModel(
+        LocalDate.parse("2018-04-01"),
+        LocalDate.parse("2018-06-30"),
+        "#002"
+      )
+    )
+
   "Rendering the Submitted Returns page with a HMRC-MTD-VAT enrolment" when {
 
     "the user is not insolvent" when {
@@ -67,19 +81,6 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
 
           "there are multiple returns for the year retrieved" should {
 
-            lazy val exampleReturns: Seq[ReturnObligationsViewModel] =
-              Seq(
-                ReturnObligationsViewModel(
-                  LocalDate.parse("2018-01-01"),
-                  LocalDate.parse("2018-03-31"),
-                  "#001"
-                ),
-                ReturnObligationsViewModel(
-                  LocalDate.parse("2018-04-01"),
-                  LocalDate.parse("2018-06-30"),
-                  "#002"
-                )
-              )
 
             lazy val view: Html = injectedView(
               VatReturnsViewModel(
@@ -774,6 +775,93 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
       "display the notice about recently submitted returns" in {
         elementText(Selectors.recentlySubmittedReturnNotice) shouldBe "Check back later if you cannot see a recently submitted return."
       }
+    }
+  }
+
+  "The webchat link is displayed" when {
+    "the webchatEnabled feature switch is switched on for principal user" in {
+
+      mockConfig.features.webchatEnabled(true)
+
+      lazy val view: Html = injectedView(
+          VatReturnsViewModel(
+            returnYears = Seq(2018),
+            obligations = exampleReturns,
+            showPreviousReturnsTab = false,
+            vrn = vrn
+          ),
+          showInsolvencyContent = false,
+          recentlySubmittedReturn = false
+        )
+
+
+      lazy implicit val document: Document = Jsoup.parse(view.body)
+
+      document.select("#webchatLink-id").text() shouldBe "Ask HMRC (opens in a new tab)"
+      document.select("#webchatLink-id").attr("href") shouldBe "/ask-hmrc/chat/vat-online?ds"
+    }
+
+    "the webchatEnabled feature switch is switched on for an agent" in {
+      mockConfig.features.webchatEnabled(true)
+
+      lazy val view: Html = injectedView(
+        VatReturnsViewModel(
+          returnYears = Seq(2018),
+          obligations = exampleReturns,
+          showPreviousReturnsTab = false,
+          vrn = vrn
+        ),
+        showInsolvencyContent = false,
+        recentlySubmittedReturn = false
+      )(request, messages, mockConfig, agentUser)
+
+
+      lazy implicit val document: Document = Jsoup.parse(view.body)
+
+      document.select("#webchatLink-id").text() shouldBe "Ask HMRC (opens in a new tab)"
+      document.select("#webchatLink-id").attr("href") shouldBe "/ask-hmrc/chat/vat-online?ds"
+    }
+  }
+
+  "The webchat link is not displayed" when {
+    "the webchatEnabled feature switch is switched off for principal user" in {
+      mockConfig.features.webchatEnabled(false)
+
+      lazy val view: Html = injectedView(
+        VatReturnsViewModel(
+          returnYears = Seq(2018),
+          obligations = exampleReturns,
+          showPreviousReturnsTab = false,
+          vrn = vrn
+        ),
+        showInsolvencyContent = false,
+        recentlySubmittedReturn = false
+      )
+
+
+      lazy implicit val document: Document = Jsoup.parse(view.body)
+
+      document.select("#webchatLink-id").size shouldBe 0
+    }
+
+    "the webchatEnabled feature switch is switched off for an agent" in {
+      mockConfig.features.webchatEnabled(false)
+
+      lazy val view: Html = injectedView(
+        VatReturnsViewModel(
+          returnYears = Seq(2018),
+          obligations = exampleReturns,
+          showPreviousReturnsTab = false,
+          vrn = vrn
+        ),
+        showInsolvencyContent = false,
+        recentlySubmittedReturn = false
+      )(request, messages, mockConfig, agentUser)
+
+
+      lazy implicit val document: Document = Jsoup.parse(view.body)
+
+      document.select("#webchatLink-id").size shouldBe 0
     }
   }
 }
