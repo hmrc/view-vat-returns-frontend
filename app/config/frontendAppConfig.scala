@@ -98,7 +98,7 @@ class FrontendAppConfig @Inject()(implicit configuration: Configuration, sc: Ser
   override lazy val btaBaseUrl: String = sc.baseUrl(Keys.businessTaxAccount)
   override lazy val btaHomeUrl: String = sc.getString(Keys.businessTaxAccountHost) + sc.getString(Keys.businessTaxAccountUrl)
 
-  override val webchatUrl: String = sc.baseUrl("self-lookup") + sc.getString("webchat.endpoint")
+  override val webchatUrl: String = sc.baseUrl("digital-engagement-platform-frontend") + sc.getString("webchat.endpoint")
 
   private lazy val vatSummaryBase: String = sc.getString(Keys.vatSummaryBase)
   override lazy val vatDetailsUrl: String = vatSummaryBase + sc.getString(Keys.vatDetailsUrl)
