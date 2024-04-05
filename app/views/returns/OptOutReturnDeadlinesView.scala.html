@@ -98,4 +98,10 @@
       }
     </ul>
   </div>
+
+   @if(appConfig.features.webchatEnabled()){
+    <p class="govuk-body govuk-!-margin-top-8 govuk-!-margin-bottom-8">
+        <a class="govuk-link" href="@{appConfig.webchatUrl}" target="_blank" id="webchatLink-id">@messages("webchat.askHMRC")</a>
+    </p>
+    }
 }
