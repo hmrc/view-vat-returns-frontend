@@ -17,7 +17,7 @@
 package views
 
 import java.time.LocalDate
-import models.viewModels.ReturnDeadlineViewModel
+import models.viewModels.{ReturnDeadlineViewModel, VatReturnsViewModel}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.scalatest.exceptions.TestFailedException
@@ -339,6 +339,109 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
 
     "have the wording for the final return period" in {
       elementText(Selectors.firstDeadlinePeriod) shouldBe "for your final return"
+    }
+  }
+
+  "The webchat link is displayed" when {
+    "the webchatEnabled feature switch is switched on for principal user" in {
+
+      mockConfig.features.webchatEnabled(true)
+
+      val finalReturnDeadline = Seq(
+        ReturnDeadlineViewModel(
+          LocalDate.parse("2018-02-02"),
+          LocalDate.parse("2018-01-01"),
+          LocalDate.parse("2018-01-01"),
+          periodKey = mockConfig.finalReturnPeriodKey
+        )
+      )
+
+      val currentDate = LocalDate.parse("2018-01-02")
+
+      lazy val view = injectedView(finalReturnDeadline, currentDate, Html(""), "MTDfB")
+
+
+      lazy implicit val document: Document = Jsoup.parse(view.body)
+
+      document.select("#webchatLink-id").text() shouldBe "Ask HMRC (opens in a new tab)"
+      document.select("#webchatLink-id").attr("href") shouldBe "/ask-hmrc/chat/vat-online?ds"
+    }
+
+    "the webchatEnabled feature switch is switched on for an agent" in {
+      mockConfig.features.webchatEnabled(true)
+
+      val finalReturnDeadline = Seq(
+        ReturnDeadlineViewModel(
+          LocalDate.parse("2018-02-02"),
+          LocalDate.parse("2018-01-01"),
+          LocalDate.parse("2018-01-01"),
+          periodKey = mockConfig.finalReturnPeriodKey
+        )
+      )
+
+      val currentDate = LocalDate.parse("2018-01-02")
+
+      lazy val view = injectedView(
+        deadlines = finalReturnDeadline,
+        currentDate = currentDate,
+        serviceInfoContent = Html(""),
+        mandationStatus = "MTDfB")(request, messages, mockConfig, agentUser)
+
+
+
+      lazy implicit val document: Document = Jsoup.parse(view.body)
+
+      document.select("#webchatLink-id").text() shouldBe "Ask HMRC (opens in a new tab)"
+      document.select("#webchatLink-id").attr("href") shouldBe "/ask-hmrc/chat/vat-online?ds"
+    }
+  }
+
+  "The webchat link is not displayed" when {
+    "the webchatEnabled feature switch is switched off for principal user" in {
+      mockConfig.features.webchatEnabled(false)
+
+      val finalReturnDeadline = Seq(
+        ReturnDeadlineViewModel(
+          LocalDate.parse("2018-02-02"),
+          LocalDate.parse("2018-01-01"),
+          LocalDate.parse("2018-01-01"),
+          periodKey = mockConfig.finalReturnPeriodKey
+        )
+      )
+
+      val currentDate = LocalDate.parse("2018-01-02")
+
+      lazy val view = injectedView(finalReturnDeadline, currentDate, Html(""), "MTDfB")
+
+      lazy implicit val document: Document = Jsoup.parse(view.body)
+
+      document.select("#webchatLink-id").size shouldBe 0
+    }
+
+    "the webchatEnabled feature switch is switched off for an agent" in {
+      mockConfig.features.webchatEnabled(false)
+
+      val finalReturnDeadline = Seq(
+        ReturnDeadlineViewModel(
+          LocalDate.parse("2018-02-02"),
+          LocalDate.parse("2018-01-01"),
+          LocalDate.parse("2018-01-01"),
+          periodKey = mockConfig.finalReturnPeriodKey
+        )
+      )
+
+      val currentDate = LocalDate.parse("2018-01-02")
+
+      lazy val view = injectedView(
+        deadlines = finalReturnDeadline,
+        currentDate = currentDate,
+        serviceInfoContent = Html(""),
+        mandationStatus = "MTDfB")(request, messages, mockConfig, agentUser)
+
+
+      lazy implicit val document: Document = Jsoup.parse(view.body)
+
+      document.select("#webchatLink-id").size shouldBe 0
     }
   }
 }
