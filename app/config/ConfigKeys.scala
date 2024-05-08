@@ -26,6 +26,7 @@ object ConfigKeys {
   val staticDateEnabledFeature: String = "features.staticDate.enabled"
   val webchatEnabled: String = "features.webchat.enabled"
   val staticDateValue: String = "date-service.staticDate.value"
+  val showUserResearchBannerEnabled: String = "features.showUserResearchBanner.enabled"
 
   val finalReturnPeriodKey: String = "final-return.periodKey"
 

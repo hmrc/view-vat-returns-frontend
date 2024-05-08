@@ -16,4 +16,6 @@
 
 package models
 
-case class FeatureSwitchModel(staticDateEnabled: Boolean, webchatEnabled: Boolean)
+case class FeatureSwitchModel(staticDateEnabled: Boolean,
+                              webchatEnabled: Boolean,
+                              showUserResearchBannerEnabled: Boolean)

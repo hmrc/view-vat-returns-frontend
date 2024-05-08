@@ -32,7 +32,8 @@ class FeatureSwitchController @Inject()(mcc: MessagesControllerComponents,
     Ok(featureSwitchView(FeatureSwitchForm.form.fill(
       FeatureSwitchModel(
         staticDateEnabled = appConfig.features.staticDateEnabled(),
-        webchatEnabled = appConfig.features.webchatEnabled()
+        webchatEnabled = appConfig.features.webchatEnabled(),
+        showUserResearchBannerEnabled = appConfig.features.showUserResearchBannerEnabled()
       )
     )))
   }
@@ -47,6 +48,7 @@ class FeatureSwitchController @Inject()(mcc: MessagesControllerComponents,
   def handleSuccess(model: FeatureSwitchModel): Result = {
     appConfig.features.staticDateEnabled(model.staticDateEnabled)
     appConfig.features.webchatEnabled(model.webchatEnabled)
+    appConfig.features.showUserResearchBannerEnabled(model.showUserResearchBannerEnabled)
     Redirect(routes.FeatureSwitchController.featureSwitch)
   }
 }

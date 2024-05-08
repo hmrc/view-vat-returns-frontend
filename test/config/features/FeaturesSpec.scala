@@ -27,18 +27,44 @@ class FeaturesSpec extends PlaySpec with GuiceOneAppPerSuite with BeforeAndAfter
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    features.staticDateEnabled(false)
+    features.staticDateEnabled(true)
+    features.webchatEnabled(true)
+    features.showUserResearchBannerEnabled(false)
   }
 
-  "The Auth Feature" should {
+  "The static date feature" should {
 
     "return its current state" in {
-      features.staticDateEnabled() mustBe false
+      features.staticDateEnabled() mustBe true
     }
 
     "switch to a new state" in {
-      features.staticDateEnabled(true)
-      features.staticDateEnabled() mustBe true
+      features.staticDateEnabled(false)
+      features.staticDateEnabled() mustBe false
+    }
+  }
+
+  "The webchat feature" should {
+
+    "return its current state" in {
+      features.webchatEnabled() mustBe true
+    }
+
+    "switch to a different state" in {
+      features.webchatEnabled(false)
+      features.webchatEnabled() mustBe false
+    }
+  }
+
+  "The show user research banner feature" should {
+
+    "return its current state" in {
+      features.showUserResearchBannerEnabled() mustBe false
+    }
+
+    "switch to a different state" in {
+      features.showUserResearchBannerEnabled(true)
+      features.showUserResearchBannerEnabled() mustBe true
     }
   }
 }
