@@ -17,7 +17,7 @@
 package views
 
 import java.time.LocalDate
-import models.viewModels.{ReturnDeadlineViewModel, VatReturnsViewModel}
+import models.viewModels.ReturnDeadlineViewModel
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.scalatest.exceptions.TestFailedException

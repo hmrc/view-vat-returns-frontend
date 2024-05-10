@@ -87,7 +87,9 @@
     serviceName = Some(titleServiceName),
     serviceUrl = titleServiceUrl,
     signOutUrl = if(showSignOut) Some(routes.SignOutController.signOut(feedbackOnSignOut).url) else None,
-    userResearchBanner = Some(UserResearchBanner(url = "https://signup.take-part-in-research.service.gov.uk/?utm_campaign=VATviewchange&utm_source=Other&utm_medium=other&t=HMRC&id=34")),
+    userResearchBanner = if(appConfig.features.showUserResearchBannerEnabled()) Some(UserResearchBanner(
+        url = "https://signup.take-part-in-research.service.gov.uk/?utm_campaign=VATviewchange&utm_source=Other&utm_medium=other&t=HMRC&id=34"
+                        )) else None,
     displayHmrcBanner = false
   )
 }

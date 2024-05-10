@@ -24,47 +24,103 @@ import views.html.MainTemplate
 class MainTemplateSpec extends ViewBaseSpec {
 
   val injectedView: MainTemplate = inject[MainTemplate]
+  val userBannerHeading: String = "Help make GOV.UK better"
+
+  object Selectors {
+    val serviceName: String = ".hmrc-header__service-name"
+    val userResearchBanner: String = ".hmrc-user-research-banner"
+    val userResearchBannerHeading = ".hmrc-user-research-banner__title"
+  }
 
   "MainTemplate" when {
 
-    "the user is an Agent" should {
-      lazy val view = injectedView(pageTitle = "", user = Some(agentUser))(Html("Test"))(request, messages, mockConfig)
-      lazy implicit val document: Document = Jsoup.parse(view.body)
+    "the showUserResearchBanner feature switch is turned off" when {
 
-      "have the correct service name" in {
-        elementText(".hmrc-header__service-name") shouldBe "Your client’s VAT details"
+      "the user is an Agent" should {
+        lazy val view = injectedView(pageTitle = "", user = Some(agentUser))(Html("Test"))(request, messages, mockConfig)
+        lazy implicit val document: Document = Jsoup.parse(view.body)
+
+        "have the correct service name" in {
+          elementText(Selectors.serviceName) shouldBe "Your client’s VAT details"
+        }
+
+        "have the correct service URL" in {
+          element(Selectors.serviceName).attr("href") shouldBe mockConfig.agentClientHubUrl
+        }
+
+        "not display the user research banner" in {
+          mockConfig.features.showUserResearchBannerEnabled(false)
+          elementExtinct(Selectors.userResearchBanner)
+        }
       }
 
-      "have the correct service URL" in {
-        element(".hmrc-header__service-name").attr("href") shouldBe mockConfig.agentClientHubUrl
+      "the user is not an Agent" should {
+        lazy val view = injectedView(pageTitle = "", user = Some(user))(Html("Test"))(request, messages, mockConfig)
+        lazy implicit val document: Document = Jsoup.parse(view.body)
+
+        "have the correct service name" in {
+          elementText(Selectors.serviceName) shouldBe "Manage your VAT account"
+        }
+
+        "have the correct service URL" in {
+          element(Selectors.serviceName).attr("href") shouldBe mockConfig.vatDetailsUrl
+        }
+
+        "not display the user research banner" in {
+          mockConfig.features.showUserResearchBannerEnabled(false)
+          elementExtinct(Selectors.userResearchBanner)
+        }
+      }
+
+      "the user type cannot be determined" should {
+        lazy val view = injectedView(pageTitle = "", user = None)(Html("Test"))(request, messages, mockConfig)
+        lazy implicit val document: Document = Jsoup.parse(view.body)
+
+        "have the correct service name" in {
+          elementText(Selectors.serviceName) shouldBe "VAT"
+        }
+
+        "have the correct service URL" in {
+          element(Selectors.serviceName).attr("href") shouldBe ""
+        }
+
+        "not display the user research banner" in {
+          mockConfig.features.showUserResearchBannerEnabled(false)
+          elementExtinct(Selectors.userResearchBanner)
+        }
       }
     }
 
-    "the user is not an Agent" should {
+    "the showUserResearchBanner feature switch is turned on" when {
 
-      lazy val view = injectedView(pageTitle = "", user = Some(user))(Html("Test"))(request, messages, mockConfig)
-      lazy implicit val document: Document = Jsoup.parse(view.body)
+      "the user is an Agent" should {
+        lazy val view = injectedView(pageTitle = "", user = Some(agentUser))(Html("Test"))(request, messages, mockConfig)
+        lazy implicit val document: Document = Jsoup.parse(view.body)
 
-      "have the correct service name" in {
-        elementText(".hmrc-header__service-name") shouldBe "Manage your VAT account"
+        "display the correct user research banner heading" in {
+          mockConfig.features.showUserResearchBannerEnabled(true)
+          elementText(Selectors.userResearchBannerHeading) shouldBe userBannerHeading
+        }
       }
 
-      "have the correct service URL" in {
-        element(".hmrc-header__service-name").attr("href") shouldBe mockConfig.vatDetailsUrl
-      }
-    }
+      "the user is not an Agent" should {
+        lazy val view = injectedView(pageTitle = "", user = Some(user))(Html("Test"))(request, messages, mockConfig)
+        lazy implicit val document: Document = Jsoup.parse(view.body)
 
-    "the user type cannot be determined" should {
-
-      lazy val view = injectedView(pageTitle = "", user = None)(Html("Test"))(request, messages, mockConfig)
-      lazy implicit val document: Document = Jsoup.parse(view.body)
-
-      "have the correct service name" in {
-        elementText(".hmrc-header__service-name") shouldBe "VAT"
+        "display the correct user research banner content" in {
+          mockConfig.features.showUserResearchBannerEnabled(true)
+          elementText(Selectors.userResearchBannerHeading) shouldBe userBannerHeading
+        }
       }
 
-      "have the correct service URL" in {
-        element(".hmrc-header__service-name").attr("href") shouldBe ""
+      "the user type cannot be determined" should {
+        lazy val view = injectedView(pageTitle = "", user = None)(Html("Test"))(request, messages, mockConfig)
+        lazy implicit val document: Document = Jsoup.parse(view.body)
+
+        "display the correct user research banner content" in {
+          mockConfig.features.showUserResearchBannerEnabled(true)
+          elementText(Selectors.userResearchBannerHeading) shouldBe userBannerHeading
+        }
       }
     }
   }
