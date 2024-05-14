@@ -32,7 +32,6 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
   object Selectors {
     val pageHeading = "h1"
     val secondaryHeading = "h2"
-    val previousReturnsHeading = "#previous-returns > h2"
     val btaBreadcrumb = "div.govuk-breadcrumbs li:nth-of-type(1)"
     val btaBreadcrumbLink = s"$btaBreadcrumb a"
     val vatBreadcrumb = "div.govuk-breadcrumbs li:nth-of-type(2)"
@@ -43,6 +42,8 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
     val tabTwo = "#content > div.govuk-tabs > ul > li:nth-child(2) > a"
     val tabThree = "#content > div.govuk-tabs > ul > li:nth-child(3) > a"
     val tabFour = "#content > div.govuk-tabs > ul > li:nth-child(4) > a"
+    val prevReturnsHeading = "#previous-returns > h1"
+    val prevReturnsParagraph = "#previous-returns > p"
     val returnsHeading = "div.govuk-tabs__panel > h2.govuk-heading-m"
     val period = "div.govuk-tabs__panel > p.govuk-body"
     val backLink = ".govuk-back-link"
@@ -537,6 +538,18 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
             elementText(Selectors.tabTwo) should include("Previous returns")
           }
 
+          "display the 'Previous returns' content" which {
+
+            "has the correct h1" in {
+              elementText(Selectors.prevReturnsHeading) shouldBe "Service has closed"
+            }
+
+            "has the correct text body" in {
+              elementText(Selectors.prevReturnsParagraph) shouldBe
+                "You can no longer view previous returns. Please refer to your own business records and accounts."
+            }
+          }
+
           "not display the notice about recently submitted returns" in {
             elementExtinct(Selectors.recentlySubmittedReturnNotice)
           }
@@ -591,6 +604,18 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
 
           "have a tab for 'Previous Returns'" in {
             elementText(Selectors.tabThree) should include("Previous returns")
+          }
+
+          "display the 'Previous returns' content" which {
+
+            "has the correct h1" in {
+              elementText(Selectors.prevReturnsHeading) shouldBe "Service has closed"
+            }
+
+            "has the correct text body" in {
+              elementText(Selectors.prevReturnsParagraph) shouldBe
+                "You can no longer view previous returns. Please refer to your own business records and accounts."
+            }
           }
 
           "not display the notice about recently submitted returns" in {
@@ -667,6 +692,18 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
           elementText(Selectors.tabFour) should include("Previous returns")
         }
 
+        "display the 'Previous returns' content" which {
+
+          "has the correct h1" in {
+            elementText(Selectors.prevReturnsHeading) shouldBe "Service has closed"
+          }
+
+          "has the correct text body" in {
+            elementText(Selectors.prevReturnsParagraph) shouldBe
+              "You can no longer view previous returns. Please refer to your own business records and accounts."
+          }
+        }
+
         "not display the notice about recently submitted returns" in {
           elementExtinct(Selectors.recentlySubmittedReturnNotice)
         }
@@ -725,6 +762,18 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
 
       "have a tab for 'Previous Returns'" in {
         elementText(Selectors.tabFour) should include("Previous returns")
+      }
+
+      "display the 'Previous returns' content" which {
+
+        "has the correct h1" in {
+          elementText(Selectors.prevReturnsHeading) shouldBe "Service has closed"
+        }
+
+        "has the correct text body" in {
+          elementText(Selectors.prevReturnsParagraph) shouldBe
+            "You can no longer view previous returns. Please refer to your own business records and accounts."
+        }
       }
 
       "display a 'Back to client's details' button" in {

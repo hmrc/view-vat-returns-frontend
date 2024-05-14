@@ -20,7 +20,8 @@ import java.time.{LocalDate, Period}
 import audit.AuditingService
 import audit.models.ViewSubmittedVatObligationsAuditModel
 import common.SessionKeys
-import config.AppConfig
+import config.{AppConfig, ServiceErrorHandler}
+
 import javax.inject.{Inject, Singleton}
 import models.viewModels.{ReturnObligationsViewModel, VatReturnsViewModel}
 import models.{CustomerInformation, MigrationDateModel, ServiceResponse, User}
@@ -31,8 +32,8 @@ import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import utils.LoggerUtil
-import views.html.errors.SubmittedReturnsErrorView
 import views.html.returns.SubmittedReturnsView
+
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -43,7 +44,7 @@ class SubmittedReturnsController @Inject()(mcc: MessagesControllerComponents,
                                            serviceInfoService: ServiceInfoService,
                                            subscriptionService: SubscriptionService,
                                            submittedReturnsView: SubmittedReturnsView,
-                                           submittedReturnsErrorView: SubmittedReturnsErrorView)
+                                           errorHandler: ServiceErrorHandler)
                                           (implicit appConfig: AppConfig,
                                            auditService: AuditingService,
                                            ec: ExecutionContext) extends FrontendController(mcc) with LoggerUtil {
@@ -71,7 +72,7 @@ class SubmittedReturnsController @Inject()(mcc: MessagesControllerComponents,
             Ok(submittedReturnsView(model, showInsolvencyContent, hasRecentlySubmittedReturn(recentlySubmittedReturnValue), serviceInfoContent))
           case Left(error) =>
             logger.warn("[ReturnObligationsController][submittedReturns] error: " + error.toString)
-            InternalServerError(submittedReturnsErrorView(user))
+            errorHandler.showInternalServerError
         }
       }
   }
