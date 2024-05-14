@@ -28,7 +28,6 @@ import play.api.http.Status
 import play.api.mvc.Result
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core._
-import views.html.errors.SubmittedReturnsErrorView
 import views.html.returns.SubmittedReturnsView
 import scala.concurrent.Future
 
@@ -76,7 +75,7 @@ class SubmittedReturnsControllerSpec extends ControllerBaseSpec {
     mockServiceInfoService,
     mockSubscriptionService,
     inject[SubmittedReturnsView],
-    inject[SubmittedReturnsErrorView]
+    errorHandler
   )
 
   val exampleMigrationDateModel: MigrationDateModel = MigrationDateModel(Some(LocalDate.parse("2018-01-01")), None)

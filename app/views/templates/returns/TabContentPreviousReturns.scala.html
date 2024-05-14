@@ -14,17 +14,12 @@
  * limitations under the License.
  *@
 
-@import models.viewModels.VatReturnsViewModel
-
 @this()
 
-@(model: VatReturnsViewModel)(implicit messages: Messages,
-                              appConfig: config.AppConfig)
+@()(implicit messages: Messages)
 
-<h2 class="govuk-heading-m">@messages("submittedReturns.previousReturns")</h2>
+<h1 class="govuk-heading-s">@messages("submittedReturns.previousReturnsSubheading")</h1>
 <p class="govuk-body" id="previous-one">
-    @messages("submittedReturns.previousReturnsOne")
-    <a class="govuk-link" rel="noreferrer noopener" target="_blank" href="@appConfig.portalUrl(model.vrn)">
-        @messages("submittedReturns.previousReturnsTwo")</a>.
+    @messages("submittedReturns.previousReturnsPara")
 </p>
 
