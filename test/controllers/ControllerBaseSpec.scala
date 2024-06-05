@@ -16,12 +16,12 @@
 
 package controllers
 
-import akka.actor.ActorSystem
 import common.EnrolmentKeys._
 import common.SessionKeys
 import common.SessionKeys.{mtdVatvcClientVrn, mtdVatvcSubmittedReturn}
 import mocks.MockAuth
 import models.User
+import org.apache.pekko.actor.ActorSystem
 import play.api.http.Status.FORBIDDEN
 import play.api.mvc._
 import play.api.test.FakeRequest
@@ -30,6 +30,7 @@ import uk.gov.hmrc.auth.core.AffinityGroup.{Agent, Individual}
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.auth.core.{AffinityGroup, Enrolment, EnrolmentIdentifier, Enrolments}
 import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys => GovUkSessionKeys}
+
 import scala.concurrent.Future
 
 class ControllerBaseSpec extends MockAuth {

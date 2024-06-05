@@ -100,11 +100,19 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
       }
 
       "have the correct obligation due date" in {
-        elementText(Selectors.firstDeadlineDueDate) should include("2\u00a0February\u00a02018")
+        elementText(Selectors.firstDeadlineDueDate) should include("2 February 2018")
+      }
+
+      "have the correct obligation due date using non breaking space" in {
+        elementText(Selectors.firstDeadlineDueDate).contains("2\u00a0February\u00a02018")
       }
 
       "have the correct obligation start and end date text" in {
-        elementText(Selectors.firstDeadlinePeriod) shouldBe "for the period 1\u00a0January to 1\u00a0January\u00a02018"
+        elementText(Selectors.firstDeadlinePeriod) shouldBe "for the period 1 January to 1 January 2018"
+      }
+
+      "have the correct obligation start and end date text using non breaking space" in {
+        elementText(Selectors.firstDeadlinePeriod).contains("for the period 1\u00a0January to 1\u00a0January\u00a02018")
       }
 
       "have the correct hint box title" in {
@@ -154,19 +162,35 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
       lazy implicit val document: Document = Jsoup.parse(view.body)
 
       "have the correct obligation due date for the first deadline" in {
-        elementText(Selectors.firstDeadlineDueDate) should include("2\u00a0February\u00a02018")
+        elementText(Selectors.firstDeadlineDueDate) should include("2 February 2018")
+      }
+
+      "have the correct obligation due date for the first deadline using non breaking space" in {
+        elementText(Selectors.firstDeadlineDueDate).contains("2\u00a0February\u00a02018")
       }
 
       "have the correct obligation start and end date text for the first deadline" in {
-        elementText(Selectors.firstDeadlinePeriod) shouldBe "for the period 1\u00a0January to 1\u00a0January\u00a02018"
+        elementText(Selectors.firstDeadlinePeriod) shouldBe "for the period 1 January to 1 January 2018"
+      }
+
+      "have the correct obligation start and end date text for the first deadline using non breaking space" in {
+        elementText(Selectors.firstDeadlinePeriod).contains("for the period 1\u00a0January to 1\u00a0January\u00a02018")
       }
 
       "have the correct obligation due date for the second deadline" in {
-        elementText(Selectors.secondDeadlineDueDate) should include("12\u00a0October\u00a02018")
+        elementText(Selectors.secondDeadlineDueDate) should include("12 October 2018")
+      }
+
+      "have the correct obligation due date for the second deadline using non breaking space" in {
+        elementText(Selectors.secondDeadlineDueDate).contains("12\u00a0October\u00a02018")
       }
 
       "have the correct obligation start and end date text for the second deadline" in {
-        elementText(Selectors.secondDeadlinePeriod) shouldBe "for the period 7\u00a0September to 7\u00a0September\u00a02018"
+        elementText(Selectors.secondDeadlinePeriod) shouldBe "for the period 7 September to 7 September 2018"
+      }
+
+      "have the correct obligation start and end date text for the second deadline using non breaking space" in {
+        elementText(Selectors.secondDeadlinePeriod).contains("for the period 7\u00a0September to 7\u00a0September\u00a02018")
       }
 
       "have the overdue label" in {
@@ -193,7 +217,11 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
       lazy implicit val document: Document = Jsoup.parse(view.body)
 
       "have the correct obligation due date for the deadline" in {
-        elementText(Selectors.firstDeadlineDueDate) should include("2\u00a0February\u00a02018")
+        elementText(Selectors.firstDeadlineDueDate) should include("2 February 2018")
+      }
+
+      "have the correct obligation due date for the deadline using non breaking space" in {
+        elementText(Selectors.firstDeadlineDueDate).contains("2\u00a0February\u00a02018")
       }
 
       "have the wording for the final return period" in {
@@ -240,11 +268,19 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
     }
 
     "have the correct obligation due date" in {
-      elementText(Selectors.firstDeadlineDueDate) should include("2\u00a0February\u00a02018")
+      elementText(Selectors.firstDeadlineDueDate) should include("2 February 2018")
+    }
+
+    "have the correct obligation due date using non breaking space" in {
+      elementText(Selectors.firstDeadlineDueDate).contains("2\u00a0February\u00a02018")
     }
 
     "have the correct obligation start and end date text" in {
-      elementText(Selectors.firstDeadlinePeriod) shouldBe "for the period 1\u00a0January to 1\u00a0January\u00a02018"
+      elementText(Selectors.firstDeadlinePeriod) shouldBe "for the period 1 January to 1 January 2018"
+    }
+
+    "have the correct obligation start and end date text non breaking space" in {
+      elementText(Selectors.firstDeadlinePeriod).contains("for the period 1\u00a0January to 1\u00a0January\u00a02018")
     }
 
     "have the correct hint box title" in {

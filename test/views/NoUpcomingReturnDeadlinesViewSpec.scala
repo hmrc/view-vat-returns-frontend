@@ -96,7 +96,12 @@ class NoUpcomingReturnDeadlinesViewSpec extends ViewBaseSpec {
 
       "have the correct text for no deadlines" in {
         elementText(Selectors.noReturnsNextDeadline) shouldBe
-          "We received your return for the period 1\u00a0January to 1\u00a0April\u00a02018."
+          "We received your return for the period 1 January to 1 April 2018."
+      }
+
+      "have the correct text for no deadlines using non breaking space" in {
+        elementText(Selectors.noReturnsNextDeadline)
+          .contains("We received your return for the period 1\u00a0January to 1\u00a0April\u00a02018.")
       }
 
       "have the correct received return guidance" in {
@@ -137,7 +142,12 @@ class NoUpcomingReturnDeadlinesViewSpec extends ViewBaseSpec {
 
     "have the correct text for no deadlines" in {
       elementText(Selectors.noReturnsNextDeadline) shouldBe
-        "We received your return for the period 1\u00a0January to 1\u00a0April\u00a02018."
+        "We received your return for the period 1 January to 1 April 2018."
+    }
+
+    "have the correct text for no deadlines using non breaking space" in {
+      elementText(Selectors.noReturnsNextDeadline)
+        .contains("We received your return for the period 1\u00a0January to 1\u00a0April\u00a02018.")
     }
 
     "have the correct received return guidance" in {
