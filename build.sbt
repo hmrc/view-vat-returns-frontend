@@ -17,6 +17,9 @@
 import play.sbt.routes.RoutesKeys
 import uk.gov.hmrc.DefaultBuildSettings.*
 
+ThisBuild / majorVersion := 0
+ThisBuild / scalaVersion := "2.13.14"
+
 val appName: String = "view-vat-returns-frontend"
 lazy val appDependencies: Seq[ModuleID] = compile ++ test()
 lazy val plugins : Seq[Plugins] = Seq(play.sbt.PlayScala)
@@ -50,7 +53,7 @@ val compile = Seq(
   "uk.gov.hmrc"       %% "play-frontend-hmrc-play-30" % "9.11.0"
 )
 
-def test(scope: String = "test, it"): Seq[ModuleID] = Seq(
+def test(scope: String = "test"): Seq[ModuleID] = Seq(
   "uk.gov.hmrc"             %% "bootstrap-test-play-30"       % "8.6.0"           % scope,
   "org.scalamock"           %% "scalamock"                    % "6.0.0"           % scope
 )
@@ -69,18 +72,19 @@ lazy val microservice = Project(appName, file("."))
   .settings(playSettings *)
   .settings(scalaSettings *)
   .settings(defaultSettings() *)
-  .settings(majorVersion := 0)
   .settings(
-    scalaVersion := "2.13.12",
     libraryDependencies ++= appDependencies,
     retrieveManaged := true,
       scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Wconf:cat=unused-imports&site=.*views.html.*:s",
         "-Wconf:cat=unused-imports&src=html/.*:s", "-Wconf:src=routes/.*:s")
   )
-  .configs(IntegrationTest)
-  .settings(inConfig(IntegrationTest)(Defaults.itSettings) *)
+
+lazy val it = project
+  .enablePlugins(PlayScala)
+  .dependsOn(microservice % "test->test") // the "test->test" allows reusing test code and test dependencies
+  .settings(itSettings())
   .settings(
-    IntegrationTest / Keys.fork := false,
-    IntegrationTest / unmanagedSourceDirectories := (IntegrationTest / baseDirectory)(base => Seq(base / "it")).value,
-    addTestReportOption(IntegrationTest, "int-test-reports"),
-    IntegrationTest / parallelExecution := false)
+    fork := false,
+    addTestReportOption(Test, "int-test-reports"),
+    Test / testGrouping := oneForkedJvmPerTest((Test / definedTests).value)
+  )

@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package connectors
+package test.connectors
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import helpers.IntegrationBaseSpec
+import connectors.VatReturnsConnector
 import models.errors.{ApiSingleError, BadRequestError, MultipleErrors}
 import models.VatReturn
 import play.api.libs.json.Json
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
-import stubs.VatReturnsStub
+import test.helpers.IntegrationBaseSpec
+import test.stubs.VatReturnsStub
 import uk.gov.hmrc.http.HeaderCarrier
 
 class VatReturnsConnectorISpec extends IntegrationBaseSpec {

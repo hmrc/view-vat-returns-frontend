@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package helpers
+package test.helpers
 
 import java.net.URLEncoder
 import play.api.http.SecretConfiguration

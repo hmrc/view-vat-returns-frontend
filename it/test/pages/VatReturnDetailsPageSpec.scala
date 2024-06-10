@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package pages
+package test.pages
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import helpers.IntegrationBaseSpec
 import play.api.http.Status
 import play.api.libs.ws.{WSRequest, WSResponse}
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
-import stubs._
+import test.helpers.IntegrationBaseSpec
+import test.stubs.{AuthStub, CustomerInfoStub, FinancialDataStub, VatObligationsStub, VatReturnsStub}
 
 class VatReturnDetailsPageSpec extends IntegrationBaseSpec {
 

@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package stubs
+package test.stubs
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import helpers.WireMockMethods
 import models.errors.{ApiMultiError, ApiSingleError}
 import play.api.http.Status.{BAD_REQUEST, OK}
 import play.api.libs.json.{JsValue, Json}
+import test.helpers.WireMockMethods
 
 class VatReturnsStub extends WireMockMethods {
 

@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package stubs
+package test.stubs
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import helpers.WireMockMethods
 import models.VatReturnObligations
 import models.errors.{ApiMultiError, ApiSingleError}
 import play.api.http.Status._
 import play.api.libs.json.Json
+import test.helpers.WireMockMethods
 
 class VatObligationsStub(backendFeatureEnabled: Boolean) extends WireMockMethods {
 
