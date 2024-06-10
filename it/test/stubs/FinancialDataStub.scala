@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package stubs
+package test.stubs
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import helpers.WireMockMethods
 import play.api.http.Status.{BAD_REQUEST, OK, NOT_FOUND}
 import play.api.libs.json.{JsValue, Json}
+import test.helpers.WireMockMethods
 
 object FinancialDataStub extends WireMockMethods{
 

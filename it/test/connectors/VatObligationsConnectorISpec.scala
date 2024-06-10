@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package connectors
+package test.connectors
 
 import java.time.LocalDate
-
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import helpers.IntegrationBaseSpec
+import connectors.VatObligationsConnector
 import models.Obligation.Status
 import models.errors.{ApiSingleError, BadRequestError, MultipleErrors}
 import models.{VatReturnObligation, VatReturnObligations}
 import play.api.libs.json.Json
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
-import stubs.VatObligationsStub
+import test.helpers.IntegrationBaseSpec
+import test.stubs.VatObligationsStub
 import uk.gov.hmrc.http.HeaderCarrier
 
 class VatObligationsConnectorISpec extends IntegrationBaseSpec {

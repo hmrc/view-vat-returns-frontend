@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package connectors
+package test.connectors
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import helpers.IntegrationBaseSpec
+import connectors.ServiceInfoConnector
 import models.{NavContent, NavLinks}
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
-import stubs.ServiceInfoStub
+import test.helpers.IntegrationBaseSpec
+import test.stubs.ServiceInfoStub
 import uk.gov.hmrc.http.HeaderCarrier
 
 class ServiceInfoConnectorISpec extends IntegrationBaseSpec {

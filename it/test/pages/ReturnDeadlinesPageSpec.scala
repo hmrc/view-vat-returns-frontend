@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package pages
+package test.pages
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import config.FrontendAppConfig
-import helpers.IntegrationBaseSpec
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.http.Status
 import play.api.libs.ws.{WSRequest, WSResponse}
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
-import stubs.{AuthStub, CustomerInfoStub, VatObligationsStub}
+import test.helpers.IntegrationBaseSpec
+import test.stubs.{AuthStub, CustomerInfoStub, VatObligationsStub}
 
 class ReturnDeadlinesPageSpec extends IntegrationBaseSpec {
 

@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package connectors
+package test.connectors
 
 import java.time.LocalDate
-
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import helpers.IntegrationBaseSpec
+import connectors.FinancialDataConnector
 import models.errors.BadRequestError
 import models.payments.{Payment, Payments}
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
-import stubs.FinancialDataStub
+import test.helpers.IntegrationBaseSpec
+import test.stubs.FinancialDataStub
 import uk.gov.hmrc.http.HeaderCarrier
 
 class FinancialDataConnectorISpec extends IntegrationBaseSpec {

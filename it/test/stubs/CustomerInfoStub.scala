@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package stubs
+package test.stubs
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import common.MandationStatuses.{mtdfb, nonMTDfB}
-import helpers.WireMockMethods
 import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK}
 import play.api.libs.json.Json
+import test.helpers.WireMockMethods
 
 object CustomerInfoStub extends WireMockMethods {
 

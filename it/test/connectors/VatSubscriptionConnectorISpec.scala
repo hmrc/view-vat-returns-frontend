@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package connectors
+package test.connectors
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import common.MandationStatuses.mtdfb
-import helpers.IntegrationBaseSpec
+import connectors.VatSubscriptionConnector
 import models.CustomerInformation
 import models.errors.ServerSideError
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
-import stubs.CustomerInfoStub
+import test.helpers.IntegrationBaseSpec
+import test.stubs.CustomerInfoStub
 import uk.gov.hmrc.http.HeaderCarrier
 
 class VatSubscriptionConnectorISpec extends IntegrationBaseSpec {

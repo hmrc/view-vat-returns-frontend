@@ -27,7 +27,7 @@ class MainTemplateSpec extends ViewBaseSpec {
   val userBannerHeading: String = "Help make GOV.UK better"
 
   object Selectors {
-    val serviceName: String = ".hmrc-header__service-name"
+    val serviceName: String = ".govuk-header__service-name"
     val userResearchBanner: String = ".hmrc-user-research-banner"
     val userResearchBannerHeading = ".hmrc-user-research-banner__title"
   }

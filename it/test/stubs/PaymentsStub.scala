@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package stubs
+package test.stubs
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import helpers.WireMockMethods
 import play.api.http.Status._
 import play.api.libs.json.Json
+import test.helpers.WireMockMethods
 
 object PaymentsStub extends WireMockMethods {
 
