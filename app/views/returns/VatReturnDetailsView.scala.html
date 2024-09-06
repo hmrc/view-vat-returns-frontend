@@ -20,6 +20,7 @@
 @import views.html.templates.formatters.dates._
 @import views.html.templates.formatters.money._
 @import views.html.templates.returns.PaymentStatus
+@import views.html.helper.CSPNonce
 
 @this(mainTemplate: MainTemplate,
       govukBreadcrumbs: GovukBreadcrumbs,
@@ -189,10 +190,14 @@
       )
     </div>
 
-      <div class="form-group">
-          <button id="print-return-button" class="govuk-button" data-module="govuk-button"
-          onclick="javascript:window.print()">@messages("yourVatReturn.print")
-          </button>
+    <div class="form-group">
+      <button id="print-return-button" class="govuk-button" data-module="govuk-button">@messages("yourVatReturn.print")</button>
+      <script @CSPNonce.attr>
+        document.getElementById("print-return-button").addEventListener("click", function() {
+            window.print();
+        });
+      </script>
+
       </div>
 
     @govukDetails(Details(
