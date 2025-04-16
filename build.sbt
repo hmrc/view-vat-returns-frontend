@@ -55,7 +55,7 @@ val compile = Seq(
 
 def test(scope: String = "test"): Seq[ModuleID] = Seq(
   "uk.gov.hmrc"             %% "bootstrap-test-play-30"       % "8.6.0"           % scope,
-  "org.scalamock"           %% "scalamock"                    % "6.0.0"           % scope
+  "org.scalamock"           %% "scalamock"                    % "7.3.0"           % scope
 )
 
 TwirlKeys.templateImports ++= Seq(
