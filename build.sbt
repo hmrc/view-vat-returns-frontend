@@ -24,7 +24,7 @@ val appName: String = "view-vat-returns-frontend"
 lazy val appDependencies: Seq[ModuleID] = compile ++ test()
 lazy val plugins : Seq[Plugins] = Seq(play.sbt.PlayScala)
 lazy val playSettings: Seq[Setting[?]] = Seq.empty
-RoutesKeys.routesImport := Seq.empty
+RoutesKeys.routesImport := Seq("uk.gov.hmrc.play.bootstrap.binders.RedirectUrl")
 
 lazy val coverageSettings: Seq[Setting[?]] = {
   import scoverage.ScoverageKeys
@@ -85,6 +85,5 @@ lazy val it = project
   .settings(itSettings())
   .settings(
     fork := false,
-    addTestReportOption(Test, "int-test-reports"),
-    Test / testGrouping := oneForkedJvmPerTest((Test / definedTests).value)
+    addTestReportOption(Test, "int-test-reports")
   )
