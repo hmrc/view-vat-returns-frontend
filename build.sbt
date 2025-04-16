@@ -18,7 +18,7 @@ import play.sbt.routes.RoutesKeys
 import uk.gov.hmrc.DefaultBuildSettings.*
 
 ThisBuild / majorVersion := 0
-ThisBuild / scalaVersion := "2.13.14"
+ThisBuild / scalaVersion := "2.13.16"
 
 val appName: String = "view-vat-returns-frontend"
 lazy val appDependencies: Seq[ModuleID] = compile ++ test()
