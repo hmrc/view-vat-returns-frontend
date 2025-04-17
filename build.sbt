@@ -18,13 +18,13 @@ import play.sbt.routes.RoutesKeys
 import uk.gov.hmrc.DefaultBuildSettings.*
 
 ThisBuild / majorVersion := 0
-ThisBuild / scalaVersion := "2.13.14"
+ThisBuild / scalaVersion := "2.13.16"
 
 val appName: String = "view-vat-returns-frontend"
 lazy val appDependencies: Seq[ModuleID] = compile ++ test()
 lazy val plugins : Seq[Plugins] = Seq(play.sbt.PlayScala)
 lazy val playSettings: Seq[Setting[?]] = Seq.empty
-RoutesKeys.routesImport := Seq.empty
+RoutesKeys.routesImport := Seq("uk.gov.hmrc.play.bootstrap.binders.RedirectUrl")
 
 lazy val coverageSettings: Seq[Setting[?]] = {
   import scoverage.ScoverageKeys
@@ -55,7 +55,7 @@ val compile = Seq(
 
 def test(scope: String = "test"): Seq[ModuleID] = Seq(
   "uk.gov.hmrc"             %% "bootstrap-test-play-30"       % "8.6.0"           % scope,
-  "org.scalamock"           %% "scalamock"                    % "6.0.0"           % scope
+  "org.scalamock"           %% "scalamock"                    % "7.3.0"           % scope
 )
 
 TwirlKeys.templateImports ++= Seq(
@@ -85,6 +85,5 @@ lazy val it = project
   .settings(itSettings())
   .settings(
     fork := false,
-    addTestReportOption(Test, "int-test-reports"),
-    Test / testGrouping := oneForkedJvmPerTest((Test / definedTests).value)
+    addTestReportOption(Test, "int-test-reports")
   )
