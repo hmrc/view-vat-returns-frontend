@@ -42,10 +42,10 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
     val secondDeadlineDueDate = ".govuk-list li:nth-of-type(2)"
     val secondDeadlinePeriod = ".govuk-list li:nth-of-type(2) .vatvc-grey-paragraph-text"
 
-    val btaBreadcrumb = "div.govuk-breadcrumbs li:nth-of-type(1)"
-    val btaBreadCrumbLink = "div.govuk-breadcrumbs li:nth-of-type(1) a"
-    val vatDetailsBreadCrumb = "div.govuk-breadcrumbs li:nth-of-type(2)"
-    val vatDetailsBreadcrumbLink = "div.govuk-breadcrumbs li:nth-of-type(2) a"
+    val btaBreadcrumb = ".govuk-breadcrumbs li:nth-of-type(1)"
+    val btaBreadCrumbLink = ".govuk-breadcrumbs li:nth-of-type(1) a"
+    val vatDetailsBreadCrumb = ".govuk-breadcrumbs li:nth-of-type(2)"
+    val vatDetailsBreadcrumbLink = ".govuk-breadcrumbs li:nth-of-type(2) a"
 
     val overdueLabel = ".govuk-tag--red"
     val caption = "#content > span"
@@ -67,7 +67,6 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
 
       lazy val view = injectedView(singleDeadline, Html(""), None)
       lazy implicit val document: Document = Jsoup.parse(view.body)
-
       "render the breadcrumbs which" should {
 
         "have the 'Business tax account' title" in {
