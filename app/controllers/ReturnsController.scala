@@ -74,7 +74,7 @@ class ReturnsController @Inject()(mcc: MessagesControllerComponents,
 
         } else {
           logger.warn(s"[ReturnsController][vatReturn] - The given period key was invalid - `$periodKey`")
-          Future.successful(errorHandler.showNotFoundError)
+          errorHandler.showNotFoundError
         }
   }
 
@@ -105,7 +105,7 @@ class ReturnsController @Inject()(mcc: MessagesControllerComponents,
 
         } else {
           logger.warn(s"[ReturnsController][vatReturnViaPayments] - The given period key was invalid - `$periodKey`")
-          Future.successful(errorHandler.showNotFoundError)
+          errorHandler.showNotFoundError
         }
   }
 
@@ -130,7 +130,7 @@ class ReturnsController @Inject()(mcc: MessagesControllerComponents,
         checkIfComingFromSubmissionConfirmation(isNumericPeriodKey, "obligation")
       case _ =>
         logger.warn("[ReturnsController][renderResult] - Unknown error")
-        Future.successful(errorHandler.showInternalServerError)
+        errorHandler.showInternalServerError
     }
   }
 
@@ -148,7 +148,7 @@ class ReturnsController @Inject()(mcc: MessagesControllerComponents,
       if(preMtdReturn) {
         Future.successful(NotFound(preMtdReturnView(user)))
       } else {
-        Future.successful(errorHandler.showNotFoundError)
+        errorHandler.showNotFoundError
       }
     }
   }

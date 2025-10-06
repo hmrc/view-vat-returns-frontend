@@ -18,28 +18,29 @@ package config
 
 import javax.inject.Inject
 import play.api.i18n.MessagesApi
-import play.api.mvc.{Request, Result}
+import play.api.mvc.{RequestHeader, Result}
 import play.api.mvc.Results.{InternalServerError, NotFound}
 import play.twirl.api.Html
 import uk.gov.hmrc.play.bootstrap.frontend.http.FrontendErrorHandler
 import views.html.errors.StandardErrorView
 
+import scala.concurrent.{ExecutionContext, Future}
+
 class ServiceErrorHandler @Inject()(val messagesApi: MessagesApi,
-                                    standardErrorView: StandardErrorView)
-                                   (implicit appConfig: AppConfig) extends FrontendErrorHandler {
+                                    standardErrorView: StandardErrorView,
+                                   implicit val appConfig: AppConfig) (implicit val ec: ExecutionContext) extends FrontendErrorHandler {
 
   override def standardErrorTemplate(pageTitle: String, heading: String, message: String)
-                                    (implicit request: Request[_]): Html =
-    standardErrorView(pageTitle, heading, message)
+                                    (implicit request: RequestHeader): Future[Html] =
+    Future.successful(standardErrorView(pageTitle, heading, message))
 
-  override def internalServerErrorTemplate(implicit request: Request[_]): Html =
+  override def internalServerErrorTemplate(implicit request: RequestHeader): Future[Html] =
     standardErrorTemplate("technicalProblem.title", "technicalProblem.heading", "technicalProblem.message")
 
-  def showInternalServerError(implicit request: Request[_]): Result =
-    InternalServerError(internalServerErrorTemplate)
+  def showInternalServerError(implicit request: RequestHeader): Future[Result] = internalServerErrorTemplate.map(InternalServerError(_))(ec)
 
-  override def notFoundTemplate(implicit request: Request[_]): Html =
+  override def notFoundTemplate(implicit request: RequestHeader): Future[Html] =
     standardErrorTemplate("notFound.title", "notFound.heading", "notFound.message")
 
-  def showNotFoundError(implicit request: Request[_]): Result = NotFound(notFoundTemplate)
+  def showNotFoundError(implicit request: RequestHeader): Future[Result] = notFoundTemplate.map(NotFound(_))(ec)
 }

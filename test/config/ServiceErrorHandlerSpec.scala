@@ -18,12 +18,17 @@ package config
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import play.twirl.api.Html
 import views.ViewBaseSpec
 import views.html.errors.StandardErrorView
 
+import scala.concurrent.duration.DurationInt
+import scala.concurrent.{Await, ExecutionContext}
+
 class ServiceErrorHandlerSpec extends ViewBaseSpec {
 
-  val service: ServiceErrorHandler = new ServiceErrorHandler(messagesApi, inject[StandardErrorView])
+  implicit val ec: ExecutionContext = inject[ExecutionContext]
+  val service: ServiceErrorHandler = new ServiceErrorHandler(messagesApi, inject[StandardErrorView], inject[AppConfig])
 
   object Selectors {
     val pageHeading = "h1"
@@ -32,7 +37,7 @@ class ServiceErrorHandlerSpec extends ViewBaseSpec {
 
   "Calling .notFoundTemplate" should {
 
-    lazy val view = service.notFoundTemplate
+    lazy val view: Html = Await.result(service.notFoundTemplate, 5.seconds)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "display the correct title" in {
@@ -50,7 +55,7 @@ class ServiceErrorHandlerSpec extends ViewBaseSpec {
 
   "Calling .internalServerErrorTemplate" should {
 
-    lazy val view = service.internalServerErrorTemplate
+    lazy val view: Html = Await.result(service.internalServerErrorTemplate, 5.seconds)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "display the correct title" in {
@@ -68,7 +73,7 @@ class ServiceErrorHandlerSpec extends ViewBaseSpec {
 
   "Calling .standardErrorTemplate" should {
 
-    lazy val view = service.standardErrorTemplate("errorTitle", "errorHeading", "errorMessage")
+    lazy val view: Html = Await.result(service.standardErrorTemplate("errorTitle", "errorHeading", "errorMessage"), 5.seconds)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "display the correct title" in {

@@ -66,15 +66,17 @@ class SubmittedReturnsController @Inject()(mcc: MessagesControllerComponents,
         serviceInfoContent <- serviceInfoService.getServiceInfoPartial
         migrationDates = getMigrationDates(customerDetails)
         obligationsResult <- getReturnObligations(migrationDates)
-      } yield {
-        obligationsResult match {
+        result <- obligationsResult match {
           case Right(model) =>
-            Ok(submittedReturnsView(model, showInsolvencyContent, hasRecentlySubmittedReturn(recentlySubmittedReturnValue), serviceInfoContent))
+            Future.successful(
+              Ok(submittedReturnsView(model, showInsolvencyContent, hasRecentlySubmittedReturn(recentlySubmittedReturnValue), serviceInfoContent))
+            )
           case Left(error) =>
             logger.warn("[ReturnObligationsController][submittedReturns] error: " + error.toString)
             errorHandler.showInternalServerError
         }
-      }
+      } yield result
+
   }
 
   private[controllers] def getValidYears(registrationDate: Option[LocalDate]): Seq[Int] =
