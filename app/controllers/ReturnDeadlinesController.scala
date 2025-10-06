@@ -79,7 +79,7 @@ class ReturnDeadlinesController @Inject()(mcc: MessagesControllerComponents,
           }
         case Left(error) =>
           logger.warn("[ReturnObligationsController][returnDeadlines] error: " + error.toString)
-          Future.successful(errorHandler.showInternalServerError)
+          errorHandler.showInternalServerError
       }
   }
 
@@ -90,12 +90,12 @@ class ReturnDeadlinesController @Inject()(mcc: MessagesControllerComponents,
     val clientName = request.session.get(SessionKeys.clientName)
     val mandationStatus = request.session.get(SessionKeys.mtdVatMandationStatus).getOrElse("")
 
-    returnsService.getFulfilledObligations(user.vrn, currentDate).map {
-      case Right(VatReturnObligations(Seq())) => Ok(noUpcomingReturnDeadlinesView(None, serviceInfoContent, clientName, mandationStatus))
+    returnsService.getFulfilledObligations(user.vrn, currentDate).flatMap {
+      case Right(VatReturnObligations(Seq())) => Future.successful(Ok(noUpcomingReturnDeadlinesView(None, serviceInfoContent, clientName, mandationStatus)))
       case Right(VatReturnObligations(obligations)) =>
         val lastFulfilledObligation: VatReturnObligation = returnsService.getLastObligation(obligations)
-        Ok(noUpcomingReturnDeadlinesView(Some(toReturnDeadlineViewModel(lastFulfilledObligation, currentDate)),
-          serviceInfoContent, clientName, mandationStatus))
+        Future.successful(Ok(noUpcomingReturnDeadlinesView(Some(toReturnDeadlineViewModel(lastFulfilledObligation, currentDate)),
+          serviceInfoContent, clientName, mandationStatus)))
       case Left(error) =>
         logger.warn("[ReturnObligationsController][fulfilledObligationsAction] error: " + error.toString)
         errorHandler.showInternalServerError
@@ -120,12 +120,12 @@ class ReturnDeadlinesController @Inject()(mcc: MessagesControllerComponents,
     request.session.get(SessionKeys.mtdVatMandationStatus) match {
       case Some(status) => Future.successful(Ok(view(status)))
       case None =>
-        subscriptionService.getUserDetails(user.vrn) map {
+        subscriptionService.getUserDetails(user.vrn).flatMap {
           case Some(details) =>
-            Ok(view(details.mandationStatus)).addingToSession(SessionKeys.mtdVatMandationStatus -> details.mandationStatus)
+            Future.successful(Ok(view(details.mandationStatus)).addingToSession(SessionKeys.mtdVatMandationStatus -> details.mandationStatus))
           case None =>
             errorHandler.showInternalServerError
-        }
+       }
     }
   }
 }

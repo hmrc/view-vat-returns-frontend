@@ -44,7 +44,7 @@ class AuthorisedController @Inject()(enrolmentsAuthService: EnrolmentsAuthServic
                                      ec: ExecutionContext) extends FrontendController(mcc)  with LoggerUtil {
 
   def authorisedAction(block: MessagesRequest[AnyContent] => User => Future[Result],
-                       allowAgentAccess: Boolean = true): Action[AnyContent] = Action.async { implicit request =>
+                       allowAgentAccess: Boolean = true): Action[AnyContent] = Action async { implicit request =>
 
     enrolmentsAuthService.authorised().retrieve(Retrievals.allEnrolments and Retrievals.affinityGroup) {
       case _ ~ Some(AffinityGroup.Agent) =>
@@ -57,7 +57,7 @@ class AuthorisedController @Inject()(enrolmentsAuthService: EnrolmentsAuthServic
       case enrolments ~ Some(_) => authorisedAsNonAgent(block, enrolments)
       case _ =>
         logger.warn("[AuthorisedController][authorisedAction] - Missing affinity group")
-        Future.successful(errorHandler.showInternalServerError)
+        errorHandler.showInternalServerError
     } recoverWith {
       case _: NoActiveSession => Future.successful(Redirect(appConfig.signInUrl))
       case _: InsufficientEnrolments =>
@@ -82,7 +82,7 @@ class AuthorisedController @Inject()(enrolmentsAuthService: EnrolmentsAuthServic
 
         (request.session.get(SessionKeys.insolventWithoutAccessKey), request.session.get(SessionKeys.futureInsolvencyDate)) match {
           case (Some("true"), _) => Future.successful(Forbidden(insolventUnauthView(user)))
-          case (Some("false"), Some("true")) => Future.successful(errorHandler.showInternalServerError)
+          case (Some("false"), Some("true")) => errorHandler.showInternalServerError
           case (Some("false"), Some("false")) => block(request)(user)
           case _ => insolvencySubscriptionCall(user, block(request))
         }
@@ -95,7 +95,6 @@ class AuthorisedController @Inject()(enrolmentsAuthService: EnrolmentsAuthServic
 
   private[controllers] def insolvencySubscriptionCall(user: User, block: User => Future[Result])
                                                      (implicit request: MessagesRequest[AnyContent]): Future[Result] =
-
     subscriptionService.getUserDetails(user.vrn).flatMap {
       case Some(details) =>
         (details.isInsolventWithoutAccess, details.insolvencyDateFutureUserBlocked(dateService.now())) match {
@@ -108,20 +107,22 @@ class AuthorisedController @Inject()(enrolmentsAuthService: EnrolmentsAuthServic
             )
           case (_, true) =>
             logger.debug("[AuthorisedController][insolvencySubscriptionCall] - User has a future insolvencyDate, throwing ISE")
-            Future.successful(
-              errorHandler.showInternalServerError.addingToSession(
+
+              errorHandler.showInternalServerError.map(_.addingToSession(
                 SessionKeys.insolventWithoutAccessKey -> "false",
                 SessionKeys.futureInsolvencyDate -> "true")
             )
           case _ =>
             logger.debug("[AuthorisedController][insolvencySubscriptionCall] - Authenticated as principle")
-            block(user).map(result => result.addingToSession(
+            block(user).map {result =>
+              result.addingToSession(
               SessionKeys.insolventWithoutAccessKey -> "false",
-              SessionKeys.futureInsolvencyDate -> "false")
+              SessionKeys.futureInsolvencyDate -> "false"
             )
+        }
         }
       case _ =>
         logger.warn("[AuthorisedController][insolvencySubscriptionCall] - Failure obtaining insolvency status from Customer Info API")
-        Future.successful(errorHandler.showInternalServerError)
+        errorHandler.showInternalServerError
     }
 }

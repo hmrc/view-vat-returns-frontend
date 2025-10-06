@@ -41,10 +41,10 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
     val secondDeadlineDueDate = ".govuk-list li:nth-of-type(2)"
     val secondDeadlinePeriod = ".govuk-list li:nth-of-type(2) .vatvc-grey-paragraph-text"
 
-    val btaBreadcrumb = "div.govuk-breadcrumbs li:nth-of-type(1)"
-    val btaBreadCrumbLink = "div.govuk-breadcrumbs li:nth-of-type(1) a"
-    val vatDetailsBreadCrumb = "div.govuk-breadcrumbs li:nth-of-type(2)"
-    val vatDetailsBreadcrumbLink = "div.govuk-breadcrumbs li:nth-of-type(2) a"
+    val btaBreadcrumb = ".govuk-breadcrumbs li:nth-of-type(1)"
+    val btaBreadCrumbLink = ".govuk-breadcrumbs li:nth-of-type(1) a"
+    val vatDetailsBreadCrumb = ".govuk-breadcrumbs li:nth-of-type(2)"
+    val vatDetailsBreadcrumbLink = ".govuk-breadcrumbs li:nth-of-type(2) a"
 
     val backLink = ".govuk-back-link"
 

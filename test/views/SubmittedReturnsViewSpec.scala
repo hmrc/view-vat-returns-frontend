@@ -32,9 +32,9 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
   object Selectors {
     val pageHeading = "h1"
     val secondaryHeading = "h2"
-    val btaBreadcrumb = "div.govuk-breadcrumbs li:nth-of-type(1)"
+    val btaBreadcrumb = ".govuk-breadcrumbs li:nth-of-type(1)"
     val btaBreadcrumbLink = s"$btaBreadcrumb a"
-    val vatBreadcrumb = "div.govuk-breadcrumbs li:nth-of-type(2)"
+    val vatBreadcrumb = ".govuk-breadcrumbs li:nth-of-type(2)"
     val vatBreadcrumbLink = s"$vatBreadcrumb a"
     val submitThroughSoftwareLink = "div > div > a"
     val noReturnsFound = ".govuk-tabs__panel > p"
