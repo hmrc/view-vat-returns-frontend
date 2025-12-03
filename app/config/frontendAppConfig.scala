@@ -65,6 +65,7 @@ trait AppConfig {
   val agentClientHubUrl: String
   val gtmContainer: String
   val webchatUrl: String
+  val urBannerUrl: String
 }
 
 @Singleton
@@ -164,4 +165,6 @@ class FrontendAppConfig @Inject()(implicit configuration: Configuration, sc: Ser
 
   override lazy val agentClientHubUrl: String =
     sc.getString(Keys.vatAgentClientLookupFrontendHost) + sc.getString(Keys.vatAgentClientLookupHubUrl)
+
+  override lazy val urBannerUrl: String = sc.getString(Keys.urBannerUrl)
 }

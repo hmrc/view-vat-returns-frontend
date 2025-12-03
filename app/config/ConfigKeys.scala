@@ -67,4 +67,6 @@ object ConfigKeys {
   val govUkCommercialSoftwareUrl: String = "govuk-commercial-software.url"
 
   val host: String = "host"
+
+  val urBannerUrl: String = "urBanner.url"
 }
