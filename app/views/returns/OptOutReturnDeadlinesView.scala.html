@@ -53,7 +53,7 @@
   backLinkContent = Some(navContent),
   serviceInfoContent = serviceInfoContent,
   user = Some(user),
-  urBanner = Some(UserResearchBanner(url = appConfig.urBannerUrl))
+  urBanner = Some(UserResearchBanner(url = appConfig.urBannerUrl, language = if(messages.lang.code == "en") En else Cy))
 ) {
 
   <h1 class="govuk-heading-xl">@messages("returnDeadlines.submitReturn.title")</h1>
