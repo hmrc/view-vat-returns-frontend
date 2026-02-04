@@ -17,6 +17,7 @@
 @import play.twirl.api.HtmlFormat
 @import config.AppConfig
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers._
+@import uk.gov.hmrc.hmrcfrontend.views.html.components._
 @import views.html.helper.CSPNonce
 @import models.User
 
@@ -28,14 +29,16 @@
       hmrcTimeoutDialog: HmrcTimeoutDialog,
       hmrcStandardHeader: HmrcStandardHeader,
       hmrcStandardFooter: HmrcStandardFooter,
-      hmrcTrackingConsentSnippet: HmrcTrackingConsentSnippet)
+      hmrcTrackingConsentSnippet: HmrcTrackingConsentSnippet,
+      hmrcUserResearchBanner : HmrcUserResearchBanner)
 
 @(pageTitle: String,
   backLinkContent: Option[Html] = None,
   showSignOut: Boolean = true,
   feedbackOnSignOut: Boolean = true,
   serviceInfoContent: Html = HtmlFormat.empty,
-  user: Option[User] = None)(mainContent: Html)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
+  user: Option[User] = None,
+  urBanner: Option[UserResearchBanner] = None)(mainContent: Html)(implicit request: RequestHeader, messages: Messages, appConfig: AppConfig)
 
 @titleServiceName = @{
   user.fold(messages("navTitle.makingTaxDigitalForVat"))(u =>
@@ -90,10 +93,8 @@
     serviceName = Some(titleServiceName),
     serviceUrl = titleServiceUrl,
     signOutUrl = if(showSignOut) Some(routes.SignOutController.signOut(feedbackOnSignOut).url) else None,
-    userResearchBanner = if(appConfig.features.showUserResearchBannerEnabled()) Some(UserResearchBanner(
-        url = "https://signup.take-part-in-research.service.gov.uk/?utm_campaign=VATviewchange&utm_source=Other&utm_medium=other&t=HMRC&id=34"
-                        )) else None,
-    displayHmrcBanner = false
+    displayHmrcBanner = false,
+    additionalBannersBlock = if(appConfig.features.showUserResearchBannerEnabled()) urBanner.map(hmrcUserResearchBanner(_)) else None
   )
 }
 

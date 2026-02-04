@@ -62,7 +62,8 @@
   pageTitle = messages("returnDeadlines.title"),
   backLinkContent = Some(navContent),
   serviceInfoContent = serviceInfoContent,
-  user = Some(user)
+  user = Some(user),
+  urBanner = Some(UserResearchBanner(url = appConfig.urBannerUrl, language = if(messages.lang.code == "en") En else Cy))
 ) {
     @clientName.map { name =>
       <span class = "govuk-caption-xl">@name</span>

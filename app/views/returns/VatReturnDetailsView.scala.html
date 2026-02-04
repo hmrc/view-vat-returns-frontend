@@ -85,7 +85,8 @@
   pageTitle = messages("yourVatReturn.title") + returnHeading(useShortDayFormat = false),
   backLinkContent = Some(navContent),
   serviceInfoContent = serviceInfoContent,
-  user = Some(user)
+  user = Some(user),
+  urBanner = Some(UserResearchBanner(url = appConfig.urBannerUrl, hideCloseButton = true, language = if(messages.lang.code == "en") En else Cy))
 ) {
 
   <section>
