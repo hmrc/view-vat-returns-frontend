@@ -28,7 +28,8 @@ class MainTemplateSpec extends ViewBaseSpec {
   val userBannerHeading: String = "Help make GOV.UK better"
 
   object Selectors {
-    val serviceName: String = ".govuk-header__service-name"
+    val serviceName: String = ".govuk-service-navigation__link"
+    val serviceNameNoUserType: String = ".govuk-service-navigation__text"
     val userResearchBanner: String = ".hmrc-user-research-banner"
     val userResearchBannerHeading = ".hmrc-user-research-banner__title"
   }
@@ -93,14 +94,14 @@ class MainTemplateSpec extends ViewBaseSpec {
           mockConfig.features.showUserResearchBannerEnabled(false)
           val view = injectedView(pageTitle = "", user = None, urBanner = userResearchBanner)(Html("Test"))(request, messages, mockConfig)
           implicit val document: Document = Jsoup.parse(view.body)
-          elementText(Selectors.serviceName) shouldBe "VAT"
+          elementText(Selectors.serviceNameNoUserType) shouldBe "VAT"
         }
 
         "have the correct service URL" in {
           mockConfig.features.showUserResearchBannerEnabled(false)
           val view = injectedView(pageTitle = "", user = None, urBanner = userResearchBanner)(Html("Test"))(request, messages, mockConfig)
           implicit val document: Document = Jsoup.parse(view.body)
-          element(Selectors.serviceName).attr("href") shouldBe ""
+          element(Selectors.serviceNameNoUserType).attr("href") shouldBe ""
         }
 
         "not display the user research banner" in {
