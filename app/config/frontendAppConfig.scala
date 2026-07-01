@@ -66,6 +66,7 @@ trait AppConfig {
   val gtmContainer: String
   val webchatUrl: String
   val urBannerUrl: String
+  val isServiceNavigationEnabled: Boolean
 }
 
 @Singleton
@@ -167,4 +168,6 @@ class FrontendAppConfig @Inject()(implicit configuration: Configuration, sc: Ser
     sc.getString(Keys.vatAgentClientLookupFrontendHost) + sc.getString(Keys.vatAgentClientLookupHubUrl)
 
   override lazy val urBannerUrl: String = sc.getString(Keys.urBannerUrl)
+
+  lazy val isServiceNavigationEnabled: Boolean = sc.getBoolean("play-frontend-hmrc.forceServiceNavigation")
 }
