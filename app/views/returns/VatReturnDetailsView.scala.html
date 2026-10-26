@@ -21,6 +21,7 @@
 @import views.html.templates.formatters.money._
 @import views.html.templates.returns.PaymentStatus
 @import views.html.helper.CSPNonce
+@import views.helpers.UrBannerUtil
 
 @this(mainTemplate: MainTemplate,
       govukBreadcrumbs: GovukBreadcrumbs,
@@ -86,7 +87,7 @@
   backLinkContent = Some(navContent),
   serviceInfoContent = serviceInfoContent,
   user = Some(user),
-  urBanner = Some(UserResearchBanner(url = appConfig.urBannerUrl, hideCloseButton = true, language = if(messages.lang.code == "en") En else Cy))
+  urBanner = Some(UrBannerUtil.getUrBanner())
 ) {
 
   <section>

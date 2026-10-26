@@ -21,6 +21,7 @@
 @import views.html.templates.formatters.dates.DisplayDateRange
 @import views.html.templates.returns.TabContentPreviousReturns
 @import views.html.templates.returns.TabContentReturnYears
+@import views.helpers.UrBannerUtil
 
 @this(mainTemplate: MainTemplate,
       govukBreadcrumbs: GovukBreadcrumbs,
@@ -93,7 +94,7 @@
   backLinkContent = Some(navContent),
   serviceInfoContent = serviceInfoContent,
   user = Some(user),
-  urBanner = Some(UserResearchBanner(url = appConfig.urBannerUrl, language = if(messages.lang.code == "en") En else Cy))
+  urBanner = Some(UrBannerUtil.getUrBanner(hideCloseButton = false))
 ) {
 
     <h1 id="top" class="govuk-heading-xl">@messages("submittedReturns.title")</h1>
