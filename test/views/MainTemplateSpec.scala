@@ -18,11 +18,13 @@ package views
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.scalatest.BeforeAndAfterEach
 import play.twirl.api.Html
 import uk.gov.hmrc.hmrcfrontend.views.viewmodels.userresearchbanner.UserResearchBanner
+import views.helpers.UrBannerUtil
 import views.html.MainTemplate
 
-class MainTemplateSpec extends ViewBaseSpec {
+class MainTemplateSpec extends ViewBaseSpec with BeforeAndAfterEach {
 
   val injectedView: MainTemplate = inject[MainTemplate]
   val userBannerHeading: String = "Help make GOV.UK better"
@@ -32,6 +34,7 @@ class MainTemplateSpec extends ViewBaseSpec {
     val serviceNameNoUserType: String = ".govuk-service-navigation__text"
     val userResearchBanner: String = ".hmrc-user-research-banner"
     val userResearchBannerHeading = ".hmrc-user-research-banner__title"
+    val userResearchBannerCloseButton = ".hmrc-user-research-banner__close"
   }
 
   val userResearchBanner = Some(UserResearchBanner(url = "http://test"))
@@ -39,6 +42,7 @@ class MainTemplateSpec extends ViewBaseSpec {
   "MainTemplate" when {
 
     "the showUserResearchBanner feature switch is turned off" when {
+      mockConfig.features.showUserResearchBannerEnabled(false)
 
       "the user is an Agent" should {
 
@@ -176,6 +180,44 @@ class MainTemplateSpec extends ViewBaseSpec {
           implicit val document: Document = Jsoup.parse(view.body)
           elementExtinct(Selectors.userResearchBannerHeading)
         }
+      }
+    }
+
+    "the showUserResearchBanner feature switch is turned on and the page has a ur banner with a close button" should {
+
+      "display the user research banner link with the configured url" in {
+        mockConfig.features.showUserResearchBannerEnabled(true)
+        val urBanner = UrBannerUtil.getUrBanner(hideCloseButton = false)(mockConfig, messages)
+        val view = injectedView(pageTitle = "", user = Some(user), urBanner = Some(urBanner))(Html("Test"))(request, messages, mockConfig)
+        implicit val document: Document = Jsoup.parse(view.body)
+        element(s"${Selectors.userResearchBanner} a").attr("href") shouldBe mockConfig.urBannerUrl
+      }
+
+      "display the close button" in {
+        mockConfig.features.showUserResearchBannerEnabled(true)
+        val urBanner = UrBannerUtil.getUrBanner(hideCloseButton = false)(mockConfig, messages)
+        val view = injectedView(pageTitle = "", user = Some(user), urBanner = Some(urBanner))(Html("Test"))(request, messages, mockConfig)
+        implicit val document: Document = Jsoup.parse(view.body)
+        document.select(Selectors.userResearchBannerCloseButton).size shouldBe 1
+      }
+    }
+
+    "the showUserResearchBanner feature switch is turned on and the page has a ur banner without a close button" should {
+
+      "display the correct user research banner heading" in {
+        mockConfig.features.showUserResearchBannerEnabled(true)
+        val urBanner = UrBannerUtil.getUrBanner()(mockConfig, messages)
+        val view = injectedView(pageTitle = "", user = Some(user), urBanner = Some(urBanner))(Html("Test"))(request, messages, mockConfig)
+        implicit val document: Document = Jsoup.parse(view.body)
+        elementText(Selectors.userResearchBannerHeading) shouldBe userBannerHeading
+      }
+
+      "not display the close button" in {
+        mockConfig.features.showUserResearchBannerEnabled(true)
+        val urBanner = UrBannerUtil.getUrBanner()(mockConfig, messages)
+        val view = injectedView(pageTitle = "", user = Some(user), urBanner = Some(urBanner))(Html("Test"))(request, messages, mockConfig)
+        implicit val document: Document = Jsoup.parse(view.body)
+        elementExtinct(Selectors.userResearchBannerCloseButton)
       }
     }
   }
