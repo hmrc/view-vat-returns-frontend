@@ -27,7 +27,7 @@ import views.html.MainTemplate
 class MainTemplateSpec extends ViewBaseSpec with BeforeAndAfterEach {
 
   val injectedView: MainTemplate = inject[MainTemplate]
-  val userBannerHeading: String = "Help make GOV.UK better"
+  val userBannerHeading: String = "You may receive a voucher for feedback"
 
   object Selectors {
     val serviceName: String = ".govuk-service-navigation__link"

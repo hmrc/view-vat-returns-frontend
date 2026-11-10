@@ -20,7 +20,7 @@ import common.EnrolmentKeys._
 import common.SessionKeys
 import common.SessionKeys.{mtdVatvcClientVrn, mtdVatvcSubmittedReturn}
 import mocks.MockAuth
-import models.User
+import models.{ListLinks, ServiceNavigationInfo, User}
 import org.apache.pekko.actor.ActorSystem
 import play.api.http.Status.FORBIDDEN
 import play.api.mvc._
@@ -40,6 +40,11 @@ class ControllerBaseSpec extends MockAuth {
 
   implicit val system: ActorSystem = ActorSystem()
   implicit val hc: HeaderCarrier = HeaderCarrier()
+
+  val navBarLinks: Seq[ListLinks] = Seq(
+    ListLinks("Home", "test-url.com"),
+  )
+  val serviceInfoPartial: Option[ServiceNavigationInfo] = Some(ServiceNavigationInfo(navLinks = navBarLinks))
 
   def fakeRequestToPOSTWithSession(input: (String, String)*): FakeRequest[AnyContentAsFormUrlEncoded] =
     fakeRequestWithSession.withFormUrlEncodedBody(input: _*)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,15 +47,18 @@ lazy val coverageSettings: Seq[Setting[?]] = {
   )
 }
 
+val playfrontendHmrcVersion: String = "13.11.0"
+val bootstrapPlayVersion: String = "10.7.0"
+
 val compile = Seq(
   ws,
-  "uk.gov.hmrc"       %% "bootstrap-frontend-play-30" % "10.1.0",
-  "uk.gov.hmrc"       %% "play-frontend-hmrc-play-30" % "12.32.0"
+  "uk.gov.hmrc"       %% "bootstrap-frontend-play-30" % bootstrapPlayVersion,
+  "uk.gov.hmrc"       %% "play-frontend-hmrc-play-30" % playfrontendHmrcVersion
 )
 
 def test(scope: String = "test"): Seq[ModuleID] = Seq(
-  "uk.gov.hmrc"             %% "bootstrap-test-play-30"       % "10.1.0"          % scope,
-  "org.scalamock"           %% "scalamock"                    % "7.3.0"           % scope
+  "uk.gov.hmrc"             %% "bootstrap-test-play-30"       % bootstrapPlayVersion  % scope,
+  "org.scalamock"           %% "scalamock"                    % "7.3.2"               % scope
 )
 
 TwirlKeys.templateImports ++= Seq(

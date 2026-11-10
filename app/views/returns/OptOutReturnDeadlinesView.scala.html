@@ -19,6 +19,7 @@
 @import views.html.templates.formatters.dates._
 @import java.time.LocalDate
 @import views.helpers.UrBannerUtil
+@import models.ServiceNavigationInfo
 
 @this(mainTemplate: MainTemplate,
       govukBreadcrumbs: GovukBreadcrumbs,
@@ -29,7 +30,7 @@
 
 @(deadlines: Seq[ReturnDeadlineViewModel],
     currentDate: LocalDate,
-    serviceInfoContent: Html = HtmlFormat.empty,
+    serviceInfoContent: Option[ServiceNavigationInfo],
     mandationStatus: String)(
     implicit request: Request[_], messages: Messages, appConfig: config.AppConfig, user: User)
 

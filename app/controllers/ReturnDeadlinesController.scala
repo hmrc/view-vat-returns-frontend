@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,21 @@
 
 package controllers
 
-import java.time.LocalDate
 import audit.AuditingService
 import audit.models.ViewOpenVatObligationsAuditModel
 import common.MandationStatuses._
 import common.SessionKeys
 import config.{AppConfig, ServiceErrorHandler}
-import javax.inject.{Inject, Singleton}
 import models._
 import models.viewModels.ReturnDeadlineViewModel
 import play.api.mvc._
-import play.twirl.api.Html
 import services.{DateService, ReturnsService, ServiceInfoService, SubscriptionService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import utils.LoggerUtil
 import views.html.returns.{NoUpcomingReturnDeadlinesView, OptOutReturnDeadlinesView, ReturnDeadlinesView}
+
+import java.time.LocalDate
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -83,7 +83,7 @@ class ReturnDeadlinesController @Inject()(mcc: MessagesControllerComponents,
       }
   }
 
-  private[controllers] def noUpcomingObligationsAction(serviceInfoContent: Html, currentDate: LocalDate)
+  private[controllers] def noUpcomingObligationsAction(serviceInfoContent: Option[ServiceNavigationInfo], currentDate: LocalDate)
                                                       (implicit request: MessagesRequest[AnyContent],
                                                        user: User): Future[Result] = {
 
@@ -103,7 +103,7 @@ class ReturnDeadlinesController @Inject()(mcc: MessagesControllerComponents,
   }
 
   private[controllers] def upcomingObligationsAction(obligations: Seq[ReturnDeadlineViewModel],
-                                                     serviceInfoContent: Html)
+                                                     serviceInfoContent: Option[ServiceNavigationInfo])
                                                     (implicit user: User,
                                                      request: MessagesRequest[AnyContent]): Future[Result] = {
 

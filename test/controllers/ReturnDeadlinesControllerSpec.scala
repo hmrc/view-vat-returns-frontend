@@ -598,7 +598,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
       lazy val result = {
         (mockVatReturnService.getLastObligation(_: Seq[VatReturnObligation])).expects(*).returns(obligation)
         callFulfilledObligations(exampleObligations)
-        controller.noUpcomingObligationsAction(Html(""), LocalDate.parse("2018-01-01"))(request(), user)
+        controller.noUpcomingObligationsAction(serviceInfoPartial, LocalDate.parse("2018-01-01"))(request(), user)
       }
 
       "return 200" in {
@@ -610,7 +610,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
 
       lazy val result = {
         callFulfilledObligations(Left(ObligationError))
-        controller.noUpcomingObligationsAction(Html(""), LocalDate.parse("2018-01-01"))(request(), user)
+        controller.noUpcomingObligationsAction(serviceInfoPartial, LocalDate.parse("2018-01-01"))(request(), user)
       }
 
       "return 500" in {
@@ -625,7 +625,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
 
       lazy val result = {
         callDateService()
-        controller.upcomingObligationsAction(Seq(returnDeadlinesModel), Html(""))(user, request(mandationRequest))
+        controller.upcomingObligationsAction(Seq(returnDeadlinesModel), serviceInfoPartial)(user, request(mandationRequest))
       }
 
       "return 200" in {
@@ -637,7 +637,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
 
       lazy val result = {
         callSubscriptionService(Some(customerInformationMax))
-        controller.upcomingObligationsAction(Seq(returnDeadlinesModel), Html(""))(user, request())
+        controller.upcomingObligationsAction(Seq(returnDeadlinesModel), serviceInfoPartial)(user, request())
       }
 
       "VAT subscription call is a success" should {
@@ -656,7 +656,7 @@ class ReturnDeadlinesControllerSpec extends ControllerBaseSpec {
 
         lazy val result = {
           callSubscriptionService(None)
-          controller.upcomingObligationsAction(Seq(returnDeadlinesModel), Html(""))(user, request())
+          controller.upcomingObligationsAction(Seq(returnDeadlinesModel), serviceInfoPartial)(user, request())
         }
 
         "return an Internal Server Error (500)" in {

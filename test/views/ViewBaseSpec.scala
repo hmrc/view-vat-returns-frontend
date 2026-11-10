@@ -18,7 +18,7 @@ package views
 
 import common.SessionKeys
 import mocks.MockAppConfig
-import models.User
+import models.{ListLinks, ServiceNavigationInfo, User}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 import org.scalatest.Assertion
@@ -42,6 +42,11 @@ class ViewBaseSpec extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuit
     FakeRequest().withSession(SessionKeys.mtdVatvcClientVrn -> vrn)
   implicit val user: User = User(vrn)
   lazy val agentUser: User = User(vrn, active = true, hasNonMtdVat = true, Some(arn))
+
+  val navBarLinks: Seq[ListLinks] = Seq(
+    ListLinks("Home", "test-url.com"),
+  )
+  val serviceInfoPartial: Option[ServiceNavigationInfo] = Some(ServiceNavigationInfo(navLinks = navBarLinks))
 
   def element(cssSelector: String)(implicit document: Document): Element = {
     val elements = document.select(cssSelector)

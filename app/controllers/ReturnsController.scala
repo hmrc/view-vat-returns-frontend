@@ -20,19 +20,19 @@ import audit.AuditingService
 import audit.models.ViewVatReturnAuditModel
 import common.SessionKeys
 import config.{AppConfig, ServiceErrorHandler}
-import javax.inject.{Inject, Singleton}
 import models._
 import models.errors.NotFoundError
 import models.payments.Payment
 import models.viewModels.VatReturnViewModel
 import play.api.mvc._
-import play.twirl.api.HtmlFormat
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import utils.LoggerUtil
 import views.html.errors.PreMtdReturnView
 import views.html.returns.VatReturnDetailsView
+
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -99,7 +99,7 @@ class ReturnsController @Inject()(mcc: MessagesControllerComponents,
             customerInfo <- entityNameCall
             payment <- financialDataCall
             obligation <- obligationCall(payment)
-            serviceInfoContent <- if(user.isAgent) Future.successful(HtmlFormat.empty) else serviceInfoService.getServiceInfoPartial
+            serviceInfoContent <- if(user.isAgent) Future.successful(Some(ServiceNavigationInfo.apply())) else serviceInfoService.getServiceInfoPartial
           } yield ReturnsControllerData(vatReturnResult, customerInfo, payment, obligation, serviceInfoContent))
             .flatMap(pageData => renderResult(pageData, isReturnsPageRequest, numericPeriodKey(periodKey)))
 
@@ -154,16 +154,12 @@ class ReturnsController @Inject()(mcc: MessagesControllerComponents,
   }
 
   private def auditEvent(isReturnsPageRequest: Boolean, data: VatReturnViewModel)(implicit user: User, hc: HeaderCarrier): Unit = {
-
     val periodKey = data.vatReturnDetails.vatReturn.periodKey
-
     val auditPath = if (isReturnsPageRequest) {
       routes.ReturnsController.vatReturn(data.periodFrom.getYear, periodKey).url
-    }
-    else {
+    } else {
       routes.ReturnsController.vatReturnViaPayments(periodKey).url
     }
-
     auditService.audit(ViewVatReturnAuditModel(user, data), auditPath)
   }
 

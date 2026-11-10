@@ -65,7 +65,7 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
         )
       )
 
-      lazy val view = injectedView(singleDeadline, Html(""), None)
+      lazy val view = injectedView(singleDeadline, serviceInfoPartial, None)
       lazy implicit val document: Document = Jsoup.parse(view.body)
       "render the breadcrumbs which" should {
 
@@ -157,7 +157,7 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
         )
       )
 
-      lazy val view = injectedView(multipleDeadlines, Html(""), None)
+      lazy val view = injectedView(multipleDeadlines, serviceInfoPartial, None)
       lazy implicit val document: Document = Jsoup.parse(view.body)
 
       "have the correct obligation due date for the first deadline" in {
@@ -212,7 +212,7 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
         )
       )
 
-      lazy val view = injectedView(finalReturnDeadline, Html(""), None)
+      lazy val view = injectedView(finalReturnDeadline, serviceInfoPartial, None)
       lazy implicit val document: Document = Jsoup.parse(view.body)
 
       "have the correct obligation due date for the deadline" in {
@@ -247,7 +247,7 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
       )
     )
     implicit val user: User = agentUser
-    lazy val view = injectedView(singleDeadline, Html(""), Some("Ancient Antiques"))
+    lazy val view = injectedView(singleDeadline, serviceInfoPartial, Some("Ancient Antiques"))
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct title" in {
@@ -328,7 +328,7 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
 
       lazy val view = {
         mockConfig.features.webchatEnabled(true)
-        injectedView(singleDeadline, Html(""), None)
+        injectedView(singleDeadline, serviceInfoPartial, None)
       }
 
       lazy implicit val document: Document = Jsoup.parse(view.body)
@@ -350,7 +350,7 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
 
       lazy val view = {
         mockConfig.features.webchatEnabled(true)
-        injectedView(singleDeadline, Html(""), None)(request, messages, mockConfig, agentUser)
+        injectedView(singleDeadline, serviceInfoPartial, None)(request, messages, mockConfig, agentUser)
       }
 
 
@@ -375,7 +375,7 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
 
       lazy val view = {
         mockConfig.features.webchatEnabled(false)
-        injectedView(singleDeadline, Html(""), None)
+        injectedView(singleDeadline, serviceInfoPartial, None)
       }
 
       lazy implicit val document: Document = Jsoup.parse(view.body)
@@ -396,7 +396,7 @@ class ReturnDeadlinesViewSpec extends ViewBaseSpec {
 
       lazy val view = {
         mockConfig.features.webchatEnabled(false)
-        injectedView(singleDeadline, Html(""), None)(request, messages, mockConfig, agentUser)
+        injectedView(singleDeadline, serviceInfoPartial, None)(request, messages, mockConfig, agentUser)
       }
 
 
