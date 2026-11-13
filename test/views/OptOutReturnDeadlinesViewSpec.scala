@@ -68,7 +68,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
 
       val currentDate = LocalDate.parse("2018-01-02")
 
-      lazy val view = injectedView(singleDeadline, currentDate, Html(""),"Non MTDfB")
+      lazy val view = injectedView(singleDeadline, currentDate, serviceInfoPartial,"Non MTDfB")
       lazy implicit val document: Document = Jsoup.parse(view.body)
 
       "render the breadcrumbs which" should {
@@ -136,7 +136,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
 
       val currentDate = LocalDate.parse("2018-12-30")
 
-      lazy val view = injectedView(singleDeadline, currentDate, Html(""),"Non MTDfB")
+      lazy val view = injectedView(singleDeadline, currentDate, serviceInfoPartial,"Non MTDfB")
       lazy implicit val document: Document = Jsoup.parse(view.body)
 
       "show text regarding when return can be submitted" in {
@@ -165,7 +165,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
         )
       )
 
-      lazy val view = injectedView(singleDeadline, currentDate, Html(""), "Non MTDfB")
+      lazy val view = injectedView(singleDeadline, currentDate, serviceInfoPartial, "Non MTDfB")
       lazy implicit val document: Document = Jsoup.parse(view.body)
 
       "show text regarding when return can be submitted" in {
@@ -197,7 +197,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
 
       val currentDate = LocalDate.parse("2018-01-02")
 
-      lazy val view = injectedView(singleDeadline, currentDate, Html(""), "MTDfB")(
+      lazy val view = injectedView(singleDeadline, currentDate, serviceInfoPartial, "MTDfB")(
         fakeRequestWithClientsVRN, messages, mockConfig, agentUser
       )
       lazy implicit val document: Document = Jsoup.parse(view.body)
@@ -254,7 +254,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
 
       val currentDate = LocalDate.parse("2018-12-30")
 
-      lazy val view = injectedView(singleDeadline, currentDate, Html(""),"MTDfB")
+      lazy val view = injectedView(singleDeadline, currentDate, serviceInfoPartial,"MTDfB")
       lazy implicit val document: Document = Jsoup.parse(view.body)
 
       "show text regarding when return can be submitted" in {
@@ -283,7 +283,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
         )
       )
 
-      lazy val view = injectedView(singleDeadline, currentDate, Html(""), "MTDfB")
+      lazy val view = injectedView(singleDeadline, currentDate, serviceInfoPartial, "MTDfB")
       lazy implicit val document: Document = Jsoup.parse(view.body)
 
       "show text regarding when return can be submitted" in {
@@ -320,7 +320,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
 
     val currentDate = LocalDate.parse("2018-01-02")
 
-    lazy val view = injectedView(multipleDeadlines, currentDate, Html(""), "MTDfB")
+    lazy val view = injectedView(multipleDeadlines, currentDate, serviceInfoPartial, "MTDfB")
 
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
@@ -378,7 +378,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
 
     val currentDate = LocalDate.parse("2018-01-02")
 
-    lazy val view = injectedView(finalReturnDeadline, currentDate, Html(""), "MTDfB")
+    lazy val view = injectedView(finalReturnDeadline, currentDate, serviceInfoPartial, "MTDfB")
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct obligation due date for the deadline" in {
@@ -410,7 +410,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
 
       val currentDate = LocalDate.parse("2018-01-02")
 
-      lazy val view = injectedView(finalReturnDeadline, currentDate, Html(""), "MTDfB")
+      lazy val view = injectedView(finalReturnDeadline, currentDate, serviceInfoPartial, "MTDfB")
 
 
       lazy implicit val document: Document = Jsoup.parse(view.body)
@@ -436,7 +436,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
       lazy val view = injectedView(
         deadlines = finalReturnDeadline,
         currentDate = currentDate,
-        serviceInfoContent = Html(""),
+        serviceInfoContent = serviceInfoPartial,
         mandationStatus = "MTDfB")(request, messages, mockConfig, agentUser)
 
 
@@ -463,7 +463,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
 
       val currentDate = LocalDate.parse("2018-01-02")
 
-      lazy val view = injectedView(finalReturnDeadline, currentDate, Html(""), "MTDfB")
+      lazy val view = injectedView(finalReturnDeadline, currentDate, serviceInfoPartial, "MTDfB")
 
       lazy implicit val document: Document = Jsoup.parse(view.body)
 
@@ -487,7 +487,7 @@ class OptOutReturnDeadlinesViewSpec extends ViewBaseSpec {
       lazy val view = injectedView(
         deadlines = finalReturnDeadline,
         currentDate = currentDate,
-        serviceInfoContent = Html(""),
+        serviceInfoContent = serviceInfoPartial,
         mandationStatus = "MTDfB")(request, messages, mockConfig, agentUser)
 
 

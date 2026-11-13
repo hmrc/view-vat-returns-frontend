@@ -532,7 +532,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
 
     "there is a VAT return, obligation and payment" when {
 
-      val data = ReturnsControllerData(Right(exampleVatReturn), None, Some(examplePayment), Some(exampleObligation), Html(""))
+      val data = ReturnsControllerData(Right(exampleVatReturn), None, Some(examplePayment), Some(exampleObligation), serviceInfoPartial)
 
       lazy val result = {
         callConstructReturnDetailsModel(exampleVatReturnDetails)
@@ -550,7 +550,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       "the period key is not all numeric" should {
 
         "return a Not Found status" in {
-          val data = ReturnsControllerData(Left(NotFoundError), None, None, None, Html(""))
+          val data = ReturnsControllerData(Left(NotFoundError), None, None, None, serviceInfoPartial)
           lazy val result = controller.renderResult(data, isReturnsPageRequest = true,
             isNumericPeriodKey = false)(request(), user)
           status(result) shouldBe Status.NOT_FOUND
@@ -560,7 +560,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       "the period key is all numeric" should {
 
         "return a Not Found status" in {
-          val data = ReturnsControllerData(Left(NotFoundError), None, None, None, Html(""))
+          val data = ReturnsControllerData(Left(NotFoundError), None, None, None, serviceInfoPartial)
           lazy val result = controller.renderResult(data, isReturnsPageRequest = true,
             isNumericPeriodKey = true)(request(), user)
           status(result) shouldBe Status.NOT_FOUND
@@ -571,7 +571,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     "there is a VAT return but no obligation" should {
 
       "return an 303(SEE OTHER) status if user has come from the submission journey" in {
-        val data = ReturnsControllerData(Right(exampleVatReturn), None, None, None, Html(""))
+        val data = ReturnsControllerData(Right(exampleVatReturn), None, None, None, serviceInfoPartial)
         lazy val result = controller.renderResult(data, isReturnsPageRequest = true,
           isNumericPeriodKey = false)(request(fakeRequest.withSession(SessionKeys.submissionYear -> "true",
           SessionKeys.inSessionPeriodKey -> "true")), user)
@@ -579,7 +579,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       }
 
       "is a pre-mtd return" should {
-        val data = ReturnsControllerData(Right(exampleVatReturn), None, None, None, Html(""))
+        val data = ReturnsControllerData(Right(exampleVatReturn), None, None, None, serviceInfoPartial)
         lazy val result = controller.renderResult(data, isReturnsPageRequest = true,
           isNumericPeriodKey = true)(request(), user)
 
@@ -593,7 +593,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
       }
 
       "is not a pre-mtd return" should {
-        val data = ReturnsControllerData(Right(exampleVatReturn), None, None, None, Html(""))
+        val data = ReturnsControllerData(Right(exampleVatReturn), None, None, None, serviceInfoPartial)
         lazy val result = controller.renderResult(data, isReturnsPageRequest = true,
           isNumericPeriodKey = false)(request(), user)
 
@@ -610,7 +610,7 @@ class ReturnsControllerSpec extends ControllerBaseSpec {
     "there is any other combination" should {
 
       "return an Internal Server Error status" in {
-        val data = ReturnsControllerData(Left(VatReturnError), None, None, None, Html(""))
+        val data = ReturnsControllerData(Left(VatReturnError), None, None, None, serviceInfoPartial)
         lazy val result = controller.renderResult(data, isReturnsPageRequest = true,
           isNumericPeriodKey = false)(request(), user)
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR

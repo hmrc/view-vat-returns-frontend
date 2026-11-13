@@ -19,43 +19,42 @@ package services
 import common.TestModels.navContent
 import connectors.ServiceInfoConnector
 import controllers.ControllerBaseSpec
-import models.{ListLinks, User}
+import models.{ListLinks, ServiceNavigationInfo, User}
 import play.api.i18n.{Lang, Messages, MessagesImpl}
-import play.twirl.api.{Html, HtmlFormat}
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import uk.gov.hmrc.http.HeaderCarrier
-import views.html.templates.BTALinksView
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class ServiceInfoServiceSpec extends ControllerBaseSpec {
 
   val mockConnector: ServiceInfoConnector = mock[ServiceInfoConnector]
-  val btaLinks: BTALinksView = inject[BTALinksView]
-  val service: ServiceInfoService = new ServiceInfoService(mockConnector, btaLinks)
+  val service: ServiceInfoService = new ServiceInfoService(mockConnector)
   val agentUser: User = User("123123123", arn = Some("XARN1234567"))
 
   ".getServiceInfoPartial" should {
+
+    val listLinks = Seq(
+      ListLinks(navContent.home.en, navContent.home.url),
+      ListLinks(navContent.account.en, navContent.account.url),
+      ListLinks(navContent.messages.en, navContent.messages.url, navContent.messages.alerts.map(_.toString)),
+      ListLinks(navContent.help.en, navContent.help.url)
+    )
 
     "return the BTA nav HTML for principal users" in {
       (mockConnector.getNavLinks()(_: HeaderCarrier, _: ExecutionContext))
         .expects(*, *)
         .returning(Future.successful(Some(navContent)))
-      val listLinks = Seq(
-        ListLinks(navContent.home.en, navContent.home.url),
-        ListLinks(navContent.account.en, navContent.account.url),
-        ListLinks(navContent.messages.en, navContent.messages.url, navContent.messages.alerts.map(_.toString)),
-        ListLinks(navContent.help.en, navContent.help.url)
-      )
-      val result: Html = await(service.getServiceInfoPartial(user, hc, ec, messages))
-      val expectedResult: Html = btaLinks(listLinks)
 
-      result.body shouldBe expectedResult.body
+      val result: Option[ServiceNavigationInfo] = await(service.getServiceInfoPartial(user, hc, ec, messages))
+      val expectedResult: Option[ServiceNavigationInfo] = Some(ServiceNavigationInfo(navLinks = listLinks))
+
+      result shouldBe expectedResult
     }
 
     "return empty HTML for agents" in {
-      val result: Html = await(service.getServiceInfoPartial(agentUser, hc, ec, messages))
-      val expectedResult: Html = HtmlFormat.empty
+      val result: Option[ServiceNavigationInfo] = await(service.getServiceInfoPartial(agentUser, hc, ec, messages))
+      val expectedResult: Option[ServiceNavigationInfo] = Some(ServiceNavigationInfo.apply())
 
       result shouldBe expectedResult
     }

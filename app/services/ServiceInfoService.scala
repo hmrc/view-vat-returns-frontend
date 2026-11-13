@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,36 +17,28 @@
 package services
 
 import connectors.ServiceInfoConnector
-
-import javax.inject.{Inject, Singleton}
-import models.{ListLinks, NavContent, User}
+import models.{ListLinks, NavContent, ServiceNavigationInfo, User}
 import play.api.http.HeaderNames
 import play.api.i18n.{Lang, Messages}
-import play.twirl.api.{Html, HtmlFormat}
 import uk.gov.hmrc.http.HeaderCarrier
-import views.html.templates.BTALinksView
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ServiceInfoService @Inject()(serviceInfoConnector: ServiceInfoConnector, btaLinks: BTALinksView) {
+class ServiceInfoService @Inject()(serviceInfoConnector: ServiceInfoConnector) {
 
-  def getServiceInfoPartial(implicit user: User, hc: HeaderCarrier, ec: ExecutionContext, messages: Messages): Future[Html] =
+  def getServiceInfoPartial(implicit user: User, hc: HeaderCarrier, ec: ExecutionContext, messages: Messages): Future[Option[ServiceNavigationInfo]] =
     if(user.isAgent){
-      Future.successful(HtmlFormat.empty)
+      Future.successful(Some(ServiceNavigationInfo.apply()))
     } else {
-      val hcWithCookie = hc.copy(extraHeaders = hc.headers(Seq(HeaderNames.COOKIE)))
-      serviceInfoConnector.getNavLinks()(hcWithCookie, ec).map { links =>
-        val listLinks = partialList(links)
-        btaLinks(listLinks)
-      }
-    }
-
-  def notificationBadgeCount(messageCount: Int): String =
-    messageCount match {
-      case 0 => "0"
-      case count if count > 99  => "+99"
-      case _ => s"$messageCount"
+        val hcWithCookie = hc.copy(extraHeaders = hc.headers(Seq(HeaderNames.COOKIE)))
+        val mayBeNavLinks = serviceInfoConnector.getNavLinks()(hcWithCookie, ec)
+        for {
+          navLinks <- mayBeNavLinks
+        } yield {
+        Some(ServiceNavigationInfo(navLinks = partialList(navLinks)))
+        }
     }
 
   def partialList(navLinks: Option[NavContent])(implicit messages: Messages): Seq[ListLinks] =
@@ -69,4 +61,12 @@ class ServiceInfoService @Inject()(serviceInfoConnector: ServiceInfoConnector, b
         }
       case None => Seq()
     }
+
+  def notificationBadgeCount(messageCount: Int): String =
+    messageCount match {
+      case 0 => "0"
+      case count if count > 99  => "+99"
+      case _ => s"$messageCount"
+    }
+
 }

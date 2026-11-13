@@ -16,7 +16,6 @@
 
 package mocks
 
-import java.time.LocalDate
 import audit.AuditingService
 import audit.models.{AuditModel, ExtendedAuditModel}
 import config.{AppConfig, ServiceErrorHandler}
@@ -26,7 +25,7 @@ import controllers.AuthorisedController
 import controllers.predicate.AuthoriseAgentWithClient
 import models.Obligation.Status
 import models.payments.Payment
-import models.{Obligation, _}
+import models._
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.should.Matchers
@@ -35,13 +34,14 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.i18n.{Lang, Messages, MessagesApi, MessagesImpl}
 import play.api.mvc.MessagesControllerComponents
 import play.api.test.Injecting
-import play.twirl.api.Html
 import services._
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.{Retrieval, ~}
 import uk.gov.hmrc.auth.core.{AffinityGroup, AuthConnector, Enrolments}
 import uk.gov.hmrc.http.HeaderCarrier
 import views.html.errors.{InsolventUnauthView, UnauthorisedView}
+
+import java.time.LocalDate
 import scala.concurrent.{ExecutionContext, Future}
 
 trait MockAuth extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite with BeforeAndAfterEach with
@@ -136,7 +136,7 @@ trait MockAuth extends AnyWordSpecLike with Matchers with GuiceOneAppPerSuite wi
   def callServiceInfoPartialService: Any =
     (mockServiceInfoService.getServiceInfoPartial(_: User, _: HeaderCarrier, _: ExecutionContext, _: Messages))
       .expects(*, *, *, *)
-      .returns(Future.successful(Html("")))
+      .returns(Future.successful(Some(ServiceNavigationInfo.apply())))
 
   def callAuthService(response: Future[~[Enrolments, Option[AffinityGroup]]]): Any =
     (mockAuthConnector.authorise(_: Predicate, _: Retrieval[~[Enrolments, Option[AffinityGroup]]])

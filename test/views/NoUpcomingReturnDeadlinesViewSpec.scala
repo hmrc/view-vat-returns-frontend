@@ -17,13 +17,12 @@
 package views
 
 import models.User
-
-import java.time.LocalDate
 import models.viewModels.ReturnDeadlineViewModel
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import play.twirl.api.Html
 import views.html.returns.NoUpcomingReturnDeadlinesView
+
+import java.time.LocalDate
 
 class NoUpcomingReturnDeadlinesViewSpec extends ViewBaseSpec {
 
@@ -41,7 +40,6 @@ class NoUpcomingReturnDeadlinesViewSpec extends ViewBaseSpec {
     val noReturnsDue = "#no-returns"
     val caption = "#content > span"
     val backLink = "body > div.govuk-width-container > a"
-
   }
 
   "The Return deadlines page for a principal user" should {
@@ -49,7 +47,7 @@ class NoUpcomingReturnDeadlinesViewSpec extends ViewBaseSpec {
     "Render the Return deadlines page with no fulfilled obligations" should {
 
       val noFulfilledObligation = None
-      lazy val view = injectedView(noFulfilledObligation, Html(""), None, "")
+      lazy val view = injectedView(noFulfilledObligation, serviceInfoPartial, None, "")
       lazy implicit val document: Document = Jsoup.parse(view.body)
 
       "render the breadcrumbs which" should {
@@ -91,7 +89,7 @@ class NoUpcomingReturnDeadlinesViewSpec extends ViewBaseSpec {
         due = LocalDate.parse("2018-05-01"),
         periodKey = "18CC"
       ))
-      lazy val view = injectedView(fulfilledObligation, Html(""), None, "Non MTDfB")
+      lazy val view = injectedView(fulfilledObligation, serviceInfoPartial, None, "Non MTDfB")
       lazy implicit val document: Document = Jsoup.parse(view.body)
 
       "have the correct text for no deadlines" in {
@@ -125,7 +123,7 @@ class NoUpcomingReturnDeadlinesViewSpec extends ViewBaseSpec {
     ))
 
     implicit val user: User = agentUser
-    lazy val view = injectedView(fulfilledObligation, Html(""), Some("Ancient Antiques"), "")
+    lazy val view = injectedView(fulfilledObligation, serviceInfoPartial, Some("Ancient Antiques"), "")
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct title" in {

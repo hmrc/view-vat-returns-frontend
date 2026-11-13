@@ -112,7 +112,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
 
   "Rendering the vat return details page from the returns route with flat rate scheme enabled" should {
 
-    lazy val view = injectedView(vatReturnViewModel)
+    lazy val view = injectedView(vatReturnViewModel, serviceInfoPartial)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct document title" in {
@@ -230,7 +230,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
 
   "Rendering the vat return details page from the returns route with flat rate scheme for an agent" should {
 
-    lazy val view = injectedView(vatReturnViewModel)(
+    lazy val view = injectedView(vatReturnViewModel, serviceInfoPartial)(
       fakeRequestWithClientsVRN, messages, mockConfig, agentUser)
 
     lazy implicit val document: Document = Jsoup.parse(view.body)
@@ -266,7 +266,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
 
     val vatReturnViewModelWithoutFlatRate = vatReturnViewModel.copy(hasFlatRateScheme = false)
 
-    lazy val view = injectedView(vatReturnViewModelWithoutFlatRate)
+    lazy val view = injectedView(vatReturnViewModelWithoutFlatRate, serviceInfoPartial)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct box 6 description in the table" in {
@@ -283,7 +283,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
       showReturnsBreadcrumb = false
     )
 
-    lazy val view = injectedView(vatReturnViewModelNoOwed)
+    lazy val view = injectedView(vatReturnViewModelNoOwed, serviceInfoPartial)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "render a breadcrumb for the payments page" should {
@@ -322,7 +322,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
       showReturnsBreadcrumb = false
     )
 
-    lazy val view = injectedView(vatReturnViewModelMoneyOwed)
+    lazy val view = injectedView(vatReturnViewModelMoneyOwed, serviceInfoPartial)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct subheading" in {
@@ -362,7 +362,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
       showReturnsBreadcrumb = false
     )
 
-    lazy val view = injectedView(vatReturnViewModelHmrcOwes)
+    lazy val view = injectedView(vatReturnViewModelHmrcOwes,serviceInfoPartial)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct subheading" in {
@@ -388,7 +388,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
       showReturnsBreadcrumb = false
     )
 
-    lazy val view = injectedView(vatReturnViewModelHmrcPaid)
+    lazy val view = injectedView(vatReturnViewModelHmrcPaid, serviceInfoPartial)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct subheading" in {
@@ -403,7 +403,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
       vatReturnDetails = returnDetails.copy(oweHmrc = None, payment = None)
     )
 
-    lazy val view = injectedView(vatReturnViewModelNoCharge)
+    lazy val view = injectedView(vatReturnViewModelNoCharge, serviceInfoPartial)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the correct subheading" in {
@@ -416,7 +416,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
 
     val vatReturnViewModelNoEntityName = vatReturnViewModel.copy(entityName = None)
 
-    lazy val view = injectedView(vatReturnViewModelNoEntityName)
+    lazy val view = injectedView(vatReturnViewModelNoEntityName, serviceInfoPartial)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "not show the entity name in the page heading" in {
@@ -448,7 +448,7 @@ class VatReturnDetailsViewSpec extends ViewBaseSpec with BeforeAndAfterEach {
       )
     )
 
-    lazy val view = injectedView(vatReturnViewModelFinalReturn)
+    lazy val view = injectedView(vatReturnViewModelFinalReturn, serviceInfoPartial)
     lazy implicit val document: Document = Jsoup.parse(view.body)
 
     "have the pageHeading of 'Final return'" in {

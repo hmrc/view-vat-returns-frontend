@@ -34,3 +34,6 @@ case class NavContent(home: NavLinks,
 object NavContent {
   implicit val format: OFormat[NavContent] = Json.format[NavContent]
 }
+
+case class ServiceNavigationInfo(navLinks: Seq[ListLinks] = Seq(), activeTab: String = "home")
+

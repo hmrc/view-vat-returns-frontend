@@ -91,7 +91,8 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
                 vrn = vrn
               ),
               showInsolvencyContent = false,
-              recentlySubmittedReturn = false
+              recentlySubmittedReturn = false,
+              serviceInfoPartial
             )
 
             lazy implicit val document: Document = Jsoup.parse(view.body)
@@ -198,7 +199,8 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
                 vrn = vrn
               ),
               showInsolvencyContent = false,
-              recentlySubmittedReturn = false
+              recentlySubmittedReturn = false,
+              serviceInfoPartial
             )
 
             lazy implicit val document: Document = Jsoup.parse(view.body)
@@ -244,7 +246,8 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
           lazy val view = injectedView(
             VatReturnsViewModel(returnYears, exampleReturns, showPreviousReturnsTab = false, vrn),
             showInsolvencyContent = false,
-            recentlySubmittedReturn = false
+            recentlySubmittedReturn = false,
+            serviceInfoPartial
           )
 
           lazy implicit val document: Document = Jsoup.parse(view.body)
@@ -307,7 +310,8 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
           lazy val view = injectedView(
             VatReturnsViewModel(returnYears, exampleReturns, showPreviousReturnsTab = false, vrn),
             showInsolvencyContent = false,
-            recentlySubmittedReturn = false
+            recentlySubmittedReturn = false,
+            serviceInfoPartial
           )
 
           lazy implicit val document: Document = Jsoup.parse(view.body)
@@ -338,7 +342,8 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
           lazy val view = injectedView(
             VatReturnsViewModel(Seq(2018), Seq(), showPreviousReturnsTab = false, vrn),
             showInsolvencyContent = false,
-            recentlySubmittedReturn = false
+            recentlySubmittedReturn = false,
+            serviceInfoPartial
           )
 
           lazy implicit val document: Document = Jsoup.parse(view.body)
@@ -363,7 +368,8 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
         lazy val view = injectedView(
           VatReturnsViewModel(Seq(2018), Seq(), showPreviousReturnsTab = false, vrn),
           showInsolvencyContent = false,
-          recentlySubmittedReturn = true
+          recentlySubmittedReturn = true,
+          serviceInfoPartial
         )
 
         lazy implicit val document: Document = Jsoup.parse(view.body)
@@ -398,7 +404,8 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
           vrn = vrn
         ),
         showInsolvencyContent = true,
-        recentlySubmittedReturn = false
+        recentlySubmittedReturn = false,
+        serviceInfoPartial
       )
 
       lazy implicit val document: Document = Jsoup.parse(view.body)
@@ -443,7 +450,8 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
               vrn = vrn
             ),
             showInsolvencyContent = false,
-            recentlySubmittedReturn = false
+            recentlySubmittedReturn = false,
+            serviceInfoPartial
           )(fakeRequestWithClientsVRN, messages, mockConfig, agentUser)
 
           lazy implicit val document: Document = Jsoup.parse(view.body)
@@ -494,7 +502,8 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
           vrn = vrn
         ),
         showInsolvencyContent = false,
-        recentlySubmittedReturn = true
+        recentlySubmittedReturn = true,
+        serviceInfoPartial
       )(fakeRequestWithClientsVRN, messages, mockConfig, agentUser)
 
       lazy implicit val document: Document = Jsoup.parse(view.body)
@@ -533,7 +542,8 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
           lazy val view = injectedView(
             VatReturnsViewModel(returnYears, exampleReturns, showPreviousReturnsTab = true, vrn),
             showInsolvencyContent = false,
-            recentlySubmittedReturn = false
+            recentlySubmittedReturn = false,
+            serviceInfoPartial
           )
 
           lazy implicit val document: Document = Jsoup.parse(view.body)
@@ -597,7 +607,8 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
           lazy val view = injectedView(
             VatReturnsViewModel(returnYears, exampleReturns, showPreviousReturnsTab = true, vrn),
             showInsolvencyContent = false,
-            recentlySubmittedReturn = false
+            recentlySubmittedReturn = false,
+            serviceInfoPartial
           )
 
           lazy implicit val document: Document = Jsoup.parse(view.body)
@@ -679,7 +690,8 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
         lazy val view = injectedView(
           VatReturnsViewModel(returnYears, exampleReturns, showPreviousReturnsTab = true, vrn),
           showInsolvencyContent = false,
-          recentlySubmittedReturn = false
+          recentlySubmittedReturn = false,
+          serviceInfoPartial
         )
 
         lazy implicit val document: Document = Jsoup.parse(view.body)
@@ -751,7 +763,8 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
       lazy val view = injectedView(
         VatReturnsViewModel(returnYears, exampleReturns, showPreviousReturnsTab = true, vrn),
         showInsolvencyContent = false,
-        recentlySubmittedReturn = false
+        recentlySubmittedReturn = false,
+        serviceInfoPartial
       )(fakeRequestWithClientsVRN, messages, mockConfig, agentUser)
 
       lazy implicit val document: Document = Jsoup.parse(view.body)
@@ -824,7 +837,8 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
       lazy val view = injectedView(
         VatReturnsViewModel(returnYears, exampleReturns, showPreviousReturnsTab = true, vrn),
         showInsolvencyContent = false,
-        recentlySubmittedReturn = true
+        recentlySubmittedReturn = true,
+        serviceInfoPartial
       )(fakeRequestWithClientsVRN, messages, mockConfig, agentUser)
 
       lazy implicit val document: Document = Jsoup.parse(view.body)
@@ -848,7 +862,8 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
             vrn = vrn
           ),
           showInsolvencyContent = false,
-          recentlySubmittedReturn = false
+          recentlySubmittedReturn = false,
+          serviceInfoPartial
         )
 
 
@@ -869,7 +884,8 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
           vrn = vrn
         ),
         showInsolvencyContent = false,
-        recentlySubmittedReturn = false
+        recentlySubmittedReturn = false,
+        serviceInfoPartial
       )(request, messages, mockConfig, agentUser)
 
 
@@ -892,7 +908,8 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
           vrn = vrn
         ),
         showInsolvencyContent = false,
-        recentlySubmittedReturn = false
+        recentlySubmittedReturn = false,
+        serviceInfoPartial
       )
 
 
@@ -912,7 +929,8 @@ class SubmittedReturnsViewSpec extends ViewBaseSpec {
           vrn = vrn
         ),
         showInsolvencyContent = false,
-        recentlySubmittedReturn = false
+        recentlySubmittedReturn = false,
+        serviceInfoPartial
       )(request, messages, mockConfig, agentUser)
 
 
